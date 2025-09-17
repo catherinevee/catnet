@@ -8,7 +8,12 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(gh run list:*)",
-      "Bash(gh run view:*)"
+      "Bash(gh run view:*)",
+      "Bash(gh repo view:*)",
+      "Bash(gh workflow:*)",
+      "Bash(gh api:*)",
+      "Bash(actionlint:*)",
+      "Bash(gh run watch:*)"
     ],
     "deny": [],
     "ask": []
