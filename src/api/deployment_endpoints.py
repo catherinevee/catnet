@@ -95,7 +95,8 @@ async def dry_run_deployment(
     - Provides recommendations
     """
     logger.info(
-        f"Dry-run deployment requested by {current_user.username} for {len(request.device_ids)} devices"
+        f"Dry-run deployment requested by {current_user.username} "
+        f"for {len(request.device_ids)} devices"
     )
 
     try:

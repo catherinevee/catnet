@@ -8,6 +8,8 @@ from starlette.middleware.base import BaseHTTPMiddleware
 import hashlib
 import secrets
 import json
+import time
+import hmac
 
 from ..core.logging import get_logger
 
@@ -353,10 +355,6 @@ class RequestSignatureVerification:
         except Exception as e:
             logger.error(f"Request signature verification failed: {e}")
             return False
-
-
-import time
-import hmac
 
 
 def configure_security_headers(app, config: Dict[str, any] = None):

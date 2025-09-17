@@ -270,7 +270,7 @@ async def get_active_sessions(
         # Get active sessions for user
         result = await db.execute(
             select(Session).where(
-                Session.user_id == current_user.id, Session.is_active == True
+                Session.user_id == current_user.id, Session.is_active is True
             )
         )
         sessions = result.scalars().all()

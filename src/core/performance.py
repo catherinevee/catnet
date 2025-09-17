@@ -4,9 +4,9 @@ Performance Optimization - Database pooling, caching, and async tasks
 import asyncio
 import json
 import pickle
-from typing import Any, Optional, Union, Callable
+from typing import Any, Optional, Union, Callable, Dict, List
 from functools import wraps
-from datetime import timedelta
+from datetime import timedelta, datetime
 import redis.asyncio as redis
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.pool import NullPool, QueuePool

@@ -323,5 +323,6 @@ def limit_deployment_endpoint(rate: int = 10, period: int = 300):
         rate=rate,
         period=period,
         key_func=get_user_key,
-        error_message="Deployment rate limit exceeded. Please wait before creating more deployments.",
+        error_message="Deployment rate limit exceeded. "
+        "Please wait before creating more deployments.",
     )

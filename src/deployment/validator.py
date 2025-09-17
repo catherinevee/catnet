@@ -174,7 +174,8 @@ class DeploymentValidator:
                 or len(deployment.approved_by) < deployment.approval_count
             ):
                 errors.append(
-                    f"Deployment requires {deployment.approval_count} approvals, has {len(deployment.approved_by or [])}"
+                    f"Deployment requires {deployment.approval_count} approvals, "
+                    f"has {len(deployment.approved_by or [])}"
                 )
 
         # Check deployment strategy
