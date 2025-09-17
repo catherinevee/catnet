@@ -194,9 +194,7 @@ class ConfigValidator:
                 match = re.search(r"ip address (\S+) (\S+)", line)
                 if match:
                     try:
-                        ipaddress.IPv4Interface(
-                            f"{match.group(1)}/{match.group(2)}"
-                        )
+                        ipaddress.IPv4Interface(f"{match.group(1)}/{match.group(2)}")
                     except ValueError:
                         result.add_error(f"Line {line_num}: Invalid IP address or mask")
 
