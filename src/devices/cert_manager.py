@@ -3,6 +3,7 @@ Device Certificate Manager for certificate-based authentication
 """
 import os
 import asyncio
+import ipaddress
 from datetime import datetime, timedelta
 from typing import Dict, Optional, List, Tuple
 from pathlib import Path
@@ -474,7 +475,3 @@ class DeviceCertificateManager:
                 }
 
         return None
-
-
-# Import ipaddress for IP SANs
-import ipaddress

@@ -454,22 +454,22 @@ class ConfigurationHasher:
             return ""
 
         # Hash all configurations
-        hashes = [ConfigurationHasher.hash_config(c) for c in configs]
+        config_hashes = [ConfigurationHasher.hash_config(c) for c in configs]
 
         # Build Merkle tree
-        while len(hashes) > 1:
-            if len(hashes) % 2 == 1:
-                hashes.append(hashes[-1])  # Duplicate last hash if odd number
+        while len(config_hashes) > 1:
+            if len(config_hashes) % 2 == 1:
+                config_hashes.append(config_hashes[-1])  # Duplicate last hash if odd number
 
             new_hashes = []
-            for i in range(0, len(hashes), 2):
-                combined = hashes[i] + hashes[i + 1]
+            for i in range(0, len(config_hashes), 2):
+                combined = config_hashes[i] + config_hashes[i + 1]
                 new_hash = hashlib.sha256(combined.encode()).hexdigest()
                 new_hashes.append(new_hash)
 
-            hashes = new_hashes
+            config_hashes = new_hashes
 
-        return hashes[0]
+        return config_hashes[0]
 
     @staticmethod
     def verify_integrity(config: Dict, expected_hash: str) -> bool:
