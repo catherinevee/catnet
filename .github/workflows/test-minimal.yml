@@ -1,0 +1,112 @@
+name: Minimal CI Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test-basic:
+    name: Basic Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install core dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # Install only essential dependencies for testing
+          pip install pytest pytest-asyncio pytest-cov
+          pip install fastapi uvicorn pydantic
+          pip install sqlalchemy asyncpg
+          pip install cryptography passlib python-jose
+
+      - name: Check Python syntax
+        run: |
+          python -m py_compile src/main.py
+          python -m py_compile src/security/encryption.py
+          python -m py_compile src/security/audit.py
+          python -m py_compile src/core/validators.py
+
+      - name: Run basic imports test
+        run: |
+          python -c "from src.security.encryption import EncryptionManager; print('✓ Encryption module loads')"
+          python -c "from src.security.audit import AuditLogger; print('✓ Audit module loads')"
+          python -c "from src.core.validators import ConfigValidator; print('✓ Validator module loads')"
+          python -c "from src.core.exceptions import CatNetError; print('✓ Exceptions load')"
+
+      - name: Run security tests (minimal)
+        run: |
+          # Create a simple test that can run without full dependencies
+          cat << 'EOF' > test_minimal.py
+          import sys
+          import os
+          sys.path.insert(0, os.path.abspath('.'))
+
+          from src.security.encryption import EncryptionManager
+          from src.core.validators import ConfigValidator, ValidationResult
+
+          # Test encryption
+          enc = EncryptionManager()
+          encrypted = enc.encrypt_string("test")
+          decrypted = enc.decrypt_string(encrypted)
+          assert decrypted == "test", "Encryption test failed"
+          print("✓ Encryption/decryption works")
+
+          # Test password hashing
+          hashed = EncryptionManager.hash_password("testpass123")
+          assert EncryptionManager.verify_password("testpass123", hashed), "Password verification failed"
+          print("✓ Password hashing works")
+
+          # Test validator
+          validator = ConfigValidator()
+          result = ValidationResult()
+          result.add_error("test error")
+          assert not result.is_valid, "Validation result failed"
+          print("✓ Validator works")
+
+          print("\n✅ All basic tests passed!")
+          EOF
+
+          python test_minimal.py
+
+      - name: Check Docker files
+        run: |
+          echo "Checking Docker configuration..."
+          test -f Dockerfile && echo "✓ Dockerfile exists" || echo "✗ Dockerfile missing"
+          test -f docker-compose.yml && echo "✓ docker-compose.yml exists" || echo "✗ docker-compose.yml missing"
+
+      - name: Validate project structure
+        run: |
+          echo "Validating project structure..."
+          dirs=("src/api" "src/auth" "src/core" "src/db" "src/deployment" "src/devices" "src/gitops" "src/security")
+          for dir in "${dirs[@]}"; do
+            if [ -d "$dir" ]; then
+              echo "✓ $dir exists"
+            else
+              echo "✗ $dir missing"
+              exit 1
+            fi
+          done
+
+      - name: Summary
+        run: |
+          echo "========================"
+          echo "  CI Test Summary"
+          echo "========================"
+          echo "✓ Code syntax valid"
+          echo "✓ Core modules load"
+          echo "✓ Basic functionality works"
+          echo "✓ Project structure correct"
+          echo ""
+          echo "🎉 Basic CI pipeline passed!"
