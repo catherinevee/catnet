@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 import os
+import ssl
 from datetime import datetime, timedelta
 import uvicorn
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -13,6 +14,7 @@ from ..security.auth import AuthManager
 from ..security.audit import AuditLogger
 from ..db.database import get_db
 from ..db.models import User
+from ..core.mtls import MTLSManager, MTLSMiddleware, MTLSServer
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 

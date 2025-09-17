@@ -53,6 +53,12 @@ class User(Base):
     failed_login_attempts = Column(Integer, default=0)
     locked_until = Column(DateTime(timezone=True))
 
+    # Signing key fields
+    signing_key_id = Column(String(255))
+    signing_key_fingerprint = Column(String(128))
+    signing_key_created_at = Column(DateTime(timezone=True))
+    signing_key_expires_at = Column(DateTime(timezone=True))
+
     # Relationships
     deployments = relationship("Deployment", back_populates="creator")
     audit_logs = relationship("AuditLog", back_populates="user")
@@ -77,6 +83,15 @@ class Device(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     device_metadata = Column(JSON, default={})
+
+    # Certificate fields
+    certificate_serial = Column(String(255), index=True)
+    certificate_expires_at = Column(DateTime(timezone=True))
+    certificate_fingerprint = Column(String(128), index=True)
+    certificate_status = Column(String(50), default='pending', index=True)
+    certificate_issued_at = Column(DateTime(timezone=True))
+    certificate_revoked_at = Column(DateTime(timezone=True))
+    certificate_revocation_reason = Column(String(255))
 
     # Relationships
     configs = relationship("DeviceConfig", back_populates="device")
@@ -110,8 +125,15 @@ class Deployment(Base):
     git_commit = Column(String(40))  # Git commit hash
     git_repository_id = Column(UUID(as_uuid=True), ForeignKey("git_repositories.id"))
 
+    # Signature fields
+    config_signature = Column(Text)
+    signed_by = Column(UUID(as_uuid=True), ForeignKey("users.id"))
+    signature_verified = Column(Boolean, default=False)
+    signature_timestamp = Column(DateTime(timezone=True))
+
     # Relationships
-    creator = relationship("User", back_populates="deployments")
+    creator = relationship("User", foreign_keys=[created_by], back_populates="deployments")
+    signer = relationship("User", foreign_keys=[signed_by])
     repository = relationship("GitRepository", back_populates="deployments")
     devices = relationship("DeploymentDevice", back_populates="deployment")
 
