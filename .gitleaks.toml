@@ -1,26 +1,25 @@
-[allowlist]
-description = "Allowlist for CatNet project"
-
-[[allowlist.regexes]]
-description = "Allow placeholder API keys in documentation"
-regex = '''YOUR_API_KEY_HERE'''
-
-[[allowlist.regexes]]
-description = "Allow example tokens in documentation"
-regex = '''your-api-key'''
-
-[[allowlist.regexes]]
-description = "Allow example secrets in documentation"
-regex = '''your-.*-token'''
-
-[[allowlist.paths]]
-description = "Allow all documentation files"
-paths = [
-    '''docs/.*\.md''',
-    '''README\.md''',
-    '''IMPLEMENTATION_PLAN\.md''',
-]
+# GitLeaks configuration for CatNet project
+title = "CatNet GitLeaks Config"
 
 # Extend default configuration
 [extend]
 useDefault = true
+
+# Allowlist configuration
+[allowlist]
+description = "Allowlist for CatNet project"
+paths = [
+    "docs/.*\\.md",
+    "README\\.md",
+    "IMPLEMENTATION_PLAN\\.md",
+    "CLAUDE\\.md"
+]
+
+# Allow specific patterns
+regexes = [
+    "YOUR_API_KEY_HERE",
+    "your-api-key",
+    "your-.*-token",
+    "example\\.com",
+    "test@example\\.com"
+]
