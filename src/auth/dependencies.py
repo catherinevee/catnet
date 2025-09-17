@@ -1,7 +1,6 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
-from typing import Optional, Dict, Any
 from ..security.auth import AuthManager
 from ..db.database import get_db
 from ..db.models import User

@@ -8,7 +8,7 @@ from typing import Dict, Any, List, Optional
 from dataclasses import dataclass, field
 from enum import Enum
 
-from .exceptions import ValidationError, ComplianceError
+# ValidationError and ComplianceError defined in exceptions module
 
 
 class ValidationLevel(Enum):
@@ -120,9 +120,9 @@ class ConfigValidator:
 
         # Required fields
         required_fields = ["vendor", "device_id", "configuration"]
-        for field in required_fields:
-            if field not in config:
-                result.add_error(f"Required field missing: {field}")
+        for field_name in required_fields:
+            if field_name not in config:
+                result.add_error(f"Required field missing: {field_name}")
 
         # Field types
         if "configuration" in config and not isinstance(
@@ -182,7 +182,6 @@ class ConfigValidator:
             # Exit context
             elif line == "exit" or line == "end":
                 current_context = []
-                interface_context = None
 
             # IP address validation
             elif "ip address" in line:
@@ -195,7 +194,7 @@ class ConfigValidator:
                 match = re.search(r"ip address (\S+) (\S+)", line)
                 if match:
                     try:
-                        ip = ipaddress.IPv4Interface(
+                        ipaddress.IPv4Interface(
                             f"{match.group(1)}/{match.group(2)}"
                         )
                     except ValueError:

@@ -1,11 +1,9 @@
 from fastapi import FastAPI, Depends, HTTPException, status, Request
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 import uvicorn
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
@@ -240,7 +238,7 @@ class AuthenticationService:
                     access_token=tokens["access_token"],
                     refresh_token=refresh_data.refresh_token,  # Return same refresh token
                 )
-            except Exception as e:
+            except Exception:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Invalid refresh token",

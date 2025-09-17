@@ -2,7 +2,7 @@
 CatNet Main API Gateway
 Following CLAUDE.md security and architecture patterns
 """
-from fastapi import FastAPI, Depends, HTTPException, Request
+from fastapi import FastAPI, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
@@ -12,12 +12,13 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 import os
 from datetime import datetime
+from typing import Optional
 import logging
 
 from ..auth.dependencies import get_current_user, require_auth
 from ..security.audit import AuditLogger, AuditLevel
-from ..core.exceptions import CatNetError, SecurityError, handle_errors
-from ..db.database import init_database, get_db
+from ..core.exceptions import CatNetError, SecurityError
+from ..db.database import init_database
 from ..db.models import User
 
 # Configure logging
@@ -396,6 +397,3 @@ if __name__ == "__main__":
     uvicorn.run(
         app, host="0.0.0.0", port=int(os.getenv("API_PORT", 8080)), log_level="info"
     )
-
-
-from typing import Optional
