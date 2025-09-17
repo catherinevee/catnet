@@ -3,7 +3,11 @@ Tests for Deployment Service
 """
 import pytest
 from unittest.mock import Mock, AsyncMock, patch
-from src.deployment.executor import DeploymentExecutor, DeploymentStrategy, DeploymentResult
+from src.deployment.executor import (
+    DeploymentExecutor,
+    DeploymentStrategy,
+    DeploymentResult,
+)
 from src.db.models import Device, DeviceVendor
 
 
@@ -16,8 +20,7 @@ class TestDeploymentExecutor:
         mock_connector.connect_to_device = AsyncMock()
 
         executor = DeploymentExecutor(
-            device_connector=mock_connector,
-            audit_logger=mock_audit_logger
+            device_connector=mock_connector, audit_logger=mock_audit_logger
         )
 
         # Mock backup and deployment methods
@@ -31,7 +34,7 @@ class TestDeploymentExecutor:
             deployment_id="deploy-123",
             devices=[mock_device],
             configuration={"test": "config"},
-            user_context={"user_id": "user-123"}
+            user_context={"user_id": "user-123"},
         )
 
         # Assert
@@ -51,8 +54,7 @@ class TestDeploymentExecutor:
         # Setup
         mock_connector = Mock()
         executor = DeploymentExecutor(
-            device_connector=mock_connector,
-            audit_logger=mock_audit_logger
+            device_connector=mock_connector, audit_logger=mock_audit_logger
         )
 
         # Mock backup success but deployment failure
@@ -66,7 +68,7 @@ class TestDeploymentExecutor:
                 deployment_id="deploy-123",
                 devices=[mock_device],
                 configuration={"test": "config"},
-                user_context={"user_id": "user-123"}
+                user_context={"user_id": "user-123"},
             )
 
         assert "Deploy failed" in str(exc_info.value)
@@ -80,8 +82,7 @@ class TestDeploymentExecutor:
         # Setup
         mock_connector = Mock()
         executor = DeploymentExecutor(
-            device_connector=mock_connector,
-            audit_logger=mock_audit_logger
+            device_connector=mock_connector, audit_logger=mock_audit_logger
         )
 
         # Mock successful deployment
@@ -94,7 +95,7 @@ class TestDeploymentExecutor:
             deployment_id="deploy-123",
             devices=[mock_device],
             configuration={"test": "config"},
-            user_context={"user_id": "user-123"}
+            user_context={"user_id": "user-123"},
         )
 
         # Assert
@@ -107,8 +108,7 @@ class TestDeploymentExecutor:
         # Setup
         mock_connector = Mock()
         executor = DeploymentExecutor(
-            device_connector=mock_connector,
-            audit_logger=mock_audit_logger
+            device_connector=mock_connector, audit_logger=mock_audit_logger
         )
 
         # Mock staging and activation
@@ -122,7 +122,7 @@ class TestDeploymentExecutor:
             deployment_id="deploy-123",
             devices=[mock_device],
             configuration={"test": "config"},
-            user_context={"user_id": "user-123"}
+            user_context={"user_id": "user-123"},
         )
 
         # Assert
@@ -135,9 +135,7 @@ class TestDeploymentExecutor:
     def test_deployment_result(self):
         """Test deployment result object"""
         result = DeploymentResult(
-            success=True,
-            devices=["device1", "device2"],
-            errors=[]
+            success=True, devices=["device1", "device2"], errors=[]
         )
 
         assert result.success is True
@@ -174,17 +172,16 @@ class TestDeploymentPatterns:
         executor.monitor_health = AsyncMock()
 
         await executor.execute_canary_deployment(
-            "deploy-123",
-            [mock_device],
-            {"config": "test"},
-            {"user_id": "test"}
+            "deploy-123", [mock_device], {"config": "test"}, {"user_id": "test"}
         )
 
         assert backup_called
         assert deploy_called
 
     @pytest.mark.asyncio
-    async def test_health_validation_after_deployment(self, mock_device, mock_audit_logger):
+    async def test_health_validation_after_deployment(
+        self, mock_device, mock_audit_logger
+    ):
         """Verify health check is performed after deployment"""
         mock_connector = Mock()
         executor = DeploymentExecutor(mock_connector, mock_audit_logger)
@@ -202,10 +199,7 @@ class TestDeploymentPatterns:
         executor.monitor_health = AsyncMock()
 
         await executor.execute_canary_deployment(
-            "deploy-123",
-            [mock_device],
-            {"config": "test"},
-            {"user_id": "test"}
+            "deploy-123", [mock_device], {"config": "test"}, {"user_id": "test"}
         )
 
         assert health_checked, "Health validation not performed!"

@@ -63,10 +63,12 @@ class AuthenticationService:
             title="CatNet Authentication Service",
             version="1.0.0",
             docs_url="/api/docs",
-            redoc_url="/api/redoc"
+            redoc_url="/api/redoc",
         )
         self.port = port
-        self.secret_key = os.getenv("JWT_SECRET_KEY", "your-secret-key-change-in-production")
+        self.secret_key = os.getenv(
+            "JWT_SECRET_KEY", "your-secret-key-change-in-production"
+        )
         self.auth_manager = AuthManager(secret_key=self.secret_key)
         self.audit_logger = AuditLogger(log_file="logs/auth_audit.jsonl")
 
@@ -93,7 +95,7 @@ class AuthenticationService:
         async def login(
             request: Request,
             login_data: LoginRequest,
-            db: AsyncSession = Depends(get_db)
+            db: AsyncSession = Depends(get_db),
         ):
             # Get user from database
             result = await db.execute(
@@ -106,22 +108,23 @@ class AuthenticationService:
                     user_id=login_data.username,
                     success=False,
                     method="password",
-                    ip_address=request.client.host
+                    ip_address=request.client.host,
                 )
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Invalid credentials"
+                    detail="Invalid credentials",
                 )
 
             # Check if account is locked
             if user.locked_until and user.locked_until > datetime.utcnow():
                 raise HTTPException(
-                    status_code=status.HTTP_423_LOCKED,
-                    detail="Account is locked"
+                    status_code=status.HTTP_423_LOCKED, detail="Account is locked"
                 )
 
             # Verify password
-            if not self.auth_manager.verify_password(login_data.password, user.password_hash):
+            if not self.auth_manager.verify_password(
+                login_data.password, user.password_hash
+            ):
                 user.failed_login_attempts += 1
 
                 # Lock account after 5 failed attempts
@@ -134,26 +137,28 @@ class AuthenticationService:
                     user_id=login_data.username,
                     success=False,
                     method="password",
-                    ip_address=request.client.host
+                    ip_address=request.client.host,
                 )
 
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Invalid credentials"
+                    detail="Invalid credentials",
                 )
 
             # Verify MFA if enabled
             if user.mfa_secret and login_data.mfa_token:
-                if not self.auth_manager.verify_mfa_token(user.username, login_data.mfa_token, user.mfa_secret):
+                if not self.auth_manager.verify_mfa_token(
+                    user.username, login_data.mfa_token, user.mfa_secret
+                ):
                     await self.audit_logger.log_authentication(
                         user_id=user.username,
                         success=False,
                         method="mfa",
-                        ip_address=request.client.host
+                        ip_address=request.client.host,
                     )
                     raise HTTPException(
                         status_code=status.HTTP_401_UNAUTHORIZED,
-                        detail="Invalid MFA token"
+                        detail="Invalid MFA token",
                     )
 
             # Reset failed login attempts
@@ -165,7 +170,7 @@ class AuthenticationService:
             user_data = {
                 "sub": str(user.id),
                 "username": user.username,
-                "roles": user.roles
+                "roles": user.roles,
             }
 
             access_token = await self.auth_manager.create_access_token(data=user_data)
@@ -175,55 +180,43 @@ class AuthenticationService:
                 user_id=user.username,
                 success=True,
                 method="password+mfa" if user.mfa_secret else "password",
-                ip_address=request.client.host
+                ip_address=request.client.host,
             )
 
-            return LoginResponse(
-                access_token=access_token,
-                refresh_token=refresh_token
-            )
+            return LoginResponse(access_token=access_token, refresh_token=refresh_token)
 
         @self.app.post("/auth/mfa/verify")
         async def verify_mfa(
-            token: str,
-            user_id: str,
-            db: AsyncSession = Depends(get_db)
+            token: str, user_id: str, db: AsyncSession = Depends(get_db)
         ):
-            result = await db.execute(
-                select(User).where(User.id == user_id)
-            )
+            result = await db.execute(select(User).where(User.id == user_id))
             user = result.scalar_one_or_none()
 
             if not user or not user.mfa_secret:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
-                    detail="MFA not configured for user"
+                    detail="MFA not configured for user",
                 )
 
-            is_valid = self.auth_manager.verify_mfa_token(user.username, token, user.mfa_secret)
+            is_valid = self.auth_manager.verify_mfa_token(
+                user.username, token, user.mfa_secret
+            )
 
             if not is_valid:
                 raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Invalid MFA token"
+                    status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid MFA token"
                 )
 
             return {"verified": True}
 
         @self.app.post("/auth/mfa/setup", response_model=MFASetupResponse)
-        async def setup_mfa(
-            user_id: str,
-            db: AsyncSession = Depends(get_db)
-        ):
-            result = await db.execute(
-                select(User).where(User.id == user_id)
-            )
+        async def setup_mfa(user_id: str, db: AsyncSession = Depends(get_db)):
+            result = await db.execute(select(User).where(User.id == user_id))
             user = result.scalar_one_or_none()
 
             if not user:
                 raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail="User not found"
+                    status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
                 )
 
             # Generate MFA secret
@@ -234,41 +227,33 @@ class AuthenticationService:
             user.mfa_secret = secret
             await db.commit()
 
-            return MFASetupResponse(
-                secret=secret,
-                qr_code_uri=qr_code_uri
-            )
+            return MFASetupResponse(secret=secret, qr_code_uri=qr_code_uri)
 
         @self.app.post("/auth/refresh", response_model=LoginResponse)
-        async def refresh_token(
-            refresh_data: RefreshRequest
-        ):
+        async def refresh_token(refresh_data: RefreshRequest):
             try:
-                tokens = await self.auth_manager.refresh_access_token(refresh_data.refresh_token)
+                tokens = await self.auth_manager.refresh_access_token(
+                    refresh_data.refresh_token
+                )
 
                 return LoginResponse(
                     access_token=tokens["access_token"],
-                    refresh_token=refresh_data.refresh_token  # Return same refresh token
+                    refresh_token=refresh_data.refresh_token,  # Return same refresh token
                 )
             except Exception as e:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Invalid refresh token"
+                    detail="Invalid refresh token",
                 )
 
         @self.app.delete("/auth/logout")
-        async def logout(
-            request: Request,
-            token: str
-        ):
+        async def logout(request: Request, token: str):
             await self.auth_manager.revoke_token(token)
 
             await self.audit_logger.log_event(
                 event_type="logout",
                 user_id=None,  # Extract from token if needed
-                details={
-                    "ip_address": request.client.host
-                }
+                details={"ip_address": request.client.host},
             )
 
             return {"message": "Logged out successfully"}
@@ -276,15 +261,13 @@ class AuthenticationService:
         @self.app.post("/auth/users", response_model=UserResponse)
         @self.limiter.limit("10/hour")
         async def create_user(
-            request: Request,
-            user_data: UserCreate,
-            db: AsyncSession = Depends(get_db)
+            request: Request, user_data: UserCreate, db: AsyncSession = Depends(get_db)
         ):
             # Check if user exists
             result = await db.execute(
                 select(User).where(
-                    (User.username == user_data.username) |
-                    (User.email == user_data.email)
+                    (User.username == user_data.username)
+                    | (User.email == user_data.email)
                 )
             )
             existing_user = result.scalar_one_or_none()
@@ -292,7 +275,7 @@ class AuthenticationService:
             if existing_user:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="User already exists"
+                    detail="User already exists",
                 )
 
             # Create new user
@@ -302,7 +285,7 @@ class AuthenticationService:
                 username=user_data.username,
                 email=user_data.email,
                 password_hash=password_hash,
-                roles=user_data.roles
+                roles=user_data.roles,
             )
 
             db.add(new_user)
@@ -315,8 +298,8 @@ class AuthenticationService:
                 details={
                     "username": new_user.username,
                     "email": new_user.email,
-                    "roles": new_user.roles
-                }
+                    "roles": new_user.roles,
+                },
             )
 
             return UserResponse(
@@ -325,7 +308,7 @@ class AuthenticationService:
                 email=new_user.email,
                 roles=new_user.roles,
                 is_active=new_user.is_active,
-                mfa_enabled=bool(new_user.mfa_secret)
+                mfa_enabled=bool(new_user.mfa_secret),
             )
 
         @self.app.get("/health")
@@ -333,12 +316,7 @@ class AuthenticationService:
             return {"status": "healthy", "service": "authentication"}
 
     def run(self):
-        uvicorn.run(
-            self.app,
-            host="0.0.0.0",
-            port=self.port,
-            log_level="info"
-        )
+        uvicorn.run(self.app, host="0.0.0.0", port=self.port, log_level="info")
 
 
 if __name__ == "__main__":

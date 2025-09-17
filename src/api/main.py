@@ -30,7 +30,7 @@ app = FastAPI(
     description="Secure Network Configuration Deployment System",
     version="1.0.0",
     docs_url="/api/docs",
-    redoc_url="/api/redoc"
+    redoc_url="/api/redoc",
 )
 
 # Initialize services
@@ -57,7 +57,9 @@ async def security_headers_middleware(request: Request, call_next):
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["X-XSS-Protection"] = "1; mode=block"
-    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    response.headers[
+        "Strict-Transport-Security"
+    ] = "max-age=31536000; includeSubDomains"
     response.headers["Content-Security-Policy"] = "default-src 'self'"
 
     return response
@@ -75,9 +77,9 @@ async def audit_middleware(request: Request, call_next):
         details={
             "method": request.method,
             "path": request.url.path,
-            "client": request.client.host if request.client else "unknown"
+            "client": request.client.host if request.client else "unknown",
         },
-        level=AuditLevel.INFO
+        level=AuditLevel.INFO,
     )
 
     response = await call_next(request)
@@ -91,9 +93,9 @@ async def audit_middleware(request: Request, call_next):
             "method": request.method,
             "path": request.url.path,
             "status": response.status_code,
-            "duration_seconds": duration
+            "duration_seconds": duration,
         },
-        level=AuditLevel.INFO
+        level=AuditLevel.INFO,
     )
 
     return response
@@ -110,8 +112,7 @@ app.add_middleware(
 
 # Trusted host middleware
 app.add_middleware(
-    TrustedHostMiddleware,
-    allowed_hosts=os.getenv("ALLOWED_HOSTS", "*").split(",")
+    TrustedHostMiddleware, allowed_hosts=os.getenv("ALLOWED_HOSTS", "*").split(",")
 )
 
 
@@ -125,14 +126,13 @@ async def catnet_exception_handler(request: Request, exc: CatNetError):
         details={
             "error_type": type(exc).__name__,
             "message": str(exc),
-            "path": request.url.path
+            "path": request.url.path,
         },
-        level=AuditLevel.ERROR
+        level=AuditLevel.ERROR,
     )
 
     return JSONResponse(
-        status_code=500,
-        content={"detail": "An error occurred processing your request"}
+        status_code=500, content={"detail": "An error occurred processing your request"}
     )
 
 
@@ -145,13 +145,12 @@ async def security_exception_handler(request: Request, exc: SecurityError):
         details={
             "error": str(exc),
             "path": request.url.path,
-            "client": request.client.host if request.client else "unknown"
-        }
+            "client": request.client.host if request.client else "unknown",
+        },
     )
 
     return JSONResponse(
-        status_code=403,
-        content={"detail": "Security violation detected"}
+        status_code=403, content={"detail": "Security violation detected"}
     )
 
 
@@ -163,7 +162,7 @@ async def root():
         "name": "CatNet API",
         "version": "1.0.0",
         "status": "operational",
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.utcnow().isoformat(),
     }
 
 
@@ -180,7 +179,7 @@ async def health_check():
         "auth": True,
         "gitops": True,
         "deployment": True,
-        "device": True
+        "device": True,
     }
 
     overall_health = all(services.values())
@@ -188,7 +187,7 @@ async def health_check():
     return {
         "status": "healthy" if overall_health else "degraded",
         "services": services,
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.utcnow().isoformat(),
     }
 
 
@@ -207,19 +206,15 @@ async def api_info(request: Request):
             "MFA enabled",
             "Audit logging",
             "Rate limiting",
-            "Webhook signature verification"
+            "Webhook signature verification",
         ],
         "supported_vendors": [
             "Cisco IOS",
             "Cisco IOS-XE",
             "Cisco NX-OS",
-            "Juniper Junos"
+            "Juniper Junos",
         ],
-        "deployment_strategies": [
-            "canary",
-            "rolling",
-            "blue-green"
-        ]
+        "deployment_strategies": ["canary", "rolling", "blue-green"],
     }
 
 
@@ -234,8 +229,12 @@ async def get_profile(current_user: User = Depends(get_current_user)):
         "roles": current_user.roles,
         "is_superuser": current_user.is_superuser,
         "mfa_enabled": bool(current_user.mfa_secret),
-        "created_at": current_user.created_at.isoformat() if current_user.created_at else None,
-        "last_login": current_user.last_login.isoformat() if current_user.last_login else None
+        "created_at": current_user.created_at.isoformat()
+        if current_user.created_at
+        else None,
+        "last_login": current_user.last_login.isoformat()
+        if current_user.last_login
+        else None,
     }
 
 
@@ -246,7 +245,7 @@ async def search_audit_logs(
     end_date: Optional[str] = None,
     event_type: Optional[str] = None,
     user_id: Optional[str] = None,
-    current_user: User = Depends(require_auth("audit.read"))
+    current_user: User = Depends(require_auth("audit.read")),
 ):
     """Search audit logs"""
     from datetime import datetime
@@ -257,16 +256,10 @@ async def search_audit_logs(
 
     # Search logs
     logs = await audit_logger.search_logs(
-        start_date=start,
-        end_date=end,
-        event_type=event_type,
-        user_id=user_id
+        start_date=start, end_date=end, event_type=event_type, user_id=user_id
     )
 
-    return {
-        "total": len(logs),
-        "logs": logs[:100]  # Limit results
-    }
+    return {"total": len(logs), "logs": logs[:100]}  # Limit results
 
 
 # Metrics endpoint
@@ -290,47 +283,43 @@ async def service_status(request: Request):
         "authentication": {
             "status": "operational",
             "port": 8081,
-            "endpoints": ["/auth/login", "/auth/refresh", "/auth/logout"]
+            "endpoints": ["/auth/login", "/auth/refresh", "/auth/logout"],
         },
         "gitops": {
             "status": "operational",
             "port": 8082,
-            "endpoints": ["/git/connect", "/git/webhook", "/git/configs"]
+            "endpoints": ["/git/connect", "/git/webhook", "/git/configs"],
         },
         "deployment": {
             "status": "operational",
             "port": 8083,
-            "endpoints": ["/deploy/create", "/deploy/status", "/deploy/rollback"]
+            "endpoints": ["/deploy/create", "/deploy/status", "/deploy/rollback"],
         },
         "device": {
             "status": "operational",
             "port": 8084,
-            "endpoints": ["/devices", "/devices/connect", "/devices/backup"]
-        }
+            "endpoints": ["/devices", "/devices/connect", "/devices/backup"],
+        },
     }
 
     return {
         "overall_status": "operational",
         "services": services,
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.utcnow().isoformat(),
     }
 
 
 # Emergency shutdown endpoint
 @app.post("/api/v1/emergency/shutdown")
 async def emergency_shutdown(
-    reason: str,
-    current_user: User = Depends(require_auth("admin"))
+    reason: str, current_user: User = Depends(require_auth("admin"))
 ):
     """Emergency shutdown of all deployments"""
     await audit_logger.log_event(
         event_type="emergency_shutdown",
         user_id=str(current_user.id),
-        details={
-            "reason": reason,
-            "timestamp": datetime.utcnow().isoformat()
-        },
-        level=AuditLevel.CRITICAL
+        details={"reason": reason, "timestamp": datetime.utcnow().isoformat()},
+        level=AuditLevel.CRITICAL,
     )
 
     # Would trigger emergency shutdown procedures
@@ -341,7 +330,7 @@ async def emergency_shutdown(
     return {
         "status": "emergency_shutdown_initiated",
         "reason": reason,
-        "initiated_by": current_user.username
+        "initiated_by": current_user.username,
     }
 
 
@@ -360,9 +349,9 @@ async def startup_event():
         user_id=None,
         details={
             "version": "1.0.0",
-            "environment": os.getenv("ENVIRONMENT", "development")
+            "environment": os.getenv("ENVIRONMENT", "development"),
         },
-        level=AuditLevel.INFO
+        level=AuditLevel.INFO,
     )
 
     logger.info("CatNet API started successfully")
@@ -378,10 +367,8 @@ async def shutdown_event():
     await audit_logger.log_event(
         event_type="api_shutdown",
         user_id=None,
-        details={
-            "timestamp": datetime.utcnow().isoformat()
-        },
-        level=AuditLevel.INFO
+        details={"timestamp": datetime.utcnow().isoformat()},
+        level=AuditLevel.INFO,
     )
 
     # Close database connections
@@ -407,10 +394,7 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(
-        app,
-        host="0.0.0.0",
-        port=int(os.getenv("API_PORT", 8080)),
-        log_level="info"
+        app, host="0.0.0.0", port=int(os.getenv("API_PORT", 8080)), log_level="info"
     )
 
 

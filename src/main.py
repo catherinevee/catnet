@@ -15,7 +15,7 @@ load_dotenv()
 # Configure logging
 logging.basicConfig(
     level=getattr(logging, os.getenv("LOG_LEVEL", "INFO")),
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger("catnet")
 
@@ -27,6 +27,7 @@ class CatNetOrchestrator:
 
     async def start_auth_service(self):
         from src.auth.service import AuthenticationService
+
         logger.info("Starting Authentication Service on port 8081...")
         service = AuthenticationService(port=8081)
         self.services["auth"] = service
@@ -60,6 +61,7 @@ class CatNetOrchestrator:
 
         # Initialize database
         from src.db.database import init_database
+
         db_manager = init_database()
 
         # Create tables if needed
@@ -98,7 +100,11 @@ def cli():
 
 
 @cli.command()
-@click.option('--service', type=click.Choice(['all', 'auth', 'gitops', 'deployment', 'device']), default='all')
+@click.option(
+    "--service",
+    type=click.Choice(["all", "auth", "gitops", "deployment", "device"]),
+    default="all",
+)
 def start(service):
     """Start CatNet services"""
     orchestrator = CatNetOrchestrator()
@@ -108,15 +114,15 @@ def start(service):
     signal.signal(signal.SIGTERM, orchestrator.handle_signal)
 
     async def run():
-        if service == 'all':
+        if service == "all":
             await orchestrator.start_all_services()
-        elif service == 'auth':
+        elif service == "auth":
             await orchestrator.start_auth_service()
-        elif service == 'gitops':
+        elif service == "gitops":
             await orchestrator.start_gitops_service()
-        elif service == 'deployment':
+        elif service == "deployment":
             await orchestrator.start_deployment_service()
-        elif service == 'device':
+        elif service == "device":
             await orchestrator.start_device_service()
 
         # Keep running
@@ -132,6 +138,7 @@ def start(service):
 @cli.command()
 def init():
     """Initialize CatNet database and configuration"""
+
     async def init_db():
         from src.db.database import init_database
         from alembic.config import Config
@@ -159,9 +166,8 @@ def init():
         async with db_manager.session_scope() as session:
             # Check if admin exists
             from sqlalchemy import select
-            result = await session.execute(
-                select(User).where(User.username == "admin")
-            )
+
+            result = await session.execute(select(User).where(User.username == "admin"))
             admin = result.scalar_one_or_none()
 
             if not admin:
@@ -169,13 +175,17 @@ def init():
                 admin = User(
                     username="admin",
                     email="admin@catnet.local",
-                    password_hash=auth_manager.get_password_hash("admin123"),  # Change in production!
+                    password_hash=auth_manager.get_password_hash(
+                        "admin123"
+                    ),  # Change in production!
                     is_superuser=True,
-                    roles=["admin"]
+                    roles=["admin"],
                 )
                 session.add(admin)
                 await session.commit()
-                logger.info("Default admin user created (username: admin, password: admin123)")
+                logger.info(
+                    "Default admin user created (username: admin, password: admin123)"
+                )
                 logger.warning("⚠️  CHANGE THE DEFAULT ADMIN PASSWORD IMMEDIATELY!")
             else:
                 logger.info("Admin user already exists")
@@ -184,10 +194,10 @@ def init():
 
 
 @cli.command()
-@click.option('--host', default='192.168.1.1')
-@click.option('--vendor', type=click.Choice(['cisco_ios', 'cisco_xe', 'juniper']))
-@click.option('--username', prompt=True)
-@click.option('--password', prompt=True, hide_input=True)
+@click.option("--host", default="192.168.1.1")
+@click.option("--vendor", type=click.Choice(["cisco_ios", "cisco_xe", "juniper"]))
+@click.option("--username", prompt=True)
+@click.option("--password", prompt=True, hide_input=True)
 def test_connection(host, vendor, username, password):
     """Test connection to a network device"""
     from netmiko import ConnectHandler
@@ -196,14 +206,14 @@ def test_connection(host, vendor, username, password):
 
     try:
         device = {
-            'device_type': vendor,
-            'host': host,
-            'username': username,
-            'password': password,
+            "device_type": vendor,
+            "host": host,
+            "username": username,
+            "password": password,
         }
 
         with ConnectHandler(**device) as conn:
-            output = conn.send_command('show version')
+            output = conn.send_command("show version")
             logger.info("Connection successful!")
             print(output[:500])  # Print first 500 chars
 
@@ -234,6 +244,7 @@ def validate_config():
     # Test database connection
     async def test_db():
         from src.db.database import init_database
+
         db_manager = init_database()
         if await db_manager.health_check():
             logger.info("✓ Database connection OK")
@@ -252,6 +263,7 @@ def validate_config():
     if vault_url and vault_url != "http://localhost:8200":
         try:
             from src.security.vault import VaultClient
+
             vault = VaultClient()
             if vault.client.is_authenticated():
                 logger.info("✓ Vault connection OK")
@@ -264,8 +276,8 @@ def validate_config():
 
 
 @cli.command()
-@click.option('--coverage', is_flag=True, help='Run with coverage report')
-@click.option('--verbose', is_flag=True, help='Verbose output')
+@click.option("--coverage", is_flag=True, help="Run with coverage report")
+@click.option("--verbose", is_flag=True, help="Verbose output")
 def test(coverage, verbose):
     """Run test suite"""
     import subprocess

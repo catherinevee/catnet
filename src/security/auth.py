@@ -15,7 +15,7 @@ class AuthManager:
         algorithm: str = "HS256",
         access_token_expire_minutes: int = 30,
         refresh_token_expire_days: int = 7,
-        audit_logger: Optional[AuditLogger] = None
+        audit_logger: Optional[AuditLogger] = None,
     ):
         self.secret_key = secret_key
         self.algorithm = algorithm
@@ -33,22 +33,24 @@ class AuthManager:
         return self.pwd_context.hash(password)
 
     async def create_access_token(
-        self,
-        data: Dict[str, Any],
-        expires_delta: Optional[timedelta] = None
+        self, data: Dict[str, Any], expires_delta: Optional[timedelta] = None
     ) -> str:
         to_encode = data.copy()
         if expires_delta:
             expire = datetime.now(timezone.utc) + expires_delta
         else:
-            expire = datetime.now(timezone.utc) + timedelta(minutes=self.access_token_expire_minutes)
+            expire = datetime.now(timezone.utc) + timedelta(
+                minutes=self.access_token_expire_minutes
+            )
 
-        to_encode.update({
-            "exp": expire,
-            "iat": datetime.now(timezone.utc),
-            "jti": str(uuid.uuid4()),  # JWT ID for tracking
-            "type": "access"
-        })
+        to_encode.update(
+            {
+                "exp": expire,
+                "iat": datetime.now(timezone.utc),
+                "jti": str(uuid.uuid4()),  # JWT ID for tracking
+                "type": "access",
+            }
+        )
 
         encoded_jwt = jwt.encode(to_encode, self.secret_key, algorithm=self.algorithm)
 
@@ -59,30 +61,32 @@ class AuthManager:
             details={
                 "token_type": "access",
                 "jti": to_encode["jti"],
-                "expires_at": expire.isoformat()
+                "expires_at": expire.isoformat(),
             },
-            level=AuditLevel.INFO
+            level=AuditLevel.INFO,
         )
 
         return encoded_jwt
 
     async def create_refresh_token(
-        self,
-        data: Dict[str, Any],
-        expires_delta: Optional[timedelta] = None
+        self, data: Dict[str, Any], expires_delta: Optional[timedelta] = None
     ) -> str:
         to_encode = data.copy()
         if expires_delta:
             expire = datetime.now(timezone.utc) + expires_delta
         else:
-            expire = datetime.now(timezone.utc) + timedelta(days=self.refresh_token_expire_days)
+            expire = datetime.now(timezone.utc) + timedelta(
+                days=self.refresh_token_expire_days
+            )
 
-        to_encode.update({
-            "exp": expire,
-            "iat": datetime.now(timezone.utc),
-            "jti": str(uuid.uuid4()),
-            "type": "refresh"
-        })
+        to_encode.update(
+            {
+                "exp": expire,
+                "iat": datetime.now(timezone.utc),
+                "jti": str(uuid.uuid4()),
+                "type": "refresh",
+            }
+        )
 
         encoded_jwt = jwt.encode(to_encode, self.secret_key, algorithm=self.algorithm)
 
@@ -90,7 +94,7 @@ class AuthManager:
         self.active_sessions[to_encode["jti"]] = {
             "user_id": data.get("sub"),
             "created_at": datetime.now(timezone.utc),
-            "expires_at": expire
+            "expires_at": expire,
         }
 
         await self.audit.log_event(
@@ -99,14 +103,16 @@ class AuthManager:
             details={
                 "token_type": "refresh",
                 "jti": to_encode["jti"],
-                "expires_at": expire.isoformat()
+                "expires_at": expire.isoformat(),
             },
-            level=AuditLevel.INFO
+            level=AuditLevel.INFO,
         )
 
         return encoded_jwt
 
-    async def verify_token(self, token: str, token_type: str = "access") -> Dict[str, Any]:
+    async def verify_token(
+        self, token: str, token_type: str = "access"
+    ) -> Dict[str, Any]:
         try:
             payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
 
@@ -126,13 +132,13 @@ class AuthManager:
                 event_type="token_verification_failed",
                 user_id=None,
                 details={"error": str(e)},
-                level=AuditLevel.WARNING
+                level=AuditLevel.WARNING,
             )
             raise
 
     def _is_token_revoked(self, jti: str) -> bool:
         # Check if token is in revoked list or session is invalid
-        return jti in self.revoked_tokens if hasattr(self, 'revoked_tokens') else False
+        return jti in self.revoked_tokens if hasattr(self, "revoked_tokens") else False
 
     async def revoke_token(self, token: str):
         try:
@@ -140,7 +146,7 @@ class AuthManager:
             jti = payload.get("jti")
 
             if jti:
-                if not hasattr(self, 'revoked_tokens'):
+                if not hasattr(self, "revoked_tokens"):
                     self.revoked_tokens = set()
                 self.revoked_tokens.add(jti)
 
@@ -152,7 +158,7 @@ class AuthManager:
                     event_type="token_revoked",
                     user_id=payload.get("sub"),
                     details={"jti": jti},
-                    level=AuditLevel.INFO
+                    level=AuditLevel.INFO,
                 )
         except JWTError:
             pass
@@ -162,15 +168,16 @@ class AuthManager:
         self.mfa_secrets[user_id] = secret
         return secret
 
-    def generate_mfa_qr_code(self, user_id: str, secret: str, issuer: str = "CatNet") -> str:
+    def generate_mfa_qr_code(
+        self, user_id: str, secret: str, issuer: str = "CatNet"
+    ) -> str:
         totp = pyotp.TOTP(secret)
-        provisioning_uri = totp.provisioning_uri(
-            name=user_id,
-            issuer_name=issuer
-        )
+        provisioning_uri = totp.provisioning_uri(name=user_id, issuer_name=issuer)
         return provisioning_uri
 
-    def verify_mfa_token(self, user_id: str, token: str, secret: Optional[str] = None) -> bool:
+    def verify_mfa_token(
+        self, user_id: str, token: str, secret: Optional[str] = None
+    ) -> bool:
         if not secret:
             secret = self.mfa_secrets.get(user_id)
 
@@ -187,7 +194,7 @@ class AuthManager:
         password: str,
         mfa_token: Optional[str] = None,
         require_mfa: bool = True,
-        ip_address: Optional[str] = None
+        ip_address: Optional[str] = None,
     ) -> Dict[str, Any]:
         # This would typically check against database
         # For now, returning mock authentication
@@ -198,7 +205,7 @@ class AuthManager:
                 user_id=username,
                 success=False,
                 method="password",
-                ip_address=ip_address or "unknown"
+                ip_address=ip_address or "unknown",
             )
             return {"authenticated": False, "error": "Invalid credentials"}
 
@@ -209,7 +216,7 @@ class AuthManager:
                     user_id=username,
                     success=False,
                     method="mfa",
-                    ip_address=ip_address or "unknown"
+                    ip_address=ip_address or "unknown",
                 )
                 return {"authenticated": False, "error": "Invalid MFA token"}
 
@@ -222,36 +229,26 @@ class AuthManager:
             user_id=username,
             success=True,
             method="password+mfa" if require_mfa else "password",
-            ip_address=ip_address or "unknown"
+            ip_address=ip_address or "unknown",
         )
 
         return {
             "authenticated": True,
             "access_token": access_token,
             "refresh_token": refresh_token,
-            "token_type": "bearer"
+            "token_type": "bearer",
         }
 
     async def refresh_access_token(self, refresh_token: str) -> Dict[str, str]:
         payload = await self.verify_token(refresh_token, token_type="refresh")
 
         # Create new access token
-        user_data = {
-            "sub": payload.get("sub"),
-            "roles": payload.get("roles", [])
-        }
+        user_data = {"sub": payload.get("sub"), "roles": payload.get("roles", [])}
         new_access_token = await self.create_access_token(data=user_data)
 
-        return {
-            "access_token": new_access_token,
-            "token_type": "bearer"
-        }
+        return {"access_token": new_access_token, "token_type": "bearer"}
 
-    async def check_permission(
-        self,
-        user: Dict[str, Any],
-        permission: str
-    ) -> bool:
+    async def check_permission(self, user: Dict[str, Any], permission: str) -> bool:
         user_roles = user.get("roles", [])
 
         # Define role-permission mapping
@@ -261,12 +258,9 @@ class AuthManager:
                 "deployment.view",
                 "deployment.create",
                 "device.view",
-                "device.backup"
+                "device.backup",
             ],
-            "viewer": [
-                "deployment.view",
-                "device.view"
-            ]
+            "viewer": ["deployment.view", "device.view"],
         }
 
         # Check if user has permission
@@ -278,8 +272,8 @@ class AuthManager:
 
         await self.audit.log_unauthorized_attempt(
             user_context=user,
-            resource=permission.split('.')[0],
-            action=permission.split('.')[1]
+            resource=permission.split(".")[0],
+            action=permission.split(".")[1],
         )
 
         return False
@@ -291,9 +285,5 @@ class AuthManager:
         # This would check against database
         # For now, returning mock verification
         if api_key:
-            return {
-                "sub": "api_user",
-                "roles": ["api"],
-                "key_id": api_key[:8]
-            }
+            return {"sub": "api_user", "roles": ["api"], "key_id": api_key[:8]}
         return None

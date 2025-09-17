@@ -1,4 +1,15 @@
-from sqlalchemy import Column, String, Integer, DateTime, Boolean, Text, JSON, ForeignKey, ARRAY, Enum as SQLEnum
+from sqlalchemy import (
+    Column,
+    String,
+    Integer,
+    DateTime,
+    Boolean,
+    Text,
+    JSON,
+    ForeignKey,
+    ARRAY,
+    Enum as SQLEnum,
+)
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -76,12 +87,16 @@ class Deployment(Base):
     __tablename__ = "deployments"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    created_at = Column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
     created_by = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     config_hash = Column(String(64), nullable=False)  # SHA-256
     signature = Column(Text, nullable=False)  # Digital signature
     encryption_key_id = Column(String(128))  # KMS key reference
-    state = Column(SQLEnum(DeploymentState), nullable=False, default=DeploymentState.PENDING)
+    state = Column(
+        SQLEnum(DeploymentState), nullable=False, default=DeploymentState.PENDING
+    )
     approved_by = Column(ARRAY(UUID(as_uuid=True)), default=[])
     approval_required = Column(Boolean, default=True)
     approval_count = Column(Integer, default=2)  # Number of approvals needed
@@ -105,9 +120,13 @@ class DeploymentDevice(Base):
     __tablename__ = "deployment_devices"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    deployment_id = Column(UUID(as_uuid=True), ForeignKey("deployments.id"), nullable=False)
+    deployment_id = Column(
+        UUID(as_uuid=True), ForeignKey("deployments.id"), nullable=False
+    )
     device_id = Column(UUID(as_uuid=True), ForeignKey("devices.id"), nullable=False)
-    status = Column(String(50), nullable=False)  # pending, in_progress, completed, failed
+    status = Column(
+        String(50), nullable=False
+    )  # pending, in_progress, completed, failed
     started_at = Column(DateTime(timezone=True))
     completed_at = Column(DateTime(timezone=True))
     backup_id = Column(UUID(as_uuid=True))
@@ -165,10 +184,14 @@ class AuditLog(Base):
     __tablename__ = "audit_logs"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    timestamp = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), index=True)
+    timestamp = Column(
+        DateTime(timezone=True), nullable=False, server_default=func.now(), index=True
+    )
     event_type = Column(String(100), nullable=False, index=True)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), index=True)
-    level = Column(String(20), nullable=False)  # INFO, WARNING, ERROR, CRITICAL, SECURITY
+    level = Column(
+        String(20), nullable=False
+    )  # INFO, WARNING, ERROR, CRITICAL, SECURITY
     details = Column(JSON, nullable=False)
     hash = Column(String(64), nullable=False)  # SHA-256 for integrity
     ip_address = Column(String(45))
@@ -218,7 +241,9 @@ class Session(Base):
     id = Column(String(255), primary_key=True)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     device_id = Column(UUID(as_uuid=True), ForeignKey("devices.id"))
-    started_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    started_at = Column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
     ended_at = Column(DateTime(timezone=True))
     commands = Column(JSON, default=[])  # List of executed commands
     is_active = Column(Boolean, default=True)

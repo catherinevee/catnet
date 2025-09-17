@@ -20,6 +20,7 @@ class ValidationLevel(Enum):
 @dataclass
 class ValidationResult:
     """Validation result container"""
+
     is_valid: bool = True
     errors: List[str] = field(default_factory=list)
     warnings: List[str] = field(default_factory=list)
@@ -59,7 +60,7 @@ class ConfigValidator:
             self.no_default_communities,
             self.ssh_only_access,
             self.ntp_configured,
-            self.logging_configured
+            self.logging_configured,
         ]
 
         # Business rules
@@ -67,7 +68,7 @@ class ConfigValidator:
             self.approved_ip_ranges,
             self.naming_conventions,
             self.vlan_restrictions,
-            self.interface_descriptions_required
+            self.interface_descriptions_required,
         ]
 
     async def validate_configuration(self, config: Dict[str, Any]) -> ValidationResult:
@@ -84,7 +85,7 @@ class ConfigValidator:
             return result  # Stop if schema invalid
 
         # Layer 2: Syntax validation (vendor-specific)
-        vendor = config.get('vendor')
+        vendor = config.get("vendor")
         if not vendor:
             result.add_error("Vendor not specified")
             return result
@@ -118,33 +119,37 @@ class ConfigValidator:
         result = ValidationResult()
 
         # Required fields
-        required_fields = ['vendor', 'device_id', 'configuration']
+        required_fields = ["vendor", "device_id", "configuration"]
         for field in required_fields:
             if field not in config:
                 result.add_error(f"Required field missing: {field}")
 
         # Field types
-        if 'configuration' in config and not isinstance(config['configuration'], (dict, str)):
+        if "configuration" in config and not isinstance(
+            config["configuration"], (dict, str)
+        ):
             result.add_error("Configuration must be dict or string")
 
         # Metadata validation
-        if 'metadata' in config:
-            if not isinstance(config['metadata'], dict):
+        if "metadata" in config:
+            if not isinstance(config["metadata"], dict):
                 result.add_error("Metadata must be a dictionary")
 
         return result
 
-    async def validate_syntax(self, config: Dict[str, Any], vendor: str) -> ValidationResult:
+    async def validate_syntax(
+        self, config: Dict[str, Any], vendor: str
+    ) -> ValidationResult:
         """Layer 2: Vendor-specific syntax validation"""
         result = ValidationResult()
 
-        config_text = config.get('configuration', '')
+        config_text = config.get("configuration", "")
         if isinstance(config_text, dict):
             config_text = self.dict_to_config_text(config_text, vendor)
 
-        if vendor.lower() == 'cisco':
+        if vendor.lower() == "cisco":
             return await self.validate_cisco_syntax(config_text)
-        elif vendor.lower() == 'juniper':
+        elif vendor.lower() == "juniper":
             return await self.validate_juniper_syntax(config_text)
         else:
             result.add_error(f"Unsupported vendor: {vendor}")
@@ -155,7 +160,7 @@ class ConfigValidator:
         """Validate Cisco IOS/IOS-XE/NX-OS syntax"""
         result = ValidationResult()
 
-        lines = config.strip().split('\n')
+        lines = config.strip().split("\n")
         current_context = []
         interface_context = None
 
@@ -163,43 +168,47 @@ class ConfigValidator:
             line = line.strip()
 
             # Skip comments and empty lines
-            if not line or line.startswith('!'):
+            if not line or line.startswith("!"):
                 continue
 
             # Interface context
-            if line.startswith('interface '):
+            if line.startswith("interface "):
                 interface_context = line
-                current_context = ['interface']
+                current_context = ["interface"]
                 # Validate interface name
-                if not re.match(r'interface \S+', line):
+                if not re.match(r"interface \S+", line):
                     result.add_error(f"Line {line_num}: Invalid interface syntax")
 
             # Exit context
-            elif line == 'exit' or line == 'end':
+            elif line == "exit" or line == "end":
                 current_context = []
                 interface_context = None
 
             # IP address validation
-            elif 'ip address' in line:
-                if 'interface' not in current_context:
-                    result.add_warning(f"Line {line_num}: IP address outside interface context")
+            elif "ip address" in line:
+                if "interface" not in current_context:
+                    result.add_warning(
+                        f"Line {line_num}: IP address outside interface context"
+                    )
 
                 # Extract and validate IP
-                match = re.search(r'ip address (\S+) (\S+)', line)
+                match = re.search(r"ip address (\S+) (\S+)", line)
                 if match:
                     try:
-                        ip = ipaddress.IPv4Interface(f"{match.group(1)}/{match.group(2)}")
+                        ip = ipaddress.IPv4Interface(
+                            f"{match.group(1)}/{match.group(2)}"
+                        )
                     except ValueError:
                         result.add_error(f"Line {line_num}: Invalid IP address or mask")
 
             # ACL validation
-            elif line.startswith('access-list'):
-                if not re.match(r'access-list \d+ (permit|deny)', line):
+            elif line.startswith("access-list"):
+                if not re.match(r"access-list \d+ (permit|deny)", line):
                     result.add_error(f"Line {line_num}: Invalid ACL syntax")
 
             # VLAN validation
-            elif line.startswith('vlan '):
-                match = re.match(r'vlan (\d+)', line)
+            elif line.startswith("vlan "):
+                match = re.match(r"vlan (\d+)", line)
                 if match:
                     vlan_id = int(match.group(1))
                     if vlan_id < 1 or vlan_id > 4094:
@@ -211,30 +220,32 @@ class ConfigValidator:
         """Validate Juniper Junos syntax"""
         result = ValidationResult()
 
-        lines = config.strip().split('\n')
+        lines = config.strip().split("\n")
 
         for line_num, line in enumerate(lines, 1):
             line = line.strip()
 
             # Skip comments and empty lines
-            if not line or line.startswith('#'):
+            if not line or line.startswith("#"):
                 continue
 
             # Set commands
-            if line.startswith('set '):
+            if line.startswith("set "):
                 # Basic syntax check
-                if not re.match(r'set \S+ \S+', line):
+                if not re.match(r"set \S+ \S+", line):
                     result.add_error(f"Line {line_num}: Invalid set command syntax")
 
                 # Interface validation
-                if 'interfaces' in line:
+                if "interfaces" in line:
                     # Check for valid interface format
-                    if not re.search(r'(ge-|xe-|et-)\d+/\d+/\d+', line):
-                        result.add_warning(f"Line {line_num}: Non-standard interface naming")
+                    if not re.search(r"(ge-|xe-|et-)\d+/\d+/\d+", line):
+                        result.add_warning(
+                            f"Line {line_num}: Non-standard interface naming"
+                        )
 
                 # IP address validation
-                if 'address' in line:
-                    match = re.search(r'address (\S+)', line)
+                if "address" in line:
+                    match = re.search(r"address (\S+)", line)
                     if match:
                         try:
                             ipaddress.IPv4Interface(match.group(1))
@@ -242,17 +253,19 @@ class ConfigValidator:
                             result.add_error(f"Line {line_num}: Invalid IP address")
 
             # Delete commands
-            elif line.startswith('delete '):
-                if not re.match(r'delete \S+', line):
+            elif line.startswith("delete "):
+                if not re.match(r"delete \S+", line):
                     result.add_error(f"Line {line_num}: Invalid delete command syntax")
 
         return result
 
-    async def check_security_compliance(self, config: Dict[str, Any]) -> ValidationResult:
+    async def check_security_compliance(
+        self, config: Dict[str, Any]
+    ) -> ValidationResult:
         """Layer 3: Security compliance validation"""
         result = ValidationResult()
 
-        config_text = config.get('configuration', '')
+        config_text = config.get("configuration", "")
         if isinstance(config_text, dict):
             config_text = str(config_text)
 
@@ -268,9 +281,9 @@ class ConfigValidator:
         """Check for plaintext passwords"""
         # Check for common plaintext password patterns
         patterns = [
-            r'password [^0-9]\S+',  # Non-encrypted password
-            r'enable password [^0-9]',  # Non-encrypted enable
-            r'username \S+ password [^0-9]',  # User password not encrypted
+            r"password [^0-9]\S+",  # Non-encrypted password
+            r"enable password [^0-9]",  # Non-encrypted enable
+            r"username \S+ password [^0-9]",  # User password not encrypted
         ]
 
         for pattern in patterns:
@@ -281,7 +294,7 @@ class ConfigValidator:
 
     def no_weak_encryption(self, config: str) -> Optional[str]:
         """Check for weak encryption algorithms"""
-        weak_algorithms = ['des', 'md5', '3des', 'rc4']
+        weak_algorithms = ["des", "md5", "3des", "rc4"]
 
         for algo in weak_algorithms:
             if algo in config.lower():
@@ -291,42 +304,42 @@ class ConfigValidator:
 
     def required_access_lists(self, config: str) -> Optional[str]:
         """Check for required access lists"""
-        if 'vty' in config.lower():
-            if 'access-class' not in config.lower():
+        if "vty" in config.lower():
+            if "access-class" not in config.lower():
                 return "VTY lines without access-class"
 
         return None
 
     def no_default_communities(self, config: str) -> Optional[str]:
         """Check for default SNMP communities"""
-        default_communities = ['public', 'private']
+        default_communities = ["public", "private"]
 
         for community in default_communities:
-            if f'community {community}' in config.lower():
+            if f"community {community}" in config.lower():
                 return f"Default SNMP community detected: {community}"
 
         return None
 
     def ssh_only_access(self, config: str) -> Optional[str]:
         """Ensure SSH-only access"""
-        if 'transport input telnet' in config.lower():
+        if "transport input telnet" in config.lower():
             return "Telnet access enabled - use SSH only"
 
-        if 'line vty' in config.lower() and 'transport input ssh' not in config.lower():
+        if "line vty" in config.lower() and "transport input ssh" not in config.lower():
             return "VTY lines should specify SSH-only access"
 
         return None
 
     def ntp_configured(self, config: str) -> Optional[str]:
         """Check NTP is configured"""
-        if 'ntp server' not in config.lower():
+        if "ntp server" not in config.lower():
             return "NTP not configured - time synchronization required"
 
         return None
 
     def logging_configured(self, config: str) -> Optional[str]:
         """Check logging is configured"""
-        if 'logging' not in config.lower():
+        if "logging" not in config.lower():
             return "Logging not configured"
 
         return None
@@ -335,7 +348,7 @@ class ConfigValidator:
         """Layer 4: Business rules validation"""
         result = ValidationResult()
 
-        config_text = config.get('configuration', '')
+        config_text = config.get("configuration", "")
         if isinstance(config_text, dict):
             config_text = str(config_text)
 
@@ -349,14 +362,14 @@ class ConfigValidator:
     def approved_ip_ranges(self, config: str) -> Optional[str]:
         """Check for approved IP ranges"""
         # Extract all IP addresses
-        ip_pattern = r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b'
+        ip_pattern = r"\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b"
         ips = re.findall(ip_pattern, config)
 
         # Define approved ranges (example)
         approved_ranges = [
-            ipaddress.IPv4Network('10.0.0.0/8'),
-            ipaddress.IPv4Network('172.16.0.0/12'),
-            ipaddress.IPv4Network('192.168.0.0/16'),
+            ipaddress.IPv4Network("10.0.0.0/8"),
+            ipaddress.IPv4Network("172.16.0.0/12"),
+            ipaddress.IPv4Network("192.168.0.0/16"),
         ]
 
         for ip_str in ips:
@@ -372,15 +385,15 @@ class ConfigValidator:
     def naming_conventions(self, config: str) -> Optional[str]:
         """Check naming conventions"""
         # Check interface descriptions
-        if 'interface ' in config:
-            if 'description' not in config:
+        if "interface " in config:
+            if "description" not in config:
                 return "Interface missing description"
 
         # Check hostname format (example: must start with site code)
-        hostname_match = re.search(r'hostname (\S+)', config)
+        hostname_match = re.search(r"hostname (\S+)", config)
         if hostname_match:
             hostname = hostname_match.group(1)
-            if not re.match(r'^[A-Z]{3}-', hostname):
+            if not re.match(r"^[A-Z]{3}-", hostname):
                 return f"Hostname {hostname} doesn't follow naming convention"
 
         return None
@@ -390,7 +403,7 @@ class ConfigValidator:
         # Reserved VLANs
         reserved_vlans = [1, 1002, 1003, 1004, 1005]
 
-        vlan_matches = re.findall(r'vlan (\d+)', config)
+        vlan_matches = re.findall(r"vlan (\d+)", config)
         for vlan_str in vlan_matches:
             vlan_id = int(vlan_str)
             if vlan_id in reserved_vlans:
@@ -400,16 +413,18 @@ class ConfigValidator:
 
     def interface_descriptions_required(self, config: str) -> Optional[str]:
         """Ensure all interfaces have descriptions"""
-        lines = config.split('\n')
+        lines = config.split("\n")
         in_interface = False
 
         for line in lines:
-            if line.strip().startswith('interface '):
+            if line.strip().startswith("interface "):
                 in_interface = True
                 has_description = False
-            elif in_interface and line.strip().startswith('description'):
+            elif in_interface and line.strip().startswith("description"):
                 has_description = True
-            elif in_interface and (line.strip() == '!' or line.strip().startswith('interface')):
+            elif in_interface and (
+                line.strip() == "!" or line.strip().startswith("interface")
+            ):
                 if not has_description:
                     return "Interface missing description"
                 in_interface = False
@@ -420,12 +435,12 @@ class ConfigValidator:
         """Layer 5: Conflict detection"""
         result = ValidationResult()
 
-        config_text = config.get('configuration', '')
+        config_text = config.get("configuration", "")
         if isinstance(config_text, dict):
             config_text = str(config_text)
 
         # Check for duplicate IP addresses
-        ip_pattern = r'ip address (\S+) (\S+)'
+        ip_pattern = r"ip address (\S+) (\S+)"
         ip_matches = re.findall(ip_pattern, config_text)
         seen_ips = set()
 
@@ -435,7 +450,7 @@ class ConfigValidator:
             seen_ips.add(ip)
 
         # Check for overlapping ACLs
-        acl_pattern = r'access-list (\d+)'
+        acl_pattern = r"access-list (\d+)"
         acl_matches = re.findall(acl_pattern, config_text)
         acl_counts = {}
 
@@ -444,14 +459,18 @@ class ConfigValidator:
 
         for acl_num, count in acl_counts.items():
             if count > 10:  # Arbitrary threshold
-                result.add_warning(f"ACL {acl_num} has {count} entries - consider optimization")
+                result.add_warning(
+                    f"ACL {acl_num} has {count} entries - consider optimization"
+                )
 
         # Check for routing conflicts
-        static_routes = re.findall(r'ip route (\S+) (\S+) (\S+)', config_text)
+        static_routes = re.findall(r"ip route (\S+) (\S+) (\S+)", config_text)
         for i, route1 in enumerate(static_routes):
-            for route2 in static_routes[i+1:]:
+            for route2 in static_routes[i + 1 :]:
                 if route1[0] == route2[0] and route1[1] == route2[1]:
-                    result.add_warning(f"Duplicate static route for {route1[0]}/{route1[1]}")
+                    result.add_warning(
+                        f"Duplicate static route for {route1[0]}/{route1[1]}"
+                    )
 
         return result
 
@@ -467,4 +486,4 @@ class ConfigValidator:
             else:
                 lines.append(f"{key} {value}")
 
-        return '\n'.join(lines)
+        return "\n".join(lines)

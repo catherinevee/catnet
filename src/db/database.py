@@ -16,16 +16,17 @@ class DatabaseManager:
         database_url: Optional[str] = None,
         echo: bool = False,
         pool_size: int = 20,
-        max_overflow: int = 40
+        max_overflow: int = 40,
     ):
         self.database_url = database_url or os.getenv(
-            "DATABASE_URL",
-            "postgresql+asyncpg://catnet:catnet@localhost/catnet"
+            "DATABASE_URL", "postgresql+asyncpg://catnet:catnet@localhost/catnet"
         )
 
         # Ensure asyncpg driver for async operations
         if "postgresql://" in self.database_url and "+asyncpg" not in self.database_url:
-            self.database_url = self.database_url.replace("postgresql://", "postgresql+asyncpg://")
+            self.database_url = self.database_url.replace(
+                "postgresql://", "postgresql+asyncpg://"
+            )
 
         self.engine = create_async_engine(
             self.database_url,
@@ -37,9 +38,7 @@ class DatabaseManager:
         )
 
         self.async_session = async_sessionmaker(
-            self.engine,
-            class_=AsyncSession,
-            expire_on_commit=False
+            self.engine, class_=AsyncSession, expire_on_commit=False
         )
 
         # For synchronous operations (migrations)

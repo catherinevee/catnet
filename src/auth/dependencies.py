@@ -17,8 +17,7 @@ auth_manager = AuthManager(
 
 
 async def get_current_user(
-    token: str = Depends(oauth2_scheme),
-    db: AsyncSession = Depends(get_db)
+    token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
 ) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -36,9 +35,7 @@ async def get_current_user(
     except JWTError:
         raise credentials_exception
 
-    result = await db.execute(
-        select(User).where(User.id == user_id)
-    )
+    result = await db.execute(select(User).where(User.id == user_id))
     user = result.scalar_one_or_none()
 
     if user is None:
@@ -46,27 +43,24 @@ async def get_current_user(
 
     if not user.is_active:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Inactive user"
+            status_code=status.HTTP_403_FORBIDDEN, detail="Inactive user"
         )
 
     return user
 
 
 async def require_auth(
-    permission: str,
-    current_user: User = Depends(get_current_user)
+    permission: str, current_user: User = Depends(get_current_user)
 ) -> User:
     user_dict = {
         "sub": str(current_user.id),
         "username": current_user.username,
-        "roles": current_user.roles
+        "roles": current_user.roles,
     }
 
     if not await auth_manager.check_permission(user_dict, permission):
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions"
+            status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions"
         )
 
     return current_user
@@ -77,7 +71,7 @@ def require_roles(roles: list):
         if not any(role in current_user.roles for role in roles):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Insufficient role privileges"
+                detail="Insufficient role privileges",
             )
         return current_user
 

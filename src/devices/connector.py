@@ -20,7 +20,7 @@ class DeviceConnection:
         connection_id: str,
         device: Device,
         connection_handler: Any,
-        audit_logger: AuditLogger
+        audit_logger: AuditLogger,
     ):
         self.connection_id = connection_id
         self.device = device
@@ -33,20 +33,20 @@ class DeviceConnection:
     async def execute_command(self, command: str, enable_mode: bool = False) -> str:
         try:
             # Record command for audit
-            self.commands_executed.append({
-                "command": command,
-                "timestamp": datetime.utcnow().isoformat(),
-                "enable_mode": enable_mode
-            })
+            self.commands_executed.append(
+                {
+                    "command": command,
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "enable_mode": enable_mode,
+                }
+            )
 
             # Execute command
-            if enable_mode and hasattr(self.handler, 'enable'):
+            if enable_mode and hasattr(self.handler, "enable"):
                 self.handler.enable()
 
             output = await asyncio.get_event_loop().run_in_executor(
-                None,
-                self.handler.send_command,
-                command
+                None, self.handler.send_command, command
             )
 
             # Record output for audit
@@ -61,8 +61,8 @@ class DeviceConnection:
                 details={
                     "device_id": str(self.device.id),
                     "command": command,
-                    "error": str(e)
-                }
+                    "error": str(e),
+                },
             )
             raise
 
@@ -74,15 +74,13 @@ class DeviceConnection:
                 user_id=None,
                 details={
                     "device_id": str(self.device.id),
-                    "commands_count": len(commands)
-                }
+                    "commands_count": len(commands),
+                },
             )
 
             # Execute configuration commands
             output = await asyncio.get_event_loop().run_in_executor(
-                None,
-                self.handler.send_config_set,
-                commands
+                None, self.handler.send_config_set, commands
             )
 
             return output
@@ -91,10 +89,7 @@ class DeviceConnection:
             await self.audit.log_event(
                 event_type="configuration_change_failed",
                 user_id=None,
-                details={
-                    "device_id": str(self.device.id),
-                    "error": str(e)
-                }
+                details={"device_id": str(self.device.id), "error": str(e)},
             )
             raise
 
@@ -138,7 +133,7 @@ class DeviceConnection:
 
     def __del__(self):
         try:
-            if hasattr(self, 'handler') and self.handler:
+            if hasattr(self, "handler") and self.handler:
                 self.handler.disconnect()
         except:
             pass
@@ -148,7 +143,7 @@ class SecureDeviceConnector:
     def __init__(
         self,
         vault_client: Optional[VaultClient] = None,
-        audit_logger: Optional[AuditLogger] = None
+        audit_logger: Optional[AuditLogger] = None,
     ):
         self.vault = vault_client or VaultClient()
         self.audit = audit_logger or AuditLogger()
@@ -156,13 +151,11 @@ class SecureDeviceConnector:
         self.bastion_hosts = {
             "us-east": "bastion1.example.com",
             "us-west": "bastion2.example.com",
-            "eu-west": "bastion3.example.com"
+            "eu-west": "bastion3.example.com",
         }
 
     async def check_authorization(
-        self,
-        user_context: Dict[str, Any],
-        device_id: str
+        self, user_context: Dict[str, Any], device_id: str
     ) -> bool:
         # Check user permissions
         required_permission = "device.connect"
@@ -196,14 +189,14 @@ class SecureDeviceConnector:
         self,
         device: Device,
         credentials: Dict[str, Any],
-        jump_host: Optional[str] = None
+        jump_host: Optional[str] = None,
     ) -> Any:
         # Map vendor to device type
         device_type_map = {
             DeviceVendor.CISCO_IOS: "cisco_ios",
             DeviceVendor.CISCO_IOS_XE: "cisco_xe",
             DeviceVendor.CISCO_NX_OS: "cisco_nxos",
-            DeviceVendor.JUNIPER_JUNOS: "juniper_junos"
+            DeviceVendor.JUNIPER_JUNOS: "juniper_junos",
         }
 
         device_type = device_type_map.get(device.vendor)
@@ -217,7 +210,7 @@ class SecureDeviceConnector:
             "password": credentials["password"],
             "port": device.port or 22,
             "timeout": 30,
-            "session_log": f"logs/sessions/{device.hostname}_{datetime.utcnow().isoformat()}.log"
+            "session_log": f"logs/sessions/{device.hostname}_{datetime.utcnow().isoformat()}.log",
         }
 
         # Add enable password if available
@@ -228,16 +221,13 @@ class SecureDeviceConnector:
         if jump_host:
             # Create SSH tunnel through bastion
             connection_params["ssh_config_file"] = self._create_ssh_config(
-                device.ip_address,
-                jump_host
+                device.ip_address, jump_host
             )
 
         # Establish connection
         loop = asyncio.get_event_loop()
         connection = await loop.run_in_executor(
-            None,
-            ConnectHandler,
-            **connection_params
+            None, ConnectHandler, **connection_params
         )
 
         return connection
@@ -245,6 +235,7 @@ class SecureDeviceConnector:
     def _create_ssh_config(self, target_host: str, jump_host: str) -> str:
         # Create temporary SSH config for jump host
         import tempfile
+
         config_content = f"""
 Host target
     HostName {target_host}
@@ -252,22 +243,18 @@ Host target
     StrictHostKeyChecking no
     UserKnownHostsFile /dev/null
 """
-        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.conf') as f:
+        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".conf") as f:
             f.write(config_content)
             return f.name
 
     async def connect_to_device(
-        self,
-        device_id: str,
-        user_context: Dict[str, Any]
+        self, device_id: str, user_context: Dict[str, Any]
     ) -> Optional[DeviceConnection]:
         try:
             # Step 1: Verify user authorization
             if not await self.check_authorization(user_context, device_id):
                 await self.audit.log_unauthorized_attempt(
-                    user_context,
-                    f"device:{device_id}",
-                    "connect"
+                    user_context, f"device:{device_id}", "connect"
                 )
                 raise UnauthorizedException("Unauthorized access attempt")
 
@@ -277,22 +264,20 @@ Host target
                 hostname="router1",
                 ip_address="192.168.1.1",
                 vendor=DeviceVendor.CISCO_IOS,
-                port=22
+                port=22,
             )
 
             # Step 2: Get temporary credentials from Vault
             creds = await self.vault.get_temporary_credentials(
                 device_id=device_id,
-                requestor=user_context['user_id'],
-                ttl=1800  # 30 minutes
+                requestor=user_context["user_id"],
+                ttl=1800,  # 30 minutes
             )
 
             # Step 3: Connect through bastion
             jump_host = self.select_bastion(device)
             connection = await self.establish_secure_connection(
-                device=device,
-                credentials=creds,
-                jump_host=jump_host
+                device=device, credentials=creds, jump_host=jump_host
             )
 
             # Step 4: Create DeviceConnection wrapper
@@ -300,14 +285,12 @@ Host target
                 connection_id=str(uuid.uuid4()),
                 device=device,
                 connection_handler=connection,
-                audit_logger=self.audit
+                audit_logger=self.audit,
             )
 
             # Step 5: Enable session recording
             await self.audit.start_session_recording(
-                device_conn.session_id,
-                user_context['user_id'],
-                device_id
+                device_conn.session_id, user_context["user_id"], device_id
             )
 
             # Store active connection
@@ -315,12 +298,12 @@ Host target
 
             await self.audit.log_event(
                 event_type="device_connected",
-                user_id=user_context['user_id'],
+                user_id=user_context["user_id"],
                 details={
                     "device_id": device_id,
                     "connection_id": device_conn.connection_id,
-                    "session_id": device_conn.session_id
-                }
+                    "session_id": device_conn.session_id,
+                },
             )
 
             return device_conn
@@ -328,11 +311,8 @@ Host target
         except Exception as e:
             await self.audit.log_event(
                 event_type="device_connection_failed",
-                user_id=user_context.get('user_id'),
-                details={
-                    "device_id": device_id,
-                    "error": str(e)
-                }
+                user_id=user_context.get("user_id"),
+                details={"device_id": device_id, "error": str(e)},
             )
             raise
 
@@ -347,52 +327,37 @@ Host target
         device_ids: List[str],
         commands: List[str],
         user_context: Dict[str, Any],
-        parallel: bool = True
+        parallel: bool = True,
     ) -> Dict[str, Any]:
         results = {}
 
         if parallel:
             tasks = []
             for device_id in device_ids:
-                task = self._execute_on_device(
-                    device_id,
-                    commands,
-                    user_context
-                )
+                task = self._execute_on_device(device_id, commands, user_context)
                 tasks.append(task)
 
             responses = await asyncio.gather(*tasks, return_exceptions=True)
 
             for device_id, response in zip(device_ids, responses):
                 if isinstance(response, Exception):
-                    results[device_id] = {
-                        "success": False,
-                        "error": str(response)
-                    }
+                    results[device_id] = {"success": False, "error": str(response)}
                 else:
                     results[device_id] = response
         else:
             for device_id in device_ids:
                 try:
                     result = await self._execute_on_device(
-                        device_id,
-                        commands,
-                        user_context
+                        device_id, commands, user_context
                     )
                     results[device_id] = result
                 except Exception as e:
-                    results[device_id] = {
-                        "success": False,
-                        "error": str(e)
-                    }
+                    results[device_id] = {"success": False, "error": str(e)}
 
         return results
 
     async def _execute_on_device(
-        self,
-        device_id: str,
-        commands: List[str],
-        user_context: Dict[str, Any]
+        self, device_id: str, commands: List[str], user_context: Dict[str, Any]
     ) -> Dict[str, Any]:
         conn = None
         try:
@@ -405,10 +370,7 @@ Host target
                 output = await conn.execute_command(command)
                 outputs.append(output)
 
-            return {
-                "success": True,
-                "outputs": outputs
-            }
+            return {"success": True, "outputs": outputs}
 
         finally:
             if conn:

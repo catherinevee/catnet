@@ -49,7 +49,10 @@ class TestEncryption:
 
         assert private_key is not None
         assert public_key is not None
-        assert b"BEGIN RSA PRIVATE KEY" in private_key or b"BEGIN PRIVATE KEY" in private_key
+        assert (
+            b"BEGIN RSA PRIVATE KEY" in private_key
+            or b"BEGIN PRIVATE KEY" in private_key
+        )
         assert b"BEGIN PUBLIC KEY" in public_key
 
     def test_digital_signature(self):
@@ -64,7 +67,9 @@ class TestEncryption:
 
         # Verify with tampered data
         tampered_data = b"Tampered configuration data"
-        assert not EncryptionManager.verify_signature(tampered_data, signature, public_key)
+        assert not EncryptionManager.verify_signature(
+            tampered_data, signature, public_key
+        )
 
 
 class TestAuditLogger:
@@ -77,7 +82,7 @@ class TestAuditLogger:
             event_type="test_event",
             user_id="test_user",
             details={"action": "test_action"},
-            level=AuditLevel.INFO
+            level=AuditLevel.INFO,
         )
 
         assert event_id is not None
@@ -93,7 +98,7 @@ class TestAuditLogger:
             success=True,
             method="password",
             ip_address="192.168.1.1",
-            user_agent="TestAgent/1.0"
+            user_agent="TestAgent/1.0",
         )
 
         # Read and verify log
@@ -110,9 +115,7 @@ class TestAuditLogger:
         # Log multiple events
         for i in range(5):
             await audit.log_event(
-                event_type=f"test_event_{i}",
-                user_id=f"user_{i}",
-                details={"index": i}
+                event_type=f"test_event_{i}", user_id=f"user_{i}", details={"index": i}
             )
 
         # Verify integrity
@@ -127,9 +130,7 @@ class TestAuditLogger:
 
         # Start session
         await audit.start_session_recording(
-            session_id=session_id,
-            user_id="test_user",
-            device_id="device_1"
+            session_id=session_id, user_id="test_user", device_id="device_1"
         )
 
         # Record commands
@@ -213,7 +214,7 @@ class TestAuthManager:
 
 class TestVaultClient:
     @pytest.mark.asyncio
-    @patch('hvac.Client')
+    @patch("hvac.Client")
     async def test_get_secret(self, mock_hvac):
         mock_client = Mock()
         mock_client.is_authenticated.return_value = True
@@ -229,17 +230,19 @@ class TestVaultClient:
         assert secret["password"] == "secret123"
 
     @pytest.mark.asyncio
-    @patch('hvac.Client')
+    @patch("hvac.Client")
     async def test_get_device_credentials(self, mock_hvac):
         mock_client = Mock()
         mock_client.is_authenticated.return_value = True
         mock_client.secrets.kv.v2.read_secret_version.return_value = {
-            "data": {"data": {
-                "username": "device_admin",
-                "password": "device_pass",
-                "enable_password": "enable_pass",
-                "ssh_key": "ssh_key_content"
-            }}
+            "data": {
+                "data": {
+                    "username": "device_admin",
+                    "password": "device_pass",
+                    "enable_password": "enable_pass",
+                    "ssh_key": "ssh_key_content",
+                }
+            }
         }
         mock_hvac.return_value = mock_client
 
@@ -270,9 +273,9 @@ class TestSecurityIntegration:
             user_id="security_admin",
             details={
                 "config_hash": encryption.calculate_hash(config.encode()),
-                "encryption_method": "AES-256-GCM"
+                "encryption_method": "AES-256-GCM",
             },
-            level=AuditLevel.INFO
+            level=AuditLevel.INFO,
         )
 
         # Decrypt configuration
@@ -285,7 +288,7 @@ class TestSecurityIntegration:
             details={
                 "config_hash": encryption.calculate_hash(decrypted_config.encode())
             },
-            level=AuditLevel.INFO
+            level=AuditLevel.INFO,
         )
 
         # Verify

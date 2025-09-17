@@ -20,10 +20,7 @@ class GitHandler:
         self.temp_dirs = []
 
     async def clone_repository(
-        self,
-        repo_url: str,
-        branch: str = "main",
-        ssh_key_ref: Optional[str] = None
+        self, repo_url: str, branch: str = "main", ssh_key_ref: Optional[str] = None
     ) -> str:
         temp_dir = tempfile.mkdtemp(prefix="catnet_repo_")
         self.temp_dirs.append(temp_dir)
@@ -44,7 +41,7 @@ class GitHandler:
                     repo_url,
                     temp_dir,
                     branch=branch,
-                    env={"GIT_SSH_COMMAND": ssh_command}
+                    env={"GIT_SSH_COMMAND": ssh_command},
                 )
             else:
                 repo = Repo.clone_from(repo_url, temp_dir, branch=branch)
@@ -82,13 +79,15 @@ class GitHandler:
                 "previous_commit": current_commit,
                 "current_commit": new_commit,
                 "changed_files": changed_files,
-                "updated": current_commit != new_commit
+                "updated": current_commit != new_commit,
             }
 
         except Exception as e:
             raise Exception(f"Failed to pull latest changes: {str(e)}")
 
-    async def get_configs(self, repo_path: str, config_path: str = "configs/") -> List[Dict[str, Any]]:
+    async def get_configs(
+        self, repo_path: str, config_path: str = "configs/"
+    ) -> List[Dict[str, Any]]:
         configs = []
         config_dir = Path(repo_path) / config_path
 
@@ -99,11 +98,13 @@ class GitHandler:
             if file_path.is_file() and file_path.suffix in [".yaml", ".yml", ".json"]:
                 config = await self.parse_config_file(str(file_path))
                 if config:
-                    configs.append({
-                        "file": str(file_path.relative_to(repo_path)),
-                        "config": config,
-                        "hash": self.calculate_file_hash(str(file_path))
-                    })
+                    configs.append(
+                        {
+                            "file": str(file_path.relative_to(repo_path)),
+                            "config": config,
+                            "hash": self.calculate_file_hash(str(file_path)),
+                        }
+                    )
 
         return configs
 
@@ -176,13 +177,19 @@ class GitHandler:
                     for pattern in patterns:
                         matches = re.finditer(pattern, content)
                         for match in matches:
-                            line_num = content[:match.start()].count("\n") + 1
-                            secrets_found.append({
-                                "file": file_path.replace(repo_path, ""),
-                                "line": line_num,
-                                "pattern": pattern[:30],  # Truncate pattern for display
-                                "match": match.group()[:50]  # Truncate match for security
-                            })
+                            line_num = content[: match.start()].count("\n") + 1
+                            secrets_found.append(
+                                {
+                                    "file": file_path.replace(repo_path, ""),
+                                    "line": line_num,
+                                    "pattern": pattern[
+                                        :30
+                                    ],  # Truncate pattern for display
+                                    "match": match.group()[
+                                        :50
+                                    ],  # Truncate match for security
+                                }
+                            )
 
                 except Exception:
                     continue
@@ -196,38 +203,29 @@ class GitHandler:
 
             return {
                 "sha": commit.hexsha,
-                "author": {
-                    "name": commit.author.name,
-                    "email": commit.author.email
-                },
+                "author": {"name": commit.author.name, "email": commit.author.email},
                 "committer": {
                     "name": commit.committer.name,
-                    "email": commit.committer.email
+                    "email": commit.committer.email,
                 },
                 "message": commit.message,
                 "timestamp": commit.committed_datetime.isoformat(),
                 "files_changed": len(commit.stats.files),
-                "signed": await self.verify_commit_signature(repo_path, commit_sha)
+                "signed": await self.verify_commit_signature(repo_path, commit_sha),
             }
 
         except Exception as e:
             raise Exception(f"Failed to get commit info: {str(e)}")
 
     async def create_deployment_manifest(
-        self,
-        configs: List[Dict[str, Any]],
-        metadata: Dict[str, Any]
+        self, configs: List[Dict[str, Any]], metadata: Dict[str, Any]
     ) -> Dict[str, Any]:
         manifest = {
             "version": "1.0",
             "timestamp": datetime.utcnow().isoformat(),
             "metadata": metadata,
             "configs": [],
-            "validation": {
-                "passed": True,
-                "errors": [],
-                "warnings": []
-            }
+            "validation": {"passed": True, "errors": [], "warnings": []},
         }
 
         for config in configs:
@@ -236,13 +234,15 @@ class GitHandler:
                 json.dumps(config, sort_keys=True).encode()
             ).hexdigest()
 
-            manifest["configs"].append({
-                "file": config.get("file"),
-                "hash": config_hash,
-                "devices": config.get("devices", []),
-                "vendor": config.get("vendor"),
-                "type": config.get("type", "configuration")
-            })
+            manifest["configs"].append(
+                {
+                    "file": config.get("file"),
+                    "hash": config_hash,
+                    "devices": config.get("devices", []),
+                    "vendor": config.get("vendor"),
+                    "type": config.get("type", "configuration"),
+                }
+            )
 
         # Sign the manifest
         manifest_json = json.dumps(manifest, sort_keys=True)

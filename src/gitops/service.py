@@ -67,7 +67,7 @@ class GitOpsService:
             title="CatNet GitOps Service",
             version="1.0.0",
             docs_url="/api/docs",
-            redoc_url="/api/redoc"
+            redoc_url="/api/redoc",
         )
         self.port = port
         self.vault = VaultClient()
@@ -84,7 +84,7 @@ class GitOpsService:
         async def connect_repository(
             repo_data: RepositoryConnect,
             current_user: User = Depends(get_current_user),
-            db: AsyncSession = Depends(get_db)
+            db: AsyncSession = Depends(get_db),
         ):
             """Connect a Git repository"""
             # Check permission
@@ -100,7 +100,7 @@ class GitOpsService:
                 repo_path = await self.git_handler.clone_repository(
                     repo_url=repo_data.url,
                     branch=repo_data.branch,
-                    ssh_key_ref=repo_data.ssh_key_ref
+                    ssh_key_ref=repo_data.ssh_key_ref,
                 )
 
                 # Scan for secrets (CLAUDE.md requirement)
@@ -117,15 +117,14 @@ class GitOpsService:
                     webhook_secret_ref=None,
                     auto_deploy=repo_data.auto_deploy,
                     gpg_verification=repo_data.gpg_verification,
-                    config_path=repo_data.config_path
+                    config_path=repo_data.config_path,
                 )
 
                 # Store webhook secret in Vault if provided
                 if repo_data.webhook_secret:
                     webhook_secret_ref = f"git/webhooks/{repository.id}"
                     await self.vault.store_secret(
-                        webhook_secret_ref,
-                        {"secret": repo_data.webhook_secret}
+                        webhook_secret_ref, {"secret": repo_data.webhook_secret}
                     )
                     repository.webhook_secret_ref = webhook_secret_ref
 
@@ -139,8 +138,8 @@ class GitOpsService:
                     details={
                         "repository_id": str(repository.id),
                         "url": repo_data.url,
-                        "branch": repo_data.branch
-                    }
+                        "branch": repo_data.branch,
+                    },
                 )
 
                 # Cleanup temp directory
@@ -150,7 +149,7 @@ class GitOpsService:
                     "id": str(repository.id),
                     "url": repository.url,
                     "branch": repository.branch,
-                    "status": "connected"
+                    "status": "connected",
                 }
 
             except Exception as e:
@@ -158,11 +157,8 @@ class GitOpsService:
                 await self.audit.log_event(
                     event_type="repository_connection_failed",
                     user_id=str(current_user.id),
-                    details={
-                        "url": repo_data.url,
-                        "error": str(e)
-                    },
-                    level=AuditLevel.ERROR
+                    details={"url": repo_data.url, "error": str(e)},
+                    level=AuditLevel.ERROR,
                 )
                 raise HTTPException(500, f"Failed to connect repository: {str(e)}")
 
@@ -173,7 +169,7 @@ class GitOpsService:
             x_hub_signature: Optional[str] = Header(None),
             x_gitlab_token: Optional[str] = Header(None),
             x_hub_signature_256: Optional[str] = Header(None),
-            db: AsyncSession = Depends(get_db)
+            db: AsyncSession = Depends(get_db),
         ):
             """
             Process Git webhook
@@ -192,7 +188,7 @@ class GitOpsService:
                 await self.audit.log_security_incident(
                     incident_type="webhook_no_signature",
                     user_id=None,
-                    details={"provider": provider}
+                    details={"provider": provider},
                 )
                 raise HTTPException(401, "Webhook signature required")
 
@@ -215,7 +211,7 @@ class GitOpsService:
                     payload=payload,
                     signature=signature,
                     provider=provider,
-                    repository_id=str(repository.id)
+                    repository_id=str(repository.id),
                 )
 
                 if not is_valid:
@@ -224,24 +220,26 @@ class GitOpsService:
                         user_id=None,
                         details={
                             "repository_id": str(repository.id),
-                            "provider": provider
-                        }
+                            "provider": provider,
+                        },
                     )
                     raise HTTPException(401, "Invalid webhook signature")
 
                 # Parse webhook
-                parsed = self.webhook_handler.parse_webhook_payload(webhook_data, provider)
+                parsed = self.webhook_handler.parse_webhook_payload(
+                    webhook_data, provider
+                )
 
                 # CRITICAL: Scan for secrets (CLAUDE.md requirement)
                 await self._scan_webhook_commits(parsed, repository)
 
                 # Check if configuration changed
-                if self.webhook_handler.is_config_change(parsed, repository.config_path):
+                if self.webhook_handler.is_config_change(
+                    parsed, repository.config_path
+                ):
                     # Process configuration change in background
                     background_tasks.add_task(
-                        self._process_config_change,
-                        repository,
-                        parsed
+                        self._process_config_change, repository, parsed
                     )
 
                 await self.audit.log_event(
@@ -250,8 +248,8 @@ class GitOpsService:
                     details={
                         "repository_id": str(repository.id),
                         "provider": provider,
-                        "event": parsed.get("event")
-                    }
+                        "event": parsed.get("event"),
+                    },
                 )
 
                 return {"status": "accepted", "repository_id": str(repository.id)}
@@ -261,7 +259,7 @@ class GitOpsService:
                     event_type="webhook_processing_failed",
                     user_id=None,
                     details={"error": str(e)},
-                    level=AuditLevel.ERROR
+                    level=AuditLevel.ERROR,
                 )
                 raise HTTPException(500, f"Webhook processing failed: {str(e)}")
 
@@ -269,7 +267,7 @@ class GitOpsService:
         async def get_configurations(
             repository_id: str,
             current_user: User = Depends(get_current_user),
-            db: AsyncSession = Depends(get_db)
+            db: AsyncSession = Depends(get_db),
         ):
             """Get configurations from repository"""
             # Get repository
@@ -286,28 +284,29 @@ class GitOpsService:
                 repo_path = await self.git_handler.clone_repository(
                     repo_url=repository.url,
                     branch=repository.branch,
-                    ssh_key_ref=repository.ssh_key_ref
+                    ssh_key_ref=repository.ssh_key_ref,
                 )
 
                 # Get configurations
                 configs = await self.git_handler.get_configs(
-                    repo_path=repo_path,
-                    config_path=repository.config_path
+                    repo_path=repo_path, config_path=repository.config_path
                 )
 
                 # Validate each configuration
                 validated_configs = []
                 for config_item in configs:
                     validation = await self.validator.validate_configuration(
-                        config_item['config']
+                        config_item["config"]
                     )
-                    validated_configs.append({
-                        "file": config_item['file'],
-                        "hash": config_item['hash'],
-                        "valid": validation.is_valid,
-                        "errors": validation.errors,
-                        "warnings": validation.warnings
-                    })
+                    validated_configs.append(
+                        {
+                            "file": config_item["file"],
+                            "hash": config_item["hash"],
+                            "valid": validation.is_valid,
+                            "errors": validation.errors,
+                            "warnings": validation.warnings,
+                        }
+                    )
 
                 # Cleanup
                 self.git_handler.cleanup()
@@ -315,7 +314,7 @@ class GitOpsService:
                 return {
                     "repository_id": repository_id,
                     "configs": validated_configs,
-                    "total": len(validated_configs)
+                    "total": len(validated_configs),
                 }
 
             except Exception as e:
@@ -326,7 +325,7 @@ class GitOpsService:
         async def sync_repository(
             sync_request: ConfigSyncRequest,
             current_user: User = Depends(get_current_user),
-            db: AsyncSession = Depends(get_db)
+            db: AsyncSession = Depends(get_db),
         ):
             """Sync repository with latest changes"""
             # Check permission
@@ -335,7 +334,9 @@ class GitOpsService:
 
             # Get repository
             result = await db.execute(
-                select(GitRepository).where(GitRepository.id == sync_request.repository_id)
+                select(GitRepository).where(
+                    GitRepository.id == sync_request.repository_id
+                )
             )
             repository = result.scalar_one_or_none()
 
@@ -347,16 +348,15 @@ class GitOpsService:
                 repo_path = await self.git_handler.clone_repository(
                     repo_url=repository.url,
                     branch=repository.branch,
-                    ssh_key_ref=repository.ssh_key_ref
+                    ssh_key_ref=repository.ssh_key_ref,
                 )
 
                 # Pull latest
                 pull_result = await self.git_handler.pull_latest(
-                    repo_path=repo_path,
-                    branch=repository.branch
+                    repo_path=repo_path, branch=repository.branch
                 )
 
-                if pull_result['updated']:
+                if pull_result["updated"]:
                     # Scan for secrets
                     secrets_found = await self.git_handler.scan_for_secrets(repo_path)
                     if secrets_found:
@@ -364,7 +364,7 @@ class GitOpsService:
                         raise HTTPException(400, "New commits contain secrets")
 
                     # Update last commit hash
-                    repository.last_commit_hash = pull_result['current_commit']
+                    repository.last_commit_hash = pull_result["current_commit"]
                     repository.last_sync = datetime.utcnow()
                     await db.commit()
 
@@ -377,9 +377,9 @@ class GitOpsService:
                     user_id=str(current_user.id),
                     details={
                         "repository_id": str(repository.id),
-                        "updated": pull_result['updated'],
-                        "commit": pull_result['current_commit']
-                    }
+                        "updated": pull_result["updated"],
+                        "commit": pull_result["current_commit"],
+                    },
                 )
 
                 # Cleanup
@@ -387,9 +387,9 @@ class GitOpsService:
 
                 return {
                     "repository_id": str(repository.id),
-                    "updated": pull_result['updated'],
-                    "current_commit": pull_result['current_commit'],
-                    "changed_files": pull_result.get('changed_files', [])
+                    "updated": pull_result["updated"],
+                    "current_commit": pull_result["current_commit"],
+                    "changed_files": pull_result.get("changed_files", []),
                 }
 
             except Exception as e:
@@ -411,7 +411,7 @@ class GitOpsService:
 
     def _validate_repo_url(self, url: str) -> bool:
         """Validate repository URL"""
-        valid_prefixes = ['https://', 'git@', 'ssh://']
+        valid_prefixes = ["https://", "git@", "ssh://"]
         return any(url.startswith(prefix) for prefix in valid_prefixes)
 
     async def _quarantine_and_alert(self, secrets: List[Dict[str, Any]], user_id: str):
@@ -421,8 +421,8 @@ class GitOpsService:
             user_id=user_id,
             details={
                 "secret_count": len(secrets),
-                "files": list(set(s['file'] for s in secrets))
-            }
+                "files": list(set(s["file"] for s in secrets)),
+            },
         )
 
         # Would send alerts to security team
@@ -430,58 +430,61 @@ class GitOpsService:
 
     def _detect_provider(self, headers: dict) -> str:
         """Detect Git provider from headers"""
-        if 'x-github-event' in headers:
-            return 'github'
-        elif 'x-gitlab-event' in headers:
-            return 'gitlab'
-        elif 'x-event-key' in headers:
-            return 'bitbucket'
+        if "x-github-event" in headers:
+            return "github"
+        elif "x-gitlab-event" in headers:
+            return "gitlab"
+        elif "x-event-key" in headers:
+            return "bitbucket"
         else:
-            return 'unknown'
+            return "unknown"
 
     def _extract_repo_url(self, webhook_data: dict, provider: str) -> str:
         """Extract repository URL from webhook"""
-        if provider == 'github':
-            return webhook_data.get('repository', {}).get('clone_url', '')
-        elif provider == 'gitlab':
-            return webhook_data.get('project', {}).get('git_http_url', '')
+        if provider == "github":
+            return webhook_data.get("repository", {}).get("clone_url", "")
+        elif provider == "gitlab":
+            return webhook_data.get("project", {}).get("git_http_url", "")
         else:
-            return ''
+            return ""
 
     async def _scan_webhook_commits(self, parsed: dict, repository: GitRepository):
         """Scan webhook commits for secrets"""
         # Would implement secret scanning on commit content
         pass
 
-    async def _process_config_change(self, repository: GitRepository, webhook_data: dict):
+    async def _process_config_change(
+        self, repository: GitRepository, webhook_data: dict
+    ):
         """Process configuration change from webhook"""
         try:
             # Clone repository
             repo_path = await self.git_handler.clone_repository(
                 repo_url=repository.url,
                 branch=repository.branch,
-                ssh_key_ref=repository.ssh_key_ref
+                ssh_key_ref=repository.ssh_key_ref,
             )
 
             # Get updated configs
             configs = await self.git_handler.get_configs(
-                repo_path=repo_path,
-                config_path=repository.config_path
+                repo_path=repo_path, config_path=repository.config_path
             )
 
             # Validate configurations
             for config in configs:
-                validation = await self.validator.validate_configuration(config['config'])
+                validation = await self.validator.validate_configuration(
+                    config["config"]
+                )
                 if not validation.is_valid:
                     await self.audit.log_event(
                         event_type="config_validation_failed",
                         user_id=None,
                         details={
                             "repository_id": str(repository.id),
-                            "file": config['file'],
-                            "errors": validation.errors
+                            "file": config["file"],
+                            "errors": validation.errors,
                         },
-                        level=AuditLevel.WARNING
+                        level=AuditLevel.WARNING,
                     )
                     return
 
@@ -497,14 +500,13 @@ class GitOpsService:
             await self.audit.log_event(
                 event_type="config_change_processing_failed",
                 user_id=None,
-                details={
-                    "repository_id": str(repository.id),
-                    "error": str(e)
-                },
-                level=AuditLevel.ERROR
+                details={"repository_id": str(repository.id), "error": str(e)},
+                level=AuditLevel.ERROR,
             )
 
-    async def _trigger_auto_deployment(self, repository: GitRepository, pull_result: dict):
+    async def _trigger_auto_deployment(
+        self, repository: GitRepository, pull_result: dict
+    ):
         """Trigger automatic deployment"""
         # Would create deployment through deployment service
         pass
@@ -515,12 +517,7 @@ class GitOpsService:
         pass
 
     def run(self):
-        uvicorn.run(
-            self.app,
-            host="0.0.0.0",
-            port=self.port,
-            log_level="info"
-        )
+        uvicorn.run(self.app, host="0.0.0.0", port=self.port, log_level="info")
 
 
 if __name__ == "__main__":

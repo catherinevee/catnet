@@ -10,10 +10,7 @@ class WebhookHandler:
         self.vault = vault_client or VaultClient()
 
     async def verify_github_signature(
-        self,
-        payload: bytes,
-        signature: str,
-        secret: str
+        self, payload: bytes, signature: str, secret: str
     ) -> bool:
         if not signature:
             return False
@@ -22,19 +19,12 @@ class WebhookHandler:
         if signature.startswith("sha256="):
             signature = signature[7:]
 
-        expected_sig = hmac.new(
-            secret.encode(),
-            payload,
-            hashlib.sha256
-        ).hexdigest()
+        expected_sig = hmac.new(secret.encode(), payload, hashlib.sha256).hexdigest()
 
         return hmac.compare_digest(expected_sig, signature)
 
     async def verify_gitlab_signature(
-        self,
-        payload: bytes,
-        signature: str,
-        secret: str
+        self, payload: bytes, signature: str, secret: str
     ) -> bool:
         if not signature:
             return False
@@ -42,28 +32,17 @@ class WebhookHandler:
         return signature == secret
 
     async def verify_bitbucket_signature(
-        self,
-        payload: bytes,
-        signature: str,
-        secret: str
+        self, payload: bytes, signature: str, secret: str
     ) -> bool:
         if not signature:
             return False
 
-        expected_sig = hmac.new(
-            secret.encode(),
-            payload,
-            hashlib.sha256
-        ).hexdigest()
+        expected_sig = hmac.new(secret.encode(), payload, hashlib.sha256).hexdigest()
 
         return hmac.compare_digest(expected_sig, signature)
 
     async def verify_webhook_signature(
-        self,
-        payload: bytes,
-        signature: str,
-        provider: str,
-        repository_id: str
+        self, payload: bytes, signature: str, provider: str, repository_id: str
     ) -> bool:
         # Get webhook secret from vault
         secret = await self.vault.get_webhook_secret(repository_id)
@@ -84,7 +63,7 @@ class WebhookHandler:
             "repository": {
                 "name": payload.get("repository", {}).get("name"),
                 "url": payload.get("repository", {}).get("clone_url"),
-                "branch": payload.get("ref", "").replace("refs/heads/", "")
+                "branch": payload.get("ref", "").replace("refs/heads/", ""),
             },
             "commits": [
                 {
@@ -94,14 +73,14 @@ class WebhookHandler:
                     "timestamp": commit.get("timestamp"),
                     "added": commit.get("added", []),
                     "modified": commit.get("modified", []),
-                    "removed": commit.get("removed", [])
+                    "removed": commit.get("removed", []),
                 }
                 for commit in payload.get("commits", [])
             ],
             "sender": {
                 "username": payload.get("sender", {}).get("login"),
-                "email": payload.get("sender", {}).get("email")
-            }
+                "email": payload.get("sender", {}).get("email"),
+            },
         }
 
     def parse_gitlab_webhook(self, payload: Dict[str, Any]) -> Dict[str, Any]:
@@ -111,7 +90,7 @@ class WebhookHandler:
             "repository": {
                 "name": payload.get("project", {}).get("name"),
                 "url": payload.get("project", {}).get("git_http_url"),
-                "branch": payload.get("ref", "").replace("refs/heads/", "")
+                "branch": payload.get("ref", "").replace("refs/heads/", ""),
             },
             "commits": [
                 {
@@ -121,20 +100,18 @@ class WebhookHandler:
                     "timestamp": commit.get("timestamp"),
                     "added": commit.get("added", []),
                     "modified": commit.get("modified", []),
-                    "removed": commit.get("removed", [])
+                    "removed": commit.get("removed", []),
                 }
                 for commit in payload.get("commits", [])
             ],
             "sender": {
                 "username": payload.get("user_username"),
-                "email": payload.get("user_email")
-            }
+                "email": payload.get("user_email"),
+            },
         }
 
     def parse_webhook_payload(
-        self,
-        payload: Dict[str, Any],
-        provider: str
+        self, payload: Dict[str, Any], provider: str
     ) -> Dict[str, Any]:
         if provider.lower() == "github":
             return self.parse_github_webhook(payload)
@@ -142,10 +119,7 @@ class WebhookHandler:
             return self.parse_gitlab_webhook(payload)
         else:
             # Return raw payload for unsupported providers
-            return {
-                "provider": provider,
-                "raw": payload
-            }
+            return {"provider": provider, "raw": payload}
 
     def get_changed_files(self, parsed_webhook: Dict[str, Any]) -> List[str]:
         changed_files = set()
@@ -158,9 +132,7 @@ class WebhookHandler:
         return list(changed_files)
 
     def is_config_change(
-        self,
-        parsed_webhook: Dict[str, Any],
-        config_path: str = "configs/"
+        self, parsed_webhook: Dict[str, Any], config_path: str = "configs/"
     ) -> bool:
         changed_files = self.get_changed_files(parsed_webhook)
 

@@ -8,7 +8,8 @@ import os
 from unittest.mock import Mock, AsyncMock
 
 # Add src to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 
 # Configure event loop
 @pytest.fixture(scope="session")
@@ -34,13 +35,17 @@ def mock_database():
 def mock_vault_client():
     """Mock Vault client"""
     mock_vault = Mock()
-    mock_vault.get_secret = AsyncMock(return_value={"username": "test", "password": "test123"})
+    mock_vault.get_secret = AsyncMock(
+        return_value={"username": "test", "password": "test123"}
+    )
     mock_vault.store_secret = AsyncMock()
-    mock_vault.get_device_credentials = AsyncMock(return_value={
-        "username": "admin",
-        "password": "admin123",
-        "enable_password": "enable123"
-    })
+    mock_vault.get_device_credentials = AsyncMock(
+        return_value={
+            "username": "admin",
+            "password": "admin123",
+            "enable_password": "enable123",
+        }
+    )
     return mock_vault
 
 
@@ -99,10 +104,7 @@ interface GigabitEthernet0/0
  no shutdown
 !
 """,
-        "metadata": {
-            "author": "test",
-            "timestamp": "2024-01-01T00:00:00Z"
-        }
+        "metadata": {"author": "test", "timestamp": "2024-01-01T00:00:00Z"},
     }
 
 
