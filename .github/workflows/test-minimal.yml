@@ -30,6 +30,7 @@ jobs:
           pip install fastapi uvicorn pydantic
           pip install sqlalchemy asyncpg
           pip install cryptography passlib python-jose
+          pip install aiofiles pyyaml
 
       - name: Check Python syntax
         run: |
