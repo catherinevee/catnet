@@ -194,7 +194,9 @@ async def dry_run_deployment(
         ]
 
         # Create simulation ID
-        simulation_id = str(UUID(int=hash(str(request.dict()) + str(datetime.utcnow()))))
+        simulation_id = str(
+            UUID(int=hash(str(request.dict()) + str(datetime.utcnow())))
+        )
 
         # Audit log
         audit = AuditLogger()
@@ -262,21 +264,14 @@ async def get_deployment_metrics(
             select(
                 func.count(Deployment.id).label("total"),
                 func.sum(
-                    func.cast(
-                        Deployment.state == DeploymentState.COMPLETED,
-                        type_=int
-                    )
+                    func.cast(Deployment.state == DeploymentState.COMPLETED, type_=int)
                 ).label("successful"),
                 func.sum(
-                    func.cast(
-                        Deployment.state == DeploymentState.FAILED,
-                        type_=int
-                    )
+                    func.cast(Deployment.state == DeploymentState.FAILED, type_=int)
                 ).label("failed"),
                 func.sum(
                     func.cast(
-                        Deployment.state == DeploymentState.ROLLED_BACK,
-                        type_=int
+                        Deployment.state == DeploymentState.ROLLED_BACK, type_=int
                     )
                 ).label("rollback"),
             ).where(Deployment.created_at >= start_date)
@@ -347,9 +342,7 @@ async def get_deployment_metrics(
         vendor_stats = {}  # Simplified for now
 
         # Record metrics for Prometheus
-        deployment_metrics.record(
-            "total", total, {"period": f"{days}_days"}
-        )
+        deployment_metrics.record("total", total, {"period": f"{days}_days"})
         deployment_metrics.record(
             "success_rate", success_rate, {"period": f"{days}_days"}
         )
@@ -414,7 +407,9 @@ async def schedule_deployment(
         # Check maintenance window if specified
         if request.maintenance_window_id:
             # Validate maintenance window (simplified)
-            logger.info(f"Validating maintenance window {request.maintenance_window_id}")
+            logger.info(
+                f"Validating maintenance window {request.maintenance_window_id}"
+            )
 
         # Create deployment record
         deployment = Deployment(

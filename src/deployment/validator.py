@@ -106,7 +106,9 @@ class DeploymentValidator:
 
             # Check last seen
             if device.last_seen:
-                last_seen_hours = (datetime.utcnow() - device.last_seen).total_seconds() / 3600
+                last_seen_hours = (
+                    datetime.utcnow() - device.last_seen
+                ).total_seconds() / 3600
                 if last_seen_hours > 24:
                     warnings.append(
                         f"Device {device.hostname} last seen {last_seen_hours:.1f} hours ago"
@@ -167,7 +169,10 @@ class DeploymentValidator:
 
         # Check approval requirements
         if deployment.approval_required:
-            if not deployment.approved_by or len(deployment.approved_by) < deployment.approval_count:
+            if (
+                not deployment.approved_by
+                or len(deployment.approved_by) < deployment.approval_count
+            ):
                 errors.append(
                     f"Deployment requires {deployment.approval_count} approvals, has {len(deployment.approved_by or [])}"
                 )
@@ -186,7 +191,9 @@ class DeploymentValidator:
             if device.location and any(
                 loc in device.location.lower() for loc in critical_locations
             ):
-                warnings.append(f"Deployment includes critical device: {device.hostname}")
+                warnings.append(
+                    f"Deployment includes critical device: {device.hostname}"
+                )
 
         return {
             "rule_name": "business_rules",
@@ -247,8 +254,12 @@ class DeploymentValidator:
         # - Configuration dependencies
 
         # Example: Check if core routers are deployed before edge
-        core_devices = [d for d in devices if d.location and "core" in d.location.lower()]
-        edge_devices = [d for d in devices if d.location and "edge" in d.location.lower()]
+        core_devices = [
+            d for d in devices if d.location and "core" in d.location.lower()
+        ]
+        edge_devices = [
+            d for d in devices if d.location and "edge" in d.location.lower()
+        ]
 
         if edge_devices and not core_devices:
             warnings.append("Deploying to edge devices without core devices")

@@ -48,9 +48,7 @@ class ConfigDiff(BaseModel):
 
 def verify_github_signature(payload: bytes, signature: str, secret: str) -> bool:
     """Verify GitHub webhook signature"""
-    expected = hmac.new(
-        secret.encode(), payload, hashlib.sha256
-    ).hexdigest()
+    expected = hmac.new(secret.encode(), payload, hashlib.sha256).hexdigest()
     return hmac.compare_digest(f"sha256={expected}", signature)
 
 
@@ -116,7 +114,9 @@ async def handle_github_webhook(
 
         # Verify signature
         if x_hub_signature_256:
-            if not verify_github_signature(payload, x_hub_signature_256, webhook_secret):
+            if not verify_github_signature(
+                payload, x_hub_signature_256, webhook_secret
+            ):
                 logger.error(f"Invalid GitHub signature for {repo_url}")
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,

@@ -78,9 +78,7 @@ class DatabasePoolManager:
             async with self.engine.begin() as conn:
                 await conn.execute("SELECT 1")
 
-            logger.info(
-                f"Database pool initialized with {self.pool_size} connections"
-            )
+            logger.info(f"Database pool initialized with {self.pool_size} connections")
 
         except Exception as e:
             logger.error(f"Failed to initialize database pool: {e}")
@@ -174,9 +172,7 @@ class RedisCacheManager:
         """Create namespaced cache key"""
         return f"{self.key_prefix}{key}"
 
-    async def get(
-        self, key: str, default: Any = None, deserialize: bool = True
-    ) -> Any:
+    async def get(self, key: str, default: Any = None, deserialize: bool = True) -> Any:
         """Get value from cache"""
         if not self.redis_client:
             return default

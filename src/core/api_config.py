@@ -47,12 +47,14 @@ class CORSConfig:
 
         # Add localhost for development (remove in production)
         if self._is_development():
-            self.allowed_origins.extend([
-                "http://localhost:3000",
-                "http://localhost:8080",
-                "http://127.0.0.1:3000",
-                "http://127.0.0.1:8080",
-            ])
+            self.allowed_origins.extend(
+                [
+                    "http://localhost:3000",
+                    "http://localhost:8080",
+                    "http://127.0.0.1:3000",
+                    "http://127.0.0.1:8080",
+                ]
+            )
 
         self.allowed_methods = allowed_methods or [
             "GET",
@@ -92,6 +94,7 @@ class CORSConfig:
     def _is_development(self) -> bool:
         """Check if running in development mode"""
         import os
+
         return os.getenv("ENVIRONMENT", "production").lower() in ["development", "dev"]
 
     def configure_cors(self, app):
@@ -170,7 +173,9 @@ class APIVersioning:
 
             # Add deprecation warning for deprecated versions
             if version in self.deprecated_versions:
-                router.add_event_handler("startup", self._log_deprecation_warning(version))
+                router.add_event_handler(
+                    "startup", self._log_deprecation_warning(version)
+                )
 
             self.version_routers[version] = router
             app.include_router(router)
@@ -178,14 +183,18 @@ class APIVersioning:
         # Add version middleware
         app.middleware("http")(self._version_middleware)
 
-        logger.info(f"API versioning configured with versions: {self.supported_versions}")
+        logger.info(
+            f"API versioning configured with versions: {self.supported_versions}"
+        )
 
     def _log_deprecation_warning(self, version: str):
         """Log deprecation warning"""
+
         def log_warning():
             logger.warning(
                 f"API version {version} is deprecated and will be removed in future releases"
             )
+
         return log_warning
 
     async def _version_middleware(self, request: Request, call_next):
@@ -225,7 +234,9 @@ class APIVersioning:
         if version in self.deprecated_versions:
             response.headers["X-API-Deprecated"] = "true"
             response.headers["X-API-Sunset-Date"] = "2026-01-01"
-            response.headers["X-API-Migration-Guide"] = "https://docs.catnet.local/api/migration"
+            response.headers[
+                "X-API-Migration-Guide"
+            ] = "https://docs.catnet.local/api/migration"
 
         return response
 
@@ -241,10 +252,14 @@ class RequestValidation:
 
     # Common patterns for validation
     PATTERNS = {
-        "uuid": re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"),
+        "uuid": re.compile(
+            r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        ),
         "ipv4": re.compile(r"^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$"),
         "ipv6": re.compile(r"^(?:[0-9a-fA-F]{0,4}:){7}[0-9a-fA-F]{0,4}$"),
-        "hostname": re.compile(r"^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*$"),
+        "hostname": re.compile(
+            r"^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*$"
+        ),
         "email": re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"),
         "alphanumeric": re.compile(r"^[a-zA-Z0-9]+$"),
         "safe_string": re.compile(r"^[a-zA-Z0-9\s\-_.,!?]+$"),
@@ -258,7 +273,9 @@ class RequestValidation:
     @classmethod
     def validate_ip(cls, value: str) -> bool:
         """Validate IP address (v4 or v6)"""
-        return bool(cls.PATTERNS["ipv4"].match(value) or cls.PATTERNS["ipv6"].match(value))
+        return bool(
+            cls.PATTERNS["ipv4"].match(value) or cls.PATTERNS["ipv6"].match(value)
+        )
 
     @classmethod
     def validate_hostname(cls, value: str) -> bool:
@@ -324,7 +341,9 @@ class PaginationParams(BaseModel):
     page: int = Field(1, ge=1, le=10000, description="Page number")
     per_page: int = Field(20, ge=1, le=100, description="Items per page")
     sort_by: Optional[str] = Field(None, description="Sort field")
-    sort_order: Optional[str] = Field("asc", regex="^(asc|desc)$", description="Sort order")
+    sort_order: Optional[str] = Field(
+        "asc", regex="^(asc|desc)$", description="Sort order"
+    )
 
     def get_offset(self) -> int:
         """Calculate offset for database query"""
@@ -342,7 +361,9 @@ class APIResponse(BaseModel):
     data: Optional[Any] = Field(None, description="Response data")
     error: Optional[str] = Field(None, description="Error message")
     message: Optional[str] = Field(None, description="Status message")
-    timestamp: datetime = Field(default_factory=datetime.utcnow, description="Response timestamp")
+    timestamp: datetime = Field(
+        default_factory=datetime.utcnow, description="Response timestamp"
+    )
     request_id: Optional[str] = Field(None, description="Request tracking ID")
 
     class Config:

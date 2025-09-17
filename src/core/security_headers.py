@@ -65,9 +65,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
         return response
 
-    def _add_security_headers(
-        self, response: Response, request: Request, nonce: str
-    ):
+    def _add_security_headers(self, response: Response, request: Request, nonce: str):
         """Add security headers to response"""
 
         # X-Content-Type-Options
@@ -96,9 +94,9 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
         # Strict-Transport-Security (HSTS)
         if self.enable_hsts and request.url.scheme == "https":
-            response.headers["Strict-Transport-Security"] = (
-                "max-age=31536000; includeSubDomains; preload"
-            )
+            response.headers[
+                "Strict-Transport-Security"
+            ] = "max-age=31536000; includeSubDomains; preload"
 
         # Content-Security-Policy
         if self.enable_csp:
@@ -111,7 +109,9 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
         # Cache-Control for sensitive endpoints
         if self._is_sensitive_endpoint(request.url.path):
-            response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, private"
+            response.headers[
+                "Cache-Control"
+            ] = "no-store, no-cache, must-revalidate, private"
             response.headers["Pragma"] = "no-cache"
             response.headers["Expires"] = "0"
 
@@ -140,10 +140,12 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         if origin in self.allowed_origins:
             response.headers["Access-Control-Allow-Origin"] = origin
             response.headers["Access-Control-Allow-Credentials"] = "true"
-            response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-            response.headers["Access-Control-Allow-Headers"] = (
-                "Content-Type, Authorization, X-Request-ID, X-CSRF-Token"
-            )
+            response.headers[
+                "Access-Control-Allow-Methods"
+            ] = "GET, POST, PUT, DELETE, OPTIONS"
+            response.headers[
+                "Access-Control-Allow-Headers"
+            ] = "Content-Type, Authorization, X-Request-ID, X-CSRF-Token"
             response.headers["Access-Control-Max-Age"] = "86400"
         else:
             # Default to most restrictive
@@ -186,9 +188,7 @@ class CSRFProtection:
 
         # Create signed token
         payload = f"{random_data}.{timestamp}"
-        signature = hashlib.sha256(
-            f"{payload}.{self.secret_key}".encode()
-        ).hexdigest()
+        signature = hashlib.sha256(f"{payload}.{self.secret_key}".encode()).hexdigest()
 
         return f"{payload}.{signature}"
 

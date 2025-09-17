@@ -53,7 +53,9 @@ class GitOpsProcessor:
 
             # Check if push is to configured branch
             if branch != repository.branch:
-                logger.info(f"Ignoring push to branch {branch}, configured: {repository.branch}")
+                logger.info(
+                    f"Ignoring push to branch {branch}, configured: {repository.branch}"
+                )
                 return {
                     "status": "ignored",
                     "reason": f"Branch {branch} not configured for auto-deployment",
@@ -69,7 +71,9 @@ class GitOpsProcessor:
             repo_path = await self.sync_repository(repository)
 
             # Parse configurations
-            configs = await self._parse_configurations(repo_path, repository.config_path)
+            configs = await self._parse_configurations(
+                repo_path, repository.config_path
+            )
 
             # Validate configurations
             validation_results = await self._validate_configurations(configs)
@@ -129,7 +133,9 @@ class GitOpsProcessor:
 
         try:
             # Extract PR information
-            pr = webhook_data.get("pull_request") or webhook_data.get("merge_request", {})
+            pr = webhook_data.get("pull_request") or webhook_data.get(
+                "merge_request", {}
+            )
             action = webhook_data.get("action", "")
 
             if action not in ["opened", "synchronize", "reopened"]:
@@ -145,7 +151,9 @@ class GitOpsProcessor:
             repo_path = await self.sync_repository(repository, pr_branch)
 
             # Parse configurations from PR
-            configs = await self._parse_configurations(repo_path, repository.config_path)
+            configs = await self._parse_configurations(
+                repo_path, repository.config_path
+            )
 
             # Validate configurations
             validation_results = await self._validate_configurations(configs)
@@ -264,11 +272,13 @@ class GitOpsProcessor:
             message = commit.get("message", "")
             for pattern in patterns:
                 if re.search(pattern, message):
-                    secrets_found.append({
-                        "commit": commit.get("id"),
-                        "location": "commit message",
-                        "pattern": pattern,
-                    })
+                    secrets_found.append(
+                        {
+                            "commit": commit.get("id"),
+                            "location": "commit message",
+                            "pattern": pattern,
+                        }
+                    )
 
             # Check added/modified content
             added = commit.get("added", [])
@@ -276,7 +286,10 @@ class GitOpsProcessor:
 
             for file in added + modified:
                 # Would check file content here
-                if any(keyword in file.lower() for keyword in ["secret", "key", "password", "token"]):
+                if any(
+                    keyword in file.lower()
+                    for keyword in ["secret", "key", "password", "token"]
+                ):
                     logger.warning(f"Potential secret file: {file}")
 
         return {
@@ -366,7 +379,9 @@ class GitOpsProcessor:
 
             # Security validation
             if "password" in str(config).lower():
-                errors.append(f"{config.get('_source_file')}: Contains hardcoded password")
+                errors.append(
+                    f"{config.get('_source_file')}: Contains hardcoded password"
+                )
 
             # Business rules validation
             # Would add custom validation rules here
@@ -435,7 +450,9 @@ class GitOpsProcessor:
             for warning in validation_results["warnings"]:
                 comment += f"- {warning}\n"
 
-        comment += f"\n*Validated {validation_results['configs_validated']} configurations*"
+        comment += (
+            f"\n*Validated {validation_results['configs_validated']} configurations*"
+        )
 
         return comment
 
