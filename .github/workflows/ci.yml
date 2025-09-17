@@ -500,8 +500,7 @@ jobs:
   dependency-check:
     name: Dependency Security Check
     runs-on: ubuntu-latest
-    schedule:
-      - cron: '0 0 * * 1'  # Weekly on Monday
+    if: github.event_name == 'schedule'  # Only run on scheduled events
 
     steps:
       - name: Checkout code
