@@ -20,17 +20,20 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Create non-root user for security
+RUN useradd -m -u 1000 catnet
+
 # Copy application code
 COPY src/ ./src/
-COPY --chown=catnet:catnet alembic.ini* ./
-COPY --chown=catnet:catnet migrations/ ./migrations/
 
-# Create necessary directories (some may not exist)
-RUN mkdir -p logs configs migrations/versions || true
+# Create necessary directories
+RUN mkdir -p logs configs migrations/versions
 
-# Create non-root user for security
-RUN useradd -m -u 1000 catnet && \
-    chown -R catnet:catnet /app
+# Copy optional files if they exist
+RUN touch alembic.ini || true
+
+# Set ownership
+RUN chown -R catnet:catnet /app
 
 USER catnet
 
