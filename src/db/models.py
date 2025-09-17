@@ -76,7 +76,7 @@ class Device(Base):
     port = Column(Integer, default=22)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-    metadata = Column(JSON, default={})
+    device_metadata = Column(JSON, default={})
 
     # Relationships
     configs = relationship("DeviceConfig", back_populates="device")
@@ -153,7 +153,7 @@ class GitRepository(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     last_sync = Column(DateTime(timezone=True))
-    metadata = Column(JSON, default={})
+    repo_metadata = Column(JSON, default={})
 
     # Relationships
     deployments = relationship("Deployment", back_populates="repository")
@@ -174,7 +174,7 @@ class DeviceConfig(Base):
     is_active = Column(Boolean, default=False)
     validation_status = Column(String(50))
     validation_results = Column(JSON)
-    metadata = Column(JSON, default={})
+    config_metadata = Column(JSON, default={})
 
     # Relationships
     device = relationship("Device", back_populates="configs")
@@ -232,7 +232,7 @@ class SecretRotation(Base):
     rotation_interval_days = Column(Integer, default=90)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    metadata = Column(JSON, default={})
+    rotation_metadata = Column(JSON, default={})
 
 
 class Session(Base):
