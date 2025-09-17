@@ -15,7 +15,8 @@
       "Bash(actionlint:*)",
       "Bash(gh run watch:*)",
       "Bash(black:*)",
-      "Bash(docker build:*)"
+      "Bash(docker build:*)",
+      "Bash(pip install:*)"
     ],
     "deny": [],
     "ask": []

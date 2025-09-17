@@ -459,7 +459,9 @@ class ConfigurationHasher:
         # Build Merkle tree
         while len(config_hashes) > 1:
             if len(config_hashes) % 2 == 1:
-                config_hashes.append(config_hashes[-1])  # Duplicate last hash if odd number
+                config_hashes.append(
+                    config_hashes[-1]
+                )  # Duplicate last hash if odd number
 
             new_hashes = []
             for i in range(0, len(config_hashes), 2):
