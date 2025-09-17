@@ -38,10 +38,7 @@ class SignatureManager:
         self.gpg = gnupg.GPG(gnupghome=str(self.gpg_home))
 
     async def generate_signing_key(
-        self,
-        user_id: str,
-        user_email: str,
-        passphrase: Optional[str] = None
+        self, user_id: str, user_email: str, passphrase: Optional[str] = None
     ) -> Dict[str, str]:
         """
         Generate GPG signing key for a user
@@ -62,9 +59,9 @@ class SignatureManager:
             name_email=user_email,
             key_type="RSA",
             key_length=4096,
-            key_usage='sign',
-            expire_date='2y',  # 2 years
-            passphrase=passphrase or ""
+            key_usage="sign",
+            expire_date="2y",  # 2 years
+            passphrase=passphrase or "",
         )
 
         key = self.gpg.gen_key(input_data)
@@ -75,12 +72,12 @@ class SignatureManager:
 
         # Get key fingerprint
         keys = self.gpg.list_keys(secret=True)
-        key_info = next((k for k in keys if k['keyid'] == key_id), None)
+        key_info = next((k for k in keys if k["keyid"] == key_id), None)
 
         if not key_info:
             raise SecurityError("Generated key not found")
 
-        fingerprint = key_info['fingerprint']
+        fingerprint = key_info["fingerprint"]
 
         # Export keys
         public_key = self.gpg.export_keys(key_id)
@@ -95,20 +92,20 @@ class SignatureManager:
                 "public_key": public_key,
                 "private_key": private_key,
                 "created_at": datetime.utcnow().isoformat(),
-                "expires_at": (datetime.utcnow() + timedelta(days=730)).isoformat()
-            }
+                "expires_at": (datetime.utcnow() + timedelta(days=730)).isoformat(),
+            },
         )
 
         # Update database
         async with get_db() as session:
             await session.execute(
-                update(User).
-                where(User.id == user_id).
-                values(
+                update(User)
+                .where(User.id == user_id)
+                .values(
                     signing_key_id=key_id,
                     signing_key_fingerprint=fingerprint,
                     signing_key_created_at=datetime.utcnow(),
-                    signing_key_expires_at=datetime.utcnow() + timedelta(days=730)
+                    signing_key_expires_at=datetime.utcnow() + timedelta(days=730),
                 )
             )
             await session.commit()
@@ -117,27 +114,19 @@ class SignatureManager:
         await self.audit.log_security_event(
             event_type="signing_key_generated",
             severity="INFO",
-            details={
-                "user_id": user_id,
-                "key_id": key_id,
-                "fingerprint": fingerprint
-            }
+            details={"user_id": user_id, "key_id": key_id, "fingerprint": fingerprint},
         )
 
         logger.info(f"Signing key generated for user {user_id}: {key_id}")
 
-        return {
-            "key_id": key_id,
-            "fingerprint": fingerprint,
-            "public_key": public_key
-        }
+        return {"key_id": key_id, "fingerprint": fingerprint, "public_key": public_key}
 
     async def sign_configuration(
         self,
         config: Dict,
         user_id: str,
         deployment_id: str,
-        passphrase: Optional[str] = None
+        passphrase: Optional[str] = None,
     ) -> str:
         """
         Generate cryptographic signature for configuration
@@ -159,13 +148,13 @@ class SignatureManager:
             raise SecurityError(f"No signing key for user {user_id}")
 
         # Import private key if not already imported
-        if key_info['private_key']:
-            import_result = self.gpg.import_keys(key_info['private_key'])
+        if key_info["private_key"]:
+            import_result = self.gpg.import_keys(key_info["private_key"])
             if not import_result.count:
                 raise SecurityError("Failed to import signing key")
 
         # Canonicalize configuration (sort keys for consistent hashing)
-        canonical_config = json.dumps(config, sort_keys=True, separators=(',', ':'))
+        canonical_config = json.dumps(config, sort_keys=True, separators=(",", ":"))
 
         # Create signature data
         signature_data = {
@@ -173,16 +162,16 @@ class SignatureManager:
             "deployment_id": deployment_id,
             "timestamp": datetime.utcnow().isoformat(),
             "user_id": user_id,
-            "version": "1.0"
+            "version": "1.0",
         }
 
         # Sign the data
         signature_json = json.dumps(signature_data, sort_keys=True)
         signed_data = self.gpg.sign(
             signature_json,
-            keyid=key_info['key_id'],
+            keyid=key_info["key_id"],
             passphrase=passphrase or "",
-            detach=True
+            detach=True,
         )
 
         if not signed_data:
@@ -193,12 +182,12 @@ class SignatureManager:
         # Update deployment
         async with get_db() as session:
             await session.execute(
-                update(Deployment).
-                where(Deployment.id == deployment_id).
-                values(
+                update(Deployment)
+                .where(Deployment.id == deployment_id)
+                .values(
                     config_signature=signature,
                     signed_by=user_id,
-                    signature_timestamp=datetime.utcnow()
+                    signature_timestamp=datetime.utcnow(),
                 )
             )
             await session.commit()
@@ -210,18 +199,15 @@ class SignatureManager:
             details={
                 "deployment_id": deployment_id,
                 "user_id": user_id,
-                "config_hash": signature_data['config_hash']
-            }
+                "config_hash": signature_data["config_hash"],
+            },
         )
 
         logger.info(f"Configuration signed for deployment {deployment_id}")
         return signature
 
     async def verify_signature(
-        self,
-        config: Dict,
-        signature: str,
-        deployment_id: str
+        self, config: Dict, signature: str, deployment_id: str
     ) -> bool:
         """
         Verify configuration hasn't been tampered with
@@ -255,7 +241,7 @@ class SignatureManager:
                     return False
 
             # Import public key
-            import_result = self.gpg.import_keys(key_info['public_key'])
+            import_result = self.gpg.import_keys(key_info["public_key"])
             if not import_result.count:
                 logger.error("Failed to import public key")
                 return False
@@ -264,7 +250,7 @@ class SignatureManager:
             signature_data = base64.b64decode(signature)
 
             # Canonicalize configuration
-            canonical_config = json.dumps(config, sort_keys=True, separators=(',', ':'))
+            canonical_config = json.dumps(config, sort_keys=True, separators=(",", ":"))
             config_hash = hashlib.sha256(canonical_config.encode()).hexdigest()
 
             # Recreate signature data
@@ -281,9 +267,9 @@ class SignatureManager:
                 # Update verification status
                 async with get_db() as session:
                     await session.execute(
-                        update(Deployment).
-                        where(Deployment.id == deployment_id).
-                        values(signature_verified=True)
+                        update(Deployment)
+                        .where(Deployment.id == deployment_id)
+                        .values(signature_verified=True)
                     )
                     await session.commit()
 
@@ -302,7 +288,7 @@ class SignatureManager:
         repo_path: str,
         commit_message: str,
         user_id: str,
-        passphrase: Optional[str] = None
+        passphrase: Optional[str] = None,
     ) -> str:
         """
         Create signed Git commit
@@ -328,16 +314,13 @@ class SignatureManager:
         # Configure Git for signing
         repo = git.Repo(repo_path)
         config = repo.config_writer()
-        config.set_value('user', 'signingkey', key_info['key_id'])
-        config.set_value('commit', 'gpgsign', 'true')
+        config.set_value("user", "signingkey", key_info["key_id"])
+        config.set_value("commit", "gpgsign", "true")
         config.release()
 
         # Stage changes and create signed commit
-        repo.index.add('*')
-        commit = repo.index.commit(
-            commit_message,
-            gpgsign=True
-        )
+        repo.index.add("*")
+        commit = repo.index.commit(commit_message, gpgsign=True)
 
         # Verify the commit signature
         if await self.verify_commit_signature(repo_path, str(commit.hexsha)):
@@ -346,11 +329,7 @@ class SignatureManager:
         else:
             raise SecurityError("Failed to verify signed commit")
 
-    async def verify_commit_signature(
-        self,
-        repo_path: str,
-        commit_hash: str
-    ) -> bool:
+    async def verify_commit_signature(self, repo_path: str, commit_hash: str) -> bool:
         """
         Verify Git commit signature
 
@@ -407,11 +386,7 @@ class SignatureManager:
         """
         logger.info("Starting signing key rotation")
 
-        stats = {
-            "checked": 0,
-            "rotated": 0,
-            "failed": 0
-        }
+        stats = {"checked": 0, "rotated": 0, "failed": 0}
 
         async with get_db() as session:
             # Get users with signing keys
@@ -425,18 +400,21 @@ class SignatureManager:
 
                 # Check if key needs rotation (30 days before expiry)
                 if user.signing_key_expires_at:
-                    days_until_expiry = (user.signing_key_expires_at - datetime.utcnow()).days
+                    days_until_expiry = (
+                        user.signing_key_expires_at - datetime.utcnow()
+                    ).days
                     if days_until_expiry <= 30:
                         try:
                             # Generate new key
                             new_key = await self.generate_signing_key(
-                                str(user.id),
-                                user.email
+                                str(user.id), user.email
                             )
                             logger.info(f"Rotated signing key for user {user.username}")
                             stats["rotated"] += 1
                         except Exception as e:
-                            logger.error(f"Failed to rotate key for {user.username}: {e}")
+                            logger.error(
+                                f"Failed to rotate key for {user.username}: {e}"
+                            )
                             stats["failed"] += 1
 
         logger.info(f"Signing key rotation complete: {stats}")
@@ -458,7 +436,7 @@ class ConfigurationHasher:
             SHA-256 hash hex string
         """
         # Canonicalize by sorting keys
-        canonical = json.dumps(config, sort_keys=True, separators=(',', ':'))
+        canonical = json.dumps(config, sort_keys=True, separators=(",", ":"))
         return hashlib.sha256(canonical.encode()).hexdigest()
 
     @staticmethod
@@ -494,10 +472,7 @@ class ConfigurationHasher:
         return hashes[0]
 
     @staticmethod
-    def verify_integrity(
-        config: Dict,
-        expected_hash: str
-    ) -> bool:
+    def verify_integrity(config: Dict, expected_hash: str) -> bool:
         """
         Verify configuration integrity
 

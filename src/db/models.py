@@ -88,7 +88,7 @@ class Device(Base):
     certificate_serial = Column(String(255), index=True)
     certificate_expires_at = Column(DateTime(timezone=True))
     certificate_fingerprint = Column(String(128), index=True)
-    certificate_status = Column(String(50), default='pending', index=True)
+    certificate_status = Column(String(50), default="pending", index=True)
     certificate_issued_at = Column(DateTime(timezone=True))
     certificate_revoked_at = Column(DateTime(timezone=True))
     certificate_revocation_reason = Column(String(255))
@@ -132,7 +132,9 @@ class Deployment(Base):
     signature_timestamp = Column(DateTime(timezone=True))
 
     # Relationships
-    creator = relationship("User", foreign_keys=[created_by], back_populates="deployments")
+    creator = relationship(
+        "User", foreign_keys=[created_by], back_populates="deployments"
+    )
     signer = relationship("User", foreign_keys=[signed_by])
     repository = relationship("GitRepository", back_populates="deployments")
     devices = relationship("DeploymentDevice", back_populates="deployment")

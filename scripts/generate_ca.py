@@ -35,62 +35,60 @@ class CertificateAuthority:
 
         # Generate CA private key
         self.ca_key = rsa.generate_private_key(
-            public_exponent=65537,
-            key_size=4096,
-            backend=default_backend()
+            public_exponent=65537, key_size=4096, backend=default_backend()
         )
 
         # Generate CA certificate
-        subject = issuer = x509.Name([
-            x509.NameAttribute(NameOID.COUNTRY_NAME, "US"),
-            x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "California"),
-            x509.NameAttribute(NameOID.LOCALITY_NAME, "San Francisco"),
-            x509.NameAttribute(NameOID.ORGANIZATION_NAME, "CatNet"),
-            x509.NameAttribute(NameOID.ORGANIZATIONAL_UNIT_NAME, "Security"),
-            x509.NameAttribute(NameOID.COMMON_NAME, self.ca_name),
-        ])
+        subject = issuer = x509.Name(
+            [
+                x509.NameAttribute(NameOID.COUNTRY_NAME, "US"),
+                x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "California"),
+                x509.NameAttribute(NameOID.LOCALITY_NAME, "San Francisco"),
+                x509.NameAttribute(NameOID.ORGANIZATION_NAME, "CatNet"),
+                x509.NameAttribute(NameOID.ORGANIZATIONAL_UNIT_NAME, "Security"),
+                x509.NameAttribute(NameOID.COMMON_NAME, self.ca_name),
+            ]
+        )
 
-        self.ca_cert = x509.CertificateBuilder().subject_name(
-            subject
-        ).issuer_name(
-            issuer
-        ).public_key(
-            self.ca_key.public_key()
-        ).serial_number(
-            x509.random_serial_number()
-        ).not_valid_before(
-            datetime.utcnow()
-        ).not_valid_after(
-            datetime.utcnow() + timedelta(days=3650)  # 10 years
-        ).add_extension(
-            x509.BasicConstraints(ca=True, path_length=None),
-            critical=True,
-        ).add_extension(
-            x509.KeyUsage(
-                digital_signature=True,
-                key_cert_sign=True,
-                key_agreement=False,
-                content_commitment=False,
-                data_encipherment=False,
-                key_encipherment=False,
-                crl_sign=True,
-                encipher_only=False,
-                decipher_only=False,
-            ),
-            critical=True,
-        ).add_extension(
-            x509.SubjectKeyIdentifier.from_public_key(self.ca_key.public_key()),
-            critical=False,
-        ).sign(self.ca_key, hashes.SHA256(), default_backend())
+        self.ca_cert = (
+            x509.CertificateBuilder()
+            .subject_name(subject)
+            .issuer_name(issuer)
+            .public_key(self.ca_key.public_key())
+            .serial_number(x509.random_serial_number())
+            .not_valid_before(datetime.utcnow())
+            .not_valid_after(datetime.utcnow() + timedelta(days=3650))  # 10 years
+            .add_extension(
+                x509.BasicConstraints(ca=True, path_length=None),
+                critical=True,
+            )
+            .add_extension(
+                x509.KeyUsage(
+                    digital_signature=True,
+                    key_cert_sign=True,
+                    key_agreement=False,
+                    content_commitment=False,
+                    data_encipherment=False,
+                    key_encipherment=False,
+                    crl_sign=True,
+                    encipher_only=False,
+                    decipher_only=False,
+                ),
+                critical=True,
+            )
+            .add_extension(
+                x509.SubjectKeyIdentifier.from_public_key(self.ca_key.public_key()),
+                critical=False,
+            )
+            .sign(self.ca_key, hashes.SHA256(), default_backend())
+        )
 
         # Serialize CA certificate and key
-        ca_cert_pem = self.ca_cert.public_bytes(
-            encoding=serialization.Encoding.PEM
-        )
+        ca_cert_pem = self.ca_cert.public_bytes(encoding=serialization.Encoding.PEM)
         ca_key_pem = self.ca_key.private_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.TraditionalOpenSSL,
-            encryption_algorithm=serialization.NoEncryption()
+            encryption_algorithm=serialization.NoEncryption(),
         )
 
         # Save CA files
@@ -111,8 +109,9 @@ class CertificateAuthority:
 
         return ca_cert_pem, ca_key_pem
 
-    def generate_service_cert(self, service_name: str,
-                            san_list: Optional[list] = None) -> Tuple[bytes, bytes]:
+    def generate_service_cert(
+        self, service_name: str, san_list: Optional[list] = None
+    ) -> Tuple[bytes, bytes]:
         """Generate certificate for a service"""
         print(f"Generating certificate for service: {service_name}")
 
@@ -122,34 +121,30 @@ class CertificateAuthority:
 
         # Generate service private key
         service_key = rsa.generate_private_key(
-            public_exponent=65537,
-            key_size=2048,
-            backend=default_backend()
+            public_exponent=65537, key_size=2048, backend=default_backend()
         )
 
         # Certificate subject
-        subject = x509.Name([
-            x509.NameAttribute(NameOID.COUNTRY_NAME, "US"),
-            x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "California"),
-            x509.NameAttribute(NameOID.LOCALITY_NAME, "San Francisco"),
-            x509.NameAttribute(NameOID.ORGANIZATION_NAME, "CatNet"),
-            x509.NameAttribute(NameOID.ORGANIZATIONAL_UNIT_NAME, service_name),
-            x509.NameAttribute(NameOID.COMMON_NAME, f"{service_name}.catnet.local"),
-        ])
+        subject = x509.Name(
+            [
+                x509.NameAttribute(NameOID.COUNTRY_NAME, "US"),
+                x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "California"),
+                x509.NameAttribute(NameOID.LOCALITY_NAME, "San Francisco"),
+                x509.NameAttribute(NameOID.ORGANIZATION_NAME, "CatNet"),
+                x509.NameAttribute(NameOID.ORGANIZATIONAL_UNIT_NAME, service_name),
+                x509.NameAttribute(NameOID.COMMON_NAME, f"{service_name}.catnet.local"),
+            ]
+        )
 
         # Build certificate
-        cert_builder = x509.CertificateBuilder().subject_name(
-            subject
-        ).issuer_name(
-            self.ca_cert.issuer
-        ).public_key(
-            service_key.public_key()
-        ).serial_number(
-            x509.random_serial_number()
-        ).not_valid_before(
-            datetime.utcnow()
-        ).not_valid_after(
-            datetime.utcnow() + timedelta(days=365)  # 1 year
+        cert_builder = (
+            x509.CertificateBuilder()
+            .subject_name(subject)
+            .issuer_name(self.ca_cert.issuer)
+            .public_key(service_key.public_key())
+            .serial_number(x509.random_serial_number())
+            .not_valid_before(datetime.utcnow())
+            .not_valid_after(datetime.utcnow() + timedelta(days=365))  # 1 year
         )
 
         # Add Subject Alternative Names
@@ -158,15 +153,21 @@ class CertificateAuthority:
                 f"{service_name}.catnet.local",
                 f"{service_name}",
                 "localhost",
-                "127.0.0.1"
+                "127.0.0.1",
             ]
 
-        san_ext = x509.SubjectAlternativeName([
-            x509.DNSName(name) for name in san_list if not name.replace('.', '').isdigit()
-        ] + [
-            x509.IPAddress(ipaddress.ip_address(name))
-            for name in san_list if name.replace('.', '').isdigit()
-        ])
+        san_ext = x509.SubjectAlternativeName(
+            [
+                x509.DNSName(name)
+                for name in san_list
+                if not name.replace(".", "").isdigit()
+            ]
+            + [
+                x509.IPAddress(ipaddress.ip_address(name))
+                for name in san_list
+                if name.replace(".", "").isdigit()
+            ]
+        )
 
         cert_builder = cert_builder.add_extension(san_ext, critical=False)
 
@@ -185,10 +186,12 @@ class CertificateAuthority:
             ),
             critical=True,
         ).add_extension(
-            x509.ExtendedKeyUsage([
-                x509.oid.ExtendedKeyUsageOID.SERVER_AUTH,
-                x509.oid.ExtendedKeyUsageOID.CLIENT_AUTH,
-            ]),
+            x509.ExtendedKeyUsage(
+                [
+                    x509.oid.ExtendedKeyUsageOID.SERVER_AUTH,
+                    x509.oid.ExtendedKeyUsageOID.CLIENT_AUTH,
+                ]
+            ),
             critical=True,
         )
 
@@ -198,13 +201,11 @@ class CertificateAuthority:
         )
 
         # Serialize certificate and key
-        cert_pem = service_cert.public_bytes(
-            encoding=serialization.Encoding.PEM
-        )
+        cert_pem = service_cert.public_bytes(encoding=serialization.Encoding.PEM)
         key_pem = service_key.private_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.TraditionalOpenSSL,
-            encryption_algorithm=serialization.NoEncryption()
+            encryption_algorithm=serialization.NoEncryption(),
         )
 
         # Save service certificate and key
@@ -231,9 +232,7 @@ class CertificateAuthority:
         ca_key_path = self.certs_dir / "ca.key"
 
         with open(ca_cert_path, "rb") as f:
-            self.ca_cert = x509.load_pem_x509_certificate(
-                f.read(), default_backend()
-            )
+            self.ca_cert = x509.load_pem_x509_certificate(f.read(), default_backend())
 
         with open(ca_key_path, "rb") as f:
             self.ca_key = serialization.load_pem_private_key(
@@ -246,10 +245,10 @@ class CertificateAuthority:
             await self.vault.store_secret(
                 f"certificates/{service_name}",
                 {
-                    "certificate": cert_pem.decode('utf-8'),
-                    "private_key": key_pem.decode('utf-8'),
-                    "created_at": datetime.utcnow().isoformat()
-                }
+                    "certificate": cert_pem.decode("utf-8"),
+                    "private_key": key_pem.decode("utf-8"),
+                    "created_at": datetime.utcnow().isoformat(),
+                },
             )
             print(f"Stored {service_name} certificate in Vault")
         except Exception as e:
@@ -261,9 +260,9 @@ async def main():
     ca = CertificateAuthority()
 
     # Generate CA
-    print("="*60)
+    print("=" * 60)
     print("CatNet mTLS Certificate Generation")
-    print("="*60)
+    print("=" * 60)
 
     ca_cert, ca_key = ca.generate_ca()
 
@@ -276,9 +275,9 @@ async def main():
         ("api-gateway", ["api.catnet.local", "localhost", "127.0.0.1"]),
     ]
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Generating Service Certificates")
-    print("="*60)
+    print("=" * 60)
 
     for service_name, san_list in services:
         cert_pem, key_pem = ca.generate_service_cert(service_name, san_list)
@@ -287,21 +286,23 @@ async def main():
     # Store CA in Vault as well
     await ca.store_in_vault("ca", ca_cert, ca_key)
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Certificate Generation Complete!")
-    print("="*60)
+    print("=" * 60)
     print(f"\nCertificates stored in: {ca.certs_dir.absolute()}")
     print("\nServices can now use these certificates for mTLS communication.")
     print("\nIMPORTANT: Keep the CA private key secure!")
 
     # Verify certificates
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Certificate Verification")
-    print("="*60)
+    print("=" * 60)
 
     for service_name, _ in services:
         cert_path = ca.certs_dir / f"{service_name}.crt"
-        result = os.system(f"openssl verify -CAfile {ca.certs_dir}/ca.crt {cert_path} 2>/dev/null")
+        result = os.system(
+            f"openssl verify -CAfile {ca.certs_dir}/ca.crt {cert_path} 2>/dev/null"
+        )
         if result == 0:
             print(f"✅ {service_name}: Certificate valid")
         else:

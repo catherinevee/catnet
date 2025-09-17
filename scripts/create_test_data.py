@@ -15,8 +15,12 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.db.database import init_database
 from src.db.models import (
-    User, Device, GitRepository, ConfigTemplate,
-    DeviceVendor, DeploymentState
+    User,
+    Device,
+    GitRepository,
+    ConfigTemplate,
+    DeviceVendor,
+    DeploymentState,
 )
 from src.security.auth import AuthManager
 from sqlalchemy import select
@@ -32,36 +36,36 @@ async def create_test_users(session):
             "email": "admin@test.catnet.local",
             "password": "Admin123!",
             "roles": ["admin"],
-            "is_superuser": True
+            "is_superuser": True,
         },
         {
             "username": "network_engineer",
             "email": "network@test.catnet.local",
             "password": "Network123!",
             "roles": ["operator", "network_engineer"],
-            "is_superuser": False
+            "is_superuser": False,
         },
         {
             "username": "security_analyst",
             "email": "security@test.catnet.local",
             "password": "Security123!",
             "roles": ["viewer", "security"],
-            "is_superuser": False
+            "is_superuser": False,
         },
         {
             "username": "devops_engineer",
             "email": "devops@test.catnet.local",
             "password": "DevOps123!",
             "roles": ["operator", "devops"],
-            "is_superuser": False
+            "is_superuser": False,
         },
         {
             "username": "manager_user",
             "email": "manager@test.catnet.local",
             "password": "Manager123!",
             "roles": ["approver", "viewer"],
-            "is_superuser": False
-        }
+            "is_superuser": False,
+        },
     ]
 
     created_users = []
@@ -79,7 +83,7 @@ async def create_test_users(session):
                 password_hash=auth_manager.get_password_hash(user_data["password"]),
                 roles=user_data["roles"],
                 is_superuser=user_data["is_superuser"],
-                is_active=True
+                is_active=True,
             )
             session.add(user)
             created_users.append(user_data["username"])
@@ -101,7 +105,7 @@ async def create_test_devices(session):
             "serial_number": "FTX1234567A",
             "location": "US-East-DC1",
             "is_active": True,
-            "port": 22
+            "port": 22,
         },
         {
             "hostname": "cisco-switch-01",
@@ -111,7 +115,7 @@ async def create_test_devices(session):
             "serial_number": "FCW2234567B",
             "location": "US-East-DC1",
             "is_active": True,
-            "port": 22
+            "port": 22,
         },
         {
             "hostname": "cisco-nexus-01",
@@ -121,7 +125,7 @@ async def create_test_devices(session):
             "serial_number": "SAL1234567C",
             "location": "US-East-DC1",
             "is_active": True,
-            "port": 22
+            "port": 22,
         },
         # Juniper devices
         {
@@ -132,7 +136,7 @@ async def create_test_devices(session):
             "serial_number": "JN1234567D",
             "location": "US-West-DC2",
             "is_active": True,
-            "port": 22
+            "port": 22,
         },
         {
             "hostname": "juniper-srx-01",
@@ -142,7 +146,7 @@ async def create_test_devices(session):
             "serial_number": "JN2234567E",
             "location": "US-West-DC2",
             "is_active": True,
-            "port": 22
+            "port": 22,
         },
         # Inactive device for testing
         {
@@ -153,8 +157,8 @@ async def create_test_devices(session):
             "serial_number": "FTX9999999Z",
             "location": "Storage",
             "is_active": False,
-            "port": 22
-        }
+            "port": 22,
+        },
     ]
 
     created_devices = []
@@ -183,22 +187,22 @@ async def create_test_repositories(session):
             "branch": "main",
             "config_path": "configs/",
             "auto_deploy": False,
-            "gpg_verification": True
+            "gpg_verification": True,
         },
         {
             "url": "https://github.com/test-org/firewall-rules.git",
             "branch": "production",
             "config_path": "rules/",
             "auto_deploy": False,
-            "gpg_verification": True
+            "gpg_verification": True,
         },
         {
             "url": "https://gitlab.com/test-org/switch-configs.git",
             "branch": "develop",
             "config_path": "switches/",
             "auto_deploy": True,
-            "gpg_verification": False
-        }
+            "gpg_verification": False,
+        },
     ]
 
     created_repos = []
@@ -233,9 +237,9 @@ async def create_test_templates(session):
                 "interface_name": "string",
                 "description": "string",
                 "ip_address": "ipv4",
-                "subnet_mask": "ipv4"
+                "subnet_mask": "ipv4",
             },
-            "is_active": True
+            "is_active": True,
         },
         {
             "name": "juniper-vlan-template",
@@ -247,9 +251,9 @@ set interfaces {{ interface }} unit 0 family ethernet-switching vlan members {{ 
                 "vlan_name": "string",
                 "vlan_id": "integer",
                 "description": "string",
-                "interface": "string"
+                "interface": "string",
             },
-            "is_active": True
+            "is_active": True,
         },
         {
             "name": "cisco-acl-template",
@@ -263,10 +267,10 @@ set interfaces {{ interface }} unit 0 family ethernet-switching vlan members {{ 
                 "source_ip": "ipv4",
                 "source_wildcard": "ipv4",
                 "dest_ip": "ipv4",
-                "dest_wildcard": "ipv4"
+                "dest_wildcard": "ipv4",
             },
-            "is_active": True
-        }
+            "is_active": True,
+        },
     ]
 
     created_templates = []
@@ -417,37 +421,33 @@ async def generate_test_metrics():
         "deployment_duration_seconds": {
             "help": "Time taken for deployment",
             "type": "histogram",
-            "samples": [
-                random.uniform(30, 300) for _ in range(100)
-            ]
+            "samples": [random.uniform(30, 300) for _ in range(100)],
         },
         "deployment_success_total": {
             "help": "Total successful deployments",
             "type": "counter",
-            "value": random.randint(100, 1000)
+            "value": random.randint(100, 1000),
         },
         "deployment_failure_total": {
             "help": "Total failed deployments",
             "type": "counter",
-            "value": random.randint(5, 50)
+            "value": random.randint(5, 50),
         },
         "device_connections_active": {
             "help": "Currently active device connections",
             "type": "gauge",
-            "value": random.randint(10, 50)
+            "value": random.randint(10, 50),
         },
         "auth_failures_total": {
             "help": "Total authentication failures",
             "type": "counter",
-            "value": random.randint(10, 100)
+            "value": random.randint(10, 100),
         },
         "api_request_duration_seconds": {
             "help": "API request duration",
             "type": "histogram",
-            "samples": [
-                random.uniform(0.01, 0.5) for _ in range(1000)
-            ]
-        }
+            "samples": [random.uniform(0.01, 0.5) for _ in range(1000)],
+        },
     }
 
     with open("test_metrics.json", "w") as f:
@@ -479,9 +479,9 @@ async def main():
     metrics = await generate_test_metrics()
 
     # Summary
-    print("\n" + "="*50)
+    print("\n" + "=" * 50)
     print("✅ Test data creation completed successfully!")
-    print("="*50)
+    print("=" * 50)
     print(f"Created {len(users)} users")
     print(f"Created {len(devices)} devices")
     print(f"Created {len(repos)} repositories")

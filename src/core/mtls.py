@@ -31,7 +31,7 @@ class MTLSManager:
     async def create_ssl_context(
         self,
         target_service: Optional[str] = None,
-        verify_mode: ssl.VerifyMode = ssl.CERT_REQUIRED
+        verify_mode: ssl.VerifyMode = ssl.CERT_REQUIRED,
     ) -> ssl.SSLContext:
         """
         Create SSL context with client certificate verification
@@ -53,8 +53,10 @@ class MTLSManager:
 
         # Create SSL context
         context = ssl.create_default_context(
-            purpose=ssl.Purpose.SERVER_AUTH if target_service else ssl.Purpose.CLIENT_AUTH,
-            cafile=certifi.where()
+            purpose=ssl.Purpose.SERVER_AUTH
+            if target_service
+            else ssl.Purpose.CLIENT_AUTH,
+            cafile=certifi.where(),
         )
 
         # Load CA certificate
@@ -74,10 +76,7 @@ class MTLSManager:
         key_path = self.certs_dir / f"{self.service_name}.key"
 
         if cert_path.exists() and key_path.exists():
-            context.load_cert_chain(
-                certfile=str(cert_path),
-                keyfile=str(key_path)
-            )
+            context.load_cert_chain(certfile=str(cert_path), keyfile=str(key_path))
             logger.debug(f"Loaded service certificate from {cert_path}")
         else:
             # Try to load from Vault
@@ -87,15 +86,14 @@ class MTLSManager:
                 temp_cert = self.certs_dir / f".{self.service_name}_temp.crt"
                 temp_key = self.certs_dir / f".{self.service_name}_temp.key"
 
-                with open(temp_cert, 'w') as f:
+                with open(temp_cert, "w") as f:
                     f.write(cert)
-                with open(temp_key, 'w') as f:
+                with open(temp_key, "w") as f:
                     f.write(key)
 
                 try:
                     context.load_cert_chain(
-                        certfile=str(temp_cert),
-                        keyfile=str(temp_key)
+                        certfile=str(temp_cert), keyfile=str(temp_key)
                     )
                     logger.debug("Loaded service certificate from Vault")
                 finally:
@@ -111,7 +109,7 @@ class MTLSManager:
         context.minimum_version = ssl.TLSVersion.TLSv1_2
 
         # Disable weak ciphers
-        context.set_ciphers('HIGH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4')
+        context.set_ciphers("HIGH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4")
 
         # Cache the context
         self._ssl_contexts[cache_key] = context
@@ -120,9 +118,7 @@ class MTLSManager:
         return context
 
     async def create_client_session(
-        self,
-        target_service: str,
-        base_url: Optional[str] = None
+        self, target_service: str, base_url: Optional[str] = None
     ) -> aiohttp.ClientSession:
         """
         Create aiohttp ClientSession with mTLS
@@ -142,18 +138,15 @@ class MTLSManager:
             limit=100,
             limit_per_host=30,
             ttl_dns_cache=300,
-            enable_cleanup_closed=True
+            enable_cleanup_closed=True,
         )
 
         # Create session
         session = aiohttp.ClientSession(
             connector=connector,
             base_url=base_url,
-            headers={
-                'X-Service-Name': self.service_name,
-                'X-Service-Version': '1.0.0'
-            },
-            timeout=aiohttp.ClientTimeout(total=30)
+            headers={"X-Service-Name": self.service_name, "X-Service-Version": "1.0.0"},
+            timeout=aiohttp.ClientTimeout(total=30),
         )
 
         logger.info(f"Created mTLS client session for {target_service}")
@@ -190,20 +183,22 @@ class MTLSManager:
             # Check certificate validity
             now = datetime.utcnow()
             if now < cert.not_valid_before or now > cert.not_valid_after:
-                raise SecurityError("Certificate is not valid (expired or not yet valid)")
+                raise SecurityError(
+                    "Certificate is not valid (expired or not yet valid)"
+                )
 
             # Extract service name from CN (format: service-name.catnet.local)
-            service_name = cn.split('.')[0] if '.' in cn else cn
+            service_name = cn.split(".")[0] if "." in cn else cn
 
             cert_info = {
-                'service_name': service_name,
-                'common_name': cn,
-                'serial_number': str(cert.serial_number),
-                'not_valid_before': cert.not_valid_before.isoformat(),
-                'not_valid_after': cert.not_valid_after.isoformat(),
-                'issuer': issuer.rfc4514_string(),
-                'subject': subject.rfc4514_string(),
-                'verified': True
+                "service_name": service_name,
+                "common_name": cn,
+                "serial_number": str(cert.serial_number),
+                "not_valid_before": cert.not_valid_before.isoformat(),
+                "not_valid_after": cert.not_valid_after.isoformat(),
+                "issuer": issuer.rfc4514_string(),
+                "subject": subject.rfc4514_string(),
+                "verified": True,
             }
 
             logger.info(f"Certificate verified for {service_name}")
@@ -235,7 +230,9 @@ class MTLSManager:
             logger.error(f"Certificate rotation failed: {e}")
             return False
 
-    async def _get_cert_from_vault(self, name: str) -> Tuple[Optional[str], Optional[str]]:
+    async def _get_cert_from_vault(
+        self, name: str
+    ) -> Tuple[Optional[str], Optional[str]]:
         """
         Get certificate and key from Vault
 
@@ -250,9 +247,9 @@ class MTLSManager:
 
         try:
             secret = await self.vault.get_secret(f"certificates/{name}")
-            if secret and 'certificate' in secret and 'private_key' in secret:
-                cert = secret['certificate']
-                key = secret['private_key']
+            if secret and "certificate" in secret and "private_key" in secret:
+                cert = secret["certificate"]
+                key = secret["private_key"]
                 self._cert_cache[name] = (cert, key)
                 return cert, key
         except Exception as e:
@@ -271,11 +268,11 @@ class MTLSManager:
             Port number for the service
         """
         service_ports = {
-            'auth-service': 8081,
-            'gitops-service': 8082,
-            'deployment-service': 8083,
-            'device-service': 8084,
-            'api-gateway': 8080
+            "auth-service": 8081,
+            "gitops-service": 8082,
+            "deployment-service": 8083,
+            "device-service": 8084,
+            "api-gateway": 8080,
         }
         return service_ports.get(service_name, 8080)
 
@@ -291,11 +288,11 @@ class MTLSManager:
             Service URL
         """
         port = await self.get_service_port(service_name)
-        scheme = 'https' if use_mtls else 'http'
+        scheme = "https" if use_mtls else "http"
 
         # In production, this would use service discovery
         # For now, use localhost
-        host = 'localhost'
+        host = "localhost"
 
         return f"{scheme}://{host}:{port}"
 
@@ -312,7 +309,7 @@ class MTLSManager:
         try:
             url = await self.get_service_url(service_name)
             async with await self.create_client_session(service_name, url) as session:
-                async with session.get('/health') as response:
+                async with session.get("/health") as response:
                     return response.status == 200
         except Exception as e:
             logger.error(f"Health check failed for {service_name}: {e}")
@@ -335,11 +332,11 @@ class MTLSServer:
         """
         context = await self.mtls_manager.create_ssl_context(
             target_service=None,
-            verify_mode=ssl.CERT_REQUIRED  # Require client certificates
+            verify_mode=ssl.CERT_REQUIRED,  # Require client certificates
         )
 
         # Additional server-specific configuration
-        context.set_npn_protocols(['http/1.1'])
+        context.set_npn_protocols(["http/1.1"])
 
         return context
 
@@ -365,9 +362,7 @@ class MTLSServer:
             if ssl_object:
                 cert = ssl_object.getpeercert_bin()
                 if cert:
-                    return asyncio.run(
-                        self.mtls_manager.verify_client_cert(cert)
-                    )
+                    return asyncio.run(self.mtls_manager.verify_client_cert(cert))
 
         raise SecurityError("No client certificate provided")
 
@@ -379,11 +374,11 @@ class MTLSMiddleware:
     def __init__(self, app, service_name: str, exclude_paths: list = None):
         self.app = app
         self.mtls_server = MTLSServer(service_name)
-        self.exclude_paths = exclude_paths or ['/health', '/metrics']
+        self.exclude_paths = exclude_paths or ["/health", "/metrics"]
 
     async def __call__(self, scope, receive, send):
-        if scope['type'] == 'http':
-            path = scope['path']
+        if scope["type"] == "http":
+            path = scope["path"]
 
             # Skip mTLS for excluded paths
             if path not in self.exclude_paths:
@@ -395,15 +390,19 @@ class MTLSMiddleware:
                 except SecurityError as e:
                     logger.error(f"mTLS verification failed: {e}")
                     # Send 403 Forbidden
-                    await send({
-                        'type': 'http.response.start',
-                        'status': 403,
-                        'headers': [(b'content-type', b'text/plain')],
-                    })
-                    await send({
-                        'type': 'http.response.body',
-                        'body': b'Forbidden: Invalid client certificate',
-                    })
+                    await send(
+                        {
+                            "type": "http.response.start",
+                            "status": 403,
+                            "headers": [(b"content-type", b"text/plain")],
+                        }
+                    )
+                    await send(
+                        {
+                            "type": "http.response.body",
+                            "body": b"Forbidden: Invalid client certificate",
+                        }
+                    )
                     return
 
         await self.app(scope, receive, send)

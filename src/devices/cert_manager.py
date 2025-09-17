@@ -60,7 +60,7 @@ class DeviceCertificateManager:
         device_id: str,
         device_hostname: str,
         device_ip: str,
-        validity_days: int = 365
+        validity_days: int = 365,
     ) -> Dict[str, str]:
         """
         Issue certificate for network device
@@ -81,43 +81,41 @@ class DeviceCertificateManager:
 
         # Generate device private key
         device_key = rsa.generate_private_key(
-            public_exponent=65537,
-            key_size=2048,
-            backend=default_backend()
+            public_exponent=65537, key_size=2048, backend=default_backend()
         )
 
         # Certificate subject
-        subject = x509.Name([
-            x509.NameAttribute(NameOID.COUNTRY_NAME, "US"),
-            x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "California"),
-            x509.NameAttribute(NameOID.LOCALITY_NAME, "San Francisco"),
-            x509.NameAttribute(NameOID.ORGANIZATION_NAME, "CatNet"),
-            x509.NameAttribute(NameOID.ORGANIZATIONAL_UNIT_NAME, "Network Devices"),
-            x509.NameAttribute(NameOID.COMMON_NAME, device_hostname),
-            x509.NameAttribute(NameOID.SERIAL_NUMBER, device_id),
-        ])
+        subject = x509.Name(
+            [
+                x509.NameAttribute(NameOID.COUNTRY_NAME, "US"),
+                x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "California"),
+                x509.NameAttribute(NameOID.LOCALITY_NAME, "San Francisco"),
+                x509.NameAttribute(NameOID.ORGANIZATION_NAME, "CatNet"),
+                x509.NameAttribute(NameOID.ORGANIZATIONAL_UNIT_NAME, "Network Devices"),
+                x509.NameAttribute(NameOID.COMMON_NAME, device_hostname),
+                x509.NameAttribute(NameOID.SERIAL_NUMBER, device_id),
+            ]
+        )
 
         # Build certificate
-        cert_builder = x509.CertificateBuilder().subject_name(
-            subject
-        ).issuer_name(
-            self.ca_cert.issuer
-        ).public_key(
-            device_key.public_key()
-        ).serial_number(
-            x509.random_serial_number()
-        ).not_valid_before(
-            datetime.utcnow()
-        ).not_valid_after(
-            datetime.utcnow() + timedelta(days=validity_days)
+        cert_builder = (
+            x509.CertificateBuilder()
+            .subject_name(subject)
+            .issuer_name(self.ca_cert.issuer)
+            .public_key(device_key.public_key())
+            .serial_number(x509.random_serial_number())
+            .not_valid_before(datetime.utcnow())
+            .not_valid_after(datetime.utcnow() + timedelta(days=validity_days))
         )
 
         # Add Subject Alternative Names
         san_list = [device_hostname, device_ip]
-        san_ext = x509.SubjectAlternativeName([
-            x509.DNSName(device_hostname),
-            x509.IPAddress(ipaddress.ip_address(device_ip))
-        ])
+        san_ext = x509.SubjectAlternativeName(
+            [
+                x509.DNSName(device_hostname),
+                x509.IPAddress(ipaddress.ip_address(device_ip)),
+            ]
+        )
         cert_builder = cert_builder.add_extension(san_ext, critical=False)
 
         # Add device authentication extension
@@ -135,9 +133,11 @@ class DeviceCertificateManager:
             ),
             critical=True,
         ).add_extension(
-            x509.ExtendedKeyUsage([
-                x509.oid.ExtendedKeyUsageOID.CLIENT_AUTH,
-            ]),
+            x509.ExtendedKeyUsage(
+                [
+                    x509.oid.ExtendedKeyUsageOID.CLIENT_AUTH,
+                ]
+            ),
             critical=True,
         )
 
@@ -146,24 +146,20 @@ class DeviceCertificateManager:
         cert_builder = cert_builder.add_extension(
             x509.UnrecognizedExtension(
                 oid=x509.ObjectIdentifier("1.2.3.4.5.6.7.8.1"),  # Custom OID
-                value=device_info.encode()
+                value=device_info.encode(),
             ),
             critical=False,
         )
 
         # Sign the certificate
-        device_cert = cert_builder.sign(
-            self.ca_key, hashes.SHA256(), default_backend()
-        )
+        device_cert = cert_builder.sign(self.ca_key, hashes.SHA256(), default_backend())
 
         # Serialize certificate and key
-        cert_pem = device_cert.public_bytes(
-            encoding=serialization.Encoding.PEM
-        )
+        cert_pem = device_cert.public_bytes(encoding=serialization.Encoding.PEM)
         key_pem = device_key.private_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.TraditionalOpenSSL,
-            encryption_algorithm=serialization.NoEncryption()
+            encryption_algorithm=serialization.NoEncryption(),
         )
 
         # Calculate fingerprint
@@ -187,26 +183,26 @@ class DeviceCertificateManager:
         await self.vault.store_secret(
             f"devices/certificates/{device_id}",
             {
-                "certificate": cert_pem.decode('utf-8'),
-                "private_key": key_pem.decode('utf-8'),
+                "certificate": cert_pem.decode("utf-8"),
+                "private_key": key_pem.decode("utf-8"),
                 "fingerprint": cert_fingerprint,
                 "serial_number": str(device_cert.serial_number),
                 "not_valid_before": device_cert.not_valid_before.isoformat(),
                 "not_valid_after": device_cert.not_valid_after.isoformat(),
-                "issued_at": datetime.utcnow().isoformat()
-            }
+                "issued_at": datetime.utcnow().isoformat(),
+            },
         )
 
         # Update database
         async with get_db() as session:
             await session.execute(
-                update(Device).
-                where(Device.id == device_id).
-                values(
+                update(Device)
+                .where(Device.id == device_id)
+                .values(
                     certificate_serial=str(device_cert.serial_number),
                     certificate_fingerprint=cert_fingerprint,
                     certificate_expires_at=device_cert.not_valid_after,
-                    certificate_status='active'
+                    certificate_status="active",
                 )
             )
             await session.commit()
@@ -220,25 +216,23 @@ class DeviceCertificateManager:
                 "hostname": device_hostname,
                 "serial_number": str(device_cert.serial_number),
                 "fingerprint": cert_fingerprint,
-                "validity_days": validity_days
-            }
+                "validity_days": validity_days,
+            },
         )
 
         logger.info(f"Certificate issued for device {device_id}")
 
         return {
-            "certificate": cert_pem.decode('utf-8'),
-            "private_key": key_pem.decode('utf-8'),
+            "certificate": cert_pem.decode("utf-8"),
+            "private_key": key_pem.decode("utf-8"),
             "fingerprint": cert_fingerprint,
             "serial_number": str(device_cert.serial_number),
             "not_valid_before": device_cert.not_valid_before.isoformat(),
-            "not_valid_after": device_cert.not_valid_after.isoformat()
+            "not_valid_after": device_cert.not_valid_after.isoformat(),
         }
 
     async def revoke_device_cert(
-        self,
-        device_id: str,
-        reason: str = "unspecified"
+        self, device_id: str, reason: str = "unspecified"
     ) -> bool:
         """
         Revoke device certificate
@@ -256,12 +250,12 @@ class DeviceCertificateManager:
             # Update database
             async with get_db() as session:
                 await session.execute(
-                    update(Device).
-                    where(Device.id == device_id).
-                    values(
-                        certificate_status='revoked',
+                    update(Device)
+                    .where(Device.id == device_id)
+                    .values(
+                        certificate_status="revoked",
                         certificate_revoked_at=datetime.utcnow(),
-                        certificate_revocation_reason=reason
+                        certificate_revocation_reason=reason,
                     )
                 )
                 await session.commit()
@@ -269,10 +263,7 @@ class DeviceCertificateManager:
             # Mark as revoked in Vault
             await self.vault.store_secret(
                 f"devices/certificates/{device_id}/revoked",
-                {
-                    "revoked_at": datetime.utcnow().isoformat(),
-                    "reason": reason
-                }
+                {"revoked_at": datetime.utcnow().isoformat(), "reason": reason},
             )
 
             # Add to CRL (Certificate Revocation List)
@@ -282,10 +273,7 @@ class DeviceCertificateManager:
             await self.audit.log_security_event(
                 event_type="device_certificate_revoked",
                 severity="WARNING",
-                details={
-                    "device_id": device_id,
-                    "reason": reason
-                }
+                details={"device_id": device_id, "reason": reason},
             )
 
             logger.info(f"Certificate revoked for device {device_id}")
@@ -296,9 +284,7 @@ class DeviceCertificateManager:
             return False
 
     async def validate_device_cert(
-        self,
-        cert_data: bytes,
-        device_ip: Optional[str] = None
+        self, cert_data: bytes, device_ip: Optional[str] = None
     ) -> Optional[Device]:
         """
         Validate device certificate and return device info
@@ -351,7 +337,7 @@ class DeviceCertificateManager:
                     select(Device).where(
                         Device.id == device_id,
                         Device.certificate_fingerprint == cert_fingerprint,
-                        Device.certificate_status == 'active'
+                        Device.certificate_status == "active",
                     )
                 )
                 device = result.scalar_one_or_none()
@@ -384,18 +370,12 @@ class DeviceCertificateManager:
         """
         logger.info("Starting device certificate rotation")
 
-        stats = {
-            "checked": 0,
-            "rotated": 0,
-            "failed": 0
-        }
+        stats = {"checked": 0, "rotated": 0, "failed": 0}
 
         # Get devices with certificates
         async with get_db() as session:
             result = await session.execute(
-                select(Device).where(
-                    Device.certificate_status == 'active'
-                )
+                select(Device).where(Device.certificate_status == "active")
             )
             devices = result.scalars().all()
 
@@ -407,9 +387,7 @@ class DeviceCertificateManager:
                     try:
                         # Issue new certificate
                         new_cert = await self.issue_device_cert(
-                            str(device.id),
-                            device.hostname,
-                            device.ip_address
+                            str(device.id), device.hostname, device.ip_address
                         )
 
                         # Deploy to device (would be done via secure channel)
@@ -418,7 +396,9 @@ class DeviceCertificateManager:
                         stats["rotated"] += 1
 
                     except Exception as e:
-                        logger.error(f"Failed to rotate cert for {device.hostname}: {e}")
+                        logger.error(
+                            f"Failed to rotate cert for {device.hostname}: {e}"
+                        )
                         stats["failed"] += 1
 
         logger.info(f"Certificate rotation complete: {stats}")
@@ -437,16 +417,16 @@ class DeviceCertificateManager:
 
         crl_data = {}
         if crl_path.exists():
-            with open(crl_path, 'r') as f:
+            with open(crl_path, "r") as f:
                 import json
+
                 crl_data = json.load(f)
 
-        crl_data[device_id] = {
-            "revoked_at": datetime.utcnow().isoformat()
-        }
+        crl_data[device_id] = {"revoked_at": datetime.utcnow().isoformat()}
 
-        with open(crl_path, 'w') as f:
+        with open(crl_path, "w") as f:
             import json
+
             json.dump(crl_data, f, indent=2)
 
     async def _is_cert_revoked(self, device_id: str) -> bool:
@@ -454,8 +434,9 @@ class DeviceCertificateManager:
         crl_path = self.certs_dir / "crl.json"
 
         if crl_path.exists():
-            with open(crl_path, 'r') as f:
+            with open(crl_path, "r") as f:
                 import json
+
                 crl_data = json.load(f)
                 return device_id in crl_data
 
@@ -472,9 +453,7 @@ class DeviceCertificateManager:
             Certificate status information
         """
         async with get_db() as session:
-            result = await session.execute(
-                select(Device).where(Device.id == device_id)
-            )
+            result = await session.execute(select(Device).where(Device.id == device_id))
             device = result.scalar_one_or_none()
 
             if device:
@@ -484,8 +463,14 @@ class DeviceCertificateManager:
                     "certificate_status": device.certificate_status,
                     "certificate_serial": device.certificate_serial,
                     "certificate_fingerprint": device.certificate_fingerprint,
-                    "certificate_expires_at": device.certificate_expires_at.isoformat() if device.certificate_expires_at else None,
-                    "needs_rotation": self._needs_rotation(device.certificate_expires_at) if device.certificate_expires_at else True
+                    "certificate_expires_at": device.certificate_expires_at.isoformat()
+                    if device.certificate_expires_at
+                    else None,
+                    "needs_rotation": self._needs_rotation(
+                        device.certificate_expires_at
+                    )
+                    if device.certificate_expires_at
+                    else True,
                 }
 
         return None

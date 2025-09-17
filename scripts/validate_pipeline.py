@@ -8,6 +8,7 @@ import sys
 import json
 from pathlib import Path
 
+
 def check_file_exists(filepath, description):
     """Check if a required file exists"""
     if Path(filepath).exists():
@@ -32,6 +33,7 @@ def validate_python_syntax(filepath):
     """Validate Python file syntax"""
     try:
         import py_compile
+
         py_compile.compile(filepath, doraise=True)
         print(f"[PASS] Valid Python syntax: {filepath}")
         return True
@@ -47,13 +49,13 @@ def check_requirements():
         print(f"[FAIL] {req_file} missing")
         return False
 
-    with open(req_file, 'r') as f:
+    with open(req_file, "r") as f:
         lines = f.readlines()
 
     valid_lines = 0
     for line in lines:
         line = line.strip()
-        if line and not line.startswith('#'):
+        if line and not line.startswith("#"):
             valid_lines += 1
 
     if valid_lines > 0:
@@ -69,7 +71,7 @@ def validate_docker_files():
     docker_files = {
         "Dockerfile": "Docker container definition",
         "docker-compose.yml": "Docker Compose configuration",
-        ".dockerignore": "Docker ignore file (optional)"
+        ".dockerignore": "Docker ignore file (optional)",
     }
 
     all_valid = True
@@ -120,7 +122,7 @@ def validate_project_structure():
         ("src/security", "Security module"),
         ("tests", "Test directory"),
         ("configs", "Configuration directory"),
-        ("scripts", "Scripts directory")
+        ("scripts", "Scripts directory"),
     ]
 
     all_valid = True
@@ -137,7 +139,7 @@ def validate_test_files():
         ("pytest.ini", "Pytest configuration"),
         ("tests/__init__.py", "Tests package init"),
         ("tests/conftest.py", "Pytest fixtures"),
-        ("tests/test_security.py", "Security tests")
+        ("tests/test_security.py", "Security tests"),
     ]
 
     all_valid = True
@@ -155,7 +157,7 @@ def validate_core_modules():
         "src/security/encryption.py",
         "src/security/audit.py",
         "src/core/exceptions.py",
-        "src/core/validators.py"
+        "src/core/validators.py",
     ]
 
     all_valid = True
@@ -183,7 +185,7 @@ def check_ci_readiness():
         ("Docker Configuration", validate_docker_files),
         ("GitHub Actions", validate_github_actions),
         ("Test Configuration", validate_test_files),
-        ("Core Module Syntax", validate_core_modules)
+        ("Core Module Syntax", validate_core_modules),
     ]
 
     results = {}
