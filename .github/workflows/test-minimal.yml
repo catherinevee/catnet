@@ -30,7 +30,7 @@ jobs:
           pip install fastapi uvicorn pydantic
           pip install sqlalchemy asyncpg
           pip install cryptography passlib python-jose
-          pip install aiofiles pyyaml
+          pip install aiofiles pyyaml hvac httpx
 
       - name: Check Python syntax
         run: |
