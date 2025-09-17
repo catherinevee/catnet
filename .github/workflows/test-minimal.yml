@@ -28,9 +28,10 @@ jobs:
           # Install only essential dependencies for testing
           pip install pytest pytest-asyncio pytest-cov
           pip install fastapi uvicorn pydantic
-          pip install sqlalchemy asyncpg
-          pip install cryptography passlib python-jose
-          pip install aiofiles pyyaml hvac httpx
+          pip install sqlalchemy asyncpg alembic
+          pip install cryptography passlib[argon2] python-jose[cryptography]
+          pip install aiofiles pyyaml hvac httpx tenacity
+          pip install pyotp qrcode[pil]
 
       - name: Check Python syntax
         run: |
