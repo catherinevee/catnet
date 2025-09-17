@@ -1,7 +1,6 @@
 # CatNet - Secure Network Configuration Deployment System
 
-[![CI Status](https://github.com/catherinevee/catnet/workflows/CI%20Status/badge.svg)](https://github.com/catherinevee/catnet/actions/workflows/ci-minimal.yml)
-[![Full CI/CD](https://github.com/catherinevee/catnet/workflows/.github/workflows/ci.yml/badge.svg)](https://github.com/catherinevee/catnet/actions/workflows/ci.yml)
+[![CI/CD Pipeline](https://github.com/catherinevee/catnet/actions/workflows/ci.yml/badge.svg)](https://github.com/catherinevee/catnet/actions/workflows/ci.yml)
 
 A zero-trust, GitOps-enabled network configuration deployment system for Cisco and Juniper devices with enterprise-grade security.
 
