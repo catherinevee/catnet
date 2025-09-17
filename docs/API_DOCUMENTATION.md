@@ -691,7 +691,7 @@ class CatNetClient:
         return response.json()
 
 # Usage
-client = CatNetClient("https://api.catnet.local/api/v1", "your-api-key")
+client = CatNetClient("https://api.catnet.local/api/v1", "YOUR_API_KEY_HERE")
 devices = client.get_devices()
 ```
 
@@ -699,11 +699,11 @@ devices = client.get_devices()
 ```bash
 # Get devices
 curl -X GET "https://api.catnet.local/api/v1/devices" \
-  -H "X-API-Key: your-api-key"
+  -H "X-API-Key: YOUR_API_KEY_HERE"
 
 # Create deployment
 curl -X POST "https://api.catnet.local/api/v1/deploy/create" \
-  -H "X-API-Key: your-api-key" \
+  -H "X-API-Key: YOUR_API_KEY_HERE" \
   -H "Content-Type: application/json" \
   -d '{
     "config_ids": ["uuid1"],
@@ -745,7 +745,7 @@ class CatNetClient {
 }
 
 // Usage
-const client = new CatNetClient('https://api.catnet.local/api/v1', 'your-api-key');
+const client = new CatNetClient('https://api.catnet.local/api/v1', 'YOUR_API_KEY_HERE');
 const devices = await client.getDevices();
 ```
 
