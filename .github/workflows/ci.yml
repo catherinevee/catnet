@@ -403,7 +403,7 @@ jobs:
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
-    needs: [integration-tests, docker-build]
+    needs: [integration-tests]
     if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
     environment:
       name: staging
@@ -469,7 +469,7 @@ jobs:
   deploy-production:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    needs: [integration-tests, docker-build]
+    needs: [integration-tests]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment:
       name: production
