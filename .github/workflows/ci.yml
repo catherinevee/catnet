@@ -398,6 +398,7 @@ jobs:
       - name: Upload Docker scan results
         uses: github/codeql-action/upload-sarif@v3
         if: always() && github.event_name != 'pull_request'
+        continue-on-error: true  # May not have permission to upload
         with:
           sarif_file: 'docker-trivy-results.sarif'
 
