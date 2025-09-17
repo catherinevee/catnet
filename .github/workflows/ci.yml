@@ -220,51 +220,51 @@ jobs:
         run: |
           # Create alembic.ini if it doesn't exist
           if [ ! -f alembic.ini ]; then
-            cat > alembic.ini <<EOF
-[alembic]
-script_location = migrations
-prepend_sys_path = .
-version_path_separator = os
+            cat > alembic.ini <<'ALEMBIC_EOF'
+          [alembic]
+          script_location = migrations
+          prepend_sys_path = .
+          version_path_separator = os
 
-[loggers]
-keys = root,sqlalchemy,alembic,flask_migrate
+          [loggers]
+          keys = root,sqlalchemy,alembic,flask_migrate
 
-[handlers]
-keys = console
+          [handlers]
+          keys = console
 
-[formatters]
-keys = generic
+          [formatters]
+          keys = generic
 
-[logger_root]
-level = WARN
-handlers = console
-qualname =
+          [logger_root]
+          level = WARN
+          handlers = console
+          qualname =
 
-[logger_sqlalchemy]
-level = WARN
-handlers =
-qualname = sqlalchemy.engine
+          [logger_sqlalchemy]
+          level = WARN
+          handlers =
+          qualname = sqlalchemy.engine
 
-[logger_alembic]
-level = INFO
-handlers =
-qualname = alembic
+          [logger_alembic]
+          level = INFO
+          handlers =
+          qualname = alembic
 
-[logger_flask_migrate]
-level = INFO
-handlers =
-qualname = flask_migrate
+          [logger_flask_migrate]
+          level = INFO
+          handlers =
+          qualname = flask_migrate
 
-[handler_console]
-class = StreamHandler
-args = (sys.stderr,)
-level = NOTSET
-formatter = generic
+          [handler_console]
+          class = StreamHandler
+          args = (sys.stderr,)
+          level = NOTSET
+          formatter = generic
 
-[formatter_generic]
-format = %(levelname)-5.5s [%(name)s] %(message)s
-datefmt = %H:%M:%S
-EOF
+          [formatter_generic]
+          format = %(levelname)-5.5s [%(name)s] %(message)s
+          datefmt = %H:%M:%S
+          ALEMBIC_EOF
           fi
 
           # Initialize database
