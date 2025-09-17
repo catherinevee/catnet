@@ -309,8 +309,9 @@ class JuniperHandler:
             commands.append(
                 f'set firewall filter {filter_name} term {term_name} from {rule.get("from", "")}'
             )
+            then_action = rule.get("then", "accept")
             commands.append(
-                f'set firewall filter {filter_name} term {term_name} then {rule.get("then", "accept")}'
+                f"set firewall filter {filter_name} term {term_name} then {then_action}"
             )
 
         output = await self.execute_config(commands)

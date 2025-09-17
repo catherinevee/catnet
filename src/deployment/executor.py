@@ -436,7 +436,7 @@ class DeploymentExecutor:
                     f"configure replace flash:backup_{backup_id}.cfg force"
                 )
             elif "juniper" in device.vendor.value.lower():
-                await conn.execute_command(f"rollback 1")
+                await conn.execute_command("rollback 1")
                 await conn.execute_command("commit")
 
             await self.audit.log_event(

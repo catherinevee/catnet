@@ -135,7 +135,7 @@ class DeviceConnection:
         try:
             if hasattr(self, "handler") and self.handler:
                 self.handler.disconnect()
-        except:
+        except Exception:
             pass
 
 

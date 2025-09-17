@@ -2,6 +2,7 @@ import os
 import tempfile
 import shutil
 from typing import Dict, Any, List, Optional
+from datetime import datetime
 from git import Repo
 import git
 from pathlib import Path
@@ -257,6 +258,3 @@ class GitHandler:
 
     def __del__(self):
         self.cleanup()
-
-
-from datetime import datetime

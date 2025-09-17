@@ -1,7 +1,8 @@
 import hmac
 import hashlib
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 import json
+from datetime import datetime
 from ..security.vault import VaultClient
 
 
@@ -141,6 +142,3 @@ class WebhookHandler:
                 return True
 
         return False
-
-
-from typing import List
