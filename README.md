@@ -1,133 +1,69 @@
-# CatNet - Enterprise Network Configuration Management System
+# CatNet
 
 [![CI/CD Pipeline](https://github.com/catherinevee/catnet/actions/workflows/ci.yml/badge.svg)](https://github.com/catherinevee/catnet/actions/workflows/ci.yml)
 [![Python Version](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Security](https://img.shields.io/badge/security-A%2B-brightgreen)](docs/SECURITY_ARCHITECTURE.md)
-[![Compliance](https://img.shields.io/badge/compliance-NIST%20|%20SOC2%20|%20PCI-blue)](docs/COMPLIANCE.md)
 
-A production-ready, zero-trust GitOps-enabled network configuration deployment system for Cisco and Juniper devices with enterprise-grade security and comprehensive compliance coverage.
+Enterprise-grade network configuration management system with GitOps integration for Cisco and Juniper devices.
 
-## Project Status
+## Overview
 
-**100% Complete** - All phases implemented according to specifications
-- Full security implementation with mTLS, certificates, and GPG signing
-- Complete API implementation across all microservices
-- Production hardening with rate limiting and security headers
-- Comprehensive documentation and compliance mappings
+CatNet is a zero-trust, GitOps-enabled network configuration deployment system that provides automated, secure configuration management for enterprise network infrastructure. Built with security-first principles, it implements comprehensive audit logging, multi-layer validation, and automated rollback capabilities.
 
-## Key Features
+## Features
 
-### Core Capabilities
-- **Multi-Vendor Support**: Cisco (IOS, IOS-XE, NX-OS) and Juniper (Junos)
-- **GitOps Integration**: Automated deployments from Git repositories with webhook support
-- **Deployment Strategies**: Canary, rolling, and blue-green deployments
-- **Automatic Rollback**: Intelligent rollback on deployment failure
-- **Multi-Layer Validation**: Schema, syntax, security, and business rule validation
+- **Multi-vendor support** for Cisco (IOS, IOS-XE, NX-OS) and Juniper (Junos)
+- **GitOps integration** with GitHub and GitLab webhook support
+- **Zero-trust security** with mTLS, certificate-based authentication, and GPG signing
+- **Deployment strategies** including canary, rolling, and blue-green deployments
+- **Automated rollback** with health monitoring and validation
+- **Comprehensive audit trail** with immutable logging and non-repudiation
+- **HashiCorp Vault integration** for secrets management
+- **Rate limiting** and DDoS protection
+- **Multi-factor authentication** with TOTP support
 
-### Security Features
-- **Zero-Trust Architecture**: Never trust, always verify
-- **mTLS Communication**: Mutual TLS for all inter-service communication
-- **Certificate Management**: X.509 certificate-based device authentication
-- **Digital Signatures**: GPG signing for configurations and commits
-- **HashiCorp Vault**: Centralized secrets management
-- **MFA Support**: TOTP-based multi-factor authentication
-- **Immutable Audit Trail**: Complete audit logging with non-repudiation
+## Installation
 
-### Production Features
-- **Performance Optimized**: Database pooling, Redis caching, async processing
-- **Rate Limiting**: Token bucket algorithm with per-user/IP limits
-- **Observability**: Prometheus metrics and Grafana dashboards
-- **API Documentation**: Comprehensive REST API with OpenAPI specs
-- **Security Scanning**: Integrated Trivy, Semgrep, and GitLeaks scanning
+### Prerequisites
 
-## Architecture
-
-```mermaid
-graph TB
-    subgraph "External"
-        Users[Users/CLI]
-        Git[Git Repositories]
-    end
-
-    subgraph "API Gateway Layer"
-        Gateway[API Gateway<br/>Rate Limiting]
-    end
-
-    subgraph "Microservices"
-        Auth[Auth Service<br/>:8081]
-        GitOps[GitOps Service<br/>:8082]
-        Deploy[Deployment Service<br/>:8083]
-        Device[Device Service<br/>:8084]
-    end
-
-    subgraph "Data Layer"
-        DB[(PostgreSQL<br/>TimescaleDB)]
-        Redis[(Redis Cache)]
-        Vault[(HashiCorp Vault)]
-    end
-
-    subgraph "Infrastructure"
-        Devices[Network Devices<br/>Cisco/Juniper]
-    end
-
-    Users --> Gateway
-    Git --> GitOps
-    Gateway --> Auth
-    Gateway --> Deploy
-    Auth -.->|mTLS| GitOps
-    Auth -.->|mTLS| Deploy
-    Auth -.->|mTLS| Device
-    GitOps --> DB
-    Deploy --> DB
-    Deploy --> Device
-    Device --> Devices
-    Auth --> Vault
-    Device --> Vault
-    Deploy --> Redis
-```
-
-## Prerequisites
-
-- Python 3.11+
+- Python 3.11 or higher
 - Docker and Docker Compose
-- PostgreSQL 14+ with TimescaleDB
+- PostgreSQL 14+ with TimescaleDB extension
 - Redis 7+
 - HashiCorp Vault (optional for development)
 
-## Quick Start
+### Quick Start
 
-### Installation
+Clone the repository and install dependencies:
 
-1. **Clone the repository**
 ```bash
 git clone https://github.com/catherinevee/catnet.git
 cd catnet
+pip install -r requirements.txt
 ```
 
-2. **Set up environment**
+Configure environment variables:
+
 ```bash
 cp .env.example .env
 # Edit .env with your configuration
 ```
 
-3. **Install dependencies**
-```bash
-pip install -r requirements.txt
-```
+Initialize the database:
 
-4. **Initialize database**
 ```bash
 alembic upgrade head
 python scripts/create_test_data.py
 ```
 
-5. **Generate certificates**
+Generate certificates:
+
 ```bash
 python scripts/generate_ca.py
 ```
 
-6. **Start services**
+Start the services:
+
 ```bash
 # Using Docker Compose
 docker-compose up -d
@@ -136,203 +72,174 @@ docker-compose up -d
 python -m src.main start --service all
 ```
 
-## Configuration
+## Usage
 
-### Environment Variables
+### Basic Configuration Deployment
 
-```bash
-# Core Settings
-DATABASE_URL=postgresql://catnet:password@localhost:5432/catnet
-REDIS_URL=redis://localhost:6379
-VAULT_URL=http://localhost:8200
-VAULT_TOKEN=your-vault-token
+```python
+from catnet import Client
 
-# Security Settings
-JWT_SECRET_KEY=generate-strong-secret
-ENABLE_MFA=true
-ENABLE_MTLS=true
+# Initialize client
+client = Client(
+    base_url="https://api.catnet.local",
+    api_key="your_api_key"
+)
 
-# Service Ports
-AUTH_SERVICE_PORT=8081
-GITOPS_SERVICE_PORT=8082
-DEPLOYMENT_SERVICE_PORT=8083
-DEVICE_SERVICE_PORT=8084
+# Create a deployment
+deployment = client.deployments.create(
+    config_ids=["config_1", "config_2"],
+    device_ids=["device_1", "device_2"],
+    strategy="canary"
+)
+
+# Monitor deployment status
+status = client.deployments.get_status(deployment.id)
+print(f"Deployment {deployment.id}: {status.state}")
 ```
 
-## API Documentation
-
-Full API documentation is available at [docs/API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md)
-
-### Quick Examples
+### Command Line Interface
 
 ```bash
-# Authenticate
-curl -X POST https://api.catnet.local/api/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"username": "admin", "password": "secure_password"}'
+# Test device connectivity
+catnet test-connection --host 192.168.1.1 --vendor cisco_ios
+
+# Validate configuration
+catnet validate-config --file config.yaml
 
 # Create deployment
-curl -X POST https://api.catnet.local/api/v1/deploy/create \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "config_ids": ["uuid1"],
-    "device_ids": ["uuid1", "uuid2"],
-    "strategy": "canary"
-  }'
+catnet deploy create --config configs/router.yaml --strategy rolling
+
+# Check deployment status
+catnet deploy status --id deployment_123
 ```
 
-## Security & Compliance
+## Architecture
 
-### Compliance Coverage
-- **NIST 800-53**: 95% control coverage
-- **SOC 2 Type II**: Ready for audit
-- **PCI DSS**: Network segmentation compliant
-- **GDPR**: Data protection compliant
+CatNet uses a microservices architecture with four core services:
 
-### Security Architecture
-- Zero-trust network architecture
-- Defense-in-depth strategy
-- Comprehensive threat modeling (STRIDE)
-- Automated security scanning in CI/CD
+| Service | Port | Description |
+|---------|------|-------------|
+| Authentication Service | 8081 | Handles authentication, MFA, and session management |
+| GitOps Service | 8082 | Processes Git webhooks and manages configurations |
+| Deployment Service | 8083 | Orchestrates configuration deployments |
+| Device Service | 8084 | Manages device connections and command execution |
 
-See [docs/SECURITY_ARCHITECTURE.md](docs/SECURITY_ARCHITECTURE.md) for detailed security documentation.
+### Data Flow
 
-## Testing
-
-```bash
-# Run all tests
-pytest tests/
-
-# Run with coverage
-pytest tests/ --cov=src --cov-report=html
-
-# Run security tests
-pytest tests/ -m security
-
-# Run integration tests
-pytest tests/integration/
-```
-
-## Monitoring & Observability
-
-### Prometheus Metrics
-- Deployment success rate
-- API response times
-- Authentication failures
-- Device connection status
-
-### Grafana Dashboards
-Access at `http://localhost:3000` with provided credentials
-
-### Alerts
-- Failed deployments
-- Security violations
-- Certificate expiry
-- Service health
+1. Configurations are stored in Git repositories
+2. Webhooks trigger validation and deployment workflows
+3. Deployments require approval based on configured policies
+4. Configurations are deployed using the selected strategy
+5. Automatic rollback occurs on validation failure
 
 ## Development
 
-### Code Quality Tools
+### Running Tests
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=src --cov-report=html
+
+# Run specific test suite
+pytest tests/unit/
+pytest tests/integration/
+```
+
+### Code Quality
 
 ```bash
 # Format code
 black src/ tests/
 
-# Type checking
-mypy src/ --strict
-
-# Linting
-flake8 src/ tests/
+# Run linters
+flake8 src/
 pylint src/
+mypy src/ --strict
 
 # Security scanning
 bandit -r src/
-semgrep --config=auto src/
 ```
 
-### Git Workflow
+### Building Documentation
 
 ```bash
-# Create feature branch
-git checkout -b feature/CNT-123-new-feature
+# Generate API documentation
+python scripts/generate_docs.py
 
-# Make changes and commit with signature
-git commit -S -m "feat: add new deployment strategy"
-
-# Push and create PR
-git push origin feature/CNT-123-new-feature
+# Build Sphinx documentation
+cd docs && make html
 ```
 
-## Documentation
+## API Documentation
 
-- [API Documentation](docs/API_DOCUMENTATION.md) - Complete REST API reference
-- [Security Architecture](docs/SECURITY_ARCHITECTURE.md) - Security design and controls
-- [Compliance Mapping](docs/COMPLIANCE.md) - NIST, SOC2, PCI-DSS compliance
-- [Operational Runbooks](docs/RUNBOOKS.md) - Deployment and incident response procedures
-- [Implementation Plan](IMPLEMENTATION_PLAN.md) - Project phases and completion status
+The REST API provides comprehensive endpoints for all operations. See the [API Documentation](docs/API_DOCUMENTATION.md) for complete reference.
 
-## CI/CD Pipeline
+### Authentication
 
-The project uses GitHub Actions for continuous integration and deployment:
+All API requests require authentication using JWT tokens or API keys:
 
-- **Code Quality**: Black, Flake8, MyPy, Pylint, Bandit
-- **Security Scanning**: Trivy, Semgrep, GitLeaks
-- **Testing**: Unit tests (Python 3.11 & 3.12), Integration tests
-- **Documentation**: Automated generation and validation
-- **Deployment**: Docker builds with security scanning
+```bash
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+     https://api.catnet.local/api/v1/devices
+```
+
+### Rate Limiting
+
+API endpoints implement rate limiting:
+- Authentication: 5 requests per minute
+- Read operations: 100 requests per minute
+- Write operations: 50 requests per minute
+- Deployment operations: 10 requests per 5 minutes
+
+## Security
+
+CatNet implements defense-in-depth security:
+
+- **Encryption**: AES-256-GCM at rest, TLS 1.3 in transit
+- **Authentication**: JWT tokens with refresh, MFA support
+- **Authorization**: Role-based access control (RBAC)
+- **Audit Logging**: Immutable audit trail with hash verification
+- **Certificate Management**: X.509 certificates for device authentication
+- **Secrets Management**: HashiCorp Vault integration
+- **Security Scanning**: Integrated Trivy, Semgrep, and GitLeaks
+
+## Compliance
+
+CatNet is designed to meet enterprise compliance requirements:
+
+- **NIST 800-53**: 95% control coverage
+- **SOC 2 Type II**: Ready for audit
+- **PCI DSS**: Network segmentation compliant
+- **GDPR**: Data protection compliant
+
+See [Compliance Documentation](docs/COMPLIANCE.md) for detailed mappings.
 
 ## Contributing
 
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -S -m 'feat: add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-Please ensure:
-- All tests pass
-- Code is formatted with Black
-- Security scanning passes
-- Documentation is updated
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+2. Create a feature branch
+3. Make your changes with tests
+4. Submit a pull request
 
 ## Support
 
 - **Documentation**: [docs/](docs/)
 - **Issues**: [GitHub Issues](https://github.com/catherinevee/catnet/issues)
-- **Security**: Report vulnerabilities via security@catnet.local
+- **Discussions**: [GitHub Discussions](https://github.com/catherinevee/catnet/discussions)
 
-## Roadmap
+## License
 
-### Near Term (Q1 2025)
-- Kubernetes Operator for cloud-native deployments
-- Terraform Provider for infrastructure as code
-- Web UI Dashboard with real-time monitoring
-
-### Medium Term (Q2-Q3 2025)
-- Additional vendor support (Arista, Palo Alto, Fortinet)
-- AI-powered configuration validation and optimization
-- GraphQL API support
-
-### Long Term (Q4 2025+)
-- Multi-region deployment orchestration
-- Blockchain-based audit logs
-- Quantum-resistant cryptography
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 
-- Built with enterprise security best practices
-- Follows NIST Cybersecurity Framework
-- Implements zero-trust principles
-- Production-ready with comprehensive testing
+CatNet is built with enterprise security best practices and follows the NIST Cybersecurity Framework.
 
 ---
 
-**CatNet** - Secure. Scalable. Compliant.
-
-*Last Updated: 2025-09-17*
-*Version: 1.0.0*
+**Project Status**: Production Ready (v1.0.0)
