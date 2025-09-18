@@ -182,7 +182,7 @@ class CSRFProtection:
         secret_key: str,
         cookie_name: str = "csrf_token",
         header_name: str = "X-CSRF-Token",
-        excluded_paths: List[str] = None,
+        excluded_paths: Optional[List[str]] = None,
     ):
         self.secret_key = secret_key
         self.cookie_name = cookie_name

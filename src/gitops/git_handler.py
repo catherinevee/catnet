@@ -12,6 +12,9 @@ import asyncio
 import hashlib
 from ..security.vault import VaultClient
 from ..security.encryption import EncryptionManager
+from ..core.logging import get_logger
+
+logger = get_logger(__name__)
 
 
 class GitHandler:
@@ -51,6 +54,11 @@ class GitHandler:
                 )
             else:
                 repo = Repo.clone_from(repo_url, temp_dir, branch=branch)
+
+            # Log repository information
+            logger.info(f"Repository cloned successfully to {temp_dir}")
+            logger.debug(f"Current branch: {repo.active_branch}")
+            logger.debug(f"Remote URL: {repo.remotes.origin.url}")
 
             return temp_dir
 
@@ -146,6 +154,11 @@ class GitHandler:
         try:
             repo = Repo(repo_path)
             commit = repo.commit(commit_sha)
+
+            # Verify commit exists and log details
+            logger.debug(f"Verifying signature for commit: {commit.hexsha}")
+            logger.debug(f"Commit message: {commit.message.strip()}")
+            logger.debug(f"Commit author: {commit.author.name}")
 
             # Check if commit is signed
             signature = repo.git.show(

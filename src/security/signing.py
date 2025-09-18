@@ -285,6 +285,12 @@ class SignatureManager:
                 # Other fields would be verified from the signature
             }
 
+            # Log signature verification attempt
+            logger.debug(
+                f"Verifying signature for deployment {deployment_id}: "
+                f"{json.dumps(signature_json)}"
+            )
+
             # Verify signature
             verified = self.gpg.verify(signature_data)
 
@@ -444,6 +450,9 @@ class SignatureManager:
                             )
                             logger.info(
                                 f"Rotated signing key for user {user.username}"
+                            )
+                            logger.debug(
+                                f"New key ID: {new_key.get('key_id')}"
                             )
                             stats["rotated"] += 1
                         except Exception as e:

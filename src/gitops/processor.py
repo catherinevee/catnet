@@ -161,11 +161,13 @@ class GitOpsProcessor:
             # Post validation results as PR comment
             comment = self._format_pr_comment(validation_results)
             # Would post to GitHub/GitLab API here
+            logger.info(f"PR comment prepared: {comment[:100]}...")
 
             return {
                 "status": "validated",
                 "valid": validation_results["valid"],
                 "configs": len(configs),
+                "comment": comment,
                 "comment_posted": True,
             }
 

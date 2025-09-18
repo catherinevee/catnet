@@ -231,7 +231,7 @@ class SSHKeyManager:
                 f"username {username} privilege 15",
                 "ip ssh pubkey-chain",
                 f"username {username}",
-                f"key-string",
+                "key-string",
                 public_key.strip(),
                 "exit",
                 "exit",

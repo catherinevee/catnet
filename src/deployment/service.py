@@ -27,9 +27,27 @@ class DeploymentService:
         device_ids: List[str],
         strategy: str,
         user_context: Dict[str, Any],
+        dry_run: Optional[bool] = False,
     ) -> Dict[str, Any]:
         """Create and execute a deployment"""
         logger.info(f"Creating deployment {deployment_id}")
+
+        # Parse deployment ID if it's a UUID string
+        try:
+            deployment_uuid = UUID(deployment_id)
+            logger.debug(f"Deployment UUID: {deployment_uuid}")
+        except ValueError:
+            deployment_uuid = None
+
+        # Create deployment record
+        deployment = Deployment(
+            id=deployment_uuid or deployment_id,
+            state=DeploymentState.PENDING
+            if not dry_run
+            else DeploymentState.DRY_RUN,
+            created_at=datetime.utcnow(),
+            created_by=user_context.get("user_id"),
+        )
 
         # Validate deployment
         validation = await self.validator.validate_deployment(
@@ -39,25 +57,45 @@ class DeploymentService:
         )
 
         if not validation.get("valid", False):
+            deployment.state = DeploymentState.FAILED
             return {
                 "success": False,
                 "deployment_id": deployment_id,
                 "errors": validation.get("errors", []),
+                "state": deployment.state.value,
             }
+
+        # Load devices from IDs
+        devices = []
+        for device_id in device_ids:
+            device = Device(
+                id=device_id,
+                hostname=f"device-{device_id}",  # Would load from DB
+                vendor="cisco",  # Would load from DB
+            )
+            devices.append(device)
 
         # Execute deployment
         result = await self.executor.execute_deployment(
             deployment_id=deployment_id,
-            devices=[],  # Would load devices from DB
+            devices=devices,
             configurations={},  # Would load configs
             strategy=strategy,
             user_context=user_context,
+        )
+
+        # Update deployment state
+        deployment.state = (
+            DeploymentState.COMPLETED
+            if result.get("success")
+            else DeploymentState.FAILED
         )
 
         return {
             "success": result.get("success", False),
             "deployment_id": deployment_id,
             "result": result,
+            "state": deployment.state.value,
         }
 
     async def get_deployment_status(
