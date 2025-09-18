@@ -87,73 +87,70 @@ alembic upgrade head
 ### 1. Initialize the System
 
 ```bash
-# Create admin user
-python scripts/create_admin.py
+# Initialize database
+python -m src.main init-db
 
-# Generate certificates for mTLS
-python scripts/generate_ca.py
+# Validate configuration
+python -m src.main validate-config
 
-# Start CatNet services
-make run
+# Start services (development mode)
+python -m src.main run-server
 ```
 
-### 2. Authenticate
+### 2. Authentication
 
 ```bash
-catnet auth login
-# Enter username, password, and MFA token
+# Default admin credentials (change immediately)
+# Username: admin
+# Password: admin123
+
+# API Authentication endpoint
+curl -X POST http://localhost:8000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username": "admin", "password": "admin123"}'
 ```
 
-### 3. Add a Device
+### 3. Test Device Connection
 
 ```bash
-catnet device add \
-  --hostname router1 \
-  --ip 192.168.1.1 \
-  --vendor cisco \
-  --model ISR4451
+# Test connection to a network device
+python -m src.main test-connection \
+  --host 192.168.1.1 \
+  --vendor cisco_ios
 ```
 
 ### 4. Deploy Configuration
 
 ```bash
-catnet deploy create \
-  --config-file configs/router1.yml \
-  --target router1 \
-  --strategy canary
+# Use the API to create a deployment
+curl -X POST http://localhost:8000/api/v1/deployments \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"config": "...", "devices": ["device-id"], "strategy": "canary"}'
 ```
 
 ## Usage
 
-### Command Line Interface
-
-CatNet provides a comprehensive CLI for all operations:
+### Available CLI Commands
 
 ```bash
-# Authentication
-catnet auth login                     # Login with MFA
-catnet auth logout                    # Logout
+# System Management
+python -m src.main init-db            # Initialize database
+python -m src.main validate-config    # Validate configuration
+python -m src.main test-connection    # Test device connection
+python -m src.main generate-keys      # Generate RSA keypair
+python -m src.main test              # Run test suite
+python -m src.main run-server        # Start API server
 
-# Device Management
-catnet device list                    # List all devices
-catnet device add                     # Add new device
-catnet device backup <device_id>      # Backup configuration
-
-# Deployments
-catnet deploy create                  # Create deployment
-catnet deploy status <id>             # Check status
-catnet deploy rollback <id>           # Rollback deployment
-
-# GitOps
-catnet gitops connect                 # Connect repository
-catnet gitops sync                    # Sync configurations
-
-# SSH Key Management
-catnet ssh generate                   # Generate SSH keys
-catnet ssh add-device <device_id>     # Add SSH key to device
+# Server Startup
+python -m src.main run-server        # Starts FastAPI on port 8000
 ```
 
-For complete CLI documentation, see [CLI Reference](docs/cli-reference.md).
+### API Endpoints
+
+Once the server is running, access the API documentation at:
+- Interactive docs: `http://localhost:8000/docs`
+- ReDoc: `http://localhost:8000/redoc`
 
 ### API Usage
 
@@ -256,16 +253,18 @@ Interactive API docs available at: `http://localhost:8000/docs`
 
 ```bash
 # Install development dependencies
-make dev-install
+pip install -r requirements.txt
+pip install -r requirements-dev.txt
 
 # Run tests
-make test
+pytest tests/
 
 # Format code
-make format
+black src/ tests/
 
 # Run linters
-make lint
+flake8 src/ tests/
+bandit -r src/
 ```
 
 ### Project Structure
@@ -298,15 +297,16 @@ See [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) for detailed structure.
 
 ```bash
 # Run all tests
-make test
+pytest tests/
 
-# Run specific test categories
-make test-unit          # Unit tests only
-make test-integration   # Integration tests
-make test-security      # Security tests
+# Run with coverage
+pytest tests/ --cov=src --cov-report=html --cov-report=term
 
-# Generate coverage report
-pytest --cov=src --cov-report=html
+# Run specific test file
+pytest tests/test_security.py -v
+
+# Run tests with verbose output
+pytest tests/ -v
 ```
 
 ## Contributing
@@ -341,11 +341,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Support
 
-- **Documentation**: [https://docs.catnet.io](https://docs.catnet.io)
 - **Issues**: [GitHub Issues](https://github.com/catherinevee/catnet/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/catherinevee/catnet/discussions)
-- **Security**: security@catnet.io
-- **Commercial Support**: support@catnet.io
+- **Source Code**: [GitHub Repository](https://github.com/catherinevee/catnet)
+- **CI/CD Status**: [GitHub Actions](https://github.com/catherinevee/catnet/actions)
 
 ## Acknowledgments
 
