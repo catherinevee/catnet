@@ -22,7 +22,11 @@
       "Bash(chmod:*)",
       "Bash(gh:*)",
       "Bash(git reset:*)",
-      "Read(//c/Users/**)"
+      "Read(//c/Users/**)",
+      "Bash(az:*)",
+      "Bash(for rg in tfstate-rg polandcentralrg-1-tfstate rg-terraform-state)",
+      "Bash(do echo \"=== Resource Group: $rg ===\")",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []

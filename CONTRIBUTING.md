@@ -4,7 +4,7 @@ Thank you for considering contributing to CatNet! We welcome contributions from 
 
 ## Code of Conduct
 
-By participating in this project, you agree to abide by our Code of Conduct. Please report unacceptable behavior to security@catnet.io.
+By participating in this project, you agree to be respectful and professional. We welcome contributors of all backgrounds and experience levels.
 
 ## How Can I Contribute?
 
@@ -31,9 +31,9 @@ Enhancement suggestions are tracked as GitHub issues. When suggesting an enhance
 
 1. Fork the repository and create your branch from `main`
 2. If you've added code, add tests that cover your changes
-3. Ensure the test suite passes: `make test`
-4. Make sure your code follows our style guidelines: `make lint`
-5. Format your code: `make format`
+3. Ensure the test suite passes: `pytest tests/`
+4. Make sure your code follows our style guidelines: `flake8 src/ tests/`
+5. Format your code: `black src/ tests/`
 6. Write a clear commit message following conventional commits
 
 ## Development Setup
@@ -47,14 +47,18 @@ cd catnet
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-# Install development dependencies
-make dev-install
+# Install dependencies
+pip install -r requirements.txt
+pip install pytest pytest-asyncio black flake8
+
+# Initialize database
+python -m src.main init-db
 
 # Run tests
-make test
+pytest tests/
 
-# Start development environment
-make dev
+# Start development server
+python -m src.main run-server
 ```
 
 ## Style Guidelines
@@ -91,8 +95,8 @@ Types:
 
 - Never commit credentials or secrets
 - Use HashiCorp Vault for all secret management
-- Follow security best practices in SECURITY_ARCHITECTURE.md
-- Run security tests: `make test-security`
+- Follow security best practices in CLAUDE.md
+- Run security scan: `bandit -r src/`
 
 ## Testing
 
@@ -105,12 +109,13 @@ All code must have appropriate test coverage:
 
 ```bash
 # Run all tests
-make test
+pytest tests/
 
-# Run specific test category
-make test-unit
-make test-integration
-make test-security
+# Run with coverage
+pytest tests/ --cov=src --cov-report=term
+
+# Run specific test file
+pytest tests/test_security.py -v
 ```
 
 ## Documentation
