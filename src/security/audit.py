@@ -117,8 +117,17 @@ class AuditLogger:
 
         # Log to console if enabled
         if self.enable_console:
+            # Map our custom levels to standard logging levels
+            level_map = {
+                "INFO": logging.INFO,
+                "WARNING": logging.WARNING,
+                "ERROR": logging.ERROR,
+                "CRITICAL": logging.CRITICAL,
+                "SECURITY": logging.WARNING,  # Map SECURITY to WARNING
+            }
+            log_level = level_map.get(level.value, logging.INFO)
             self.logger.log(
-                logging._nameToLevel[level.value],
+                log_level,
                 f"[{event_type}] User: {user_id} - {json.dumps(details)}",
             )
 

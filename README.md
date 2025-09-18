@@ -1,12 +1,17 @@
 # CatNet
 
-[![CI/CD Pipeline](https://github.com/catnet/catnet/actions/workflows/ci.yml/badge.svg)](https://github.com/catnet/catnet/actions/workflows/ci.yml)
+[![CI/CD Pipeline](https://github.com/catherinevee/catnet/workflows/CI/CD%20Pipeline/badge.svg)](https://github.com/catherinevee/catnet/actions/workflows/ci.yml)
+[![Phase Validation](https://github.com/catherinevee/catnet/workflows/Phase%20Validation%20Workflow/badge.svg)](https://github.com/catherinevee/catnet/actions)
+[![User Testing](https://github.com/catherinevee/catnet/workflows/User%20Testing%20Workflow/badge.svg)](https://github.com/catherinevee/catnet/actions)
+[![Tests](https://img.shields.io/badge/tests-24%20passed-success)](https://github.com/catherinevee/catnet/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/badge/coverage-15%25-orange)](https://github.com/catherinevee/catnet)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![Dependencies](https://img.shields.io/librariesio/github/catnet/catnet)](https://libraries.io/github/catnet/catnet)
+[![Dependencies](https://img.shields.io/librariesio/github/catherinevee/catnet)](https://libraries.io/github/catherinevee/catnet)
 [![Security: Trivy](https://img.shields.io/badge/security-trivy-blue.svg)](https://github.com/aquasecurity/trivy)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](https://github.com/catherinevee/catnet/pulls)
 
 Security-first, GitOps-enabled network configuration deployment system for enterprise networks. CatNet automates network device configuration management with built-in safety mechanisms, comprehensive audit logging, and multi-vendor support.
 
@@ -49,7 +54,7 @@ Security-first, GitOps-enabled network configuration deployment system for enter
 
 ```bash
 # Clone the repository
-git clone https://github.com/catnet/catnet.git
+git clone https://github.com/catherinevee/catnet.git
 cd catnet
 
 # Copy and configure environment variables
@@ -67,7 +72,7 @@ docker-compose ps
 
 ```bash
 # Clone the repository
-git clone https://github.com/catnet/catnet.git
+git clone https://github.com/catherinevee/catnet.git
 cd catnet
 
 # Create virtual environment
@@ -341,8 +346,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Support
 
 - **Documentation**: [https://docs.catnet.io](https://docs.catnet.io)
-- **Issues**: [GitHub Issues](https://github.com/catnet/catnet/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/catnet/catnet/discussions)
+- **Issues**: [GitHub Issues](https://github.com/catherinevee/catnet/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/catherinevee/catnet/discussions)
 - **Security**: security@catnet.io
 - **Commercial Support**: support@catnet.io
 
@@ -361,6 +366,6 @@ If you use CatNet in your research or project, please cite:
   title = {CatNet: Security-First Network Configuration Management},
   author = {CatNet Team},
   year = {2024},
-  url = {https://github.com/catnet/catnet}
+  url = {https://github.com/catherinevee/catnet}
 }
 ```

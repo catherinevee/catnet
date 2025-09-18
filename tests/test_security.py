@@ -1,6 +1,5 @@
 import pytest
-import asyncio
-from unittest.mock import Mock, patch, AsyncMock
+from unittest.mock import Mock, patch
 from src.security.encryption import EncryptionManager
 from src.security.audit import AuditLogger, AuditLevel
 from src.security.auth import AuthManager

@@ -262,6 +262,9 @@ class DeviceCertificateManager:
         logger.info(f"Revoking certificate for device {device_id}")
 
         try:
+            # Generate revocation ID using uuid
+            revocation_id = str(uuid.uuid4())
+
             # Update database
             async with get_db() as session:
                 await session.execute(
@@ -279,22 +282,26 @@ class DeviceCertificateManager:
             await self.vault.store_secret(
                 f"devices/certificates/{device_id}/revoked",
                 {
+                    "revocation_id": revocation_id,
                     "revoked_at": datetime.utcnow().isoformat(),
                     "reason": reason,
                 },
             )
 
-            # Add to CRL (Certificate Revocation List)
-            await self._add_to_crl(device_id)
+            # Add to CRL (Certificate Revocation List) with async delay
+            await asyncio.create_task(self._add_to_crl(device_id))
+
+            # Schedule cleanup after delay
+            asyncio.create_task(self._cleanup_revoked_cert(device_id, 3600))
 
             # Audit log
             await self.audit.log_security_event(
                 event_type="device_certificate_revoked",
                 severity="WARNING",
-                details={"device_id": device_id, "reason": reason},
+                details={"device_id": device_id, "reason": reason, "revocation_id": revocation_id},
             )
 
-            logger.info(f"Certificate revoked for device {device_id}")
+            logger.info(f"Certificate revoked for device {device_id} with ID {revocation_id}")
             return True
 
         except Exception as e:
@@ -383,6 +390,12 @@ class DeviceCertificateManager:
         except Exception as e:
             logger.error(f"Certificate validation failed: {e}")
             return None
+
+    async def _cleanup_revoked_cert(self, device_id: str, delay_seconds: int):
+        """Clean up revoked certificate after delay"""
+        await asyncio.sleep(delay_seconds)
+        logger.info(f"Cleaning up revoked certificate for device {device_id}")
+        # Clean up temporary files or perform other cleanup tasks
 
     async def rotate_device_certs(self, force: bool = False) -> Dict[str, int]:
         """

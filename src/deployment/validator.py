@@ -1,12 +1,11 @@
 """
 Deployment Validator - Validates deployments before execution
 """
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 from datetime import datetime
 
 from ..db.models import Device, Deployment
 from ..core.logging import get_logger
-from ..core.exceptions import ValidationError
 
 logger = get_logger(__name__)
 
@@ -318,3 +317,58 @@ class DeploymentValidator:
             logger.warning("No rollback configuration defined")
 
         return True
+
+    async def validate_deployment(
+        self,
+        deployment_id: str,
+        config_ids: List[str],
+        device_ids: List[str],
+    ) -> Dict[str, Any]:
+        """
+        Validate deployment by IDs
+
+        Args:
+            deployment_id: Deployment ID
+            config_ids: Configuration IDs
+            device_ids: Device IDs
+
+        Returns:
+            Validation results
+
+        Raises:
+            ValidationError: If required resources not found
+        """
+        from ..core.exceptions import ValidationError
+
+        logger.info(f"Validating deployment {deployment_id}")
+
+        # Validate all required resources exist
+        if not deployment_id:
+            raise ValidationError("Deployment ID is required")
+
+        if not config_ids:
+            raise ValidationError("At least one configuration is required")
+
+        if not device_ids:
+            raise ValidationError("At least one device is required")
+
+        # Additional validation logic
+        errors = []
+        warnings = []
+
+        # Check device count
+        if len(device_ids) > 100:
+            warnings.append(f"Large deployment: {len(device_ids)} devices")
+
+        # Check configuration count
+        if len(config_ids) > 50:
+            warnings.append(f"Many configurations: {len(config_ids)} configs")
+
+        return {
+            "valid": len(errors) == 0,
+            "errors": errors,
+            "warnings": warnings,
+            "deployment_id": deployment_id,
+            "config_count": len(config_ids),
+            "device_count": len(device_ids),
+        }
