@@ -2,10 +2,8 @@
 
 [![CI/CD Pipeline](https://github.com/catherinevee/catnet/workflows/CI/CD%20Pipeline/badge.svg)](https://github.com/catherinevee/catnet/actions/workflows/ci.yml)
 [![Tests](https://img.shields.io/badge/tests-24%20passed-success)](https://github.com/catherinevee/catnet/actions/workflows/ci.yml)
-[![Coverage](https://img.shields.io/badge/coverage-15%25-orange)](https://github.com/catherinevee/catnet)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![Dependencies](https://img.shields.io/librariesio/github/catherinevee/catnet)](https://libraries.io/github/catherinevee/catnet)
 [![Security: Trivy](https://img.shields.io/badge/security-trivy-blue.svg)](https://github.com/aquasecurity/trivy)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
