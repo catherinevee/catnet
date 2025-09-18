@@ -166,9 +166,7 @@ async def enroll_mfa(
         )
 
 
-@router.post(
-    "/certificate/validate", response_model=CertificateValidationResponse
-)
+@router.post("/certificate/validate", response_model=CertificateValidationResponse)
 async def validate_certificate(
     request: CertificateValidationRequest,
     current_user: User = Depends(get_current_user),

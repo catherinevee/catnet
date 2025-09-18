@@ -20,9 +20,7 @@ class WebhookHandler:
         if signature.startswith("sha256="):
             signature = signature[7:]
 
-        expected_sig = hmac.new(
-            secret.encode(), payload, hashlib.sha256
-        ).hexdigest()
+        expected_sig = hmac.new(secret.encode(), payload, hashlib.sha256).hexdigest()
 
         return hmac.compare_digest(expected_sig, signature)
 
@@ -40,9 +38,7 @@ class WebhookHandler:
         if not signature:
             return False
 
-        expected_sig = hmac.new(
-            secret.encode(), payload, hashlib.sha256
-        ).hexdigest()
+        expected_sig = hmac.new(secret.encode(), payload, hashlib.sha256).hexdigest()
 
         return hmac.compare_digest(expected_sig, signature)
 
@@ -53,17 +49,11 @@ class WebhookHandler:
         secret = await self.vault.get_webhook_secret(repository_id)
 
         if provider.lower() == "github":
-            return await self.verify_github_signature(
-                payload, signature, secret
-            )
+            return await self.verify_github_signature(payload, signature, secret)
         elif provider.lower() == "gitlab":
-            return await self.verify_gitlab_signature(
-                payload, signature, secret
-            )
+            return await self.verify_gitlab_signature(payload, signature, secret)
         elif provider.lower() == "bitbucket":
-            return await self.verify_bitbucket_signature(
-                payload, signature, secret
-            )
+            return await self.verify_bitbucket_signature(payload, signature, secret)
         else:
             return False
 

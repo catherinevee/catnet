@@ -61,7 +61,11 @@ class BaseStrategy:
             backup_id = f"{device.id}_{datetime.utcnow().isoformat()}"
             await self.vault.store_secret(
                 f"backups/{backup_id}",
-                {"config": config, "device_id": device.id, "timestamp": datetime.utcnow().isoformat()},
+                {
+                    "config": config,
+                    "device_id": device.id,
+                    "timestamp": datetime.utcnow().isoformat(),
+                },
             )
 
             self.backup_map[device.id] = backup_id
@@ -109,7 +113,9 @@ class BaseStrategy:
 
             # Check interface status
             interfaces = await connection.get_interfaces()
-            critical_down = any(i.get("critical") and not i.get("up") for i in interfaces)
+            critical_down = any(
+                i.get("critical") and not i.get("up") for i in interfaces
+            )
             if critical_down:
                 logger.warning(f"Critical interface down on {device.hostname}")
                 return False
@@ -168,7 +174,9 @@ class BaseStrategy:
         logger.info(f"Rolled back {rollback_count}/{len(devices)} devices")
         return rollback_count
 
-    async def monitor_health(self, devices: List[Device], duration_minutes: int) -> bool:
+    async def monitor_health(
+        self, devices: List[Device], duration_minutes: int
+    ) -> bool:
         """Monitor device health for specified duration."""
         logger.info(f"Monitoring {len(devices)} devices for {duration_minutes} minutes")
         end_time = datetime.utcnow() + timedelta(minutes=duration_minutes)
@@ -189,7 +197,9 @@ class BaseStrategy:
         logger.info("Monitoring period completed successfully")
         return True
 
-    async def execute(self, devices: List[Device], config: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(
+        self, devices: List[Device], config: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Execute deployment strategy."""
         raise NotImplementedError("Subclasses must implement execute method")
 
@@ -206,7 +216,9 @@ class CanaryStrategy(BaseStrategy):
             DeploymentStage(percentage=100, wait_minutes=0),
         ]
 
-    async def execute(self, devices: List[Device], config: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(
+        self, devices: List[Device], config: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Execute canary deployment."""
         logger.info(f"Starting canary deployment for {len(devices)} devices")
         start_time = datetime.utcnow()
@@ -215,6 +227,7 @@ class CanaryStrategy(BaseStrategy):
 
         # Randomize device order for better distribution
         import random
+
         devices = devices.copy()
         random.shuffle(devices)
 
@@ -278,7 +291,9 @@ class CanaryStrategy(BaseStrategy):
             "failed": len(failed),
             "duration_seconds": duration,
             "success": len(failed) == 0,
-            "state": DeploymentState.COMPLETED if len(failed) == 0 else DeploymentState.FAILED,
+            "state": DeploymentState.COMPLETED
+            if len(failed) == 0
+            else DeploymentState.FAILED,
             "deployed_devices": [d.id for d in deployed],
             "failed_devices": [d.id for d in failed],
         }
@@ -295,7 +310,9 @@ class RollingStrategy(BaseStrategy):
         self.batch_size = batch_size
         self.wait_between_batches = wait_between_batches
 
-    async def execute(self, devices: List[Device], config: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(
+        self, devices: List[Device], config: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Execute rolling deployment."""
         logger.info(
             f"Starting rolling deployment for {len(devices)} devices "
@@ -366,7 +383,9 @@ class RollingStrategy(BaseStrategy):
             "batch_size": self.batch_size,
             "duration_seconds": duration,
             "success": len(failed) == 0,
-            "state": DeploymentState.COMPLETED if len(failed) == 0 else DeploymentState.FAILED,
+            "state": DeploymentState.COMPLETED
+            if len(failed) == 0
+            else DeploymentState.FAILED,
             "deployed_devices": [d.id for d in deployed],
             "failed_devices": [d.id for d in failed],
         }
@@ -397,7 +416,9 @@ class BlueGreenStrategy(BaseStrategy):
         self.validation_time = validation_time
         self.green_configs: Dict[str, Any] = {}
 
-    async def execute(self, devices: List[Device], config: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(
+        self, devices: List[Device], config: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Execute blue-green deployment."""
         logger.info(f"Starting blue-green deployment for {len(devices)} devices")
         start_time = datetime.utcnow()
@@ -473,7 +494,9 @@ class BlueGreenStrategy(BaseStrategy):
         logger.info(f"Blue-green deployment completed: {result}")
         return result
 
-    async def prepare_green_config(self, device: Device, config: Dict[str, Any]) -> Dict[str, Any]:
+    async def prepare_green_config(
+        self, device: Device, config: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Prepare green (new) configuration for device."""
         logger.debug(f"Preparing green config for {device.hostname}")
 
@@ -501,7 +524,9 @@ class BlueGreenStrategy(BaseStrategy):
         green_config["apply_groups"] = ["green-deployment"]
         return green_config
 
-    async def deploy_green_config(self, device: Device, green_config: Dict[str, Any]) -> bool:
+    async def deploy_green_config(
+        self, device: Device, green_config: Dict[str, Any]
+    ) -> bool:
         """Deploy green configuration to device."""
         logger.info(f"Deploying green config to {device.hostname}")
 
@@ -539,7 +564,9 @@ class BlueGreenStrategy(BaseStrategy):
 class AllAtOnceStrategy(BaseStrategy):
     """All-at-once deployment strategy - deploy to all devices simultaneously."""
 
-    async def execute(self, devices: List[Device], config: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(
+        self, devices: List[Device], config: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Execute all-at-once deployment."""
         logger.info(f"Starting all-at-once deployment for {len(devices)} devices")
         start_time = datetime.utcnow()

@@ -28,10 +28,7 @@ class DatabaseManager:
         )
 
         # Ensure asyncpg driver for async operations
-        if (
-            "postgresql://" in self.database_url
-            and "+asyncpg" not in self.database_url
-        ):
+        if "postgresql://" in self.database_url and "+asyncpg" not in self.database_url:
             self.database_url = self.database_url.replace(
                 "postgresql://", "postgresql+asyncpg://"
             )
@@ -105,9 +102,7 @@ class DatabaseManager:
 db_manager = None
 
 
-def init_database(
-    database_url: Optional[str] = None, **kwargs
-) -> DatabaseManager:
+def init_database(database_url: Optional[str] = None, **kwargs) -> DatabaseManager:
     global db_manager
     db_manager = DatabaseManager(database_url=database_url, **kwargs)
     return db_manager

@@ -89,11 +89,7 @@ class SSHKeyAuthService:
         fingerprint = self.calculate_fingerprint(public_key)
 
         # Check if fingerprint already exists
-        existing = (
-            self.db.query(UserSSHKey)
-            .filter_by(fingerprint=fingerprint)
-            .first()
-        )
+        existing = self.db.query(UserSSHKey).filter_by(fingerprint=fingerprint).first()
         if existing:
             raise ValidationError("SSH key already exists")
 
@@ -231,9 +227,7 @@ class SSHKeyAuthService:
         # Get the SSH key
         ssh_key = (
             self.db.query(UserSSHKey)
-            .filter_by(
-                user_id=user.id, fingerprint=key_fingerprint, is_active=True
-            )
+            .filter_by(user_id=user.id, fingerprint=key_fingerprint, is_active=True)
             .first()
         )
 
@@ -270,9 +264,7 @@ class SSHKeyAuthService:
 
         return None
 
-    def verify_signature(
-        self, public_key: str, signature: str, challenge: str
-    ) -> bool:
+    def verify_signature(self, public_key: str, signature: str, challenge: str) -> bool:
         """
         Verify signature using public key with full cryptographic verification.
         """
@@ -365,12 +357,8 @@ class SSHKeyAuthService:
                 "fingerprint": key.fingerprint,
                 "key_type": key.key_type,
                 "is_active": key.is_active,
-                "created_at": key.created_at.isoformat()
-                if key.created_at
-                else None,
-                "last_used": key.last_used.isoformat()
-                if key.last_used
-                else None,
+                "created_at": key.created_at.isoformat() if key.created_at else None,
+                "last_used": key.last_used.isoformat() if key.last_used else None,
             }
             for key in keys
         ]
@@ -387,9 +375,7 @@ class SSHKeyAuthService:
             True if removed
         """
         ssh_key = (
-            self.db.query(UserSSHKey)
-            .filter_by(id=key_id, user_id=user_id)
-            .first()
+            self.db.query(UserSSHKey).filter_by(id=key_id, user_id=user_id).first()
         )
 
         if not ssh_key:
@@ -447,15 +433,11 @@ class SSHKeyAuthService:
 
         if removed_count > 0:
             self.db.commit()
-            logger.info(
-                f"Cleaned up {removed_count} old SSH keys for user {user_id}"
-            )
+            logger.info(f"Cleaned up {removed_count} old SSH keys for user {user_id}")
 
         return removed_count
 
-    def export_public_key(
-        self, user_id: str, key_id: str, output_path: str
-    ) -> Path:
+    def export_public_key(self, user_id: str, key_id: str, output_path: str) -> Path:
         """
         Export a public key to a file.
 
@@ -468,9 +450,7 @@ class SSHKeyAuthService:
             Path to exported key file
         """
         ssh_key = (
-            self.db.query(UserSSHKey)
-            .filter_by(id=key_id, user_id=user_id)
-            .first()
+            self.db.query(UserSSHKey).filter_by(id=key_id, user_id=user_id).first()
         )
 
         if not ssh_key:
@@ -502,9 +482,7 @@ class SSHKeyAuthService:
         """
         # Get old key
         old_key = (
-            self.db.query(UserSSHKey)
-            .filter_by(id=old_key_id, user_id=user_id)
-            .first()
+            self.db.query(UserSSHKey).filter_by(id=old_key_id, user_id=user_id).first()
         )
 
         if not old_key:

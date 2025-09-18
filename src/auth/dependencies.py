@@ -11,9 +11,7 @@ import os
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 auth_manager = AuthManager(
-    secret_key=os.getenv(
-        "JWT_SECRET_KEY", "your-secret-key-change-in-production"
-    )
+    secret_key=os.getenv("JWT_SECRET_KEY", "your-secret-key-change-in-production")
 )
 
 

@@ -42,9 +42,7 @@ class DeploymentService:
         # Create deployment record
         deployment = Deployment(
             id=deployment_uuid or deployment_id,
-            state=DeploymentState.PENDING
-            if not dry_run
-            else DeploymentState.DRY_RUN,
+            state=DeploymentState.PENDING if not dry_run else DeploymentState.DRY_RUN,
             created_at=datetime.utcnow(),
             created_by=user_context.get("user_id"),
         )
@@ -98,9 +96,7 @@ class DeploymentService:
             "state": deployment.state.value,
         }
 
-    async def get_deployment_status(
-        self, deployment_id: str
-    ) -> Dict[str, Any]:
+    async def get_deployment_status(self, deployment_id: str) -> Dict[str, Any]:
         """Get deployment status"""
         # Would fetch from database
         return {

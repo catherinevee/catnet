@@ -49,9 +49,7 @@ def auth(ctx):
 
 @auth.command()
 @click.option("--username", "-u", prompt=True, help="Username")
-@click.option(
-    "--password", "-p", prompt=True, hide_input=True, help="Password"
-)
+@click.option("--password", "-p", prompt=True, hide_input=True, help="Password")
 @click.option("--mfa-token", "-m", prompt="MFA Token", help="MFA token")
 @click.pass_context
 def login(ctx, username, password, mfa_token):
@@ -78,9 +76,7 @@ def login(ctx, username, password, mfa_token):
             click.echo(click.style("✓ Authentication successful", fg="green"))
             click.echo(f"Session expires: {result['expires_at']}")
         except Exception as e:
-            click.echo(
-                click.style(f"✗ Authentication failed: {str(e)}", fg="red")
-            )
+            click.echo(click.style(f"✗ Authentication failed: {str(e)}", fg="red"))
             sys.exit(1)
 
     asyncio.run(_login())
@@ -139,13 +135,9 @@ def refresh(ctx):
                 )
             )
 
-            click.echo(
-                click.style("✓ Token refreshed successfully", fg="green")
-            )
+            click.echo(click.style("✓ Token refreshed successfully", fg="green"))
         except Exception as e:
-            click.echo(
-                click.style(f"✗ Token refresh failed: {str(e)}", fg="red")
-            )
+            click.echo(click.style(f"✗ Token refresh failed: {str(e)}", fg="red"))
             sys.exit(1)
 
     asyncio.run(_refresh())
@@ -172,16 +164,12 @@ def git_connect(ctx, url, branch, webhook_secret):
             result = await gitops_service.connect_repository(
                 url=url, branch=branch, webhook_secret=webhook_secret
             )
-            click.echo(
-                click.style("✓ Repository connected successfully", fg="green")
-            )
+            click.echo(click.style("✓ Repository connected successfully", fg="green"))
             click.echo(f"Repository ID: {result['id']}")
             click.echo(f"Webhook URL: {result['webhook_url']}")
         except Exception as e:
             click.echo(
-                click.style(
-                    f"✗ Failed to connect repository: {str(e)}", fg="red"
-                )
+                click.style(f"✗ Failed to connect repository: {str(e)}", fg="red")
             )
             sys.exit(1)
 
@@ -199,9 +187,7 @@ def git_sync(ctx, repo_id, force):
         gitops_service = GitOpsService(ctx.obj["CONFIG"])
         try:
             result = await gitops_service.sync_repository(repo_id, force=force)
-            click.echo(
-                click.style("✓ Repository synced successfully", fg="green")
-            )
+            click.echo(click.style("✓ Repository synced successfully", fg="green"))
             click.echo(f"Commits processed: {result['commits_processed']}")
             click.echo(f"Configurations updated: {result['configs_updated']}")
         except Exception as e:
@@ -231,9 +217,7 @@ def git_list(ctx):
                 click.echo(f"    Last sync: {repo['last_sync']}")
         except Exception as e:
             click.echo(
-                click.style(
-                    f"✗ Failed to list repositories: {str(e)}", fg="red"
-                )
+                click.style(f"✗ Failed to list repositories: {str(e)}", fg="red")
             )
             sys.exit(1)
 
@@ -280,23 +264,15 @@ def deploy_create(ctx, config_file, target, strategy, dry_run):
                 dry_run=dry_run,
             )
 
-            click.echo(
-                click.style("✓ Deployment created successfully", fg="green")
-            )
+            click.echo(click.style("✓ Deployment created successfully", fg="green"))
             click.echo(f"Deployment ID: {result['id']}")
             click.echo(f"Status: {result['status']}")
 
             if result.get("requires_approval"):
-                click.echo(
-                    click.style("⚠ Deployment requires approval", fg="yellow")
-                )
+                click.echo(click.style("⚠ Deployment requires approval", fg="yellow"))
                 click.echo(f"Approval URL: {result['approval_url']}")
         except Exception as e:
-            click.echo(
-                click.style(
-                    f"✗ Deployment creation failed: {str(e)}", fg="red"
-                )
-            )
+            click.echo(click.style(f"✗ Deployment creation failed: {str(e)}", fg="red"))
             sys.exit(1)
 
     asyncio.run(_create())
@@ -311,9 +287,7 @@ def deploy_status(ctx, deployment_id):
     async def _status():
         deployment_service = DeploymentService(ctx.obj["CONFIG"])
         try:
-            status = await deployment_service.get_deployment_status(
-                deployment_id
-            )
+            status = await deployment_service.get_deployment_status(deployment_id)
 
             click.echo(f"Deployment: {deployment_id}")
             click.echo(f"Status: {status['state']}")
@@ -332,9 +306,7 @@ def deploy_status(ctx, deployment_id):
                     )
         except Exception as e:
             click.echo(
-                click.style(
-                    f"✗ Failed to get deployment status: {str(e)}", fg="red"
-                )
+                click.style(f"✗ Failed to get deployment status: {str(e)}", fg="red")
             )
             sys.exit(1)
 
@@ -356,9 +328,7 @@ def deploy_approve(ctx, deployment_id, comment: Optional[str]):
             result = await deployment_service.approve_deployment(
                 deployment_id, comment=approval_comment
             )
-            click.echo(
-                click.style("✓ Deployment approved successfully", fg="green")
-            )
+            click.echo(click.style("✓ Deployment approved successfully", fg="green"))
             click.echo(f"Deployment starting: {result['start_time']}")
         except Exception as e:
             click.echo(click.style(f"✗ Approval failed: {str(e)}", fg="red"))
@@ -380,9 +350,7 @@ def deploy_rollback(ctx, deployment_id, reason):
             result = await deployment_service.rollback_deployment(
                 deployment_id, reason=reason
             )
-            click.echo(
-                click.style("✓ Rollback initiated successfully", fg="green")
-            )
+            click.echo(click.style("✓ Rollback initiated successfully", fg="green"))
             click.echo(f"Rollback ID: {result['rollback_id']}")
             click.echo(f"Affected devices: {result['device_count']}")
         except Exception as e:
@@ -393,9 +361,7 @@ def deploy_rollback(ctx, deployment_id, reason):
 
 
 @deploy.command("history")
-@click.option(
-    "--limit", "-l", default=10, help="Number of deployments to show"
-)
+@click.option("--limit", "-l", default=10, help="Number of deployments to show")
 @click.pass_context
 def deploy_history(ctx, limit):
     """Show deployment history."""
@@ -403,9 +369,7 @@ def deploy_history(ctx, limit):
     async def _history():
         deployment_service = DeploymentService(ctx.obj["CONFIG"])
         try:
-            deployments = await deployment_service.get_deployment_history(
-                limit=limit
-            )
+            deployments = await deployment_service.get_deployment_history(limit=limit)
 
             if not deployments:
                 click.echo("No deployments found")
@@ -424,9 +388,7 @@ def deploy_history(ctx, limit):
                 )
         except Exception as e:
             click.echo(
-                click.style(
-                    f"✗ Failed to get deployment history: {str(e)}", fg="red"
-                )
+                click.style(f"✗ Failed to get deployment history: {str(e)}", fg="red")
             )
             sys.exit(1)
 
@@ -458,9 +420,7 @@ def device_list(ctx, vendor, status):
     async def _list():
         device_service = DeviceService(ctx.obj["CONFIG"])
         try:
-            devices = await device_service.list_devices(
-                vendor=vendor, status=status
-            )
+            devices = await device_service.list_devices(vendor=vendor, status=status)
 
             if not devices:
                 click.echo("No devices found")
@@ -468,21 +428,13 @@ def device_list(ctx, vendor, status):
 
             click.echo("Managed devices:")
             for dev in devices:
-                status_color = (
-                    "green" if dev["status"] == "online" else "yellow"
-                )
+                status_color = "green" if dev["status"] == "online" else "yellow"
                 click.echo(f"  {dev['hostname']} ({dev['vendor']})")
-                click.echo(
-                    click.style(
-                        f"    Status: {dev['status']}", fg=status_color
-                    )
-                )
+                click.echo(click.style(f"    Status: {dev['status']}", fg=status_color))
                 click.echo(f"    IP: {dev['ip_address']}")
                 click.echo(f"    Model: {dev['model']}")
         except Exception as e:
-            click.echo(
-                click.style(f"✗ Failed to list devices: {str(e)}", fg="red")
-            )
+            click.echo(click.style(f"✗ Failed to list devices: {str(e)}", fg="red"))
             sys.exit(1)
 
     asyncio.run(_list())
@@ -519,9 +471,7 @@ def device_add(ctx, hostname, ip, vendor, model, username):
             if result.get("vault_path"):
                 click.echo(f"Credentials stored at: {result['vault_path']}")
         except Exception as e:
-            click.echo(
-                click.style(f"✗ Failed to add device: {str(e)}", fg="red")
-            )
+            click.echo(click.style(f"✗ Failed to add device: {str(e)}", fg="red"))
             sys.exit(1)
 
     asyncio.run(_add())
@@ -539,9 +489,7 @@ def device_backup(ctx, device_id):
             click.echo(f"Backing up device {device_id}...")
             result = await device_service.backup_device(device_id)
 
-            click.echo(
-                click.style("✓ Backup completed successfully", fg="green")
-            )
+            click.echo(click.style("✓ Backup completed successfully", fg="green"))
             click.echo(f"Backup ID: {result['backup_id']}")
             click.echo(f"Location: {result['location']}")
             click.echo(f"Size: {result['size']} bytes")
@@ -555,9 +503,7 @@ def device_backup(ctx, device_id):
 @device.command("execute")
 @click.argument("device_id")
 @click.option("--command", "-c", required=True, help="Command to execute")
-@click.option(
-    "--confirm/--no-confirm", default=True, help="Confirm before execution"
-)
+@click.option("--confirm/--no-confirm", default=True, help="Confirm before execution")
 @click.pass_context
 def device_execute(ctx, device_id, command, confirm):
     """Execute command on device."""
@@ -567,9 +513,7 @@ def device_execute(ctx, device_id, command, confirm):
 
         if confirm:
             click.echo(f"Command to execute: {command}")
-            if not click.confirm(
-                "Are you sure you want to execute this command?"
-            ):
+            if not click.confirm("Are you sure you want to execute this command?"):
                 click.echo("Command cancelled")
                 return
 
@@ -577,18 +521,14 @@ def device_execute(ctx, device_id, command, confirm):
             click.echo(f"Executing command on device {device_id}...")
             result = await device_service.execute_command(device_id, command)
 
-            click.echo(
-                click.style("✓ Command executed successfully", fg="green")
-            )
+            click.echo(click.style("✓ Command executed successfully", fg="green"))
             click.echo("\nOutput:")
             click.echo(result["output"])
 
             if result.get("audit_id"):
                 click.echo(f"\nAudit ID: {result['audit_id']}")
         except Exception as e:
-            click.echo(
-                click.style(f"✗ Command execution failed: {str(e)}", fg="red")
-            )
+            click.echo(click.style(f"✗ Command execution failed: {str(e)}", fg="red"))
             sys.exit(1)
 
     asyncio.run(_execute())
@@ -609,9 +549,7 @@ def device_health(ctx, device_id):
             color = "green" if health["healthy"] else "red"
 
             click.echo(f"Device: {device_id}")
-            click.echo(
-                click.style(f"Overall Status: {overall_status}", fg=color)
-            )
+            click.echo(click.style(f"Overall Status: {overall_status}", fg=color))
 
             click.echo("\nHealth Checks:")
             for check in health["checks"]:
@@ -629,9 +567,7 @@ def device_health(ctx, device_id):
                 for metric, value in health["metrics"].items():
                     click.echo(f"  {metric}: {value}")
         except Exception as e:
-            click.echo(
-                click.style(f"✗ Health check failed: {str(e)}", fg="red")
-            )
+            click.echo(click.style(f"✗ Health check failed: {str(e)}", fg="red"))
             sys.exit(1)
 
     asyncio.run(_health())
@@ -661,11 +597,7 @@ def vault_status(ctx):
             if status.get("cluster_name"):
                 click.echo(f"Cluster: {status['cluster_name']}")
         except Exception as e:
-            click.echo(
-                click.style(
-                    f"✗ Failed to get Vault status: {str(e)}", fg="red"
-                )
-            )
+            click.echo(click.style(f"✗ Failed to get Vault status: {str(e)}", fg="red"))
             sys.exit(1)
 
     asyncio.run(_status())
@@ -683,17 +615,11 @@ def vault_rotate(ctx, device_id):
             click.echo(f"Rotating credentials for device {device_id}...")
             result = await vault_client.rotate_credentials(device_id)
 
-            click.echo(
-                click.style("✓ Credentials rotated successfully", fg="green")
-            )
+            click.echo(click.style("✓ Credentials rotated successfully", fg="green"))
             click.echo(f"New version: {result['version']}")
             click.echo(f"Expires: {result['expires_at']}")
         except Exception as e:
-            click.echo(
-                click.style(
-                    f"✗ Credential rotation failed: {str(e)}", fg="red"
-                )
-            )
+            click.echo(click.style(f"✗ Credential rotation failed: {str(e)}", fg="red"))
             sys.exit(1)
 
     asyncio.run(_rotate())
@@ -714,9 +640,7 @@ def ssh(ctx):
     default="ed25519",
     help="Key type to generate",
 )
-@click.option(
-    "--size", "-s", type=int, default=4096, help="Key size (RSA only)"
-)
+@click.option("--size", "-s", type=int, default=4096, help="Key size (RSA only)")
 @click.option("--comment", "-c", help="Key comment")
 @click.option("--output", "-o", help="Output file path")
 @click.pass_context
@@ -766,9 +690,7 @@ def ssh_generate(ctx, type, size, comment, output):
             click.echo(f"\nFingerprint: {fingerprint}")
 
         except Exception as e:
-            click.echo(
-                click.style(f"✗ Key generation failed: {str(e)}", fg="red")
-            )
+            click.echo(click.style(f"✗ Key generation failed: {str(e)}", fg="red"))
             sys.exit(1)
 
     asyncio.run(_generate())
@@ -794,9 +716,7 @@ def ssh_add_user(ctx, key_file, name, comment):
         from ..db.database import get_db
 
         # Would need database session here
-        db_session = (
-            None  # In production, would use: async with get_db() as session:
-        )
+        db_session = None  # In production, would use: async with get_db() as session:
         audit_logger = AuditLogger()
 
         try:
@@ -836,9 +756,7 @@ def ssh_add_user(ctx, key_file, name, comment):
             click.echo(click.style("✓ SSH key added successfully", fg="green"))
 
         except Exception as e:
-            click.echo(
-                click.style(f"✗ Failed to add SSH key: {str(e)}", fg="red")
-            )
+            click.echo(click.style(f"✗ Failed to add SSH key: {str(e)}", fg="red"))
             sys.exit(1)
 
     asyncio.run(_add())
@@ -884,9 +802,7 @@ def ssh_list_user(ctx):
                 click.echo(f"  Last used: {key.get('last_used', 'Never')}")
 
         except Exception as e:
-            click.echo(
-                click.style(f"✗ Failed to list SSH keys: {str(e)}", fg="red")
-            )
+            click.echo(click.style(f"✗ Failed to list SSH keys: {str(e)}", fg="red"))
             sys.exit(1)
 
     asyncio.run(_list())
@@ -900,12 +816,8 @@ def ssh_list_user(ctx):
     type=click.Path(exists=True),
     help="Path to public key file",
 )
-@click.option(
-    "--generate/--no-generate", default=False, help="Generate new key pair"
-)
-@click.option(
-    "--deploy/--no-deploy", default=True, help="Deploy key to device"
-)
+@click.option("--generate/--no-generate", default=False, help="Generate new key pair")
+@click.option("--deploy/--no-deploy", default=True, help="Deploy key to device")
 @click.pass_context
 def ssh_add_device(ctx, device_id, key_file, generate, deploy):
     """Add SSH key for device authentication."""
@@ -919,9 +831,7 @@ def ssh_add_device(ctx, device_id, key_file, generate, deploy):
         try:
             if generate:
                 # Generate new key pair
-                click.echo(
-                    f"Generating SSH key pair for device {device_id}..."
-                )
+                click.echo(f"Generating SSH key pair for device {device_id}...")
                 (
                     private_key,
                     public_key,
@@ -931,9 +841,7 @@ def ssh_add_device(ctx, device_id, key_file, generate, deploy):
                 result = await ssh_manager.store_ssh_key(
                     device_id, private_key, public_key
                 )
-                click.echo(
-                    click.style("✓ SSH key generated and stored", fg="green")
-                )
+                click.echo(click.style("✓ SSH key generated and stored", fg="green"))
                 click.echo(f"Vault path: {result['vault_path']}")
 
             elif key_file:
@@ -954,15 +862,11 @@ def ssh_add_device(ctx, device_id, key_file, generate, deploy):
             if deploy:
                 click.echo(f"Deploying public key to device {device_id}...")
                 # Would deploy to actual device here
-                click.echo(
-                    click.style("✓ Public key deployed to device", fg="green")
-                )
+                click.echo(click.style("✓ Public key deployed to device", fg="green"))
 
         except Exception as e:
             click.echo(
-                click.style(
-                    f"✗ Failed to add device SSH key: {str(e)}", fg="red"
-                )
+                click.style(f"✗ Failed to add device SSH key: {str(e)}", fg="red")
             )
             sys.exit(1)
 
@@ -971,9 +875,7 @@ def ssh_add_device(ctx, device_id, key_file, generate, deploy):
 
 @ssh.command("rotate-device")
 @click.argument("device_id")
-@click.option(
-    "--deploy/--no-deploy", default=True, help="Deploy new key to device"
-)
+@click.option("--deploy/--no-deploy", default=True, help="Deploy new key to device")
 @click.pass_context
 def ssh_rotate_device(ctx, device_id, deploy):
     """Rotate SSH key for device."""
@@ -988,9 +890,7 @@ def ssh_rotate_device(ctx, device_id, deploy):
             click.echo(f"Rotating SSH key for device {device_id}...")
             result = await ssh_manager.rotate_ssh_key(device_id)
 
-            click.echo(
-                click.style("✓ SSH key rotated successfully", fg="green")
-            )
+            click.echo(click.style("✓ SSH key rotated successfully", fg="green"))
             click.echo(
                 f"New fingerprint: {result.get('public_key', '').split()[1][:20]}..."
             )
@@ -998,14 +898,10 @@ def ssh_rotate_device(ctx, device_id, deploy):
             if deploy:
                 click.echo("Deploying new public key to device...")
                 # Would deploy to actual device here
-                click.echo(
-                    click.style("✓ New key deployed to device", fg="green")
-                )
+                click.echo(click.style("✓ New key deployed to device", fg="green"))
 
         except Exception as e:
-            click.echo(
-                click.style(f"✗ Key rotation failed: {str(e)}", fg="red")
-            )
+            click.echo(click.style(f"✗ Key rotation failed: {str(e)}", fg="red"))
             sys.exit(1)
 
     asyncio.run(_rotate())
@@ -1042,16 +938,12 @@ def ssh_test(ctx, device_id, username):
             )
 
             if success:
-                click.echo(
-                    click.style("✓ SSH connection successful", fg="green")
-                )
+                click.echo(click.style("✓ SSH connection successful", fg="green"))
             else:
                 click.echo(click.style("✗ SSH connection failed", fg="red"))
 
         except Exception as e:
-            click.echo(
-                click.style(f"✗ Connection test failed: {str(e)}", fg="red")
-            )
+            click.echo(click.style(f"✗ Connection test failed: {str(e)}", fg="red"))
             sys.exit(1)
 
     asyncio.run(_test())
@@ -1097,27 +989,17 @@ def status(ctx):
                         async with session.get(url, timeout=2) as response:
                             if response.status == 200:
                                 click.echo(
-                                    click.style(
-                                        f"  ✓ {service_name}", fg="green"
-                                    )
+                                    click.style(f"  ✓ {service_name}", fg="green")
                                 )
                             else:
-                                click.echo(
-                                    click.style(
-                                        f"  ✗ {service_name}", fg="red"
-                                    )
-                                )
+                                click.echo(click.style(f"  ✗ {service_name}", fg="red"))
                     except Exception:
                         click.echo(
-                            click.style(
-                                f"  ✗ {service_name} (unreachable)", fg="red"
-                            )
+                            click.style(f"  ✗ {service_name} (unreachable)", fg="red")
                         )
 
         except Exception as e:
-            click.echo(
-                click.style(f"✗ Status check failed: {str(e)}", fg="red")
-            )
+            click.echo(click.style(f"✗ Status check failed: {str(e)}", fg="red"))
             sys.exit(1)
 
     asyncio.run(_status())

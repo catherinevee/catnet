@@ -133,9 +133,7 @@ class SSHKeyManager:
             },
         )
 
-        logger.info(
-            f"Stored SSH key for device {device_id} in Vault at {vault_path}"
-        )
+        logger.info(f"Stored SSH key for device {device_id} in Vault at {vault_path}")
 
         return {"vault_path": vault_path, "key_name": key_name}
 
@@ -181,10 +179,10 @@ class SSHKeyManager:
 
         # Archive old key
         old_key_name = f"{device_id}_key"
-        logger.info(
-            f"Rotating SSH key for device {device_id}, old key: {old_key_name}"
+        logger.info(f"Rotating SSH key for device {device_id}, old key: {old_key_name}")
+        archive_name = (
+            f"{device_id}_key_archived_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
         )
-        archive_name = f"{device_id}_key_archived_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
 
         try:
             old_key = await self.get_ssh_key(device_id)
@@ -299,9 +297,7 @@ class SSHKeyManager:
             )
 
             # Test with simple command
-            stdin, stdout, stderr = client.exec_command(
-                'echo "Connection test"'
-            )
+            stdin, stdout, stderr = client.exec_command('echo "Connection test"')
             result = stdout.read().decode().strip()
 
             client.close()

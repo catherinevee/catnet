@@ -6,6 +6,8 @@ RUN apt-get update && apt-get install -y \
     g++ \
     git \
     ssh \
+    gnupg \
+    gnupg2 \
     libpq-dev \
     libssl-dev \
     libffi-dev \

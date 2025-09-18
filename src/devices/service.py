@@ -29,9 +29,7 @@ class DeviceService:
         logger.info(f"Connecting to device {device_id}")
 
         try:
-            connection = await self.connector.connect_to_device(
-                device_id, user_context
-            )
+            connection = await self.connector.connect_to_device(device_id, user_context)
 
             if connection:
                 return {
@@ -65,9 +63,7 @@ class DeviceService:
         logger.info(f"Executing command on device {device_id}")
 
         try:
-            connection = await self.connector.connect_to_device(
-                device_id, user_context
-            )
+            connection = await self.connector.connect_to_device(device_id, user_context)
 
             if connection:
                 output = await connection.execute_command(command)
@@ -101,18 +97,14 @@ class DeviceService:
         logger.info(f"Backing up configuration for device {device_id}")
 
         try:
-            connection = await self.connector.connect_to_device(
-                device_id, user_context
-            )
+            connection = await self.connector.connect_to_device(device_id, user_context)
 
             if connection:
                 config = await connection.backup_configuration()
                 await connection.disconnect()
 
                 # Store backup (would save to database)
-                backup_id = (
-                    f"backup_{device_id}_{datetime.utcnow().isoformat()}"
-                )
+                backup_id = f"backup_{device_id}_{datetime.utcnow().isoformat()}"
 
                 return {
                     "success": True,

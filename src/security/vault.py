@@ -14,9 +14,7 @@ class VaultClient:
         vault_token: Optional[str] = None,
         namespace: str = "catnet",
     ):
-        self.vault_url = vault_url or os.getenv(
-            "VAULT_URL", "http://localhost:8200"
-        )
+        self.vault_url = vault_url or os.getenv("VAULT_URL", "http://localhost:8200")
         self.vault_token = vault_token or os.getenv("VAULT_TOKEN")
         self.namespace = namespace
         self.client = None
@@ -45,9 +43,7 @@ class VaultClient:
 
     async def store_secret(self, path: str, secret: Dict[str, Any]):
         loop = asyncio.get_event_loop()
-        return await loop.run_in_executor(
-            None, self._store_secret_sync, path, secret
-        )
+        return await loop.run_in_executor(None, self._store_secret_sync, path, secret)
 
     def _store_secret_sync(self, path: str, secret: Dict[str, Any]):
         full_path = f"{self.namespace}/{path}"
@@ -97,9 +93,7 @@ class VaultClient:
 
         return {
             **creds,
-            "expires_at": (
-                datetime.utcnow() + timedelta(seconds=ttl)
-            ).isoformat(),
+            "expires_at": (datetime.utcnow() + timedelta(seconds=ttl)).isoformat(),
             "lease_id": f"{device_id}-{requestor}-{datetime.utcnow().timestamp()}",
         }
 
@@ -190,9 +184,7 @@ class VaultClient:
 
     async def revoke_token(self, token: str):
         loop = asyncio.get_event_loop()
-        return await loop.run_in_executor(
-            None, self.client.auth.token.revoke, token
-        )
+        return await loop.run_in_executor(None, self.client.auth.token.revoke, token)
 
     async def enable_audit_device(
         self, device_type: str = "file", path: str = "/vault/logs/audit.log"
@@ -214,9 +206,7 @@ class VaultClient:
     async def unseal_vault(self, keys: List[str]):
         loop = asyncio.get_event_loop()
         for key in keys:
-            await loop.run_in_executor(
-                None, self.client.sys.submit_unseal_key, key
-            )
+            await loop.run_in_executor(None, self.client.sys.submit_unseal_key, key)
 
     def is_sealed(self) -> bool:
         return self.client.sys.is_sealed()

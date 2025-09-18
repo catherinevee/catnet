@@ -147,9 +147,7 @@ async def dry_run_deployment(
             if not device.is_active:
                 errors.append(f"Device {device.hostname} is not active")
             elif not device.certificate_status == "active":
-                warnings.append(
-                    f"Device {device.hostname} certificate not active"
-                )
+                warnings.append(f"Device {device.hostname} certificate not active")
 
             if device.last_backup:
                 backup_age = (datetime.utcnow() - device.last_backup).days
@@ -183,12 +181,8 @@ async def dry_run_deployment(
         # Check maintenance windows
         current_hour = datetime.utcnow().hour
         if 9 <= current_hour <= 17:  # Business hours
-            warnings.append(
-                "Deployment during business hours may impact users"
-            )
-            recommendations.append(
-                "Consider scheduling for maintenance window"
-            )
+            warnings.append("Deployment during business hours may impact users")
+            recommendations.append("Consider scheduling for maintenance window")
 
         # Generate affected devices list
         affected_devices = [
@@ -279,9 +273,7 @@ async def get_deployment_metrics(
                     )
                 ).label("successful"),
                 func.sum(
-                    func.cast(
-                        Deployment.state == DeploymentState.FAILED, type_=int
-                    )
+                    func.cast(Deployment.state == DeploymentState.FAILED, type_=int)
                 ).label("failed"),
                 func.sum(
                     func.cast(
@@ -342,9 +334,7 @@ async def get_deployment_metrics(
                 "state": deployment.state.value,
                 "strategy": deployment.strategy,
                 "duration": (
-                    (
-                        deployment.completed_at - deployment.started_at
-                    ).total_seconds()
+                    (deployment.completed_at - deployment.started_at).total_seconds()
                     if deployment.completed_at and deployment.started_at
                     else None
                 ),

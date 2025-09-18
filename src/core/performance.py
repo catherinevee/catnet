@@ -69,9 +69,7 @@ class DatabasePoolManager:
                 self.database_url,
                 poolclass=pool_class,
                 pool_size=self.pool_size if not self.use_null_pool else 0,
-                max_overflow=self.max_overflow
-                if not self.use_null_pool
-                else 0,
+                max_overflow=self.max_overflow if not self.use_null_pool else 0,
                 pool_timeout=self.pool_timeout,
                 pool_recycle=self.pool_recycle,
                 pool_pre_ping=True,  # Check connections before use
@@ -90,9 +88,7 @@ class DatabasePoolManager:
             async with self.engine.begin() as conn:
                 await conn.execute("SELECT 1")
 
-            logger.info(
-                f"Database pool initialized with {self.pool_size} connections"
-            )
+            logger.info(f"Database pool initialized with {self.pool_size} connections")
 
         except Exception as e:
             logger.error(f"Failed to initialize database pool: {e}")
@@ -279,9 +275,7 @@ class RedisCacheManager:
             return 0
 
         except Exception as e:
-            logger.error(
-                f"Cache invalidation error for pattern {pattern}: {e}"
-            )
+            logger.error(f"Cache invalidation error for pattern {pattern}: {e}")
             return 0
 
     def cached(
@@ -314,9 +308,7 @@ class RedisCacheManager:
                     # Default key from function name and args
                     key_parts = [func.__name__]
                     key_parts.extend(str(arg) for arg in args)
-                    key_parts.extend(
-                        f"{k}={v}" for k, v in sorted(kwargs.items())
-                    )
+                    key_parts.extend(f"{k}={v}" for k, v in sorted(kwargs.items()))
                     cache_key = ":".join(key_parts)
 
                 # Try to get from cache

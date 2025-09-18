@@ -33,6 +33,7 @@ httpx==0.25.2
 cryptography==41.0.7
 PyJWT==2.8.0
 passlib[bcrypt]==1.7.4
+argon2-cffi==23.1.0  # Argon2 password hashing
 python-jose[cryptography]==3.3.0
 hvac==2.1.0  # HashiCorp Vault client
 mfa==0.1.1

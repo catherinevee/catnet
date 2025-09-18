@@ -68,9 +68,7 @@ class AuditLogger:
         db_session: Optional[AsyncSession] = None,
         enable_console: bool = True,
     ):
-        self.log_file = (
-            Path(log_file) if log_file else Path("logs/audit.jsonl")
-        )
+        self.log_file = Path(log_file) if log_file else Path("logs/audit.jsonl")
         self.db_session = db_session
         self.enable_console = enable_console
         self.logger = logging.getLogger("audit")
@@ -292,14 +290,12 @@ class AuditLogger:
                     # Apply filters
                     if (
                         start_date
-                        and datetime.fromisoformat(event["timestamp"])
-                        < start_date
+                        and datetime.fromisoformat(event["timestamp"]) < start_date
                     ):
                         continue
                     if (
                         end_date
-                        and datetime.fromisoformat(event["timestamp"])
-                        > end_date
+                        and datetime.fromisoformat(event["timestamp"]) > end_date
                     ):
                         continue
                     if event_type and event["event_type"] != event_type:

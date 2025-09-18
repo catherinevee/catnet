@@ -27,9 +27,7 @@ class JuniperHandler:
         "show_config_json": "show configuration | display json",
     }
 
-    def __init__(
-        self, connection: Any, audit_logger: Optional[AuditLogger] = None
-    ):
+    def __init__(self, connection: Any, audit_logger: Optional[AuditLogger] = None):
         self.connection = connection
         self.audit = audit_logger or AuditLogger()
         self.in_config_mode = False
@@ -137,19 +135,14 @@ class JuniperHandler:
                     await self.execute_command(line)
 
             # Check configuration without committing
-            check_output = await self.execute_command(
-                self.COMMANDS["commit_check"]
-            )
+            check_output = await self.execute_command(self.COMMANDS["commit_check"])
 
             # Rollback changes
             await self.execute_command("rollback 0")
             await self.exit_config_mode()
 
             # Check for errors
-            if (
-                "error" in check_output.lower()
-                or "failed" in check_output.lower()
-            ):
+            if "error" in check_output.lower() or "failed" in check_output.lower():
                 return False
 
             return True
@@ -257,9 +250,7 @@ class JuniperHandler:
         commands = []
 
         if description:
-            commands.append(
-                f'set interfaces {interface} description "{description}"'
-            )
+            commands.append(f'set interfaces {interface} description "{description}"')
 
         if ip_address:
             commands.append(
@@ -295,9 +286,7 @@ class JuniperHandler:
         commands = [f"set vlans {vlan_name} vlan-id {vlan_id}"]
 
         if description:
-            commands.append(
-                f'set vlans {vlan_name} description "{description}"'
-            )
+            commands.append(f'set vlans {vlan_name} description "{description}"')
 
         output = await self.execute_config(commands)
 
@@ -441,18 +430,14 @@ class JuniperHandler:
             config,
         )
         config = re.sub(r'secret "[^"]+"', 'secret "<removed>"', config)
-        config = re.sub(
-            r'pre-shared-key "[^"]+"', 'pre-shared-key "<removed>"', config
-        )
+        config = re.sub(r'pre-shared-key "[^"]+"', 'pre-shared-key "<removed>"', config)
 
         return config
 
     async def get_configuration_json(self) -> Dict[str, Any]:
         """Get configuration in JSON format (Juniper feature)"""
         try:
-            output = await self.execute_command(
-                self.COMMANDS["show_config_json"]
-            )
+            output = await self.execute_command(self.COMMANDS["show_config_json"])
             return json.loads(output)
         except Exception as e:
             raise DeviceConnectionError(f"Failed to get JSON config: {e}")
@@ -478,9 +463,7 @@ class JuniperHandler:
         """Verify configuration matches expected"""
         current_config = await self.backup_configuration()
 
-        differences = await self.compare_configs(
-            current_config, expected_config
-        )
+        differences = await self.compare_configs(current_config, expected_config)
 
         if differences:
             await self.audit.log_event(

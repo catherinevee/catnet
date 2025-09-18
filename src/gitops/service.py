@@ -95,9 +95,7 @@ class GitOpsService:
         ):
             """Connect a Git repository"""
             # Check permission
-            if not await self._check_permission(
-                current_user, "gitops.connect"
-            ):
+            if not await self._check_permission(current_user, "gitops.connect"):
                 raise HTTPException(403, "Insufficient permissions")
 
             # Validate repository URL
@@ -113,13 +111,9 @@ class GitOpsService:
                 )
 
                 # Scan for secrets (CLAUDE.md requirement)
-                secrets_found = await self.git_handler.scan_for_secrets(
-                    repo_path
-                )
+                secrets_found = await self.git_handler.scan_for_secrets(repo_path)
                 if secrets_found:
-                    await self._quarantine_and_alert(
-                        secrets_found, current_user.id
-                    )
+                    await self._quarantine_and_alert(secrets_found, current_user.id)
                     raise HTTPException(400, "Repository contains secrets")
 
                 # Store repository in database
@@ -174,9 +168,7 @@ class GitOpsService:
                     details={"url": repo_data.url, "error": str(e)},
                     level=AuditLevel.ERROR,
                 )
-                raise HTTPException(
-                    500, f"Failed to connect repository: {str(e)}"
-                )
+                raise HTTPException(500, f"Failed to connect repository: {str(e)}")
 
         @self.app.post("/git/webhook")
         async def process_webhook(
@@ -198,9 +190,7 @@ class GitOpsService:
             provider = self._detect_provider(request.headers)
 
             # Get signature based on provider
-            signature = (
-                x_hub_signature_256 or x_hub_signature or x_gitlab_token
-            )
+            signature = x_hub_signature_256 or x_hub_signature or x_gitlab_token
 
             if not signature:
                 await self.audit.log_security_incident(
@@ -282,9 +272,7 @@ class GitOpsService:
                     details={"error": str(e)},
                     level=AuditLevel.ERROR,
                 )
-                raise HTTPException(
-                    500, f"Webhook processing failed: {str(e)}"
-                )
+                raise HTTPException(500, f"Webhook processing failed: {str(e)}")
 
         @self.app.get("/git/configs")
         async def get_configurations(
@@ -342,9 +330,7 @@ class GitOpsService:
 
             except Exception as e:
                 self.git_handler.cleanup()
-                raise HTTPException(
-                    500, f"Failed to get configurations: {str(e)}"
-                )
+                raise HTTPException(500, f"Failed to get configurations: {str(e)}")
 
         @self.app.post("/git/sync")
         async def sync_repository(
@@ -383,13 +369,9 @@ class GitOpsService:
 
                 if pull_result["updated"]:
                     # Scan for secrets
-                    secrets_found = await self.git_handler.scan_for_secrets(
-                        repo_path
-                    )
+                    secrets_found = await self.git_handler.scan_for_secrets(repo_path)
                     if secrets_found:
-                        await self._quarantine_and_alert(
-                            secrets_found, current_user.id
-                        )
+                        await self._quarantine_and_alert(secrets_found, current_user.id)
                         raise HTTPException(400, "New commits contain secrets")
 
                     # Update last commit hash
@@ -399,9 +381,7 @@ class GitOpsService:
 
                     # Process changes if auto-deploy enabled
                     if repository.auto_deploy:
-                        await self._trigger_auto_deployment(
-                            repository, pull_result
-                        )
+                        await self._trigger_auto_deployment(repository, pull_result)
 
                 await self.audit.log_event(
                     event_type="repository_synced",
@@ -445,9 +425,7 @@ class GitOpsService:
         valid_prefixes = ["https://", "git@", "ssh://"]
         return any(url.startswith(prefix) for prefix in valid_prefixes)
 
-    async def _quarantine_and_alert(
-        self, secrets: List[Dict[str, Any]], user_id: str
-    ):
+    async def _quarantine_and_alert(self, secrets: List[Dict[str, Any]], user_id: str):
         """Quarantine and alert about secrets"""
         await self.audit.log_security_incident(
             incident_type="secrets_detected",
@@ -481,9 +459,7 @@ class GitOpsService:
         else:
             return ""
 
-    async def _scan_webhook_commits(
-        self, parsed: dict, repository: GitRepository
-    ):
+    async def _scan_webhook_commits(self, parsed: dict, repository: GitRepository):
         """Scan webhook commits for secrets"""
         # Would implement secret scanning on commit content
         pass
@@ -546,9 +522,7 @@ class GitOpsService:
         # Would create deployment through deployment service
         pass
 
-    async def _create_auto_deployment(
-        self, repository: GitRepository, configs: list
-    ):
+    async def _create_auto_deployment(self, repository: GitRepository, configs: list):
         """Create automatic deployment from configs"""
         # Would create deployment through deployment service
         pass

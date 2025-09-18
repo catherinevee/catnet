@@ -80,9 +80,7 @@ class AuthenticationService:
         # Rate limiter
         self.limiter = Limiter(key_func=get_remote_address)
         self.app.state.limiter = self.limiter
-        self.app.add_exception_handler(
-            RateLimitExceeded, _rate_limit_exceeded_handler
-        )
+        self.app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
         self._setup_middleware()
         self._setup_routes()
@@ -137,9 +135,7 @@ class AuthenticationService:
 
                 # Lock account after 5 failed attempts
                 if user.failed_login_attempts >= 5:
-                    user.locked_until = datetime.utcnow() + timedelta(
-                        minutes=30
-                    )
+                    user.locked_until = datetime.utcnow() + timedelta(minutes=30)
 
                 await db.commit()
 
@@ -183,12 +179,8 @@ class AuthenticationService:
                 "roles": user.roles,
             }
 
-            access_token = await self.auth_manager.create_access_token(
-                data=user_data
-            )
-            refresh_token = await self.auth_manager.create_refresh_token(
-                data=user_data
-            )
+            access_token = await self.auth_manager.create_access_token(data=user_data)
+            refresh_token = await self.auth_manager.create_refresh_token(data=user_data)
 
             await self.audit_logger.log_authentication(
                 user_id=user.username,
@@ -197,9 +189,7 @@ class AuthenticationService:
                 ip_address=request.client.host,
             )
 
-            return LoginResponse(
-                access_token=access_token, refresh_token=refresh_token
-            )
+            return LoginResponse(access_token=access_token, refresh_token=refresh_token)
 
         @self.app.post("/auth/mfa/verify")
         async def verify_mfa(
@@ -239,9 +229,7 @@ class AuthenticationService:
 
             # Generate MFA secret
             secret = self.auth_manager.generate_mfa_secret(user.username)
-            qr_code_uri = self.auth_manager.generate_mfa_qr_code(
-                user.username, secret
-            )
+            qr_code_uri = self.auth_manager.generate_mfa_qr_code(user.username, secret)
 
             # Save secret to user (would typically be encrypted)
             user.mfa_secret = secret
@@ -302,9 +290,7 @@ class AuthenticationService:
                 )
 
             # Create new user
-            password_hash = self.auth_manager.get_password_hash(
-                user_data.password
-            )
+            password_hash = self.auth_manager.get_password_hash(user_data.password)
 
             new_user = User(
                 username=user_data.username,
