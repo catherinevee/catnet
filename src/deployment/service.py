@@ -60,9 +60,7 @@ class DeploymentService:
             "result": result,
         }
 
-    async def get_deployment_status(
-        self, deployment_id: str
-    ) -> Dict[str, Any]:
+    async def get_deployment_status(self, deployment_id: str) -> Dict[str, Any]:
         """Get deployment status"""
         # Would fetch from database
         return {
@@ -90,9 +88,7 @@ class DeploymentService:
         self, deployment_id: str, user_id: str
     ) -> Dict[str, Any]:
         """Approve a deployment for execution"""
-        logger.info(
-            f"User {user_id} approving deployment {deployment_id}"
-        )
+        logger.info(f"User {user_id} approving deployment {deployment_id}")
 
         # Would update deployment status in DB
         return {

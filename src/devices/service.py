@@ -29,9 +29,7 @@ class DeviceService:
         logger.info(f"Connecting to device {device_id}")
 
         try:
-            connection = await self.connector.connect_to_device(
-                device_id, user_context
-            )
+            connection = await self.connector.connect_to_device(device_id, user_context)
 
             if connection:
                 return {
@@ -65,9 +63,7 @@ class DeviceService:
         logger.info(f"Executing command on device {device_id}")
 
         try:
-            connection = await self.connector.connect_to_device(
-                device_id, user_context
-            )
+            connection = await self.connector.connect_to_device(device_id, user_context)
 
             if connection:
                 output = await connection.execute_command(command)
@@ -101,9 +97,7 @@ class DeviceService:
         logger.info(f"Backing up configuration for device {device_id}")
 
         try:
-            connection = await self.connector.connect_to_device(
-                device_id, user_context
-            )
+            connection = await self.connector.connect_to_device(device_id, user_context)
 
             if connection:
                 config = await connection.backup_configuration()
@@ -133,9 +127,7 @@ class DeviceService:
                 "error": str(e),
             }
 
-    async def get_device_info(
-        self, device_id: str
-    ) -> Dict[str, Any]:
+    async def get_device_info(self, device_id: str) -> Dict[str, Any]:
         """Get device information"""
         # Would fetch from database
         return {
