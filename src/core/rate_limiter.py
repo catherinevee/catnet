@@ -54,7 +54,9 @@ class RateLimiter:
             await self.redis_client.ping()
             logger.info("Rate limiter initialized with Redis backend")
         except Exception as e:
-            logger.warning(f"Redis not available, using in-memory rate limiting: {e}")
+            logger.warning(
+                f"Redis not available, using in-memory rate limiting: {e}"
+            )
             self.redis_client = None
             self._local_buckets = {}
 
@@ -99,7 +101,9 @@ class RateLimiter:
             redis_key = f"rate_limit:{key}"
 
             # Remove old entries outside the window
-            await self.redis_client.zremrangebyscore(redis_key, 0, window_start)
+            await self.redis_client.zremrangebyscore(
+                redis_key, 0, window_start
+            )
 
             # Count requests in current window
             current_requests = await self.redis_client.zcard(redis_key)
@@ -230,7 +234,9 @@ class RateLimiter:
                         )
                     )
 
-                    headers["Retry-After"] = str(result.get("retry_after", period))
+                    headers["Retry-After"] = str(
+                        result.get("retry_after", period)
+                    )
 
                     raise HTTPException(
                         status_code=status.HTTP_429_TOO_MANY_REQUESTS,

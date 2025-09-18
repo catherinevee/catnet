@@ -161,13 +161,17 @@ def init():
         from src.security.auth import AuthManager
         from sqlalchemy.ext.asyncio import AsyncSession
 
-        auth_manager = AuthManager(secret_key=os.getenv("JWT_SECRET_KEY", "change-me"))
+        auth_manager = AuthManager(
+            secret_key=os.getenv("JWT_SECRET_KEY", "change-me")
+        )
 
         async with db_manager.session_scope() as session:
             # Check if admin exists
             from sqlalchemy import select
 
-            result = await session.execute(select(User).where(User.username == "admin"))
+            result = await session.execute(
+                select(User).where(User.username == "admin")
+            )
             admin = result.scalar_one_or_none()
 
             if not admin:
@@ -186,7 +190,9 @@ def init():
                 logger.info(
                     "Default admin user created (username: admin, password: admin123)"
                 )
-                logger.warning("⚠️  CHANGE THE DEFAULT ADMIN PASSWORD IMMEDIATELY!")
+                logger.warning(
+                    "⚠️  CHANGE THE DEFAULT ADMIN PASSWORD IMMEDIATELY!"
+                )
             else:
                 logger.info("Admin user already exists")
 
@@ -195,7 +201,9 @@ def init():
 
 @cli.command()
 @click.option("--host", default="192.168.1.1")
-@click.option("--vendor", type=click.Choice(["cisco_ios", "cisco_xe", "juniper"]))
+@click.option(
+    "--vendor", type=click.Choice(["cisco_ios", "cisco_xe", "juniper"])
+)
 @click.option("--username", prompt=True)
 @click.option("--password", prompt=True, hide_input=True)
 def test_connection(host, vendor, username, password):
@@ -238,7 +246,9 @@ def validate_config():
             missing.append(var)
 
     if missing:
-        logger.error(f"Missing required environment variables: {', '.join(missing)}")
+        logger.error(
+            f"Missing required environment variables: {', '.join(missing)}"
+        )
         sys.exit(1)
 
     # Test database connection

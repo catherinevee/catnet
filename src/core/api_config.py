@@ -95,7 +95,10 @@ class CORSConfig:
         """Check if running in development mode"""
         import os
 
-        return os.getenv("ENVIRONMENT", "production").lower() in ["development", "dev"]
+        return os.getenv("ENVIRONMENT", "production").lower() in [
+            "development",
+            "dev",
+        ]
 
     def configure_cors(self, app):
         """Configure CORS for FastAPI application"""
@@ -109,7 +112,9 @@ class CORSConfig:
             max_age=self.max_age,
         )
 
-        logger.info(f"CORS configured with {len(self.allowed_origins)} allowed origins")
+        logger.info(
+            f"CORS configured with {len(self.allowed_origins)} allowed origins"
+        )
 
     def is_origin_allowed(self, origin: str) -> bool:
         """Check if origin is allowed"""
@@ -262,7 +267,9 @@ class RequestValidation:
             r"^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?"
             r"(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*$"
         ),
-        "email": re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"),
+        "email": re.compile(
+            r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+        ),
         "alphanumeric": re.compile(r"^[a-zA-Z0-9]+$"),
         "safe_string": re.compile(r"^[a-zA-Z0-9\s\-_.,!?]+$"),
     }
@@ -276,7 +283,8 @@ class RequestValidation:
     def validate_ip(cls, value: str) -> bool:
         """Validate IP address (v4 or v6)"""
         return bool(
-            cls.PATTERNS["ipv4"].match(value) or cls.PATTERNS["ipv6"].match(value)
+            cls.PATTERNS["ipv4"].match(value)
+            or cls.PATTERNS["ipv6"].match(value)
         )
 
     @classmethod
@@ -311,7 +319,9 @@ class RequestValidation:
         value = value.replace("\x00", "")
 
         # Remove control characters
-        value = "".join(char for char in value if ord(char) >= 32 or char in "\n\r\t")
+        value = "".join(
+            char for char in value if ord(char) >= 32 or char in "\n\r\t"
+        )
 
         # Escape HTML entities
         value = (
@@ -325,7 +335,9 @@ class RequestValidation:
         return value
 
     @classmethod
-    def validate_request_size(cls, request: Request, max_size: int = 10485760):  # 10MB
+    def validate_request_size(
+        cls, request: Request, max_size: int = 10485760
+    ):  # 10MB
         """Validate request body size"""
         content_length = request.headers.get("content-length")
 

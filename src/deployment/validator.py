@@ -118,7 +118,9 @@ class DeploymentValidator:
 
         return {
             "rule_name": "device_readiness",
-            "status": "error" if errors else ("warning" if warnings else "passed"),
+            "status": "error"
+            if errors
+            else ("warning" if warnings else "passed"),
             "errors": errors,
             "warnings": warnings,
         }
@@ -155,7 +157,9 @@ class DeploymentValidator:
 
         return {
             "rule_name": "configuration_syntax",
-            "status": "error" if errors else ("warning" if warnings else "passed"),
+            "status": "error"
+            if errors
+            else ("warning" if warnings else "passed"),
             "errors": errors,
             "warnings": warnings,
         }
@@ -182,7 +186,9 @@ class DeploymentValidator:
 
         # Check deployment strategy
         if deployment.strategy not in ["canary", "rolling", "blue_green"]:
-            errors.append(f"Unknown deployment strategy: {deployment.strategy}")
+            errors.append(
+                f"Unknown deployment strategy: {deployment.strategy}"
+            )
 
         # Check device count limits
         if len(devices) > 100:
@@ -200,7 +206,9 @@ class DeploymentValidator:
 
         return {
             "rule_name": "business_rules",
-            "status": "error" if errors else ("warning" if warnings else "passed"),
+            "status": "error"
+            if errors
+            else ("warning" if warnings else "passed"),
             "errors": errors,
             "warnings": warnings,
         }
@@ -227,7 +235,9 @@ class DeploymentValidator:
             # Weekday deployment
             if hour < 6 or hour > 22:
                 # Outside of extended maintenance window
-                warnings.append("Deployment outside recommended hours (6 AM - 10 PM)")
+                warnings.append(
+                    "Deployment outside recommended hours (6 AM - 10 PM)"
+                )
 
         # Check scheduled time if present
         if deployment.scheduled_at:
@@ -236,7 +246,9 @@ class DeploymentValidator:
 
         return {
             "rule_name": "maintenance_window",
-            "status": "error" if errors else ("warning" if warnings else "passed"),
+            "status": "error"
+            if errors
+            else ("warning" if warnings else "passed"),
             "errors": errors,
             "warnings": warnings,
         }
@@ -269,7 +281,9 @@ class DeploymentValidator:
 
         return {
             "rule_name": "dependencies",
-            "status": "error" if errors else ("warning" if warnings else "passed"),
+            "status": "error"
+            if errors
+            else ("warning" if warnings else "passed"),
             "errors": errors,
             "warnings": warnings,
         }
@@ -287,12 +301,16 @@ class DeploymentValidator:
         Returns:
             True if rollback is possible
         """
-        logger.info(f"Validating rollback capability for deployment {deployment.id}")
+        logger.info(
+            f"Validating rollback capability for deployment {deployment.id}"
+        )
 
         # Check all devices have backups
         for device in devices:
             if not device.last_backup:
-                logger.error(f"Device {device.hostname} has no backup for rollback")
+                logger.error(
+                    f"Device {device.hostname} has no backup for rollback"
+                )
                 return False
 
         # Check rollback configuration exists

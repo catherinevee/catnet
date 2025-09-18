@@ -80,7 +80,9 @@ class AuthenticationService:
         # Rate limiter
         self.limiter = Limiter(key_func=get_remote_address)
         self.app.state.limiter = self.limiter
-        self.app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+        self.app.add_exception_handler(
+            RateLimitExceeded, _rate_limit_exceeded_handler
+        )
 
         self._setup_middleware()
         self._setup_routes()
@@ -123,7 +125,8 @@ class AuthenticationService:
             # Check if account is locked
             if user.locked_until and user.locked_until > datetime.utcnow():
                 raise HTTPException(
-                    status_code=status.HTTP_423_LOCKED, detail="Account is locked"
+                    status_code=status.HTTP_423_LOCKED,
+                    detail="Account is locked",
                 )
 
             # Verify password
@@ -134,7 +137,9 @@ class AuthenticationService:
 
                 # Lock account after 5 failed attempts
                 if user.failed_login_attempts >= 5:
-                    user.locked_until = datetime.utcnow() + timedelta(minutes=30)
+                    user.locked_until = datetime.utcnow() + timedelta(
+                        minutes=30
+                    )
 
                 await db.commit()
 
@@ -178,8 +183,12 @@ class AuthenticationService:
                 "roles": user.roles,
             }
 
-            access_token = await self.auth_manager.create_access_token(data=user_data)
-            refresh_token = await self.auth_manager.create_refresh_token(data=user_data)
+            access_token = await self.auth_manager.create_access_token(
+                data=user_data
+            )
+            refresh_token = await self.auth_manager.create_refresh_token(
+                data=user_data
+            )
 
             await self.audit_logger.log_authentication(
                 user_id=user.username,
@@ -188,7 +197,9 @@ class AuthenticationService:
                 ip_address=request.client.host,
             )
 
-            return LoginResponse(access_token=access_token, refresh_token=refresh_token)
+            return LoginResponse(
+                access_token=access_token, refresh_token=refresh_token
+            )
 
         @self.app.post("/auth/mfa/verify")
         async def verify_mfa(
@@ -209,7 +220,8 @@ class AuthenticationService:
 
             if not is_valid:
                 raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid MFA token"
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid MFA token",
                 )
 
             return {"verified": True}
@@ -221,12 +233,15 @@ class AuthenticationService:
 
             if not user:
                 raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="User not found",
                 )
 
             # Generate MFA secret
             secret = self.auth_manager.generate_mfa_secret(user.username)
-            qr_code_uri = self.auth_manager.generate_mfa_qr_code(user.username, secret)
+            qr_code_uri = self.auth_manager.generate_mfa_qr_code(
+                user.username, secret
+            )
 
             # Save secret to user (would typically be encrypted)
             user.mfa_secret = secret
@@ -267,7 +282,9 @@ class AuthenticationService:
         @self.app.post("/auth/users", response_model=UserResponse)
         @self.limiter.limit("10/hour")
         async def create_user(
-            request: Request, user_data: UserCreate, db: AsyncSession = Depends(get_db)
+            request: Request,
+            user_data: UserCreate,
+            db: AsyncSession = Depends(get_db),
         ):
             # Check if user exists
             result = await db.execute(
@@ -285,7 +302,9 @@ class AuthenticationService:
                 )
 
             # Create new user
-            password_hash = self.auth_manager.get_password_hash(user_data.password)
+            password_hash = self.auth_manager.get_password_hash(
+                user_data.password
+            )
 
             new_user = User(
                 username=user_data.username,
@@ -349,7 +368,11 @@ class AuthenticationService:
             self.mtls_server = mtls_server
 
         uvicorn.run(
-            self.app, host="0.0.0.0", port=self.port, log_level="info", ssl=ssl_context
+            self.app,
+            host="0.0.0.0",
+            port=self.port,
+            log_level="info",
+            ssl=ssl_context,
         )
 
 

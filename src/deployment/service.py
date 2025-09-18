@@ -60,7 +60,9 @@ class DeploymentService:
             "result": result,
         }
 
-    async def get_deployment_status(self, deployment_id: str) -> Dict[str, Any]:
+    async def get_deployment_status(
+        self, deployment_id: str
+    ) -> Dict[str, Any]:
         """Get deployment status"""
         # Would fetch from database
         return {

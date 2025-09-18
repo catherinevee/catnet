@@ -7,8 +7,10 @@ import ipaddress
 from typing import Dict, Any, List, Optional
 from dataclasses import dataclass, field
 from enum import Enum
+from .logging import get_logger
 
 # ValidationError and ComplianceError defined in exceptions module
+logger = get_logger(__name__)
 
 
 class ValidationLevel(Enum):
@@ -71,7 +73,9 @@ class ConfigValidator:
             self.interface_descriptions_required,
         ]
 
-    async def validate_configuration(self, config: Dict[str, Any]) -> ValidationResult:
+    async def validate_configuration(
+        self, config: Dict[str, Any]
+    ) -> ValidationResult:
         """
         Main validation method following CLAUDE.md pattern
         """
@@ -114,7 +118,9 @@ class ConfigValidator:
 
         return result
 
-    async def validate_schema(self, config: Dict[str, Any]) -> ValidationResult:
+    async def validate_schema(
+        self, config: Dict[str, Any]
+    ) -> ValidationResult:
         """Layer 1: Schema validation"""
         result = ValidationResult()
 
@@ -179,7 +185,9 @@ class ConfigValidator:
                 logger.debug(f"Validating interface: {interface_context}")
                 # Validate interface name
                 if not re.match(r"interface \S+", line):
-                    result.add_error(f"Line {line_num}: Invalid interface syntax")
+                    result.add_error(
+                        f"Line {line_num}: Invalid interface syntax"
+                    )
 
             # Exit context
             elif line == "exit" or line == "end":
@@ -196,9 +204,13 @@ class ConfigValidator:
                 match = re.search(r"ip address (\S+) (\S+)", line)
                 if match:
                     try:
-                        ipaddress.IPv4Interface(f"{match.group(1)}/{match.group(2)}")
+                        ipaddress.IPv4Interface(
+                            f"{match.group(1)}/{match.group(2)}"
+                        )
                     except ValueError:
-                        result.add_error(f"Line {line_num}: Invalid IP address or mask")
+                        result.add_error(
+                            f"Line {line_num}: Invalid IP address or mask"
+                        )
 
             # ACL validation
             elif line.startswith("access-list"):
@@ -211,7 +223,9 @@ class ConfigValidator:
                 if match:
                     vlan_id = int(match.group(1))
                     if vlan_id < 1 or vlan_id > 4094:
-                        result.add_error(f"Line {line_num}: Invalid VLAN ID {vlan_id}")
+                        result.add_error(
+                            f"Line {line_num}: Invalid VLAN ID {vlan_id}"
+                        )
 
         return result
 
@@ -232,7 +246,9 @@ class ConfigValidator:
             if line.startswith("set "):
                 # Basic syntax check
                 if not re.match(r"set \S+ \S+", line):
-                    result.add_error(f"Line {line_num}: Invalid set command syntax")
+                    result.add_error(
+                        f"Line {line_num}: Invalid set command syntax"
+                    )
 
                 # Interface validation
                 if "interfaces" in line:
@@ -249,12 +265,16 @@ class ConfigValidator:
                         try:
                             ipaddress.IPv4Interface(match.group(1))
                         except ValueError:
-                            result.add_error(f"Line {line_num}: Invalid IP address")
+                            result.add_error(
+                                f"Line {line_num}: Invalid IP address"
+                            )
 
             # Delete commands
             elif line.startswith("delete "):
                 if not re.match(r"delete \S+", line):
-                    result.add_error(f"Line {line_num}: Invalid delete command syntax")
+                    result.add_error(
+                        f"Line {line_num}: Invalid delete command syntax"
+                    )
 
         return result
 
@@ -324,7 +344,10 @@ class ConfigValidator:
         if "transport input telnet" in config.lower():
             return "Telnet access enabled - use SSH only"
 
-        if "line vty" in config.lower() and "transport input ssh" not in config.lower():
+        if (
+            "line vty" in config.lower()
+            and "transport input ssh" not in config.lower()
+        ):
             return "VTY lines should specify SSH-only access"
 
         return None
@@ -343,7 +366,9 @@ class ConfigValidator:
 
         return None
 
-    async def check_business_rules(self, config: Dict[str, Any]) -> ValidationResult:
+    async def check_business_rules(
+        self, config: Dict[str, Any]
+    ) -> ValidationResult:
         """Layer 4: Business rules validation"""
         result = ValidationResult()
 
@@ -430,7 +455,9 @@ class ConfigValidator:
 
         return None
 
-    async def detect_conflicts(self, config: Dict[str, Any]) -> ValidationResult:
+    async def detect_conflicts(
+        self, config: Dict[str, Any]
+    ) -> ValidationResult:
         """Layer 5: Conflict detection"""
         result = ValidationResult()
 
@@ -473,7 +500,9 @@ class ConfigValidator:
 
         return result
 
-    def dict_to_config_text(self, config_dict: Dict[str, Any], vendor: str) -> str:
+    def dict_to_config_text(
+        self, config_dict: Dict[str, Any], vendor: str
+    ) -> str:
         """Convert configuration dictionary to text format"""
         # Simple conversion - would be more complex in production
         lines = []

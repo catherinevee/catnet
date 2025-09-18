@@ -26,7 +26,9 @@ class AuthManager:
         self.active_sessions = {}
         self.mfa_secrets = {}
 
-    def verify_password(self, plain_password: str, hashed_password: str) -> bool:
+    def verify_password(
+        self, plain_password: str, hashed_password: str
+    ) -> bool:
         return self.pwd_context.verify(plain_password, hashed_password)
 
     def get_password_hash(self, password: str) -> str:
@@ -52,7 +54,9 @@ class AuthManager:
             }
         )
 
-        encoded_jwt = jwt.encode(to_encode, self.secret_key, algorithm=self.algorithm)
+        encoded_jwt = jwt.encode(
+            to_encode, self.secret_key, algorithm=self.algorithm
+        )
 
         # Log token creation
         await self.audit.log_event(
@@ -88,7 +92,9 @@ class AuthManager:
             }
         )
 
-        encoded_jwt = jwt.encode(to_encode, self.secret_key, algorithm=self.algorithm)
+        encoded_jwt = jwt.encode(
+            to_encode, self.secret_key, algorithm=self.algorithm
+        )
 
         # Store refresh token in active sessions
         self.active_sessions[to_encode["jti"]] = {
@@ -114,7 +120,9 @@ class AuthManager:
         self, token: str, token_type: str = "access"
     ) -> Dict[str, Any]:
         try:
-            payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
+            payload = jwt.decode(
+                token, self.secret_key, algorithms=[self.algorithm]
+            )
 
             # Verify token type
             if payload.get("type") != token_type:
@@ -138,11 +146,17 @@ class AuthManager:
 
     def _is_token_revoked(self, jti: str) -> bool:
         # Check if token is in revoked list or session is invalid
-        return jti in self.revoked_tokens if hasattr(self, "revoked_tokens") else False
+        return (
+            jti in self.revoked_tokens
+            if hasattr(self, "revoked_tokens")
+            else False
+        )
 
     async def revoke_token(self, token: str):
         try:
-            payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
+            payload = jwt.decode(
+                token, self.secret_key, algorithms=[self.algorithm]
+            )
             jti = payload.get("jti")
 
             if jti:
@@ -172,7 +186,9 @@ class AuthManager:
         self, user_id: str, secret: str, issuer: str = "CatNet"
     ) -> str:
         totp = pyotp.TOTP(secret)
-        provisioning_uri = totp.provisioning_uri(name=user_id, issuer_name=issuer)
+        provisioning_uri = totp.provisioning_uri(
+            name=user_id, issuer_name=issuer
+        )
         return provisioning_uri
 
     def verify_mfa_token(
@@ -200,7 +216,9 @@ class AuthManager:
         # For now, returning mock authentication
 
         # Verify password (mock)
-        if not self.verify_password(password, self.get_password_hash(password)):
+        if not self.verify_password(
+            password, self.get_password_hash(password)
+        ):
             await self.audit.log_authentication(
                 user_id=username,
                 success=False,
@@ -243,12 +261,17 @@ class AuthManager:
         payload = await self.verify_token(refresh_token, token_type="refresh")
 
         # Create new access token
-        user_data = {"sub": payload.get("sub"), "roles": payload.get("roles", [])}
+        user_data = {
+            "sub": payload.get("sub"),
+            "roles": payload.get("roles", []),
+        }
         new_access_token = await self.create_access_token(data=user_data)
 
         return {"access_token": new_access_token, "token_type": "bearer"}
 
-    async def check_permission(self, user: Dict[str, Any], permission: str) -> bool:
+    async def check_permission(
+        self, user: Dict[str, Any], permission: str
+    ) -> bool:
         user_roles = user.get("roles", [])
 
         # Define role-permission mapping

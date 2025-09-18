@@ -68,7 +68,9 @@ class AuditLogger:
         db_session: Optional[AsyncSession] = None,
         enable_console: bool = True,
     ):
-        self.log_file = Path(log_file) if log_file else Path("logs/audit.jsonl")
+        self.log_file = (
+            Path(log_file) if log_file else Path("logs/audit.jsonl")
+        )
         self.db_session = db_session
         self.enable_console = enable_console
         self.logger = logging.getLogger("audit")
@@ -98,7 +100,10 @@ class AuditLogger:
         level: AuditLevel = AuditLevel.INFO,
     ) -> str:
         event = AuditEvent(
-            event_type=event_type, user_id=user_id, details=details or {}, level=level
+            event_type=event_type,
+            user_id=user_id,
+            details=details or {},
+            level=level,
         )
 
         await self.event_queue.put(event)
@@ -169,7 +174,10 @@ class AuditLogger:
         )
 
     async def log_security_incident(
-        self, incident_type: str, user_id: Optional[str], details: Dict[str, Any]
+        self,
+        incident_type: str,
+        user_id: Optional[str],
+        details: Dict[str, Any],
     ):
         await self.log_event(
             event_type="security_incident",
@@ -275,12 +283,14 @@ class AuditLogger:
                     # Apply filters
                     if (
                         start_date
-                        and datetime.fromisoformat(event["timestamp"]) < start_date
+                        and datetime.fromisoformat(event["timestamp"])
+                        < start_date
                     ):
                         continue
                     if (
                         end_date
-                        and datetime.fromisoformat(event["timestamp"]) > end_date
+                        and datetime.fromisoformat(event["timestamp"])
+                        > end_date
                     ):
                         continue
                     if event_type and event["event_type"] != event_type:

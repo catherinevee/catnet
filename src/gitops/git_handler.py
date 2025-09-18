@@ -21,7 +21,10 @@ class GitHandler:
         self.temp_dirs = []
 
     async def clone_repository(
-        self, repo_url: str, branch: str = "main", ssh_key_ref: Optional[str] = None
+        self,
+        repo_url: str,
+        branch: str = "main",
+        ssh_key_ref: Optional[str] = None,
     ) -> str:
         temp_dir = tempfile.mkdtemp(prefix="catnet_repo_")
         self.temp_dirs.append(temp_dir)
@@ -37,7 +40,9 @@ class GitHandler:
                 os.chmod(ssh_key_path, 0o600)
 
                 # Configure git to use SSH key
-                ssh_command = f"ssh -i {ssh_key_path} -o StrictHostKeyChecking=no"
+                ssh_command = (
+                    f"ssh -i {ssh_key_path} -o StrictHostKeyChecking=no"
+                )
                 repo = Repo.clone_from(
                     repo_url,
                     temp_dir,
@@ -53,7 +58,9 @@ class GitHandler:
             shutil.rmtree(temp_dir, ignore_errors=True)
             raise Exception(f"Failed to clone repository: {str(e)}")
 
-    async def pull_latest(self, repo_path: str, branch: str = "main") -> Dict[str, Any]:
+    async def pull_latest(
+        self, repo_path: str, branch: str = "main"
+    ) -> Dict[str, Any]:
         try:
             repo = Repo(repo_path)
             origin = repo.remotes.origin
@@ -96,7 +103,11 @@ class GitHandler:
             return configs
 
         for file_path in config_dir.rglob("*"):
-            if file_path.is_file() and file_path.suffix in [".yaml", ".yml", ".json"]:
+            if file_path.is_file() and file_path.suffix in [
+                ".yaml",
+                ".yml",
+                ".json",
+            ]:
                 config = await self.parse_config_file(str(file_path))
                 if config:
                     configs.append(
@@ -109,7 +120,9 @@ class GitHandler:
 
         return configs
 
-    async def parse_config_file(self, file_path: str) -> Optional[Dict[str, Any]]:
+    async def parse_config_file(
+        self, file_path: str
+    ) -> Optional[Dict[str, Any]]:
         try:
             with open(file_path, "r") as f:
                 content = f.read()
@@ -127,13 +140,17 @@ class GitHandler:
         with open(file_path, "rb") as f:
             return hashlib.sha256(f.read()).hexdigest()
 
-    async def verify_commit_signature(self, repo_path: str, commit_sha: str) -> bool:
+    async def verify_commit_signature(
+        self, repo_path: str, commit_sha: str
+    ) -> bool:
         try:
             repo = Repo(repo_path)
             commit = repo.commit(commit_sha)
 
             # Check if commit is signed
-            signature = repo.git.show(commit_sha, "--show-signature", "--no-patch")
+            signature = repo.git.show(
+                commit_sha, "--show-signature", "--no-patch"
+            )
 
             # Look for GPG signature verification
             if "gpg:" in signature.lower():
@@ -172,7 +189,9 @@ class GitHandler:
                     continue
 
                 try:
-                    with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+                    with open(
+                        file_path, "r", encoding="utf-8", errors="ignore"
+                    ) as f:
                         content = f.read()
 
                     for pattern in patterns:
@@ -197,14 +216,19 @@ class GitHandler:
 
         return secrets_found
 
-    async def get_commit_info(self, repo_path: str, commit_sha: str) -> Dict[str, Any]:
+    async def get_commit_info(
+        self, repo_path: str, commit_sha: str
+    ) -> Dict[str, Any]:
         try:
             repo = Repo(repo_path)
             commit = repo.commit(commit_sha)
 
             return {
                 "sha": commit.hexsha,
-                "author": {"name": commit.author.name, "email": commit.author.email},
+                "author": {
+                    "name": commit.author.name,
+                    "email": commit.author.email,
+                },
                 "committer": {
                     "name": commit.committer.name,
                     "email": commit.committer.email,
@@ -212,7 +236,9 @@ class GitHandler:
                 "message": commit.message,
                 "timestamp": commit.committed_datetime.isoformat(),
                 "files_changed": len(commit.stats.files),
-                "signed": await self.verify_commit_signature(repo_path, commit_sha),
+                "signed": await self.verify_commit_signature(
+                    repo_path, commit_sha
+                ),
             }
 
         except Exception as e:
@@ -247,7 +273,9 @@ class GitHandler:
 
         # Sign the manifest
         manifest_json = json.dumps(manifest, sort_keys=True)
-        manifest["signature"] = self.encryption.calculate_hash(manifest_json.encode())
+        manifest["signature"] = self.encryption.calculate_hash(
+            manifest_json.encode()
+        )
 
         return manifest
 

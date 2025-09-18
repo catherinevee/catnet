@@ -1,6 +1,10 @@
 import os
 from typing import AsyncGenerator, Optional
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+    create_async_engine,
+    async_sessionmaker,
+)
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from .models import Base
@@ -19,11 +23,15 @@ class DatabaseManager:
         max_overflow: int = 40,
     ):
         self.database_url = database_url or os.getenv(
-            "DATABASE_URL", "postgresql+asyncpg://catnet:catnet@localhost/catnet"
+            "DATABASE_URL",
+            "postgresql+asyncpg://catnet:catnet@localhost/catnet",
         )
 
         # Ensure asyncpg driver for async operations
-        if "postgresql://" in self.database_url and "+asyncpg" not in self.database_url:
+        if (
+            "postgresql://" in self.database_url
+            and "+asyncpg" not in self.database_url
+        ):
             self.database_url = self.database_url.replace(
                 "postgresql://", "postgresql+asyncpg://"
             )
@@ -97,7 +105,9 @@ class DatabaseManager:
 db_manager = None
 
 
-def init_database(database_url: Optional[str] = None, **kwargs) -> DatabaseManager:
+def init_database(
+    database_url: Optional[str] = None, **kwargs
+) -> DatabaseManager:
     global db_manager
     db_manager = DatabaseManager(database_url=database_url, **kwargs)
     return db_manager

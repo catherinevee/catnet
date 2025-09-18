@@ -196,7 +196,9 @@ class GitOpsProcessor:
 
         try:
             # Generate repo path from URL hash
-            repo_hash = hashlib.sha256(repository.url.encode()).hexdigest()[:16]
+            repo_hash = hashlib.sha256(repository.url.encode()).hexdigest()[
+                :16
+            ]
             repo_path = self.repo_base_path / repo_hash
 
             # Get SSH key from Vault if configured
@@ -252,7 +254,9 @@ class GitOpsProcessor:
             logger.error(f"Failed to sync repository: {e}")
             raise
 
-    async def _scan_for_secrets(self, commits: List[Dict[str, Any]]) -> Dict[str, Any]:
+    async def _scan_for_secrets(
+        self, commits: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
         """Scan commits for potential secrets"""
         logger.info(f"Scanning {len(commits)} commits for secrets")
 
@@ -334,7 +338,9 @@ class GitOpsProcessor:
             try:
                 with open(config_file, "r") as f:
                     config = yaml.safe_load(f)
-                    config["_source_file"] = str(config_file.relative_to(repo_path))
+                    config["_source_file"] = str(
+                        config_file.relative_to(repo_path)
+                    )
                     configs.append(config)
             except Exception as e:
                 logger.error(f"Failed to parse {config_file}: {e}")
@@ -343,7 +349,9 @@ class GitOpsProcessor:
             try:
                 with open(config_file, "r") as f:
                     config = yaml.safe_load(f)
-                    config["_source_file"] = str(config_file.relative_to(repo_path))
+                    config["_source_file"] = str(
+                        config_file.relative_to(repo_path)
+                    )
                     configs.append(config)
             except Exception as e:
                 logger.error(f"Failed to parse {config_file}: {e}")
@@ -352,7 +360,9 @@ class GitOpsProcessor:
             try:
                 with open(config_file, "r") as f:
                     config = json.load(f)
-                    config["_source_file"] = str(config_file.relative_to(repo_path))
+                    config["_source_file"] = str(
+                        config_file.relative_to(repo_path)
+                    )
                     configs.append(config)
             except Exception as e:
                 logger.error(f"Failed to parse {config_file}: {e}")
@@ -372,10 +382,14 @@ class GitOpsProcessor:
         for config in configs:
             # Schema validation
             if "device" not in config:
-                errors.append(f"{config.get('_source_file')}: Missing 'device' field")
+                errors.append(
+                    f"{config.get('_source_file')}: Missing 'device' field"
+                )
 
             if "vendor" not in config:
-                errors.append(f"{config.get('_source_file')}: Missing 'vendor' field")
+                errors.append(
+                    f"{config.get('_source_file')}: Missing 'vendor' field"
+                )
 
             # Security validation
             if "password" in str(config).lower():
@@ -450,9 +464,7 @@ class GitOpsProcessor:
             for warning in validation_results["warnings"]:
                 comment += f"- {warning}\n"
 
-        comment += (
-            f"\n*Validated {validation_results['configs_validated']} configurations*"
-        )
+        comment += f"\n*Validated {validation_results['configs_validated']} configurations*"
 
         return comment
 

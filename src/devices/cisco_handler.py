@@ -8,7 +8,9 @@ from typing import List, Dict, Any, Optional
 # from netmiko import ConnectHandler  # Used via base class
 import re
 
-from ..core.exceptions import DeviceConnectionError  # ValidationError used inline
+from ..core.exceptions import (
+    DeviceConnectionError,
+)  # ValidationError used inline
 from ..security.audit import AuditLogger
 from ..core.logging import get_logger
 
@@ -30,7 +32,9 @@ class CiscoHandler:
         "nxos_rollback": "rollback running-config checkpoint backup_config",
     }
 
-    def __init__(self, connection: Any, audit_logger: Optional[AuditLogger] = None):
+    def __init__(
+        self, connection: Any, audit_logger: Optional[AuditLogger] = None
+    ):
         self.connection = connection
         self.audit = audit_logger or AuditLogger()
         self.device_type = self._detect_device_type()
@@ -49,7 +53,9 @@ class CiscoHandler:
         except Exception:
             return "cisco_ios"  # Default
 
-    async def execute_command(self, command: str, enable_mode: bool = False) -> str:
+    async def execute_command(
+        self, command: str, enable_mode: bool = False
+    ) -> str:
         """Execute single command on Cisco device"""
         try:
             if enable_mode and hasattr(self.connection, "enable"):
@@ -116,7 +122,9 @@ class CiscoHandler:
 
         return output
 
-    async def rollback_configuration(self, backup_file: str = "backup.cfg") -> str:
+    async def rollback_configuration(
+        self, backup_file: str = "backup.cfg"
+    ) -> str:
         """Rollback to previous configuration"""
         if self.device_type == "cisco_nxos":
             # NX-OS rollback
@@ -130,7 +138,10 @@ class CiscoHandler:
         await self.audit.log_event(
             event_type="cisco_config_rolled_back",
             user_id=None,
-            details={"device_type": self.device_type, "backup_file": backup_file},
+            details={
+                "device_type": self.device_type,
+                "backup_file": backup_file,
+            },
         )
 
         return output
@@ -146,7 +157,12 @@ class CiscoHandler:
             test_output = await self.execute_config(config.split("\n"))
 
             # Check for errors
-            error_patterns = [r"% Invalid", r"% Incomplete", r"% Ambiguous", r"% Error"]
+            error_patterns = [
+                r"% Invalid",
+                r"% Incomplete",
+                r"% Ambiguous",
+                r"% Error",
+            ]
 
             for pattern in error_patterns:
                 if re.search(pattern, test_output):
@@ -192,7 +208,9 @@ class CiscoHandler:
             # Parse VLAN lines (format varies by platform)
             match = re.match(r"^(\d+)\s+(\S+)", line)
             if match:
-                vlans.append({"id": int(match.group(1)), "name": match.group(2)})
+                vlans.append(
+                    {"id": int(match.group(1)), "name": match.group(2)}
+                )
 
         return vlans
 
@@ -297,7 +315,9 @@ class CiscoHandler:
             else:
                 output = await self.execute_command("show processes cpu")
                 # Parse IOS CPU output
-                match = re.search(r"CPU utilization for five seconds: (\d+)%", output)
+                match = re.search(
+                    r"CPU utilization for five seconds: (\d+)%", output
+                )
 
             if match:
                 return float(match.group(1))

@@ -81,7 +81,9 @@ class SignatureManager:
 
         # Export keys
         public_key = self.gpg.export_keys(key_id)
-        private_key = self.gpg.export_keys(key_id, secret=True, passphrase=passphrase)
+        private_key = self.gpg.export_keys(
+            key_id, secret=True, passphrase=passphrase
+        )
 
         # Store in Vault
         await self.vault.store_secret(
@@ -92,7 +94,9 @@ class SignatureManager:
                 "public_key": public_key,
                 "private_key": private_key,
                 "created_at": datetime.utcnow().isoformat(),
-                "expires_at": (datetime.utcnow() + timedelta(days=730)).isoformat(),
+                "expires_at": (
+                    datetime.utcnow() + timedelta(days=730)
+                ).isoformat(),
             },
         )
 
@@ -105,7 +109,8 @@ class SignatureManager:
                     signing_key_id=key_id,
                     signing_key_fingerprint=fingerprint,
                     signing_key_created_at=datetime.utcnow(),
-                    signing_key_expires_at=datetime.utcnow() + timedelta(days=730),
+                    signing_key_expires_at=datetime.utcnow()
+                    + timedelta(days=730),
                 )
             )
             await session.commit()
@@ -114,12 +119,20 @@ class SignatureManager:
         await self.audit.log_security_event(
             event_type="signing_key_generated",
             severity="INFO",
-            details={"user_id": user_id, "key_id": key_id, "fingerprint": fingerprint},
+            details={
+                "user_id": user_id,
+                "key_id": key_id,
+                "fingerprint": fingerprint,
+            },
         )
 
         logger.info(f"Signing key generated for user {user_id}: {key_id}")
 
-        return {"key_id": key_id, "fingerprint": fingerprint, "public_key": public_key}
+        return {
+            "key_id": key_id,
+            "fingerprint": fingerprint,
+            "public_key": public_key,
+        }
 
     async def sign_configuration(
         self,
@@ -154,11 +167,15 @@ class SignatureManager:
                 raise SecurityError("Failed to import signing key")
 
         # Canonicalize configuration (sort keys for consistent hashing)
-        canonical_config = json.dumps(config, sort_keys=True, separators=(",", ":"))
+        canonical_config = json.dumps(
+            config, sort_keys=True, separators=(",", ":")
+        )
 
         # Create signature data
         signature_data = {
-            "config_hash": hashlib.sha256(canonical_config.encode()).hexdigest(),
+            "config_hash": hashlib.sha256(
+                canonical_config.encode()
+            ).hexdigest(),
             "deployment_id": deployment_id,
             "timestamp": datetime.utcnow().isoformat(),
             "user_id": user_id,
@@ -231,13 +248,19 @@ class SignatureManager:
                 deployment = result.scalar_one_or_none()
 
                 if not deployment or not deployment.signed_by:
-                    logger.warning(f"No signature info for deployment {deployment_id}")
+                    logger.warning(
+                        f"No signature info for deployment {deployment_id}"
+                    )
                     return False
 
                 # Get signer's public key
-                key_info = await self._get_user_signing_key(str(deployment.signed_by))
+                key_info = await self._get_user_signing_key(
+                    str(deployment.signed_by)
+                )
                 if not key_info:
-                    logger.warning(f"No signing key for user {deployment.signed_by}")
+                    logger.warning(
+                        f"No signing key for user {deployment.signed_by}"
+                    )
                     return False
 
             # Import public key
@@ -250,7 +273,9 @@ class SignatureManager:
             signature_data = base64.b64decode(signature)
 
             # Canonicalize configuration
-            canonical_config = json.dumps(config, sort_keys=True, separators=(",", ":"))
+            canonical_config = json.dumps(
+                config, sort_keys=True, separators=(",", ":")
+            )
             config_hash = hashlib.sha256(canonical_config.encode()).hexdigest()
 
             # Recreate signature data
@@ -273,10 +298,14 @@ class SignatureManager:
                     )
                     await session.commit()
 
-                logger.info(f"Signature verified for deployment {deployment_id}")
+                logger.info(
+                    f"Signature verified for deployment {deployment_id}"
+                )
                 return True
             else:
-                logger.warning(f"Invalid signature for deployment {deployment_id}")
+                logger.warning(
+                    f"Invalid signature for deployment {deployment_id}"
+                )
                 return False
 
         except Exception as e:
@@ -329,7 +358,9 @@ class SignatureManager:
         else:
             raise SecurityError("Failed to verify signed commit")
 
-    async def verify_commit_signature(self, repo_path: str, commit_hash: str) -> bool:
+    async def verify_commit_signature(
+        self, repo_path: str, commit_hash: str
+    ) -> bool:
         """
         Verify Git commit signature
 
@@ -371,7 +402,9 @@ class SignatureManager:
     async def _get_user_signing_key(self, user_id: str) -> Optional[Dict]:
         """Get user's signing key from Vault"""
         try:
-            secret = await self.vault.get_secret(f"users/{user_id}/signing_key")
+            secret = await self.vault.get_secret(
+                f"users/{user_id}/signing_key"
+            )
             return secret
         except Exception as e:
             logger.error(f"Failed to get signing key: {e}")
@@ -409,7 +442,9 @@ class SignatureManager:
                             new_key = await self.generate_signing_key(
                                 str(user.id), user.email
                             )
-                            logger.info(f"Rotated signing key for user {user.username}")
+                            logger.info(
+                                f"Rotated signing key for user {user.username}"
+                            )
                             stats["rotated"] += 1
                         except Exception as e:
                             logger.error(

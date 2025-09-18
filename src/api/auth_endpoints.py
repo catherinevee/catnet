@@ -166,7 +166,9 @@ async def enroll_mfa(
         )
 
 
-@router.post("/certificate/validate", response_model=CertificateValidationResponse)
+@router.post(
+    "/certificate/validate", response_model=CertificateValidationResponse
+)
 async def validate_certificate(
     request: CertificateValidationRequest,
     current_user: User = Depends(get_current_user),
@@ -332,7 +334,8 @@ async def terminate_session(
 
         if not session:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Session not found"
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Session not found",
             )
 
         # Terminate session

@@ -62,7 +62,9 @@ class User(Base):
     # SSH key fields
     ssh_public_keys = Column(JSON, default=[])  # List of SSH public keys
     ssh_key_added_at = Column(DateTime(timezone=True))
-    ssh_key_fingerprints = Column(JSON, default=[])  # List of SSH key fingerprints
+    ssh_key_fingerprints = Column(
+        JSON, default=[]
+    )  # List of SSH key fingerprints
 
     # Relationships
     deployments = relationship("Deployment", back_populates="creator")
@@ -118,17 +120,23 @@ class Deployment(Base):
     created_at = Column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
-    created_by = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    created_by = Column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False
+    )
     config_hash = Column(String(64), nullable=False)  # SHA-256
     signature = Column(Text, nullable=False)  # Digital signature
     encryption_key_id = Column(String(128))  # KMS key reference
     state = Column(
-        SQLEnum(DeploymentState), nullable=False, default=DeploymentState.PENDING
+        SQLEnum(DeploymentState),
+        nullable=False,
+        default=DeploymentState.PENDING,
     )
     approved_by = Column(ARRAY(UUID(as_uuid=True)), default=[])
     approval_required = Column(Boolean, default=True)
     approval_count = Column(Integer, default=2)  # Number of approvals needed
-    strategy = Column(String(50), default="rolling")  # canary, rolling, blue-green
+    strategy = Column(
+        String(50), default="rolling"
+    )  # canary, rolling, blue-green
     rollback_config = Column(JSON)
     scheduled_at = Column(DateTime(timezone=True))
     started_at = Column(DateTime(timezone=True))
@@ -136,7 +144,9 @@ class Deployment(Base):
     error_message = Column(Text)
     audit_log = Column(JSON, nullable=False, default={})
     git_commit = Column(String(40))  # Git commit hash
-    git_repository_id = Column(UUID(as_uuid=True), ForeignKey("git_repositories.id"))
+    git_repository_id = Column(
+        UUID(as_uuid=True), ForeignKey("git_repositories.id")
+    )
 
     # Signature fields
     config_signature = Column(Text)
@@ -160,7 +170,9 @@ class DeploymentDevice(Base):
     deployment_id = Column(
         UUID(as_uuid=True), ForeignKey("deployments.id"), nullable=False
     )
-    device_id = Column(UUID(as_uuid=True), ForeignKey("devices.id"), nullable=False)
+    device_id = Column(
+        UUID(as_uuid=True), ForeignKey("devices.id"), nullable=False
+    )
     status = Column(
         String(50), nullable=False
     )  # pending, in_progress, completed, failed
@@ -200,7 +212,9 @@ class DeviceConfig(Base):
     __tablename__ = "device_configs"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    device_id = Column(UUID(as_uuid=True), ForeignKey("devices.id"), nullable=False)
+    device_id = Column(
+        UUID(as_uuid=True), ForeignKey("devices.id"), nullable=False
+    )
     config_encrypted = Column(Text, nullable=False)  # Encrypted content
     backup_location = Column(Text, nullable=False)
     version = Column(Integer, nullable=False)
@@ -222,7 +236,10 @@ class AuditLog(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     timestamp = Column(
-        DateTime(timezone=True), nullable=False, server_default=func.now(), index=True
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        index=True,
     )
     event_type = Column(String(100), nullable=False, index=True)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), index=True)
@@ -263,7 +280,9 @@ class SecretRotation(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     secret_path = Column(String(500), nullable=False)
-    secret_type = Column(String(50), nullable=False)  # device_credential, api_key, etc.
+    secret_type = Column(
+        String(50), nullable=False
+    )  # device_credential, api_key, etc.
     last_rotation = Column(DateTime(timezone=True), nullable=False)
     next_rotation = Column(DateTime(timezone=True), nullable=False)
     rotation_interval_days = Column(Integer, default=90)
@@ -276,7 +295,9 @@ class Session(Base):
     __tablename__ = "sessions"
 
     id = Column(String(255), primary_key=True)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    user_id = Column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False
+    )
     device_id = Column(UUID(as_uuid=True), ForeignKey("devices.id"))
     started_at = Column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
@@ -291,7 +312,9 @@ class UserSSHKey(Base):
     __tablename__ = "user_ssh_keys"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    user_id = Column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False
+    )
     name = Column(String(255), nullable=False)
     public_key = Column(Text, nullable=False)
     fingerprint = Column(String(128), nullable=False, unique=True, index=True)

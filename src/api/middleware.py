@@ -14,7 +14,9 @@ logger = logging.getLogger(__name__)
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     """Add security headers to all responses."""
 
-    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+    async def dispatch(
+        self, request: Request, call_next: Callable
+    ) -> Response:
         # Generate request ID for tracing
         request_id = str(uuid.uuid4())
 
@@ -67,7 +69,9 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self.period = period
         self.clients = {}
 
-    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+    async def dispatch(
+        self, request: Request, call_next: Callable
+    ) -> Response:
         # Get client identifier (IP address)
         client_ip = request.client.host
 
@@ -108,7 +112,9 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         remaining = self.calls - len(self.clients[client_ip])
         response.headers["X-RateLimit-Limit"] = str(self.calls)
         response.headers["X-RateLimit-Remaining"] = str(remaining)
-        response.headers["X-RateLimit-Reset"] = str(int(current_time + self.period))
+        response.headers["X-RateLimit-Reset"] = str(
+            int(current_time + self.period)
+        )
 
         return response
 
@@ -120,7 +126,9 @@ class CORSMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
         self.allowed_origins = allowed_origins or ["https://localhost:3000"]
 
-    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+    async def dispatch(
+        self, request: Request, call_next: Callable
+    ) -> Response:
         # Handle preflight requests
         if request.method == "OPTIONS":
             response = Response(status_code=200)
@@ -148,7 +156,9 @@ class CORSMiddleware(BaseHTTPMiddleware):
 class AuditLoggingMiddleware(BaseHTTPMiddleware):
     """Log all API requests for audit purposes."""
 
-    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+    async def dispatch(
+        self, request: Request, call_next: Callable
+    ) -> Response:
         # Start timer
         start_time = time.time()
 

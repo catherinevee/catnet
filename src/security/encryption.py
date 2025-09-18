@@ -46,7 +46,9 @@ class EncryptionManager:
     ) -> Tuple[bytes, bytes, bytes]:
         iv = os.urandom(12)  # 96-bit IV for GCM
 
-        cipher = Cipher(algorithms.AES(self.key), modes.GCM(iv), backend=self.backend)
+        cipher = Cipher(
+            algorithms.AES(self.key), modes.GCM(iv), backend=self.backend
+        )
         encryptor = cipher.encryptor()
 
         if associated_data:
@@ -140,7 +142,8 @@ class EncryptionManager:
         signature = private_key.sign(
             data,
             padding.PSS(
-                mgf=padding.MGF1(hashes.SHA256()), salt_length=padding.PSS.MAX_LENGTH
+                mgf=padding.MGF1(hashes.SHA256()),
+                salt_length=padding.PSS.MAX_LENGTH,
             ),
             hashes.SHA256(),
         )
@@ -148,9 +151,13 @@ class EncryptionManager:
         return signature
 
     @staticmethod
-    def verify_signature(data: bytes, signature: bytes, public_key_pem: bytes) -> bool:
+    def verify_signature(
+        data: bytes, signature: bytes, public_key_pem: bytes
+    ) -> bool:
         try:
-            public_key = load_pem_public_key(public_key_pem, backend=default_backend())
+            public_key = load_pem_public_key(
+                public_key_pem, backend=default_backend()
+            )
 
             public_key.verify(
                 signature,

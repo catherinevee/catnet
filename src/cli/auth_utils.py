@@ -51,7 +51,10 @@ def get_headers() -> Dict[str, str]:
     if not token:
         return {}
 
-    return {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+    return {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+    }
 
 
 def secure_prompt(prompt_text: str, password: bool = False) -> str:

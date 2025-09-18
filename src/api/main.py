@@ -113,7 +113,8 @@ app.add_middleware(
 
 # Trusted host middleware
 app.add_middleware(
-    TrustedHostMiddleware, allowed_hosts=os.getenv("ALLOWED_HOSTS", "*").split(",")
+    TrustedHostMiddleware,
+    allowed_hosts=os.getenv("ALLOWED_HOSTS", "*").split(","),
 )
 
 
@@ -133,7 +134,8 @@ async def catnet_exception_handler(request: Request, exc: CatNetError):
     )
 
     return JSONResponse(
-        status_code=500, content={"detail": "An error occurred processing your request"}
+        status_code=500,
+        content={"detail": "An error occurred processing your request"},
     )
 
 
@@ -265,7 +267,9 @@ async def search_audit_logs(
 
 # Metrics endpoint
 @app.get("/api/v1/metrics")
-async def get_metrics(current_user: User = Depends(require_auth("metrics.read"))):
+async def get_metrics(
+    current_user: User = Depends(require_auth("metrics.read")),
+):
     """Get system metrics"""
     from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
     from fastapi.responses import Response
@@ -294,7 +298,11 @@ async def service_status(request: Request):
         "deployment": {
             "status": "operational",
             "port": 8083,
-            "endpoints": ["/deploy/create", "/deploy/status", "/deploy/rollback"],
+            "endpoints": [
+                "/deploy/create",
+                "/deploy/status",
+                "/deploy/rollback",
+            ],
         },
         "device": {
             "status": "operational",
@@ -395,5 +403,8 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(
-        app, host="0.0.0.0", port=int(os.getenv("API_PORT", 8080)), log_level="info"
+        app,
+        host="0.0.0.0",
+        port=int(os.getenv("API_PORT", 8080)),
+        log_level="info",
     )

@@ -11,7 +11,9 @@ import os
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 auth_manager = AuthManager(
-    secret_key=os.getenv("JWT_SECRET_KEY", "your-secret-key-change-in-production")
+    secret_key=os.getenv(
+        "JWT_SECRET_KEY", "your-secret-key-change-in-production"
+    )
 )
 
 
@@ -59,7 +61,8 @@ async def require_auth(
 
     if not await auth_manager.check_permission(user_dict, permission):
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions"
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Insufficient permissions",
         )
 
     return current_user

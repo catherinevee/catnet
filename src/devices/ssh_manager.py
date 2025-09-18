@@ -31,7 +31,10 @@ class SSHKeyManager:
         self.key_storage_path.mkdir(parents=True, exist_ok=True)
 
     async def generate_ssh_keypair(
-        self, key_type: str = "ed25519", key_size: int = 4096, comment: str = ""
+        self,
+        key_type: str = "ed25519",
+        key_size: int = 4096,
+        comment: str = "",
     ) -> Tuple[str, str]:
         """
         Generate SSH key pair.
@@ -65,7 +68,9 @@ class SSHKeyManager:
         elif key_type == "rsa":
             # Generate RSA key
             private_key = rsa.generate_private_key(
-                public_exponent=65537, key_size=key_size, backend=default_backend()
+                public_exponent=65537,
+                key_size=key_size,
+                backend=default_backend(),
             )
             public_key = private_key.public_key()
 
@@ -128,7 +133,9 @@ class SSHKeyManager:
             },
         )
 
-        logger.info(f"Stored SSH key for device {device_id} in Vault at {vault_path}")
+        logger.info(
+            f"Stored SSH key for device {device_id} in Vault at {vault_path}"
+        )
 
         return {"vault_path": vault_path, "key_name": key_name}
 
@@ -174,15 +181,18 @@ class SSHKeyManager:
 
         # Archive old key
         old_key_name = f"{device_id}_key"
-        logger.info(f"Rotating SSH key for device {device_id}, old key: {old_key_name}")
-        archive_name = (
-            f"{device_id}_key_archived_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
+        logger.info(
+            f"Rotating SSH key for device {device_id}, old key: {old_key_name}"
         )
+        archive_name = f"{device_id}_key_archived_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
 
         try:
             old_key = await self.get_ssh_key(device_id)
             await self.store_ssh_key(
-                device_id, old_key["private_key"], old_key["public_key"], archive_name
+                device_id,
+                old_key["private_key"],
+                old_key["public_key"],
+                archive_name,
             )
         except SecurityError:
             # No existing key to archive
@@ -289,7 +299,9 @@ class SSHKeyManager:
             )
 
             # Test with simple command
-            stdin, stdout, stderr = client.exec_command('echo "Connection test"')
+            stdin, stdout, stderr = client.exec_command(
+                'echo "Connection test"'
+            )
             result = stdout.read().decode().strip()
 
             client.close()
