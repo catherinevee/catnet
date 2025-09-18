@@ -295,10 +295,12 @@ class AuthManager:
         """Get list of active sessions"""
         sessions = []
         for jti, session_info in self.active_sessions.items():
-            sessions.append({
-                "jti": jti,
-                "user_id": session_info["user_id"],
-                "created_at": session_info["created_at"].isoformat(),
-                "expires_at": session_info["expires_at"].isoformat()
-            })
+            sessions.append(
+                {
+                    "jti": jti,
+                    "user_id": session_info["user_id"],
+                    "created_at": session_info["created_at"].isoformat(),
+                    "expires_at": session_info["expires_at"].isoformat(),
+                }
+            )
         return sessions

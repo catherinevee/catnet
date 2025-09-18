@@ -546,7 +546,7 @@ class GitOpsService:
                 signature="pending",
                 state="pending",
                 git_commit=repository.last_commit_hash,
-                git_repository_id=repository.id
+                git_repository_id=repository.id,
             )
             db.add(deployment)
             await db.commit()

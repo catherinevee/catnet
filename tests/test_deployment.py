@@ -131,7 +131,7 @@ class TestDeploymentExecutor:
         # Verify staging and activation
 
     @pytest.mark.asyncio
-    @patch('src.deployment.executor.DeploymentExecutor.deploy_to_device')
+    @patch("src.deployment.executor.DeploymentExecutor.deploy_to_device")
     async def test_deployment_with_patch(self, mock_deploy, mock_audit_logger):
         """Test deployment with patched method"""
         # Setup mock device with proper model
@@ -139,14 +139,13 @@ class TestDeploymentExecutor:
             id="device-123",
             hostname="router1",
             ip_address="192.168.1.1",
-            vendor=DeviceVendor.CISCO_IOS
+            vendor=DeviceVendor.CISCO_IOS,
         )
 
         # Setup executor with strategy
         strategy = DeploymentStrategy.ROLLING
         executor = DeploymentExecutor(
-            device_connector=Mock(),
-            audit_logger=mock_audit_logger
+            device_connector=Mock(), audit_logger=mock_audit_logger
         )
 
         # Configure mock
@@ -158,7 +157,7 @@ class TestDeploymentExecutor:
             devices=[device],
             configuration={"test": "config"},
             strategy=strategy,
-            user_context={"user_id": "user-123"}
+            user_context={"user_id": "user-123"},
         )
 
         # Verify patch was called
