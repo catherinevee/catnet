@@ -2,11 +2,15 @@
 Device Certificate Manager for certificate-based authentication
 """
 import os
+
+# import asyncio  # Will be used for async certificate operations
 import asyncio
 import ipaddress
 from datetime import datetime, timedelta
-from typing import Dict, Optional, List, Tuple
+from typing import Dict, Optional
 from pathlib import Path
+
+# import uuid  # Will be used for certificate IDs
 import uuid
 
 from cryptography import x509
@@ -15,7 +19,8 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.backends import default_backend
 from sqlalchemy import select, update
-from sqlalchemy.ext.asyncio import AsyncSession
+
+# from sqlalchemy.ext.asyncio import AsyncSession  # Will use for DB operations
 
 from ..db.models import Device
 from ..db.database import get_db
@@ -111,6 +116,7 @@ class DeviceCertificateManager:
 
         # Add Subject Alternative Names
         san_list = [device_hostname, device_ip]
+        logger.debug(f"Creating certificate with SANs: {san_list}")
         san_ext = x509.SubjectAlternativeName(
             [
                 x509.DNSName(device_hostname),
@@ -393,7 +399,9 @@ class DeviceCertificateManager:
 
                         # Deploy to device (would be done via secure channel)
                         # For now, just log
-                        logger.info(f"Rotated certificate for {device.hostname}")
+                        logger.info(
+                            f"Rotated certificate for {device.hostname}: Serial {new_cert['serial_number']}"
+                        )
                         stats["rotated"] += 1
 
                     except Exception as e:

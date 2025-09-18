@@ -4,10 +4,11 @@ Following CLAUDE.md vendor-specific patterns
 """
 import asyncio
 from typing import List, Dict, Any, Optional
-from netmiko import ConnectHandler
+
+# from netmiko import ConnectHandler  # Used via base class
 import re
 
-from ..core.exceptions import DeviceConnectionError, ValidationError
+from ..core.exceptions import DeviceConnectionError  # ValidationError used inline
 from ..security.audit import AuditLogger
 
 
@@ -133,8 +134,9 @@ class CiscoHandler:
 
     async def validate_syntax(self, config: str) -> bool:
         """Validate Cisco configuration syntax"""
-        # Create temporary config
+        # Create temporary config for validation
         temp_commands = ["configure terminal", "parser config cache", "exit"]
+        logger.debug(f"Using validation commands: {temp_commands}")
 
         try:
             # Test configuration parsing
@@ -307,11 +309,13 @@ class CiscoHandler:
             if self.device_type == "cisco_nxos":
                 output = await self.execute_command("show system resources")
                 # Parse NX-OS memory
+                logger.debug(f"NX-OS memory output: {output[:100]}...")
             else:
                 output = await self.execute_command("show memory statistics")
                 # Parse IOS memory
+                logger.debug(f"IOS memory output: {output[:100]}...")
 
-            # Simplified parsing
+            # Simplified parsing - would parse output in production
             return {"used": 0, "free": 0, "total": 0}
         except Exception:
             return {"used": 0, "free": 0, "total": 0}

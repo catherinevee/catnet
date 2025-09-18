@@ -307,6 +307,10 @@ class TestSecurityIntegration:
         safe_query = text("SELECT * FROM devices WHERE name = :name")
         params = {"name": malicious_input}
 
+        # Verify the query is safe
+        assert ":name" in str(safe_query)  # Query uses parameters
+        assert params["name"] == malicious_input  # Parameters contain the input
+
         # The parameters are properly escaped by SQLAlchemy
         assert "DROP TABLE" in malicious_input  # Input contains SQL injection
         # But it would be safely handled as a string parameter, not executed

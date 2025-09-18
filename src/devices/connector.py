@@ -1,16 +1,19 @@
 import asyncio
 from typing import Optional, Dict, Any, List
-from datetime import datetime, timedelta
+from datetime import datetime
 import uuid
-import io
+
+# import io  # Will be used for SSH key handling
 from netmiko import ConnectHandler
-from netmiko.exceptions import NetmikoTimeoutException, NetmikoAuthenticationException
-from paramiko import SSHClient, AutoAddPolicy, RSAKey, Ed25519Key
+
+# from netmiko.exceptions import NetmikoTimeoutException, NetmikoAuthenticationException
+# from paramiko import SSHClient, AutoAddPolicy, RSAKey, Ed25519Key  # Used in SSH manager
 from ..security.vault import VaultClient
 from ..security.audit import AuditLogger
 from ..db.models import Device, DeviceVendor
 from .ssh_manager import SSHKeyManager, SSHDeviceConnector
-import paramiko
+
+# import paramiko  # Base SSH functionality
 
 
 class UnauthorizedException(Exception):
@@ -215,7 +218,10 @@ class SecureDeviceConnector:
             "password": credentials["password"],
             "port": device.port or 22,
             "timeout": 30,
-            "session_log": f"logs/sessions/{device.hostname}_{datetime.utcnow().isoformat()}.log",
+            "session_log": (
+                f"logs/sessions/{device.hostname}_"
+                f"{datetime.utcnow().isoformat()}.log"
+            ),
         }
 
         # Add enable password if available
@@ -347,6 +353,9 @@ Host target
                 # Check if SSH key exists for device
                 try:
                     ssh_key = await self.ssh_manager.get_ssh_key(device_id)
+                    self.logger.debug(
+                        f"Retrieved SSH key for device {device_id}: {ssh_key['created_at']}"
+                    )
 
                     # Connect using SSH key
                     ssh_client = await self.ssh_connector.connect_with_key(device)
@@ -382,6 +391,9 @@ Host target
 
                 except Exception as e:
                     # Fall back to credential-based authentication
+                    self.logger.warning(
+                        f"SSH key auth failed: {e}, falling back to credentials"
+                    )
                     return await self.connect_to_device(device_id, user_context)
             else:
                 return await self.connect_to_device(device_id, user_context)

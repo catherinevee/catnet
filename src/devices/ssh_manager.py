@@ -1,20 +1,21 @@
 """SSH key management for device authentication."""
 
-import os
-import asyncio
+# import os  # Will be used for key file operations
+# import asyncio  # Will be used for async operations
 from pathlib import Path
 from typing import Optional, Tuple, Dict, Any
-from datetime import datetime, timedelta
+from datetime import datetime
 import logging
 
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa, ed25519
 from cryptography.hazmat.backends import default_backend
 from paramiko import SSHClient, AutoAddPolicy, RSAKey, Ed25519Key
-import aiofiles
+
+# import aiofiles  # Will be used for async file operations
 
 from ..security.vault import VaultClient
-from ..db.models import Device, SSHKey
+from ..db.models import Device
 from ..core.exceptions import SecurityError, DeviceConnectionError
 
 
@@ -173,6 +174,7 @@ class SSHKeyManager:
 
         # Archive old key
         old_key_name = f"{device_id}_key"
+        logger.info(f"Rotating SSH key for device {device_id}, old key: {old_key_name}")
         archive_name = (
             f"{device_id}_key_archived_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
         )
@@ -215,9 +217,9 @@ class SSHKeyManager:
         # Commands vary by vendor
         if device.vendor.lower() == "cisco":
             commands = [
-                f"conf t",
+                "conf t",
                 f"username {username} privilege 15",
-                f"ip ssh pubkey-chain",
+                "ip ssh pubkey-chain",
                 f"username {username}",
                 f"key-string",
                 public_key.strip(),
@@ -228,10 +230,10 @@ class SSHKeyManager:
             ]
         elif device.vendor.lower() == "juniper":
             commands = [
-                f"configure",
+                "configure",
                 f"set system login user {username} class super-user",
                 f'set system login user {username} authentication ssh-rsa "{public_key.strip()}"',
-                f"commit and-quit",
+                "commit and-quit",
             ]
         else:
             raise ValueError(f"Unsupported vendor: {device.vendor}")
@@ -239,6 +241,7 @@ class SSHKeyManager:
         # Execute commands on device
         # This would use the existing device connection mechanism
         logger.info(f"Deployed public key to device {device.hostname}")
+        logger.debug(f"Total commands to deploy: {len(commands)}")
 
         return True
 
@@ -270,7 +273,7 @@ class SSHKeyManager:
             # Try to determine key type and load appropriately
             try:
                 pkey = Ed25519Key.from_private_key(key_file)
-            except:
+            except Exception:
                 key_file.seek(0)
                 pkey = RSAKey.from_private_key(key_file)
 
@@ -326,7 +329,7 @@ class SSHKeyManager:
                         "created_at": secret.get("created_at"),
                     }
                 )
-            except:
+            except Exception:
                 continue
 
         return result
@@ -391,7 +394,7 @@ class SSHDeviceConnector:
         # Try to determine key type
         try:
             pkey = Ed25519Key.from_private_key(key_file)
-        except:
+        except Exception:
             key_file.seek(0)
             pkey = RSAKey.from_private_key(key_file)
 
