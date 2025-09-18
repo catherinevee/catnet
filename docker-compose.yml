@@ -8,7 +8,7 @@ services:
     environment:
       POSTGRES_DB: catnet
       POSTGRES_USER: catnet
-      POSTGRES_PASSWORD: catnet_secure_password_change_in_production
+      POSTGRES_PASSWORD: hxwsnXOSVsovBipKPmXW
       POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.UTF-8"
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -27,7 +27,7 @@ services:
   redis:
     image: redis:7-alpine
     container_name: catnet-redis
-    command: redis-server --requirepass catnet_redis_password_change_in_production
+    command: redis-server --requirepass sfzeYzhNduXLYOXZWMdk
     volumes:
       - redis_data:/data
     ports:
@@ -46,7 +46,7 @@ services:
     container_name: catnet-rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: catnet
-      RABBITMQ_DEFAULT_PASS: catnet_rabbit_password_change_in_production
+      RABBITMQ_DEFAULT_PASS: vplFWfOKgreVdSCesnqy
       RABBITMQ_DEFAULT_VHOST: catnet
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
@@ -68,7 +68,7 @@ services:
     cap_add:
       - IPC_LOCK
     environment:
-      VAULT_DEV_ROOT_TOKEN_ID: catnet_vault_token_change_in_production
+      VAULT_DEV_ROOT_TOKEN_ID: vBUKrJGJrCkacZTGkoKc
       VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
     volumes:
       - vault_data:/vault/file
@@ -87,11 +87,11 @@ services:
       dockerfile: Dockerfile
     container_name: catnet-auth
     environment:
-      DATABASE_URL: postgresql://catnet:catnet_secure_password_change_in_production@postgres:5432/catnet
-      REDIS_URL: redis://:catnet_redis_password_change_in_production@redis:6379/0
+      DATABASE_URL: postgresql://catnet:hxwsnXOSVsovBipKPmXW@postgres:5432/catnet
+      REDIS_URL: redis://:sfzeYzhNduXLYOXZWMdk@redis:6379/0
       VAULT_URL: http://vault:8200
-      VAULT_TOKEN: catnet_vault_token_change_in_production
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-change_this_secret_key_in_production}
+      VAULT_TOKEN: vBUKrJGJrCkacZTGkoKc
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-wYzuGgokCuFfAnokjknI}
       SERVICE_PORT: 8081
     volumes:
       - ./logs:/app/logs
@@ -116,10 +116,10 @@ services:
       dockerfile: Dockerfile
     container_name: catnet-gitops
     environment:
-      DATABASE_URL: postgresql://catnet:catnet_secure_password_change_in_production@postgres:5432/catnet
-      REDIS_URL: redis://:catnet_redis_password_change_in_production@redis:6379/0
+      DATABASE_URL: postgresql://catnet:hxwsnXOSVsovBipKPmXW@postgres:5432/catnet
+      REDIS_URL: redis://:sfzeYzhNduXLYOXZWMdk@redis:6379/0
       VAULT_URL: http://vault:8200
-      VAULT_TOKEN: catnet_vault_token_change_in_production
+      VAULT_TOKEN: vBUKrJGJrCkacZTGkoKc
       SERVICE_PORT: 8082
     volumes:
       - ./logs:/app/logs
@@ -145,11 +145,11 @@ services:
       dockerfile: Dockerfile
     container_name: catnet-deployment
     environment:
-      DATABASE_URL: postgresql://catnet:catnet_secure_password_change_in_production@postgres:5432/catnet
-      REDIS_URL: redis://:catnet_redis_password_change_in_production@redis:6379/0
+      DATABASE_URL: postgresql://catnet:hxwsnXOSVsovBipKPmXW@postgres:5432/catnet
+      REDIS_URL: redis://:sfzeYzhNduXLYOXZWMdk@redis:6379/0
       VAULT_URL: http://vault:8200
-      VAULT_TOKEN: catnet_vault_token_change_in_production
-      RABBITMQ_URL: amqp://catnet:catnet_rabbit_password_change_in_production@rabbitmq:5672/catnet
+      VAULT_TOKEN: vBUKrJGJrCkacZTGkoKc
+      RABBITMQ_URL: amqp://catnet:vplFWfOKgreVdSCesnqy@rabbitmq:5672/catnet
       SERVICE_PORT: 8083
     volumes:
       - ./logs:/app/logs
@@ -176,10 +176,10 @@ services:
       dockerfile: Dockerfile
     container_name: catnet-device
     environment:
-      DATABASE_URL: postgresql://catnet:catnet_secure_password_change_in_production@postgres:5432/catnet
-      REDIS_URL: redis://:catnet_redis_password_change_in_production@redis:6379/0
+      DATABASE_URL: postgresql://catnet:hxwsnXOSVsovBipKPmXW@postgres:5432/catnet
+      REDIS_URL: redis://:sfzeYzhNduXLYOXZWMdk@redis:6379/0
       VAULT_URL: http://vault:8200
-      VAULT_TOKEN: catnet_vault_token_change_in_production
+      VAULT_TOKEN: vBUKrJGJrCkacZTGkoKc
       SERVICE_PORT: 8084
     volumes:
       - ./logs:/app/logs
@@ -243,7 +243,7 @@ services:
     image: grafana/grafana:latest
     container_name: catnet-grafana
     environment:
-      GF_SECURITY_ADMIN_PASSWORD: catnet_grafana_password_change_in_production
+      GF_SECURITY_ADMIN_PASSWORD: NglBwnDRpympcIpGIYQi
       GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource
     volumes:
       - grafana_data:/var/lib/grafana

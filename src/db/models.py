@@ -59,9 +59,15 @@ class User(Base):
     signing_key_created_at = Column(DateTime(timezone=True))
     signing_key_expires_at = Column(DateTime(timezone=True))
 
+    # SSH key fields
+    ssh_public_keys = Column(JSON, default=[])  # List of SSH public keys
+    ssh_key_added_at = Column(DateTime(timezone=True))
+    ssh_key_fingerprints = Column(JSON, default=[])  # List of SSH key fingerprints
+
     # Relationships
     deployments = relationship("Deployment", back_populates="creator")
     audit_logs = relationship("AuditLog", back_populates="user")
+    ssh_keys = relationship("UserSSHKey", back_populates="user")
 
 
 class Device(Base):
@@ -92,6 +98,13 @@ class Device(Base):
     certificate_issued_at = Column(DateTime(timezone=True))
     certificate_revoked_at = Column(DateTime(timezone=True))
     certificate_revocation_reason = Column(String(255))
+
+    # SSH key fields
+    ssh_username = Column(String(100), default="catnet")
+    ssh_key_ref = Column(String(255))  # Vault reference to SSH key
+    ssh_port = Column(Integer, default=22)
+    ssh_key_fingerprint = Column(String(128))
+    ssh_auth_enabled = Column(Boolean, default=False)
 
     # Relationships
     configs = relationship("DeviceConfig", back_populates="device")
@@ -272,3 +285,41 @@ class Session(Base):
     commands = Column(JSON, default=[])  # List of executed commands
     is_active = Column(Boolean, default=True)
     recording_location = Column(String(500))  # Path to session recording
+
+
+class UserSSHKey(Base):
+    __tablename__ = "user_ssh_keys"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    name = Column(String(255), nullable=False)
+    public_key = Column(Text, nullable=False)
+    fingerprint = Column(String(128), nullable=False, unique=True, index=True)
+    key_type = Column(String(50))  # rsa, ed25519, ecdsa
+    key_size = Column(Integer)
+    comment = Column(String(500))
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    last_used = Column(DateTime(timezone=True))
+    expires_at = Column(DateTime(timezone=True))
+
+    # Relationships
+    user = relationship("User", back_populates="ssh_keys")
+
+
+class SSHKey(Base):
+    __tablename__ = "ssh_keys"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    device_id = Column(UUID(as_uuid=True), ForeignKey("devices.id"))
+    name = Column(String(255), nullable=False)
+    vault_path = Column(String(500), nullable=False)  # Path in Vault
+    fingerprint = Column(String(128), nullable=False, index=True)
+    key_type = Column(String(50))  # rsa, ed25519, ecdsa
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    rotated_at = Column(DateTime(timezone=True))
+    expires_at = Column(DateTime(timezone=True))
+
+    # Relationships
+    device = relationship("Device")

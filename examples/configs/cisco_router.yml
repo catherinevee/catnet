@@ -1,0 +1,103 @@
+---
+# Example Cisco router configuration for CatNet
+device:
+  hostname: core-router-01
+  vendor: cisco_ios
+  model: ISR4451
+
+configuration:
+  interfaces:
+    - name: GigabitEthernet0/0/0
+      description: "WAN Uplink to ISP"
+      ip_address: 203.0.113.1
+      subnet_mask: 255.255.255.252
+      shutdown: false
+
+    - name: GigabitEthernet0/0/1
+      description: "LAN Interface"
+      ip_address: 192.168.1.1
+      subnet_mask: 255.255.255.0
+      shutdown: false
+
+  routing:
+    static_routes:
+      - network: 0.0.0.0
+        mask: 0.0.0.0
+        next_hop: 203.0.113.2
+        description: "Default route to ISP"
+
+    ospf:
+      process_id: 1
+      router_id: 1.1.1.1
+      networks:
+        - network: 192.168.1.0
+          wildcard: 0.0.0.255
+          area: 0
+
+  security:
+    acls:
+      - number: 100
+        entries:
+          - action: permit
+            protocol: tcp
+            source: 192.168.1.0
+            source_wildcard: 0.0.0.255
+            destination: any
+            destination_port: 80
+
+          - action: permit
+            protocol: tcp
+            source: 192.168.1.0
+            source_wildcard: 0.0.0.255
+            destination: any
+            destination_port: 443
+
+          - action: deny
+            protocol: ip
+            source: any
+            destination: any
+
+  services:
+    ssh:
+      enabled: true
+      version: 2
+      timeout: 60
+
+    ntp:
+      servers:
+        - 0.pool.ntp.org
+        - 1.pool.ntp.org
+
+    logging:
+      destinations:
+        - host: 192.168.1.100
+          protocol: udp
+          port: 514
+
+deployment:
+  strategy: canary
+  stages:
+    - percentage: 10
+      wait_minutes: 5
+    - percentage: 50
+      wait_minutes: 10
+    - percentage: 100
+      wait_minutes: 0
+
+  validation:
+    pre_checks:
+      - ping_test: 8.8.8.8
+      - interface_status: all
+      - cpu_threshold: 80
+      - memory_threshold: 80
+
+    post_checks:
+      - ping_test: 8.8.8.8
+      - interface_status: all
+      - route_verification: true
+      - service_verification: [ssh, ntp]
+
+  rollback:
+    automatic: true
+    on_failure: true
+    max_wait: 30

@@ -2,11 +2,14 @@ import asyncio
 from typing import Optional, Dict, Any, List
 from datetime import datetime, timedelta
 import uuid
+import io
 from netmiko import ConnectHandler
 from netmiko.exceptions import NetmikoTimeoutException, NetmikoAuthenticationException
+from paramiko import SSHClient, AutoAddPolicy, RSAKey, Ed25519Key
 from ..security.vault import VaultClient
 from ..security.audit import AuditLogger
 from ..db.models import Device, DeviceVendor
+from .ssh_manager import SSHKeyManager, SSHDeviceConnector
 import paramiko
 
 
@@ -153,6 +156,8 @@ class SecureDeviceConnector:
             "us-west": "bastion2.example.com",
             "eu-west": "bastion3.example.com",
         }
+        self.ssh_manager = SSHKeyManager(self.vault)
+        self.ssh_connector = SSHDeviceConnector(self.ssh_manager)
 
     async def check_authorization(
         self, user_context: Dict[str, Any], device_id: str
@@ -307,6 +312,79 @@ Host target
             )
 
             return device_conn
+
+        except Exception as e:
+            await self.audit.log_event(
+                event_type="device_connection_failed",
+                user_id=user_context.get("user_id"),
+                details={"device_id": device_id, "error": str(e)},
+            )
+            raise
+
+    async def connect_to_device_with_ssh_key(
+        self, device_id: str, user_context: Dict[str, Any], use_ssh_key: bool = True
+    ) -> Optional[DeviceConnection]:
+        """Connect to device using SSH key authentication."""
+        try:
+            # Step 1: Verify user authorization
+            if not await self.check_authorization(user_context, device_id):
+                await self.audit.log_unauthorized_attempt(
+                    user_context, f"device:{device_id}", "connect"
+                )
+                raise UnauthorizedException("Unauthorized access attempt")
+
+            # Get device from database (mock for now)
+            device = Device(
+                id=device_id,
+                hostname="router1",
+                ip_address="192.168.1.1",
+                vendor=DeviceVendor.CISCO_IOS,
+                port=22,
+            )
+
+            # Step 2: Connect using SSH key
+            if use_ssh_key:
+                # Check if SSH key exists for device
+                try:
+                    ssh_key = await self.ssh_manager.get_ssh_key(device_id)
+
+                    # Connect using SSH key
+                    ssh_client = await self.ssh_connector.connect_with_key(device)
+
+                    # Wrap in DeviceConnection
+                    device_conn = DeviceConnection(
+                        connection_id=str(uuid.uuid4()),
+                        device=device,
+                        connection_handler=ssh_client,
+                        audit_logger=self.audit,
+                    )
+
+                    # Enable session recording
+                    await self.audit.start_session_recording(
+                        device_conn.session_id, user_context["user_id"], device_id
+                    )
+
+                    # Store active connection
+                    self.active_connections[device_conn.connection_id] = device_conn
+
+                    await self.audit.log_event(
+                        event_type="device_connected_ssh_key",
+                        user_id=user_context["user_id"],
+                        details={
+                            "device_id": device_id,
+                            "connection_id": device_conn.connection_id,
+                            "session_id": device_conn.session_id,
+                            "auth_method": "ssh_key"
+                        },
+                    )
+
+                    return device_conn
+
+                except Exception as e:
+                    # Fall back to credential-based authentication
+                    return await self.connect_to_device(device_id, user_context)
+            else:
+                return await self.connect_to_device(device_id, user_context)
 
         except Exception as e:
             await self.audit.log_event(

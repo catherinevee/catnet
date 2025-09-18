@@ -16,7 +16,11 @@
       "Bash(gh run watch:*)",
       "Bash(black:*)",
       "Bash(docker build:*)",
-      "Bash(pip install:*)"
+      "Bash(pip install:*)",
+      "Bash(rm:*)",
+      "Bash(cat:*)",
+      "Bash(chmod:*)",
+      "Bash(gh:*)"
     ],
     "deny": [],
     "ask": []

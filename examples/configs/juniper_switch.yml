@@ -1,0 +1,114 @@
+---
+# Example Juniper switch configuration for CatNet
+device:
+  hostname: access-switch-01
+  vendor: juniper_junos
+  model: EX4200
+
+configuration:
+  system:
+    host_name: access-switch-01
+    domain_name: example.com
+    time_zone: America/New_York
+
+    name_servers:
+      - 8.8.8.8
+      - 8.8.4.4
+
+    login:
+      users:
+        - name: netadmin
+          class: super-user
+          authentication:
+            ssh_keys:
+              - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC..."
+
+  interfaces:
+    - name: ge-0/0/0
+      description: "Uplink to Core"
+      unit: 0
+      family: ethernet-switching
+      vlan_members: all
+
+    - name: ge-0/0/1
+      description: "Access Port - VLAN 10"
+      unit: 0
+      family: ethernet-switching
+      vlan_members: vlan10
+
+    - name: vlan
+      unit: 10
+      description: "Management VLAN"
+      family: inet
+      address: 192.168.10.2/24
+
+  vlans:
+    - name: vlan10
+      vlan_id: 10
+      description: "User VLAN"
+
+    - name: vlan20
+      vlan_id: 20
+      description: "Server VLAN"
+
+    - name: vlan99
+      vlan_id: 99
+      description: "Management VLAN"
+
+  protocols:
+    spanning_tree:
+      mode: rstp
+      bridge_priority: 32768
+
+    lldp:
+      enabled: true
+      interfaces:
+        - all
+
+  security:
+    zones:
+      - name: trust
+        interfaces:
+          - vlan.10
+        policies:
+          - from: trust
+            to: untrust
+            policy: allow-outbound
+            match:
+              source: any
+              destination: any
+              application: any
+            then: permit
+
+  services:
+    ssh:
+      enabled: true
+      protocol_version: 2
+
+    netconf:
+      ssh:
+        enabled: true
+        port: 830
+
+deployment:
+  strategy: rolling
+  batch_size: 5
+  wait_between_batches: 300
+
+  validation:
+    pre_checks:
+      - interface_status: all
+      - spanning_tree_status: stable
+      - cpu_threshold: 70
+      - memory_threshold: 70
+
+    post_checks:
+      - interface_status: all
+      - spanning_tree_status: stable
+      - vlan_verification: all
+      - lldp_neighbors: unchanged
+
+  rollback:
+    automatic: true
+    on_failure: true
+    preserve_backup: true
