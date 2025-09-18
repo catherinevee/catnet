@@ -148,7 +148,7 @@ jobs:
           python scripts/production_checklist.py || true
 
       - name: Upload validation results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: phase-validation-results-${{ github.event.inputs.phase }}
@@ -171,7 +171,7 @@ jobs:
           fi
 
       - name: Upload validation report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: validation-report-${{ github.event.inputs.phase }}

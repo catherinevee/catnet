@@ -124,7 +124,7 @@ jobs:
           echo "Please provide feedback at: ${{ needs.setup-test-environment.outputs.environment_url }}/feedback"
 
       - name: Upload test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: network-engineer-test-results
           path: test_results.json
@@ -187,7 +187,7 @@ jobs:
           EOF
 
       - name: Upload security test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: security-team-test-results
           path: security_results.json
@@ -246,7 +246,7 @@ jobs:
           EOF
 
       - name: Upload DevOps test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: devops-team-test-results
           path: devops_results.json
@@ -300,7 +300,7 @@ jobs:
           EOF
 
       - name: Upload management test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: management-test-results
           path: management_results.json
@@ -316,7 +316,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Download all test results
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: test-results/
 
@@ -365,7 +365,7 @@ jobs:
           echo "- Update documentation based on user feedback" >> uat-report.md
 
       - name: Upload UAT report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: uat-report-${{ needs.setup-test-environment.outputs.test_id }}
           path: uat-report.md
