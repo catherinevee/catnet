@@ -142,3 +142,13 @@ class WebhookHandler:
                 return True
 
         return False
+
+    def log_webhook_event(self, webhook_data: Dict[str, Any]) -> str:
+        """Log webhook event with timestamp"""
+        event = {
+            "timestamp": datetime.now().isoformat(),
+            "data": webhook_data
+        }
+        # Convert to JSON for logging
+        event_json = json.dumps(event, indent=2)
+        return event_json

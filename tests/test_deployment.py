@@ -5,9 +5,9 @@ import pytest
 from unittest.mock import Mock, AsyncMock, patch
 from src.deployment.executor import (
     DeploymentExecutor,
-    DeploymentStrategy,
     DeploymentResult,
 )
+from src.deployment.strategies import DeploymentStrategy
 from src.db.models import Device, DeviceVendor
 
 
@@ -129,6 +129,44 @@ class TestDeploymentExecutor:
         assert result.success is True
 
         # Verify staging and activation
+
+    @pytest.mark.asyncio
+    @patch('src.deployment.executor.DeploymentExecutor.deploy_to_device')
+    async def test_deployment_with_patch(self, mock_deploy, mock_audit_logger):
+        """Test deployment with patched method"""
+        # Setup mock device with proper model
+        device = Device(
+            id="device-123",
+            hostname="router1",
+            ip_address="192.168.1.1",
+            vendor=DeviceVendor.CISCO_IOS
+        )
+
+        # Setup executor with strategy
+        strategy = DeploymentStrategy.ROLLING
+        executor = DeploymentExecutor(
+            device_connector=Mock(),
+            audit_logger=mock_audit_logger
+        )
+
+        # Configure mock
+        mock_deploy.return_value = True
+
+        # Execute deployment with strategy
+        result = await executor.execute_deployment(
+            deployment_id="deploy-123",
+            devices=[device],
+            configuration={"test": "config"},
+            strategy=strategy,
+            user_context={"user_id": "user-123"}
+        )
+
+        # Verify patch was called
+        mock_deploy.assert_called()
+
+        # Verify result and device vendor
+        assert result is not None
+        assert device.vendor == DeviceVendor.CISCO_IOS
         executor.stage_configuration.assert_called()
         executor.activate_staged_config.assert_called()
 

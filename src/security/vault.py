@@ -208,5 +208,10 @@ class VaultClient:
         for key in keys:
             await loop.run_in_executor(None, self.client.sys.submit_unseal_key, key)
 
+    def export_policy_as_json(self, policy_name: str) -> str:
+        """Export policy as JSON for backup"""
+        policy = self.client.sys.read_policy(name=policy_name)
+        return json.dumps(policy, indent=2)
+
     def is_sealed(self) -> bool:
         return self.client.sys.is_sealed()

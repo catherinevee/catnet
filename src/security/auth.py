@@ -185,7 +185,7 @@ class AuthManager:
             return False
 
         totp = pyotp.TOTP(secret)
-        # Allow for time drift (accepts tokens from 30 seconds ago to 30 seconds in future)
+        # Allow for time drift (accepts tokens from 30 seconds ago to 30 seconds ahead)
         return totp.verify(token, valid_window=1)
 
     async def authenticate_user(
@@ -290,3 +290,15 @@ class AuthManager:
         if api_key:
             return {"sub": "api_user", "roles": ["api"], "key_id": api_key[:8]}
         return None
+
+    def get_active_sessions(self) -> List[Dict[str, Any]]:
+        """Get list of active sessions"""
+        sessions = []
+        for jti, session_info in self.active_sessions.items():
+            sessions.append({
+                "jti": jti,
+                "user_id": session_info["user_id"],
+                "created_at": session_info["created_at"].isoformat(),
+                "expires_at": session_info["expires_at"].isoformat()
+            })
+        return sessions

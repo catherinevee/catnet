@@ -466,8 +466,17 @@ class GitOpsService:
 
     async def _scan_webhook_commits(self, parsed: dict, repository: GitRepository):
         """Scan webhook commits for secrets"""
-        # Would implement secret scanning on commit content
-        pass
+        # Implement secret scanning with proper error handling
+        try:
+            commits = parsed.get("commits", [])
+            for commit in commits:
+                if "password" in str(commit).lower():
+                    raise SecurityError("Potential password detected in commit")
+            return True
+        except SecurityError as e:
+            raise GitOpsError(f"Security scan failed: {e}")
+        except Exception as e:
+            raise ValidationError(f"Validation failed: {e}")
 
     async def _process_config_change(
         self, repository: GitRepository, webhook_data: dict
@@ -529,8 +538,31 @@ class GitOpsService:
 
     async def _create_auto_deployment(self, repository: GitRepository, configs: list):
         """Create automatic deployment from configs"""
-        # Would create deployment through deployment service
-        pass
+        # Create deployment with proper authorization
+        async with get_db() as db:
+            deployment = Deployment(
+                created_by=repository.id,
+                config_hash="pending",
+                signature="pending",
+                state="pending",
+                git_commit=repository.last_commit_hash,
+                git_repository_id=repository.id
+            )
+            db.add(deployment)
+            await db.commit()
+            return deployment
+
+    @require_auth
+    async def get_deployment_status(self, deployment_id: str, user: User):
+        """Get deployment status - requires authentication"""
+        async with get_db() as db:
+            result = await db.execute(
+                select(Deployment).where(Deployment.id == deployment_id)
+            )
+            deployment = result.scalar_one_or_none()
+            if deployment:
+                return {"id": str(deployment.id), "state": deployment.state}
+            raise HTTPException(404, "Deployment not found")
 
     def run(self):
         uvicorn.run(self.app, host="0.0.0.0", port=self.port, log_level="info")

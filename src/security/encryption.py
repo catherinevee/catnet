@@ -2,11 +2,8 @@ import os
 import base64
 from typing import Optional, Tuple
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.primitives import (
-    hashes,
-    serialization,
-    padding as crypto_padding,
-)
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives import padding as crypto_padding
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
@@ -173,3 +170,10 @@ class EncryptionManager:
     @staticmethod
     def generate_secure_token() -> str:
         return secrets.token_urlsafe(32)
+
+    @staticmethod
+    def pad_data(data: bytes, block_size: int = 16) -> bytes:
+        """Pad data using PKCS7 padding"""
+        padder = crypto_padding.PKCS7(block_size * 8).padder()
+        padded_data = padder.update(data) + padder.finalize()
+        return padded_data

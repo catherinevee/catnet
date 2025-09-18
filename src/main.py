@@ -24,6 +24,7 @@ class CatNetOrchestrator:
     def __init__(self):
         self.services = {}
         self.running = False
+        self.shutdown_handler: Optional[asyncio.Task] = None
 
     async def start_auth_service(self):
         from src.auth.service import AuthenticationService

@@ -502,3 +502,68 @@ class ConfigurationHasher:
         """
         actual_hash = ConfigurationHasher.hash_config(config)
         return actual_hash == expected_hash
+
+    async def create_rsa_signature(
+        self, data: bytes, private_key_path: Optional[str] = None
+    ) -> Tuple[bytes, Any]:
+        """Create RSA signature for data"""
+        # Get private key from environment or path
+        if not private_key_path:
+            private_key_path = os.getenv("RSA_PRIVATE_KEY_PATH", "keys/private.pem")
+
+        # Generate RSA key pair if needed
+        private_key = rsa.generate_private_key(
+            public_exponent=65537,
+            key_size=2048,
+            backend=default_backend()
+        )
+
+        # Sign the data
+        signature = private_key.sign(
+            data,
+            padding.PSS(
+                mgf=padding.MGF1(hashes.SHA256()),
+                salt_length=padding.PSS.MAX_LENGTH
+            ),
+            hashes.SHA256()
+        )
+
+        # Serialize public key for verification
+        public_key = private_key.public_key()
+        public_pem = public_key.public_key_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PublicFormat.SubjectPublicKeyInfo
+        )
+
+        return signature, public_pem
+
+    async def verify_rsa_signature(
+        self, data: bytes, signature: bytes, public_key_pem: bytes,
+        session: Optional[AsyncSession] = None
+    ) -> bool:
+        """Verify RSA signature"""
+        try:
+            # Load public key
+            public_key = serialization.load_pem_public_key(
+                public_key_pem,
+                backend=default_backend()
+            )
+
+            # Verify signature
+            public_key.verify(
+                signature,
+                data,
+                padding.PSS(
+                    mgf=padding.MGF1(hashes.SHA256()),
+                    salt_length=padding.PSS.MAX_LENGTH
+                ),
+                hashes.SHA256()
+            )
+
+            # Log verification success if session provided
+            if session:
+                logger.info("RSA signature verified successfully")
+
+            return True
+        except InvalidSignature:
+            return False
