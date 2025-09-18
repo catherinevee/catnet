@@ -300,7 +300,7 @@ class DeploymentValidator:
 
         return True
 
-    async def validate_deployment(
+    async def validate_deployment_targets(
         self,
         deployment_id: str,
         config_ids: List[str],

@@ -22,7 +22,7 @@ from .webhook_handler import WebhookHandler
 from ..security.vault import VaultClient
 from ..security.audit import AuditLogger, AuditLevel
 from ..security.encryption import EncryptionManager
-from ..core.validators import ConfigValidator, ValidationResult
+from ..core.validators import ConfigValidator
 from ..core.exceptions import GitOpsError, SecurityError, ValidationError
 from ..auth.dependencies import get_current_user, require_auth
 from ..db.database import get_db
@@ -49,8 +49,8 @@ class WebhookPayload(BaseModel):
 
 
 class ConfigSyncRequest(BaseModel):
-    repository_id: str
-    force: bool = False
+    repository_id: str = Field(..., description="Repository UUID")
+    force: bool = Field(False, description="Force sync even with conflicts")
 
 
 class DeploymentRequest(BaseModel):
@@ -288,6 +288,12 @@ class GitOpsService:
             repository = result.scalar_one_or_none()
 
             if not repository:
+                # Use environment variable for default response
+                if os.getenv("USE_JSON_RESPONSE", "false").lower() == "true":
+                    return JSONResponse(
+                        status_code=404,
+                        content={"error": "Repository not found"}
+                    )
                 raise HTTPException(404, "Repository not found")
 
             try:

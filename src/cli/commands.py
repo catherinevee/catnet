@@ -715,49 +715,50 @@ def ssh_add_user(ctx, key_file, name, comment):
         from ..security.audit import AuditLogger
         from ..db.database import get_db
 
-        # Would need database session here
-        db_session = None  # In production, would use: async with get_db() as session:
-        audit_logger = AuditLogger()
+        # Use database session
+        async with get_db() as db_session:
+            audit_logger = AuditLogger()
 
-        try:
-            # Read public key
-            public_key = Path(key_file).read_text().strip()
+            try:
+                # Read public key
+                public_key = Path(key_file).read_text().strip()
 
-            # Get current user from token
-            token_file = Path.home() / ".catnet" / "tokens.json"
-            if not token_file.exists():
-                click.echo("Not authenticated. Please login first.")
+                # Get current user from token
+                token_file = Path.home() / ".catnet" / "tokens.json"
+                if not token_file.exists():
+                    click.echo("Not authenticated. Please login first.")
+                    sys.exit(1)
+
+                # In production, would decode JWT to get user_id
+                user_id = "current_user_id"  # Placeholder
+
+                click.echo(f"Adding SSH key '{name}' to your account...")
+
+                # Initialize services for SSH key management
+                ssh_service = SSHKeyAuthService(db_session, audit_logger)
+
+                # Validate the public key format first
+                if not ssh_service.validate_public_key(public_key):
+                    click.echo("Invalid SSH public key format")
+                    sys.exit(1)
+
+                # Calculate fingerprint for display
+                fingerprint = ssh_service.calculate_fingerprint(public_key)
+                click.echo(f"Key fingerprint: {fingerprint}")
+
+                # Add the SSH key using the service
+                key = await ssh_service.add_ssh_key(
+                    user_id, public_key, name, comment
+                )
+                click.echo(f"Public key fingerprint: {public_key[:50]}...")
+                click.echo(f"User ID: {user_id}")
+                click.echo(f"Added key ID: {key.get('key_id', 'unknown')}")
+
+                click.echo(click.style("✓ SSH key added successfully", fg="green"))
+
+            except Exception as e:
+                click.echo(click.style(f"✗ Failed to add SSH key: {str(e)}", fg="red"))
                 sys.exit(1)
-
-            # In production, would decode JWT to get user_id
-            user_id = "current_user_id"  # Placeholder
-
-            click.echo(f"Adding SSH key '{name}' to your account...")
-
-            # Initialize services for SSH key management
-            ssh_service = SSHKeyAuthService(db_session, audit_logger)
-
-            # Validate the public key format first
-            if not ssh_service.validate_public_key(public_key):
-                click.echo("Invalid SSH public key format")
-                sys.exit(1)
-
-            # Calculate fingerprint for display
-            fingerprint = ssh_service.calculate_fingerprint(public_key)
-            click.echo(f"Key fingerprint: {fingerprint}")
-
-            # Would call the service here with actual DB session
-            # key = await ssh_service.add_ssh_key(
-            #     user_id, public_key, name, comment
-            # )
-            click.echo(f"Public key fingerprint: {public_key[:50]}...")
-            click.echo(f"User ID: {user_id}")
-
-            click.echo(click.style("✓ SSH key added successfully", fg="green"))
-
-        except Exception as e:
-            click.echo(click.style(f"✗ Failed to add SSH key: {str(e)}", fg="red"))
-            sys.exit(1)
 
     asyncio.run(_add())
 

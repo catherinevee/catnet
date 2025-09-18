@@ -7,7 +7,7 @@ import uuid
 from netmiko import ConnectHandler
 
 # from netmiko.exceptions import NetmikoTimeoutException, NetmikoAuthenticationException
-# from paramiko import SSHClient, AutoAddPolicy, RSAKey, Ed25519Key  # Used in SSH manager
+# from paramiko import SSHClient, AutoAddPolicy, RSAKey, Ed25519Key
 from ..security.vault import VaultClient
 from ..security.audit import AuditLogger
 from ..db.models import Device, DeviceVendor
@@ -356,8 +356,9 @@ Host target
                 # Check if SSH key exists for device
                 try:
                     ssh_key = await self.ssh_manager.get_ssh_key(device_id)
+                    created_at = ssh_key['created_at']
                     self.logger.debug(
-                        f"Retrieved SSH key for device {device_id}: {ssh_key['created_at']}"
+                        f"Retrieved SSH key for device {device_id}: {created_at}"
                     )
 
                     # Connect using SSH key

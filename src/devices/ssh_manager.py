@@ -240,7 +240,8 @@ class SSHKeyManager:
             commands = [
                 "configure",
                 f"set system login user {username} class super-user",
-                f'set system login user {username} authentication ssh-rsa "{public_key.strip()}"',
+                f'set system login user {username} authentication '
+                f'ssh-rsa "{public_key.strip()}"',
                 "commit and-quit",
             ]
         else:

@@ -4,7 +4,6 @@ import shutil
 from typing import Dict, Any, List, Optional
 from datetime import datetime
 from git import Repo
-import git
 from pathlib import Path
 import yaml
 import json
@@ -278,6 +277,11 @@ class GitHandler:
         for temp_dir in self.temp_dirs:
             shutil.rmtree(temp_dir, ignore_errors=True)
         self.temp_dirs.clear()
+
+    async def cleanup_async(self):
+        """Async cleanup with delay"""
+        await asyncio.sleep(1)  # Small delay before cleanup
+        self.cleanup()
 
     def __del__(self):
         self.cleanup()

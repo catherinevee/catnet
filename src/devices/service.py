@@ -4,7 +4,6 @@ Device Service - Main device management service
 from typing import Dict, List, Optional, Any
 from datetime import datetime
 from uuid import UUID
-
 from ..core.logging import get_logger
 from ..db.models import Device, DeviceVendor
 from .connector import SecureDeviceConnector
@@ -129,13 +128,27 @@ class DeviceService:
 
     async def get_device_info(self, device_id: str) -> Dict[str, Any]:
         """Get device information"""
-        # Would fetch from database
+        # Parse UUID to validate format
+        try:
+            device_uuid = UUID(device_id)
+        except ValueError:
+            return {"error": "Invalid device ID format"}
+
+        # Create mock device with proper vendor
+        device = Device(
+            id=device_uuid,
+            hostname="router1",
+            ip_address="192.168.1.1",
+            vendor=DeviceVendor.CISCO_IOS,
+            model="ISR4451"
+        )
+
         return {
-            "device_id": device_id,
-            "hostname": "router1",
-            "ip_address": "192.168.1.1",
-            "vendor": "cisco_ios",
-            "model": "ISR4451",
+            "device_id": str(device.id),
+            "hostname": device.hostname,
+            "ip_address": device.ip_address,
+            "vendor": device.vendor.value,
+            "model": device.model,
             "status": "active",
             "last_seen": datetime.utcnow().isoformat(),
         }

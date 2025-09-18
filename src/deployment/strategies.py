@@ -86,6 +86,9 @@ class BaseStrategy:
             # Apply configuration
             result = await connection.apply_config(config)
 
+            # Log the result for tracking
+            logger.info(f"Configuration apply result for {device.hostname}: {result}")
+
             # Save configuration
             await connection.save_config()
 

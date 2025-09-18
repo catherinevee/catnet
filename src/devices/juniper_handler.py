@@ -7,7 +7,7 @@ from typing import List, Dict, Any, Optional
 import re
 import json
 
-from ..core.exceptions import DeviceConnectionError, ValidationError
+from ..core.exceptions import DeviceConnectionError
 from ..security.audit import AuditLogger
 
 
@@ -309,8 +309,9 @@ class JuniperHandler:
 
         for i, rule in enumerate(rules, start=1):
             term_name = f"term{i}"
+            from_clause = rule.get("from", "")
             commands.append(
-                f'set firewall filter {filter_name} term {term_name} from {rule.get("from", "")}'
+                f'set firewall filter {filter_name} term {term_name} from {from_clause}'
             )
             then_action = rule.get("then", "accept")
             commands.append(

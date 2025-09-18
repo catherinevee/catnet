@@ -421,8 +421,10 @@ class DeviceCertificateManager:
 
                         # Deploy to device (would be done via secure channel)
                         # For now, just log
+                        serial_num = new_cert['serial_number']
                         logger.info(
-                            f"Rotated certificate for {device.hostname}: Serial {new_cert['serial_number']}"
+                            f"Rotated certificate for {device.hostname}: "
+                            f"Serial {serial_num}"
                         )
                         stats["rotated"] += 1
 

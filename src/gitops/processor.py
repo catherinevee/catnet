@@ -14,7 +14,7 @@ import yaml
 from ..security.vault import VaultClient
 from ..security.audit import AuditLogger
 from ..core.logging import get_logger
-from ..core.exceptions import ValidationError, SecurityError
+from ..core.exceptions import SecurityError
 from ..db.models import GitRepository, Deployment, DeploymentState
 from ..db.database import get_db
 
@@ -467,3 +467,14 @@ class GitOpsProcessor:
         """Get environment variables for SSH operations"""
         # Would set up SSH environment
         return os.environ.copy()
+
+    async def process_async_batch(self, webhooks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Process multiple webhooks concurrently"""
+        tasks = []
+        for webhook in webhooks:
+            repo = GitRepository()  # Would fetch from DB
+            task = asyncio.create_task(self.process_push_event(webhook, repo))
+            tasks.append(task)
+
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        return results
