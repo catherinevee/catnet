@@ -162,6 +162,7 @@ class ConfigValidator:
 
         lines = config.strip().split("\n")
         current_context = []
+        # interface_context tracks the current interface being configured
         interface_context = None
 
         for line_num, line in enumerate(lines, 1):

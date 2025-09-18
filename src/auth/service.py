@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 import os
+
 import ssl
 from datetime import datetime, timedelta
 import uvicorn
@@ -14,6 +15,7 @@ from ..security.auth import AuthManager
 from ..security.audit import AuditLogger
 from ..db.database import get_db
 from ..db.models import User
+
 from ..core.mtls import MTLSManager, MTLSMiddleware, MTLSServer
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -238,7 +240,8 @@ class AuthenticationService:
 
                 return LoginResponse(
                     access_token=tokens["access_token"],
-                    refresh_token=refresh_data.refresh_token,  # Return same refresh token
+                    # Return same refresh token
+                    refresh_token=refresh_data.refresh_token,
                 )
             except Exception:
                 raise HTTPException(

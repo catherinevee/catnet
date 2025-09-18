@@ -1,6 +1,7 @@
 """Authentication utilities for CLI commands."""
 
 import json
+
 import os
 from pathlib import Path
 from typing import Optional, Dict

@@ -4,6 +4,7 @@ import click
 import asyncio
 import json
 import os
+
 from typing import Optional
 from pathlib import Path
 import sys
@@ -374,7 +375,8 @@ def deploy_history(ctx, limit):
                 color = "green" if dep["status"] == "success" else "red"
                 click.echo(
                     click.style(
-                        f"  {symbol} {dep['id'][:8]} - {dep['created_at']} - {dep['status']}",
+                        f"  {symbol} {dep['id'][:8]} - "
+                        f"{dep['created_at']} - {dep['status']}",
                         fg=color,
                     )
                 )
@@ -723,7 +725,11 @@ def ssh_add_user(ctx, key_file, name, comment):
 
             # Would call the service here with actual DB session
             # ssh_service = SSHKeyAuthService(db_session, audit_logger)
-            # await ssh_service.add_ssh_key(user_id, public_key, name, comment)
+            # key = await ssh_service.add_ssh_key(
+            #     user_id, public_key, name, comment
+            # )
+            click.echo(f"Public key fingerprint: {public_key[:50]}...")
+            click.echo(f"User ID: {user_id}")
 
             click.echo(click.style("✓ SSH key added successfully", fg="green"))
 
@@ -862,7 +868,7 @@ def ssh_rotate_device(ctx, device_id, deploy):
             )
 
             if deploy:
-                click.echo(f"Deploying new public key to device...")
+                click.echo("Deploying new public key to device...")
                 # Would deploy to actual device here
                 click.echo(click.style("✓ New key deployed to device", fg="green"))
 
@@ -959,7 +965,7 @@ def status(ctx):
                                 )
                             else:
                                 click.echo(click.style(f"  ✗ {service_name}", fg="red"))
-                    except:
+                    except Exception:
                         click.echo(
                             click.style(f"  ✗ {service_name} (unreachable)", fg="red")
                         )

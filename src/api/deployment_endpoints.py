@@ -12,7 +12,7 @@ from ..security.auth import get_current_user, check_permission
 from ..security.audit import AuditLogger
 from ..deployment.executor import DeploymentExecutor
 from ..deployment.validator import DeploymentValidator
-from ..db.models import User, Deployment, DeploymentDevice, Device, DeploymentState
+from ..db.models import User, Deployment, Device, DeploymentState
 from ..db.database import get_db
 from ..core.logging import get_logger
 from ..core.metrics import deployment_metrics
@@ -109,6 +109,7 @@ async def dry_run_deployment(
 
         # Initialize validator
         validator = DeploymentValidator()
+        # Will use validator for configuration validation
 
         # Get devices information
         result = await db.execute(
@@ -387,7 +388,8 @@ async def schedule_deployment(
     - Automatic execution
     """
     logger.info(
-        f"Scheduled deployment requested by {current_user.username} for {request.scheduled_time}"
+        f"Scheduled deployment requested by {current_user.username} "
+        f"for {request.scheduled_time}"
     )
 
     try:
@@ -446,7 +448,8 @@ async def schedule_deployment(
             try:
                 # Send email notifications (simplified)
                 logger.info(
-                    f"Sending notifications to {len(request.notification_emails)} recipients"
+                    f"Sending notifications to "
+                    f"{len(request.notification_emails)} recipients"
                 )
                 notification_sent = True
             except Exception as e:

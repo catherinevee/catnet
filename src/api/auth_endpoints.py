@@ -10,7 +10,9 @@ import io
 import base64
 from pydantic import BaseModel, EmailStr
 
-from ..security.auth import AuthManager, get_current_user
+from ..security.auth import get_current_user  # Used in endpoints below
+
+# AuthManager will be imported when token management is implemented
 from ..security.vault import VaultClient
 from ..security.audit import AuditLogger
 from ..db.models import User

@@ -192,7 +192,8 @@ class APIVersioning:
 
         def log_warning():
             logger.warning(
-                f"API version {version} is deprecated and will be removed in future releases"
+                f"API version {version} is deprecated and will be "
+                f"removed in future releases"
             )
 
         return log_warning

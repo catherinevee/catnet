@@ -11,7 +11,7 @@ from enum import Enum
 from ..core.exceptions import DeploymentError, RollbackError, ValidationError
 from ..security.audit import AuditLogger, AuditLevel
 from ..devices.connector import SecureDeviceConnector
-from ..db.models import Deployment, DeploymentState, Device
+from ..db.models import Device  # Deployment and DeploymentState for future use
 
 
 class DeploymentStrategy(Enum):
@@ -87,6 +87,7 @@ class DeploymentExecutor:
                 action="deployment_failed",
                 devices=[d.hostname for d in devices],
                 status="failed",
+                error=str(e),  # Use the exception
             )
 
             # CRITICAL: Attempt automatic rollback
@@ -324,6 +325,10 @@ class DeploymentExecutor:
             # Execute configuration
             result = await conn.execute_config_commands(commands)
 
+            # Log the result for debugging
+            if result:
+                self.logger.debug(f"Configuration result: {result[:100]}...")
+
             # Save configuration
             await conn.save_configuration()
 
@@ -424,6 +429,7 @@ class DeploymentExecutor:
             raise RollbackError(f"Backup {backup_id} not found")
 
         backup = self.deployment_cache[backup_id]
+        self.logger.info(f"Restoring backup {backup_id} for device {device.hostname}")
 
         conn = await self.device_connector.connect_to_device(
             str(device.id), user_context

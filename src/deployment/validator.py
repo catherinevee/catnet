@@ -91,7 +91,8 @@ class DeploymentValidator:
             # Check certificate status
             if device.certificate_status != "active":
                 warnings.append(
-                    f"Device {device.hostname} certificate status: {device.certificate_status}"
+                    f"Device {device.hostname} certificate status: "
+                    f"{device.certificate_status}"
                 )
 
             # Check last backup
@@ -111,7 +112,8 @@ class DeploymentValidator:
                 ).total_seconds() / 3600
                 if last_seen_hours > 24:
                     warnings.append(
-                        f"Device {device.hostname} last seen {last_seen_hours:.1f} hours ago"
+                        f"Device {device.hostname} last seen "
+                        f"{last_seen_hours:.1f} hours ago"
                     )
 
         return {
