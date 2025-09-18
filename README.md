@@ -1,7 +1,6 @@
 # CatNet
 
 [![CI/CD Pipeline](https://github.com/catherinevee/catnet/workflows/CI/CD%20Pipeline/badge.svg)](https://github.com/catherinevee/catnet/actions/workflows/ci.yml)
-[![User Testing](https://github.com/catherinevee/catnet/workflows/User%20Testing%20Workflow/badge.svg)](https://github.com/catherinevee/catnet/actions)
 [![Tests](https://img.shields.io/badge/tests-24%20passed-success)](https://github.com/catherinevee/catnet/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/badge/coverage-15%25-orange)](https://github.com/catherinevee/catnet)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
