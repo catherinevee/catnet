@@ -356,7 +356,7 @@ Host target
                 # Check if SSH key exists for device
                 try:
                     ssh_key = await self.ssh_manager.get_ssh_key(device_id)
-                    created_at = ssh_key['created_at']
+                    created_at = ssh_key["created_at"]
                     self.logger.debug(
                         f"Retrieved SSH key for device {device_id}: {created_at}"
                     )

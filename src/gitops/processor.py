@@ -468,7 +468,9 @@ class GitOpsProcessor:
         # Would set up SSH environment
         return os.environ.copy()
 
-    async def process_async_batch(self, webhooks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    async def process_async_batch(
+        self, webhooks: List[Dict[str, Any]]
+    ) -> List[Dict[str, Any]]:
         """Process multiple webhooks concurrently"""
         tasks = []
         for webhook in webhooks:

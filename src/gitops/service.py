@@ -291,8 +291,7 @@ class GitOpsService:
                 # Use environment variable for default response
                 if os.getenv("USE_JSON_RESPONSE", "false").lower() == "true":
                     return JSONResponse(
-                        status_code=404,
-                        content={"error": "Repository not found"}
+                        status_code=404, content={"error": "Repository not found"}
                     )
                 raise HTTPException(404, "Repository not found")
 

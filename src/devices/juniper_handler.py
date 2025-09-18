@@ -311,7 +311,7 @@ class JuniperHandler:
             term_name = f"term{i}"
             from_clause = rule.get("from", "")
             commands.append(
-                f'set firewall filter {filter_name} term {term_name} from {from_clause}'
+                f"set firewall filter {filter_name} term {term_name} from {from_clause}"
             )
             then_action = rule.get("then", "accept")
             commands.append(

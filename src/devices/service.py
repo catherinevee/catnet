@@ -140,7 +140,7 @@ class DeviceService:
             hostname="router1",
             ip_address="192.168.1.1",
             vendor=DeviceVendor.CISCO_IOS,
-            model="ISR4451"
+            model="ISR4451",
         )
 
         return {

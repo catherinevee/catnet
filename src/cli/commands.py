@@ -747,9 +747,7 @@ def ssh_add_user(ctx, key_file, name, comment):
                 click.echo(f"Key fingerprint: {fingerprint}")
 
                 # Add the SSH key using the service
-                key = await ssh_service.add_ssh_key(
-                    user_id, public_key, name, comment
-                )
+                key = await ssh_service.add_ssh_key(user_id, public_key, name, comment)
                 click.echo(f"Public key fingerprint: {public_key[:50]}...")
                 click.echo(f"User ID: {user_id}")
                 click.echo(f"Added key ID: {key.get('key_id', 'unknown')}")
