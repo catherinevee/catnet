@@ -110,6 +110,7 @@ async def dry_run_deployment(
         # Initialize validator
         validator = DeploymentValidator()
         # Will use validator for configuration validation
+        logger.debug(f"Initialized validator: {validator.__class__.__name__}")
 
         # Get devices information
         result = await db.execute(

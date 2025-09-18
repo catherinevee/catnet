@@ -430,6 +430,7 @@ class DeploymentExecutor:
 
         backup = self.deployment_cache[backup_id]
         self.logger.info(f"Restoring backup {backup_id} for device {device.hostname}")
+        self.logger.debug(f"Backup content size: {len(str(backup))} bytes")
 
         conn = await self.device_connector.connect_to_device(
             str(device.id), user_context

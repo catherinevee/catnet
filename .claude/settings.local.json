@@ -20,7 +20,8 @@
       "Bash(rm:*)",
       "Bash(cat:*)",
       "Bash(chmod:*)",
-      "Bash(gh:*)"
+      "Bash(gh:*)",
+      "Bash(git reset:*)"
     ],
     "deny": [],
     "ask": []

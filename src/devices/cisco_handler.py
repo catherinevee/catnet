@@ -10,6 +10,9 @@ import re
 
 from ..core.exceptions import DeviceConnectionError  # ValidationError used inline
 from ..security.audit import AuditLogger
+from ..core.logging import get_logger
+
+logger = get_logger(__name__)
 
 
 class CiscoHandler:

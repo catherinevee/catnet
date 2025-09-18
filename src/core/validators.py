@@ -176,6 +176,7 @@ class ConfigValidator:
             if line.startswith("interface "):
                 interface_context = line
                 current_context = ["interface"]
+                logger.debug(f"Validating interface: {interface_context}")
                 # Validate interface name
                 if not re.match(r"interface \S+", line):
                     result.add_error(f"Line {line_num}: Invalid interface syntax")
