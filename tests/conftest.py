@@ -63,7 +63,7 @@ def mock_audit_logger():
 @pytest.fixture
 def mock_device():
     """Mock network device"""
-    from src.db.models import Device, DeviceVendor
+    from src.db.models import DeviceVendor
 
     device = Mock()
     device.id = "test-device-1"
@@ -78,8 +78,6 @@ def mock_device():
 @pytest.fixture
 def mock_user():
     """Mock user"""
-    from src.db.models import User
-
     user = Mock()
     user.id = "test-user-1"
     user.username = "testuser"

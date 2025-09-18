@@ -160,7 +160,6 @@ def init():
         # Create default admin user
         from src.db.models import User
         from src.security.auth import AuthManager
-        from sqlalchemy.ext.asyncio import AsyncSession
 
         auth_manager = AuthManager(secret_key=os.getenv("JWT_SECRET_KEY", "change-me"))
 
