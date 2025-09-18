@@ -54,7 +54,7 @@ class SSHKeyAuthService:
             sha256_hash = hashlib.sha256(decoded).digest()
 
             # Encode as base64 without padding
-            fingerprint = base64.b64encode(sha256_hash).decode().rstrip('=')
+            fingerprint = base64.b64encode(sha256_hash).decode().rstrip("=")
 
             return f"SHA256:{fingerprint}"
 
@@ -66,7 +66,7 @@ class SSHKeyAuthService:
         user_id: str,
         public_key: str,
         key_name: str,
-        comment: Optional[str] = None
+        comment: Optional[str] = None,
     ) -> UserSSHKey:
         """
         Add SSH public key for a user.
@@ -103,7 +103,7 @@ class SSHKeyAuthService:
             fingerprint=fingerprint,
             key_type=key_type,
             comment=comment,
-            is_active=True
+            is_active=True,
         )
 
         self.db.add(ssh_key)
@@ -129,8 +129,8 @@ class SSHKeyAuthService:
             details={
                 "key_name": key_name,
                 "fingerprint": fingerprint,
-                "key_type": key_type
-            }
+                "key_type": key_type,
+            },
         )
 
         logger.info(f"Added SSH key '{key_name}' for user {user_id}")
@@ -157,8 +157,13 @@ class SSHKeyAuthService:
             key_data = parts[1]
 
             # Check key type
-            valid_types = ['ssh-rsa', 'ssh-ed25519', 'ecdsa-sha2-nistp256',
-                          'ecdsa-sha2-nistp384', 'ecdsa-sha2-nistp521']
+            valid_types = [
+                "ssh-rsa",
+                "ssh-ed25519",
+                "ecdsa-sha2-nistp256",
+                "ecdsa-sha2-nistp384",
+                "ecdsa-sha2-nistp521",
+            ]
             if key_type not in valid_types:
                 return False
 
@@ -174,20 +179,16 @@ class SSHKeyAuthService:
         """Extract key type from public key."""
         parts = public_key.strip().split()
         key_type_map = {
-            'ssh-rsa': 'rsa',
-            'ssh-ed25519': 'ed25519',
-            'ecdsa-sha2-nistp256': 'ecdsa',
-            'ecdsa-sha2-nistp384': 'ecdsa',
-            'ecdsa-sha2-nistp521': 'ecdsa'
+            "ssh-rsa": "rsa",
+            "ssh-ed25519": "ed25519",
+            "ecdsa-sha2-nistp256": "ecdsa",
+            "ecdsa-sha2-nistp384": "ecdsa",
+            "ecdsa-sha2-nistp521": "ecdsa",
         }
-        return key_type_map.get(parts[0], 'unknown')
+        return key_type_map.get(parts[0], "unknown")
 
     async def authenticate_with_key(
-        self,
-        username: str,
-        key_fingerprint: str,
-        signature: str,
-        challenge: str
+        self, username: str, key_fingerprint: str, signature: str, challenge: str
     ) -> Optional[User]:
         """
         Authenticate user with SSH key.
@@ -211,16 +212,16 @@ class SSHKeyAuthService:
             await self.audit.log_event(
                 event_type="ssh_auth_failed",
                 user_id=str(user.id),
-                details={"reason": "key_not_found", "fingerprint": key_fingerprint}
+                details={"reason": "key_not_found", "fingerprint": key_fingerprint},
             )
             return None
 
         # Get the SSH key
-        ssh_key = self.db.query(UserSSHKey).filter_by(
-            user_id=user.id,
-            fingerprint=key_fingerprint,
-            is_active=True
-        ).first()
+        ssh_key = (
+            self.db.query(UserSSHKey)
+            .filter_by(user_id=user.id, fingerprint=key_fingerprint, is_active=True)
+            .first()
+        )
 
         if not ssh_key:
             return None
@@ -236,7 +237,7 @@ class SSHKeyAuthService:
             await self.audit.log_event(
                 event_type="ssh_auth_success",
                 user_id=str(user.id),
-                details={"key_name": ssh_key.name, "fingerprint": key_fingerprint}
+                details={"key_name": ssh_key.name, "fingerprint": key_fingerprint},
             )
 
             return user
@@ -244,7 +245,7 @@ class SSHKeyAuthService:
         await self.audit.log_event(
             event_type="ssh_auth_failed",
             user_id=str(user.id),
-            details={"reason": "invalid_signature", "fingerprint": key_fingerprint}
+            details={"reason": "invalid_signature", "fingerprint": key_fingerprint},
         )
 
         return None
@@ -281,7 +282,7 @@ class SSHKeyAuthService:
                 "key_type": key.key_type,
                 "is_active": key.is_active,
                 "created_at": key.created_at.isoformat() if key.created_at else None,
-                "last_used": key.last_used.isoformat() if key.last_used else None
+                "last_used": key.last_used.isoformat() if key.last_used else None,
             }
             for key in keys
         ]
@@ -297,10 +298,9 @@ class SSHKeyAuthService:
         Returns:
             True if removed
         """
-        ssh_key = self.db.query(UserSSHKey).filter_by(
-            id=key_id,
-            user_id=user_id
-        ).first()
+        ssh_key = (
+            self.db.query(UserSSHKey).filter_by(id=key_id, user_id=user_id).first()
+        )
 
         if not ssh_key:
             return False
@@ -320,16 +320,13 @@ class SSHKeyAuthService:
         await self.audit.log_event(
             event_type="ssh_key_removed",
             user_id=user_id,
-            details={"key_name": ssh_key.name, "fingerprint": ssh_key.fingerprint}
+            details={"key_name": ssh_key.name, "fingerprint": ssh_key.fingerprint},
         )
 
         return True
 
     async def rotate_ssh_key(
-        self,
-        user_id: str,
-        old_key_id: str,
-        new_public_key: str
+        self, user_id: str, old_key_id: str, new_public_key: str
     ) -> UserSSHKey:
         """
         Rotate an SSH key.
@@ -343,10 +340,9 @@ class SSHKeyAuthService:
             New UserSSHKey object
         """
         # Get old key
-        old_key = self.db.query(UserSSHKey).filter_by(
-            id=old_key_id,
-            user_id=user_id
-        ).first()
+        old_key = (
+            self.db.query(UserSSHKey).filter_by(id=old_key_id, user_id=user_id).first()
+        )
 
         if not old_key:
             raise ValueError("Old key not found")
@@ -359,7 +355,7 @@ class SSHKeyAuthService:
             user_id=user_id,
             public_key=new_public_key,
             key_name=f"{old_key.name} (rotated)",
-            comment=f"Rotated from {old_key.fingerprint}"
+            comment=f"Rotated from {old_key.fingerprint}",
         )
 
         await self.audit.log_event(
@@ -367,8 +363,8 @@ class SSHKeyAuthService:
             user_id=user_id,
             details={
                 "old_fingerprint": old_key.fingerprint,
-                "new_fingerprint": new_key.fingerprint
-            }
+                "new_fingerprint": new_key.fingerprint,
+            },
         )
 
         return new_key

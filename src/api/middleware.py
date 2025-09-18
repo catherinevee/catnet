@@ -29,9 +29,13 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["X-XSS-Protection"] = "1; mode=block"
-        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload"
+        response.headers[
+            "Strict-Transport-Security"
+        ] = "max-age=31536000; includeSubDomains; preload"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-        response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+        response.headers[
+            "Permissions-Policy"
+        ] = "geolocation=(), microphone=(), camera=()"
 
         # Content Security Policy
         csp = (
@@ -75,7 +79,8 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
         # Remove old requests outside the time window
         self.clients[client_ip] = [
-            req_time for req_time in self.clients[client_ip]
+            req_time
+            for req_time in self.clients[client_ip]
             if current_time - req_time < self.period
         ]
 
@@ -89,8 +94,8 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                     "Retry-After": str(self.period),
                     "X-RateLimit-Limit": str(self.calls),
                     "X-RateLimit-Remaining": "0",
-                    "X-RateLimit-Reset": str(int(current_time + self.period))
-                }
+                    "X-RateLimit-Reset": str(int(current_time + self.period)),
+                },
             )
 
         # Add current request
@@ -129,10 +134,12 @@ class CORSMiddleware(BaseHTTPMiddleware):
         if origin in self.allowed_origins:
             response.headers["Access-Control-Allow-Origin"] = origin
             response.headers["Access-Control-Allow-Credentials"] = "true"
-            response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-            response.headers["Access-Control-Allow-Headers"] = (
-                "Content-Type, Authorization, X-Request-ID"
-            )
+            response.headers[
+                "Access-Control-Allow-Methods"
+            ] = "GET, POST, PUT, DELETE, OPTIONS"
+            response.headers[
+                "Access-Control-Allow-Headers"
+            ] = "Content-Type, Authorization, X-Request-ID"
             response.headers["Access-Control-Max-Age"] = "3600"
 
         return response
@@ -202,9 +209,7 @@ def setup_middleware(app):
     app.add_middleware(AuditLoggingMiddleware)
     app.add_middleware(SecurityHeadersMiddleware)
     app.add_middleware(
-        RateLimitMiddleware,
-        calls=100,  # 100 requests
-        period=60   # per minute
+        RateLimitMiddleware, calls=100, period=60  # 100 requests  # per minute
     )
     app.add_middleware(
         CORSMiddleware,
@@ -212,8 +217,8 @@ def setup_middleware(app):
             "http://localhost:3000",
             "https://localhost:3000",
             "https://catnet.io",
-            "https://app.catnet.io"
-        ]
+            "https://app.catnet.io",
+        ],
     )
 
     logger.info("Security middleware configured")

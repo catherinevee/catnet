@@ -374,7 +374,7 @@ Host target
                             "device_id": device_id,
                             "connection_id": device_conn.connection_id,
                             "session_id": device_conn.session_id,
-                            "auth_method": "ssh_key"
+                            "auth_method": "ssh_key",
                         },
                     )
 

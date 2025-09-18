@@ -26,14 +26,11 @@ class SSHKeyManager:
 
     def __init__(self, vault_client: VaultClient):
         self.vault = vault_client
-        self.key_storage_path = Path.home() / '.catnet' / 'keys'
+        self.key_storage_path = Path.home() / ".catnet" / "keys"
         self.key_storage_path.mkdir(parents=True, exist_ok=True)
 
     async def generate_ssh_keypair(
-        self,
-        key_type: str = 'ed25519',
-        key_size: int = 4096,
-        comment: str = ''
+        self, key_type: str = "ed25519", key_size: int = 4096, comment: str = ""
     ) -> Tuple[str, str]:
         """
         Generate SSH key pair.
@@ -46,7 +43,7 @@ class SSHKeyManager:
         Returns:
             Tuple of (private_key, public_key) in PEM format
         """
-        if key_type == 'ed25519':
+        if key_type == "ed25519":
             # Generate Ed25519 key (more secure, smaller)
             private_key = ed25519.Ed25519PrivateKey.generate()
             public_key = private_key.public_key()
@@ -55,21 +52,19 @@ class SSHKeyManager:
             private_pem = private_key.private_bytes(
                 encoding=serialization.Encoding.PEM,
                 format=serialization.PrivateFormat.OpenSSH,
-                encryption_algorithm=serialization.NoEncryption()
+                encryption_algorithm=serialization.NoEncryption(),
             )
 
             # Serialize public key
             public_pem = public_key.public_bytes(
                 encoding=serialization.Encoding.OpenSSH,
-                format=serialization.PublicFormat.OpenSSH
+                format=serialization.PublicFormat.OpenSSH,
             )
 
-        elif key_type == 'rsa':
+        elif key_type == "rsa":
             # Generate RSA key
             private_key = rsa.generate_private_key(
-                public_exponent=65537,
-                key_size=key_size,
-                backend=default_backend()
+                public_exponent=65537, key_size=key_size, backend=default_backend()
             )
             public_key = private_key.public_key()
 
@@ -77,13 +72,13 @@ class SSHKeyManager:
             private_pem = private_key.private_bytes(
                 encoding=serialization.Encoding.PEM,
                 format=serialization.PrivateFormat.OpenSSH,
-                encryption_algorithm=serialization.NoEncryption()
+                encryption_algorithm=serialization.NoEncryption(),
             )
 
             # Serialize public key
             public_pem = public_key.public_bytes(
                 encoding=serialization.Encoding.OpenSSH,
-                format=serialization.PublicFormat.OpenSSH
+                format=serialization.PublicFormat.OpenSSH,
             )
 
         else:
@@ -102,7 +97,7 @@ class SSHKeyManager:
         device_id: str,
         private_key: str,
         public_key: str,
-        key_name: Optional[str] = None
+        key_name: Optional[str] = None,
     ) -> Dict[str, str]:
         """
         Store SSH key pair in Vault.
@@ -124,22 +119,21 @@ class SSHKeyManager:
         await self.vault.store_secret(
             path=vault_path,
             secret={
-                'private_key': private_key,
-                'public_key': public_key,
-                'created_at': datetime.utcnow().isoformat(),
-                'device_id': device_id,
-                'key_name': key_name
-            }
+                "private_key": private_key,
+                "public_key": public_key,
+                "created_at": datetime.utcnow().isoformat(),
+                "device_id": device_id,
+                "key_name": key_name,
+            },
         )
 
         logger.info(f"Stored SSH key for device {device_id} in Vault at {vault_path}")
 
-        return {
-            'vault_path': vault_path,
-            'key_name': key_name
-        }
+        return {"vault_path": vault_path, "key_name": key_name}
 
-    async def get_ssh_key(self, device_id: str, key_name: Optional[str] = None) -> Dict[str, str]:
+    async def get_ssh_key(
+        self, device_id: str, key_name: Optional[str] = None
+    ) -> Dict[str, str]:
         """
         Retrieve SSH key from Vault.
 
@@ -159,9 +153,9 @@ class SSHKeyManager:
             raise SecurityError(f"SSH key not found for device {device_id}")
 
         return {
-            'private_key': secret['private_key'],
-            'public_key': secret['public_key'],
-            'created_at': secret.get('created_at')
+            "private_key": secret["private_key"],
+            "public_key": secret["public_key"],
+            "created_at": secret.get("created_at"),
         }
 
     async def rotate_ssh_key(self, device_id: str) -> Dict[str, Any]:
@@ -179,11 +173,15 @@ class SSHKeyManager:
 
         # Archive old key
         old_key_name = f"{device_id}_key"
-        archive_name = f"{device_id}_key_archived_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
+        archive_name = (
+            f"{device_id}_key_archived_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
+        )
 
         try:
             old_key = await self.get_ssh_key(device_id)
-            await self.store_ssh_key(device_id, old_key['private_key'], old_key['public_key'], archive_name)
+            await self.store_ssh_key(
+                device_id, old_key["private_key"], old_key["public_key"], archive_name
+            )
         except SecurityError:
             # No existing key to archive
             pass
@@ -194,17 +192,14 @@ class SSHKeyManager:
         logger.info(f"Rotated SSH key for device {device_id}")
 
         return {
-            'device_id': device_id,
-            'new_key': result,
-            'public_key': public_key,
-            'rotated_at': datetime.utcnow().isoformat()
+            "device_id": device_id,
+            "new_key": result,
+            "public_key": public_key,
+            "rotated_at": datetime.utcnow().isoformat(),
         }
 
     async def deploy_public_key(
-        self,
-        device: Device,
-        public_key: str,
-        username: str = 'catnet'
+        self, device: Device, public_key: str, username: str = "catnet"
     ) -> bool:
         """
         Deploy public key to network device.
@@ -218,7 +213,7 @@ class SSHKeyManager:
             True if successful
         """
         # Commands vary by vendor
-        if device.vendor.lower() == 'cisco':
+        if device.vendor.lower() == "cisco":
             commands = [
                 f"conf t",
                 f"username {username} privilege 15",
@@ -229,14 +224,14 @@ class SSHKeyManager:
                 "exit",
                 "exit",
                 "exit",
-                "write memory"
+                "write memory",
             ]
-        elif device.vendor.lower() == 'juniper':
+        elif device.vendor.lower() == "juniper":
             commands = [
                 f"configure",
                 f"set system login user {username} class super-user",
-                f"set system login user {username} authentication ssh-rsa \"{public_key.strip()}\"",
-                f"commit and-quit"
+                f'set system login user {username} authentication ssh-rsa "{public_key.strip()}"',
+                f"commit and-quit",
             ]
         else:
             raise ValueError(f"Unsupported vendor: {device.vendor}")
@@ -248,11 +243,7 @@ class SSHKeyManager:
         return True
 
     async def test_ssh_connection(
-        self,
-        hostname: str,
-        username: str,
-        private_key: str,
-        port: int = 22
+        self, hostname: str, username: str, private_key: str, port: int = 22
     ) -> bool:
         """
         Test SSH connection using key authentication.
@@ -273,6 +264,7 @@ class SSHKeyManager:
 
             # Load private key
             import io
+
             key_file = io.StringIO(private_key)
 
             # Try to determine key type and load appropriately
@@ -290,7 +282,7 @@ class SSHKeyManager:
                 pkey=pkey,
                 timeout=10,
                 look_for_keys=False,
-                allow_agent=False
+                allow_agent=False,
             )
 
             # Test with simple command
@@ -326,18 +318,22 @@ class SSHKeyManager:
         for key_path in keys:
             try:
                 secret = await self.vault.get_secret(key_path)
-                result.append({
-                    'path': key_path,
-                    'device_id': secret.get('device_id'),
-                    'key_name': secret.get('key_name'),
-                    'created_at': secret.get('created_at')
-                })
+                result.append(
+                    {
+                        "path": key_path,
+                        "device_id": secret.get("device_id"),
+                        "key_name": secret.get("key_name"),
+                        "created_at": secret.get("created_at"),
+                    }
+                )
             except:
                 continue
 
         return result
 
-    async def remove_ssh_key(self, device_id: str, key_name: Optional[str] = None) -> bool:
+    async def remove_ssh_key(
+        self, device_id: str, key_name: Optional[str] = None
+    ) -> bool:
         """
         Remove SSH key from Vault.
 
@@ -365,9 +361,7 @@ class SSHDeviceConnector:
         self.ssh_manager = ssh_manager
 
     async def connect_with_key(
-        self,
-        device: Device,
-        username: Optional[str] = None
+        self, device: Device, username: Optional[str] = None
     ) -> SSHClient:
         """
         Connect to device using SSH key authentication.
@@ -383,7 +377,7 @@ class SSHDeviceConnector:
         ssh_key = await self.ssh_manager.get_ssh_key(device.id)
 
         # Use device username or override
-        ssh_username = username or device.ssh_username or 'catnet'
+        ssh_username = username or device.ssh_username or "catnet"
 
         # Create SSH client
         client = SSHClient()
@@ -391,7 +385,8 @@ class SSHDeviceConnector:
 
         # Load private key
         import io
-        key_file = io.StringIO(ssh_key['private_key'])
+
+        key_file = io.StringIO(ssh_key["private_key"])
 
         # Try to determine key type
         try:
@@ -409,10 +404,12 @@ class SSHDeviceConnector:
                 pkey=pkey,
                 timeout=30,
                 look_for_keys=False,
-                allow_agent=False
+                allow_agent=False,
             )
 
-            logger.info(f"Connected to device {device.hostname} using SSH key authentication")
+            logger.info(
+                f"Connected to device {device.hostname} using SSH key authentication"
+            )
 
             return client
 
@@ -421,10 +418,7 @@ class SSHDeviceConnector:
             raise DeviceConnectionError(f"SSH connection failed: {str(e)}")
 
     async def execute_command(
-        self,
-        device: Device,
-        command: str,
-        username: Optional[str] = None
+        self, device: Device, command: str, username: Optional[str] = None
     ) -> str:
         """
         Execute command on device using SSH key authentication.
