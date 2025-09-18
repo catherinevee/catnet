@@ -8,8 +8,8 @@ import logging
 
 from pathlib import Path
 
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import rsa, ed25519, ec
+from cryptography.hazmat.primitives import serialization, hashes
+from cryptography.hazmat.primitives.asymmetric import rsa, ed25519, ec, padding
 from cryptography.hazmat.backends import default_backend
 from cryptography.exceptions import InvalidSignature
 from sqlalchemy.orm import Session
@@ -253,15 +253,77 @@ class SSHKeyAuthService:
 
     def verify_signature(self, public_key: str, signature: str, challenge: str) -> bool:
         """
-        Verify signature using public key.
-
-        Note: This is a simplified implementation. In production,
-        you would use proper cryptographic verification.
+        Verify signature using public key with full cryptographic verification.
         """
-        # This would need actual cryptographic verification
-        # using the public key to verify the signature
-        # For now, returning True for demonstration
-        return True
+        try:
+            # Parse the public key
+            key_parts = public_key.strip().split()
+            if len(key_parts) < 2:
+                raise AuthenticationError("Invalid public key format")
+
+            key_type = key_parts[0]
+
+            # Load the appropriate key type
+            if key_type == "ssh-rsa":
+                # Load RSA key
+                public_key_obj = serialization.load_ssh_public_key(
+                    public_key.encode(), backend=default_backend()
+                )
+                if isinstance(public_key_obj, rsa.RSAPublicKey):
+                    # Verify RSA signature
+                    try:
+                        public_key_obj.verify(
+                            base64.b64decode(signature),
+                            challenge.encode(),
+                            padding.PSS(
+                                mgf=padding.MGF1(hashes.SHA256()),
+                                salt_length=padding.PSS.MAX_LENGTH,
+                            ),
+                            hashes.SHA256(),
+                        )
+                        return True
+                    except InvalidSignature:
+                        return False
+
+            elif key_type == "ssh-ed25519":
+                # Load Ed25519 key
+                public_key_obj = serialization.load_ssh_public_key(
+                    public_key.encode(), backend=default_backend()
+                )
+                if isinstance(public_key_obj, ed25519.Ed25519PublicKey):
+                    # Verify Ed25519 signature
+                    try:
+                        public_key_obj.verify(
+                            base64.b64decode(signature), challenge.encode()
+                        )
+                        return True
+                    except InvalidSignature:
+                        return False
+
+            elif key_type.startswith("ecdsa-"):
+                # Load ECDSA key
+                public_key_obj = serialization.load_ssh_public_key(
+                    public_key.encode(), backend=default_backend()
+                )
+                if isinstance(public_key_obj, ec.EllipticCurvePublicKey):
+                    # Verify ECDSA signature
+                    try:
+                        public_key_obj.verify(
+                            base64.b64decode(signature),
+                            challenge.encode(),
+                            ec.ECDSA(hashes.SHA256()),
+                        )
+                        return True
+                    except InvalidSignature:
+                        return False
+
+            # Unsupported key type
+            logger.warning(f"Unsupported key type: {key_type}")
+            return False
+
+        except Exception as e:
+            logger.error(f"Signature verification failed: {e}")
+            return False
 
     async def list_user_keys(self, user_id: str) -> List[Dict[str, Any]]:
         """
@@ -325,6 +387,68 @@ class SSHKeyAuthService:
         )
 
         return True
+
+    def cleanup_old_keys(self, user_id: str, retention_days: int = 90) -> int:
+        """
+        Clean up SSH keys older than retention period.
+
+        Args:
+            user_id: User ID
+            retention_days: Days to retain keys
+
+        Returns:
+            Number of keys removed
+        """
+        cutoff_date = datetime.utcnow() - timedelta(days=retention_days)
+
+        # Find old keys
+        old_keys = (
+            self.db.query(UserSSHKey)
+            .filter_by(user_id=user_id, is_active=False)
+            .filter(UserSSHKey.created_at < cutoff_date)
+            .all()
+        )
+
+        removed_count = len(old_keys)
+
+        # Remove old keys
+        for key in old_keys:
+            self.db.delete(key)
+
+        if removed_count > 0:
+            self.db.commit()
+            logger.info(f"Cleaned up {removed_count} old SSH keys for user {user_id}")
+
+        return removed_count
+
+    def export_public_key(self, user_id: str, key_id: str, output_path: str) -> Path:
+        """
+        Export a public key to a file.
+
+        Args:
+            user_id: User ID
+            key_id: Key ID
+            output_path: Output file path
+
+        Returns:
+            Path to exported key file
+        """
+        ssh_key = (
+            self.db.query(UserSSHKey).filter_by(id=key_id, user_id=user_id).first()
+        )
+
+        if not ssh_key:
+            raise ValueError(f"Key {key_id} not found for user {user_id}")
+
+        # Create output path
+        key_path = Path(output_path)
+        key_path.parent.mkdir(parents=True, exist_ok=True)
+
+        # Write public key
+        key_path.write_text(ssh_key.public_key)
+
+        logger.info(f"Exported SSH key {key_id} to {key_path}")
+        return key_path
 
     async def rotate_ssh_key(
         self, user_id: str, old_key_id: str, new_public_key: str

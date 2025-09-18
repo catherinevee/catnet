@@ -23,6 +23,8 @@ class MTLSManager:
 
     def __init__(self, service_name: str, certs_dir: str = "certs"):
         self.service_name = service_name
+        # Allow override via environment variable
+        certs_dir = os.getenv("CATNET_CERTS_DIR", certs_dir)
         self.certs_dir = Path(certs_dir)
         self.vault = VaultClient()
         self._ssl_contexts: Dict[str, ssl.SSLContext] = {}
@@ -185,6 +187,13 @@ class MTLSManager:
             if now < cert.not_valid_before or now > cert.not_valid_after:
                 raise SecurityError(
                     "Certificate is not valid (expired or not yet valid)"
+                )
+
+            # Check if certificate is about to expire (within 30 days)
+            expiry_threshold = now + timedelta(days=30)
+            if cert.not_valid_after < expiry_threshold:
+                logger.warning(
+                    f"Certificate for {cn} expires soon: {cert.not_valid_after}"
                 )
 
             # Extract service name from CN (format: service-name.catnet.local)

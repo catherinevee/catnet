@@ -313,14 +313,16 @@ def deploy_status(ctx, deployment_id):
 @click.argument("deployment_id")
 @click.option("--comment", "-c", help="Approval comment")
 @click.pass_context
-def deploy_approve(ctx, deployment_id, comment):
+def deploy_approve(ctx, deployment_id, comment: Optional[str]):
     """Approve a pending deployment."""
 
     async def _approve():
         deployment_service = DeploymentService(ctx.obj["CONFIG"])
         try:
+            # Comment is optional for approval
+            approval_comment = comment or "Approved via CLI"
             result = await deployment_service.approve_deployment(
-                deployment_id, comment=comment
+                deployment_id, comment=approval_comment
             )
             click.echo(click.style("✓ Deployment approved successfully", fg="green"))
             click.echo(f"Deployment starting: {result['start_time']}")
@@ -705,8 +707,11 @@ def ssh_add_user(ctx, key_file, name, comment):
     async def _add():
         from ..auth.ssh_auth import SSHKeyAuthService
         from ..security.audit import AuditLogger
+        from ..db.database import get_db
 
         # Would need database session here
+        db_session = None  # In production, would use: async with get_db() as session:
+        audit_logger = AuditLogger()
 
         try:
             # Read public key
@@ -723,8 +728,19 @@ def ssh_add_user(ctx, key_file, name, comment):
 
             click.echo(f"Adding SSH key '{name}' to your account...")
 
+            # Initialize services for SSH key management
+            ssh_service = SSHKeyAuthService(db_session, audit_logger)
+
+            # Validate the public key format first
+            if not ssh_service.validate_public_key(public_key):
+                click.echo("Invalid SSH public key format")
+                sys.exit(1)
+
+            # Calculate fingerprint for display
+            fingerprint = ssh_service.calculate_fingerprint(public_key)
+            click.echo(f"Key fingerprint: {fingerprint}")
+
             # Would call the service here with actual DB session
-            # ssh_service = SSHKeyAuthService(db_session, audit_logger)
             # key = await ssh_service.add_ssh_key(
             #     user_id, public_key, name, comment
             # )

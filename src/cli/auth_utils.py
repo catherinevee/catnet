@@ -11,6 +11,11 @@ import click
 
 def get_auth_token() -> Optional[str]:
     """Get authentication token from secure storage."""
+    # Check environment variable first
+    env_token = os.environ.get("CATNET_AUTH_TOKEN")
+    if env_token:
+        return env_token
+
     token_file = Path.home() / ".catnet" / "tokens.json"
     if not token_file.exists():
         return None

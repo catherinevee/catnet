@@ -32,6 +32,7 @@ class DatabasePoolManager:
         max_overflow: int = 10,
         pool_timeout: int = 30,
         pool_recycle: int = 3600,
+        use_null_pool: bool = False,
     ):
         """
         Initialize database pool manager
@@ -42,24 +43,29 @@ class DatabasePoolManager:
             max_overflow: Maximum overflow connections
             pool_timeout: Timeout for getting connection from pool
             pool_recycle: Time to recycle connections (seconds)
+            use_null_pool: Use NullPool for debugging (no pooling)
         """
         self.database_url = database_url
         self.pool_size = pool_size
         self.max_overflow = max_overflow
         self.pool_timeout = pool_timeout
         self.pool_recycle = pool_recycle
+        self.use_null_pool = use_null_pool
         self.engine = None
         self.session_factory = None
 
     async def initialize(self):
         """Initialize connection pool"""
         try:
+            # Choose pool class based on configuration
+            pool_class = NullPool if self.use_null_pool else QueuePool
+
             # Create async engine with connection pooling
             self.engine = create_async_engine(
                 self.database_url,
-                poolclass=QueuePool,
-                pool_size=self.pool_size,
-                max_overflow=self.max_overflow,
+                poolclass=pool_class,
+                pool_size=self.pool_size if not self.use_null_pool else 0,
+                max_overflow=self.max_overflow if not self.use_null_pool else 0,
                 pool_timeout=self.pool_timeout,
                 pool_recycle=self.pool_recycle,
                 pool_pre_ping=True,  # Check connections before use
@@ -172,7 +178,9 @@ class RedisCacheManager:
         """Create namespaced cache key"""
         return f"{self.key_prefix}{key}"
 
-    async def get(self, key: str, default: Any = None, deserialize: bool = True) -> Any:
+    async def get(
+        self, key: str, default: Any = None, deserialize: bool = True
+    ) -> Union[Any, None]:
         """Get value from cache"""
         if not self.redis_client:
             return default
@@ -374,7 +382,7 @@ class AsyncTaskQueue:
         kwargs: dict = None,
         queue: str = None,
         priority: int = 5,
-        countdown: int = None,
+        countdown: Union[int, timedelta] = None,
         eta: datetime = None,
     ) -> str:
         """
@@ -386,12 +394,16 @@ class AsyncTaskQueue:
             kwargs: Task keyword arguments
             queue: Target queue
             priority: Task priority (0-9, 0 highest)
-            countdown: Delay in seconds
+            countdown: Delay in seconds or timedelta
             eta: Exact time to execute
 
         Returns:
             Task ID
         """
+        # Convert timedelta to seconds if provided
+        if isinstance(countdown, timedelta):
+            countdown = int(countdown.total_seconds())
+
         result = self.app.send_task(
             name,
             args=args or (),

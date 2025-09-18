@@ -218,13 +218,16 @@ class RateLimiter:
 
                 if not result["allowed"]:
                     # Rate limited - log and return 429
-                    await self.audit.log_event(
-                        event_type="rate_limit_exceeded",
-                        details={
-                            "key": key,
-                            "endpoint": request.url.path,
-                            "method": request.method,
-                        },
+                    # Use asyncio to log asynchronously without blocking
+                    asyncio.create_task(
+                        self.audit.log_event(
+                            event_type="rate_limit_exceeded",
+                            details={
+                                "key": key,
+                                "endpoint": request.url.path,
+                                "method": request.method,
+                            },
+                        )
                     )
 
                     headers["Retry-After"] = str(result.get("retry_after", period))

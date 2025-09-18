@@ -19,6 +19,9 @@ from ..db.models import User
 from ..core.mtls import MTLSManager, MTLSMiddleware, MTLSServer
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from ..core.logging import get_logger
+
+logger = get_logger(__name__)
 
 
 # Pydantic models
@@ -319,7 +322,35 @@ class AuthenticationService:
             return {"status": "healthy", "service": "authentication"}
 
     def run(self):
-        uvicorn.run(self.app, host="0.0.0.0", port=self.port, log_level="info")
+        # Configure SSL context for production
+        ssl_context = None
+        if os.getenv("ENABLE_SSL", "false").lower() == "true":
+            ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+            ssl_context.load_cert_chain(
+                certfile=os.getenv("SSL_CERT_FILE", "cert.pem"),
+                keyfile=os.getenv("SSL_KEY_FILE", "key.pem"),
+            )
+
+        # Initialize mTLS if configured
+        if os.getenv("ENABLE_MTLS", "false").lower() == "true":
+            mtls_manager = MTLSManager()
+            self.app.add_middleware(MTLSMiddleware, manager=mtls_manager)
+            logger.info("mTLS enabled for authentication service")
+
+            # Create mTLS server for inter-service communication
+            mtls_server = MTLSServer(
+                app=self.app,
+                host="0.0.0.0",
+                port=self.port + 1000,  # mTLS port
+                mtls_manager=mtls_manager,
+            )
+            logger.info(f"mTLS server configured on port {self.port + 1000}")
+            # Store mTLS server for potential future use
+            self.mtls_server = mtls_server
+
+        uvicorn.run(
+            self.app, host="0.0.0.0", port=self.port, log_level="info", ssl=ssl_context
+        )
 
 
 if __name__ == "__main__":

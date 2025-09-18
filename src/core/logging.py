@@ -82,12 +82,26 @@ def setup_logging(
         log_path = Path(log_file)
         log_path.parent.mkdir(parents=True, exist_ok=True)
 
-        # Rotating file handler (10MB max, keep 5 backups)
-        file_handler = RotatingFileHandler(
-            log_file,
-            maxBytes=10 * 1024 * 1024,  # 10MB
-            backupCount=5,
-        )
+        # Choose handler based on configuration
+        # Use TimedRotatingFileHandler for daily rotation
+        use_timed_rotation = log_file.endswith(".daily.log")
+
+        if use_timed_rotation:
+            # Daily rotation at midnight
+            file_handler = TimedRotatingFileHandler(
+                log_file,
+                when="midnight",
+                interval=1,
+                backupCount=30,  # Keep 30 days
+                encoding="utf-8",
+            )
+        else:
+            # Size-based rotation (10MB max, keep 5 backups)
+            file_handler = RotatingFileHandler(
+                log_file,
+                maxBytes=10 * 1024 * 1024,  # 10MB
+                backupCount=5,
+            )
         file_handler.setLevel(level)
 
         if structured:
