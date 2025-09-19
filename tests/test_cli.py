@@ -2,12 +2,9 @@
 Comprehensive tests for CatNet CLI
 """
 import pytest
-import click
 from click.testing import CliRunner
-from unittest.mock import Mock, patch, AsyncMock
+from unittest.mock import patch, AsyncMock
 import json
-import os
-from pathlib import Path
 
 from catnet_cli.cli import cli
 from catnet_cli.config import ConfigManager
