@@ -1,11 +1,16 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional, Dict, Any, List
+from fastapi import HTTPException, status, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 import pyotp
 import secrets
 import uuid
 from .audit import AuditLogger, AuditLevel
+
+# Security scheme for FastAPI
+security = HTTPBearer()
 
 
 class AuthManager:
@@ -304,3 +309,56 @@ class AuthManager:
                 }
             )
         return sessions
+
+
+# Global auth manager instance
+auth_manager = None
+
+
+def init_auth(secret_key: str = None):
+    """Initialize the authentication manager"""
+    global auth_manager
+    if secret_key is None:
+        import os
+
+        secret_key = os.getenv("JWT_SECRET_KEY", "dev-secret-key-change-in-production")
+    auth_manager = AuthManager(secret_key=secret_key)
+    return auth_manager
+
+
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+) -> Dict[str, Any]:
+    """
+    FastAPI dependency to get the current authenticated user from JWT token
+    """
+    if auth_manager is None:
+        init_auth()
+
+    token = credentials.credentials
+
+    try:
+        payload = await auth_manager.verify_token(token, token_type="access")
+        user = {
+            "id": payload.get("sub"),
+            "username": payload.get("sub"),
+            "roles": payload.get("roles", []),
+            "token_jti": payload.get("jti"),
+        }
+        return user
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+
+async def check_permission(user: Dict[str, Any], permission: str) -> bool:
+    """
+    Check if user has a specific permission
+    """
+    if auth_manager is None:
+        init_auth()
+
+    return await auth_manager.check_permission(user, permission)

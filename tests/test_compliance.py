@@ -10,7 +10,7 @@ from src.compliance.reporting import (
     ComplianceControl,
     ComplianceReport,
     ComplianceValidator,
-    ReportGenerator
+    ReportGenerator,
 )
 
 
@@ -32,7 +32,7 @@ class TestComplianceCheck:
             status=ComplianceStatus.COMPLIANT,
             evidence=["SSH enabled", "Telnet disabled"],
             device_id="router1",
-            timestamp=datetime.now()
+            timestamp=datetime.now(),
         )
 
         assert check.control_id == "PCI-2.3"
@@ -47,7 +47,7 @@ class TestComplianceCheck:
             evidence=["Unencrypted backup found"],
             remediation="Enable backup encryption",
             device_id="switch1",
-            timestamp=datetime.now()
+            timestamp=datetime.now(),
         )
 
         assert check.status == ComplianceStatus.NON_COMPLIANT
@@ -63,7 +63,7 @@ class TestComplianceValidator:
             "hostname": "router1",
             "interfaces": [
                 {"name": "GigabitEthernet0/0", "encryption": "ipsec"},
-                {"name": "GigabitEthernet0/1", "encryption": None}
+                {"name": "GigabitEthernet0/1", "encryption": None},
             ],
             "ssh": {"enabled": True, "version": 2},
             "telnet": {"enabled": False},
@@ -73,8 +73,8 @@ class TestComplianceValidator:
             "password_policy": {
                 "min_length": 12,
                 "complexity": True,
-                "expiry_days": 90
-            }
+                "expiry_days": 90,
+            },
         }
 
         checks = await validator.validate_pci_dss(device_config)
@@ -92,25 +92,22 @@ class TestComplianceValidator:
 
         device_config = {
             "hostname": "switch1",
-            "encryption": {
-                "data_at_rest": True,
-                "data_in_transit": True
-            },
+            "encryption": {"data_at_rest": True, "data_in_transit": True},
             "access_control": {
                 "unique_user_ids": True,
                 "automatic_logoff": 15,
-                "encryption_decryption": True
+                "encryption_decryption": True,
             },
             "audit_controls": {
                 "enabled": True,
                 "log_retention_days": 180,
-                "integrity_controls": True
+                "integrity_controls": True,
             },
             "backup": {
                 "enabled": True,
                 "encrypted": True,
-                "tested": datetime.now() - timedelta(days=30)
-            }
+                "tested": datetime.now() - timedelta(days=30),
+            },
         }
 
         checks = await validator.validate_hipaa(device_config)
@@ -131,22 +128,14 @@ class TestComplianceValidator:
                 "unnecessary_services": [],
                 "source_routing": False,
                 "ip_forwarding": True,
-                "proxy_arp": False
+                "proxy_arp": False,
             },
-            "passwords": {
-                "encrypted": True,
-                "min_length": 14,
-                "lockout_attempts": 5
-            },
+            "passwords": {"encrypted": True, "min_length": 14, "lockout_attempts": 5},
             "banner": {
                 "login": "Authorized access only",
-                "motd": "This system is monitored"
+                "motd": "This system is monitored",
             },
-            "snmp": {
-                "enabled": True,
-                "version": 3,
-                "default_community": False
-            }
+            "snmp": {"enabled": True, "version": 3, "default_community": False},
         }
 
         checks = await validator.validate_cis(device_config)
@@ -154,7 +143,9 @@ class TestComplianceValidator:
         assert len(checks) > 0
 
         # Check password controls
-        password_check = next((c for c in checks if "password" in c.description.lower()), None)
+        password_check = next(
+            (c for c in checks if "password" in c.description.lower()), None
+        )
         assert password_check is not None
 
 
@@ -164,20 +155,21 @@ class TestComplianceManager:
         manager = ComplianceManager()
 
         # Mock device configurations
-        with patch.object(manager, '_get_device_configs', new_callable=AsyncMock) as mock_configs:
+        with patch.object(
+            manager, "_get_device_configs", new_callable=AsyncMock
+        ) as mock_configs:
             mock_configs.return_value = [
                 {
                     "device_id": "router1",
                     "hostname": "core-router",
                     "ssh": {"enabled": True, "version": 2},
                     "telnet": {"enabled": False},
-                    "password_policy": {"min_length": 12}
+                    "password_policy": {"min_length": 12},
                 }
             ]
 
             checks = await manager.check_compliance(
-                framework=ComplianceFramework.PCI_DSS,
-                device_ids=["router1"]
+                framework=ComplianceFramework.PCI_DSS, device_ids=["router1"]
             )
 
             assert len(checks) > 0
@@ -187,23 +179,24 @@ class TestComplianceManager:
     async def test_check_compliance_multiple_devices(self):
         manager = ComplianceManager()
 
-        with patch.object(manager, '_get_device_configs', new_callable=AsyncMock) as mock_configs:
+        with patch.object(
+            manager, "_get_device_configs", new_callable=AsyncMock
+        ) as mock_configs:
             mock_configs.return_value = [
                 {
                     "device_id": "router1",
                     "hostname": "router1",
-                    "ssh": {"enabled": True}
+                    "ssh": {"enabled": True},
                 },
                 {
                     "device_id": "switch1",
                     "hostname": "switch1",
-                    "ssh": {"enabled": False}
-                }
+                    "ssh": {"enabled": False},
+                },
             ]
 
             checks = await manager.check_compliance(
-                framework=ComplianceFramework.CIS,
-                device_ids=["router1", "switch1"]
+                framework=ComplianceFramework.CIS, device_ids=["router1", "switch1"]
             )
 
             # Should have checks for both devices
@@ -216,7 +209,9 @@ class TestComplianceManager:
         manager = ComplianceManager()
 
         # Mock historical checks
-        with patch.object(manager, '_get_historical_checks', new_callable=AsyncMock) as mock_history:
+        with patch.object(
+            manager, "_get_historical_checks", new_callable=AsyncMock
+        ) as mock_history:
             mock_history.return_value = [
                 ComplianceCheck(
                     control_id="PCI-1.1",
@@ -224,7 +219,7 @@ class TestComplianceManager:
                     status=ComplianceStatus.COMPLIANT,
                     evidence=["Firewall rules reviewed"],
                     device_id="fw1",
-                    timestamp=datetime.now()
+                    timestamp=datetime.now(),
                 ),
                 ComplianceCheck(
                     control_id="PCI-2.3",
@@ -233,14 +228,14 @@ class TestComplianceManager:
                     evidence=["Telnet enabled"],
                     remediation="Disable telnet",
                     device_id="switch1",
-                    timestamp=datetime.now()
-                )
+                    timestamp=datetime.now(),
+                ),
             ]
 
             report = await manager.generate_report(
                 framework=ComplianceFramework.PCI_DSS,
                 start_date=datetime.now() - timedelta(days=30),
-                end_date=datetime.now()
+                end_date=datetime.now(),
             )
 
             assert report.framework == ComplianceFramework.PCI_DSS
@@ -264,7 +259,7 @@ class TestComplianceManager:
             compliance_percentage=85.0,
             checks=[],
             summary={},
-            recommendations=["Implement MFA", "Update firewall rules"]
+            recommendations=["Implement MFA", "Update firewall rules"],
         )
 
         summary = manager._generate_executive_summary(report)
@@ -292,11 +287,11 @@ class TestComplianceManager:
                     status=ComplianceStatus.COMPLIANT,
                     evidence=["Procedures documented"],
                     device_id="all",
-                    timestamp=datetime.now()
+                    timestamp=datetime.now(),
                 )
             ],
             summary={"category": "Operations"},
-            recommendations=["Review quarterly"]
+            recommendations=["Review quarterly"],
         )
 
         json_output = manager.export_report(report, format="json")
@@ -320,7 +315,7 @@ class TestComplianceManager:
             compliance_percentage=93.33,
             checks=[],
             summary={},
-            recommendations=[]
+            recommendations=[],
         )
 
         html_output = manager.export_report(report, format="html")
@@ -349,11 +344,11 @@ class TestComplianceManager:
                     status=ComplianceStatus.COMPLIANT,
                     evidence=["All services reviewed"],
                     device_id="server1",
-                    timestamp=datetime.now()
+                    timestamp=datetime.now(),
                 )
             ],
             summary={},
-            recommendations=[]
+            recommendations=[],
         )
 
         csv_output = manager.export_report(report, format="csv")
@@ -383,11 +378,11 @@ class TestReportGenerator:
                     status=ComplianceStatus.COMPLIANT,
                     evidence=["Standards documented"],
                     device_id="fw1",
-                    timestamp=datetime.now()
+                    timestamp=datetime.now(),
                 )
             ],
             summary={"critical_findings": 2},
-            recommendations=["Review firewall rules monthly"]
+            recommendations=["Review firewall rules monthly"],
         )
 
         html = generator.generate_html(report)
@@ -407,7 +402,7 @@ class TestReportGenerator:
                 status=ComplianceStatus.COMPLIANT,
                 evidence=["Policies in place"],
                 device_id="all",
-                timestamp=datetime.now()
+                timestamp=datetime.now(),
             ),
             ComplianceCheck(
                 control_id="HIPAA-164.310",
@@ -416,12 +411,12 @@ class TestReportGenerator:
                 evidence=["No physical access logs"],
                 remediation="Implement access logging",
                 device_id="datacenter",
-                timestamp=datetime.now()
-            )
+                timestamp=datetime.now(),
+            ),
         ]
 
         csv = generator.generate_csv(checks)
-        lines = csv.strip().split('\n')
+        lines = csv.strip().split("\n")
 
         assert len(lines) == 3  # Header + 2 checks
         assert "HIPAA-164.308" in lines[1]
@@ -436,7 +431,9 @@ class TestComplianceIntegration:
         manager = ComplianceManager()
 
         # Mock device configurations
-        with patch.object(manager, '_get_device_configs', new_callable=AsyncMock) as mock_configs:
+        with patch.object(
+            manager, "_get_device_configs", new_callable=AsyncMock
+        ) as mock_configs:
             mock_configs.return_value = [
                 {
                     "device_id": "router1",
@@ -448,33 +445,34 @@ class TestComplianceIntegration:
                     "password_policy": {
                         "min_length": 14,
                         "complexity": True,
-                        "expiry_days": 90
+                        "expiry_days": 90,
                     },
                     "backup": {
                         "enabled": True,
                         "encrypted": True,
-                        "frequency": "daily"
-                    }
+                        "frequency": "daily",
+                    },
                 }
             ]
 
             # Run compliance check
             checks = await manager.check_compliance(
-                framework=ComplianceFramework.PCI_DSS,
-                device_ids=["router1"]
+                framework=ComplianceFramework.PCI_DSS, device_ids=["router1"]
             )
 
             assert len(checks) > 0
 
             # Generate report
-            with patch.object(manager, '_get_historical_checks', new_callable=AsyncMock) as mock_history:
+            with patch.object(
+                manager, "_get_historical_checks", new_callable=AsyncMock
+            ) as mock_history:
                 mock_history.return_value = checks
 
                 report = await manager.generate_report(
                     framework=ComplianceFramework.PCI_DSS,
                     start_date=datetime.now() - timedelta(days=30),
                     end_date=datetime.now(),
-                    device_ids=["router1"]
+                    device_ids=["router1"],
                 )
 
                 assert report.framework == ComplianceFramework.PCI_DSS
@@ -501,24 +499,25 @@ class TestComplianceIntegration:
             "device_id": "switch1",
             "hostname": "access-switch",
             "ssh": {"enabled": True, "version": 2},
-            "encryption": {"data_at_rest": True, "data_in_transit": True}
+            "encryption": {"data_at_rest": True, "data_in_transit": True},
         }
 
-        with patch.object(manager, '_get_device_configs', new_callable=AsyncMock) as mock_configs:
+        with patch.object(
+            manager, "_get_device_configs", new_callable=AsyncMock
+        ) as mock_configs:
             mock_configs.return_value = [device_config]
 
             frameworks = [
                 ComplianceFramework.PCI_DSS,
                 ComplianceFramework.HIPAA,
-                ComplianceFramework.CIS
+                ComplianceFramework.CIS,
             ]
 
             all_checks = []
 
             for framework in frameworks:
                 checks = await manager.check_compliance(
-                    framework=framework,
-                    device_ids=["switch1"]
+                    framework=framework, device_ids=["switch1"]
                 )
                 all_checks.extend(checks)
 
@@ -526,7 +525,7 @@ class TestComplianceIntegration:
             assert len(all_checks) > 0
 
             # Verify different control IDs
-            control_prefixes = {check.control_id.split('-')[0] for check in all_checks}
+            control_prefixes = {check.control_id.split("-")[0] for check in all_checks}
             assert len(control_prefixes) >= 2  # Multiple framework prefixes
 
     @pytest.mark.asyncio
@@ -542,7 +541,7 @@ class TestComplianceIntegration:
             report = ComplianceReport(
                 framework=ComplianceFramework.SOC2,
                 start_date=datetime.now() - timedelta(days=i),
-                end_date=datetime.now() - timedelta(days=i-7),
+                end_date=datetime.now() - timedelta(days=i - 7),
                 total_checks=100,
                 compliant_checks=90 + i // 10,  # Improving trend
                 non_compliant_checks=10 - i // 10,
@@ -550,7 +549,7 @@ class TestComplianceIntegration:
                 compliance_percentage=90 + i / 10,
                 checks=[],
                 summary={},
-                recommendations=[]
+                recommendations=[],
             )
             historical_reports.append(report)
 

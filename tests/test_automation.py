@@ -12,7 +12,7 @@ from src.automation.workflows import (
     WorkflowExecution,
     ExecutionStatus,
     WorkflowBuilder,
-    RemediationWorkflows
+    RemediationWorkflows,
 )
 
 
@@ -22,12 +22,9 @@ class TestWorkflow:
             id="test_workflow",
             name="Test Workflow",
             description="Test workflow description",
-            trigger=WorkflowTrigger(
-                type=TriggerType.MANUAL,
-                conditions={}
-            ),
+            trigger=WorkflowTrigger(type=TriggerType.MANUAL, conditions={}),
             steps=[],
-            enabled=True
+            enabled=True,
         )
 
         assert workflow.id == "test_workflow"
@@ -41,21 +38,21 @@ class TestWorkflow:
                 id="step1",
                 name="Check Device",
                 type=StepType.CONDITION,
-                parameters={"condition": "device.status == 'up'"}
+                parameters={"condition": "device.status == 'up'"},
             ),
             WorkflowStep(
                 id="step2",
                 name="Send Notification",
                 type=StepType.NOTIFICATION,
-                parameters={"channel": "slack", "message": "Device is up"}
-            )
+                parameters={"channel": "slack", "message": "Device is up"},
+            ),
         ]
 
         workflow = Workflow(
             id="test_workflow",
             name="Test Workflow",
             trigger=WorkflowTrigger(type=TriggerType.EVENT),
-            steps=steps
+            steps=steps,
         )
 
         assert len(workflow.steps) == 2
@@ -67,10 +64,7 @@ class TestWorkflowTrigger:
     def test_event_trigger(self):
         trigger = WorkflowTrigger(
             type=TriggerType.EVENT,
-            conditions={
-                "event_type": "device.down",
-                "severity": "critical"
-            }
+            conditions={"event_type": "device.down", "severity": "critical"},
         )
 
         assert trigger.type == TriggerType.EVENT
@@ -79,10 +73,7 @@ class TestWorkflowTrigger:
     def test_schedule_trigger(self):
         trigger = WorkflowTrigger(
             type=TriggerType.SCHEDULE,
-            conditions={
-                "cron": "0 2 * * *",  # Daily at 2 AM
-                "timezone": "UTC"
-            }
+            conditions={"cron": "0 2 * * *", "timezone": "UTC"},  # Daily at 2 AM
         )
 
         assert trigger.type == TriggerType.SCHEDULE
@@ -95,8 +86,8 @@ class TestWorkflowTrigger:
                 "metric": "cpu_usage",
                 "operator": ">",
                 "value": 90,
-                "duration": 300  # 5 minutes
-            }
+                "duration": 300,  # 5 minutes
+            },
         )
 
         assert trigger.type == TriggerType.THRESHOLD
@@ -112,7 +103,7 @@ class TestWorkflowEngine:
             id="test_workflow",
             name="Test Workflow",
             trigger=WorkflowTrigger(type=TriggerType.MANUAL),
-            steps=[]
+            steps=[],
         )
 
         success = await engine.register_workflow(workflow)
@@ -133,16 +124,15 @@ class TestWorkflowEngine:
                     id="step1",
                     name="Log Message",
                     type=StepType.NOTIFICATION,
-                    parameters={"message": "Workflow triggered"}
+                    parameters={"message": "Workflow triggered"},
                 )
-            ]
+            ],
         )
 
         await engine.register_workflow(workflow)
 
         execution_id = await engine.trigger_workflow(
-            "manual_workflow",
-            {"user": "test_user"}
+            "manual_workflow", {"user": "test_user"}
         )
 
         assert execution_id is not None
@@ -156,7 +146,7 @@ class TestWorkflowEngine:
             id="condition_step",
             name="Check Condition",
             type=StepType.CONDITION,
-            parameters={"expression": "context['value'] > 10"}
+            parameters={"expression": "context['value'] > 10"},
         )
 
         context = {"value": 15}
@@ -170,17 +160,16 @@ class TestWorkflowEngine:
     async def test_execute_device_command_step(self):
         engine = WorkflowEngine()
 
-        with patch.object(engine, '_execute_device_command', new_callable=AsyncMock) as mock_execute:
+        with patch.object(
+            engine, "_execute_device_command", new_callable=AsyncMock
+        ) as mock_execute:
             mock_execute.return_value = {"output": "Command executed"}
 
             step = WorkflowStep(
                 id="device_step",
                 name="Execute Command",
                 type=StepType.DEVICE_COMMAND,
-                parameters={
-                    "device_id": "device123",
-                    "command": "show version"
-                }
+                parameters={"device_id": "device123", "command": "show version"},
             )
 
             result = await engine._execute_step(step, {})
@@ -192,7 +181,7 @@ class TestWorkflowEngine:
     async def test_execute_api_call_step(self):
         engine = WorkflowEngine()
 
-        with patch('aiohttp.ClientSession') as mock_session:
+        with patch("aiohttp.ClientSession") as mock_session:
             mock_response = Mock()
             mock_response.status = 200
             mock_response.json = AsyncMock(return_value={"status": "success"})
@@ -207,10 +196,7 @@ class TestWorkflowEngine:
                 id="api_step",
                 name="Call API",
                 type=StepType.API_CALL,
-                parameters={
-                    "url": "https://api.example.com/status",
-                    "method": "GET"
-                }
+                parameters={"url": "https://api.example.com/status", "method": "GET"},
             )
 
             result = await engine._execute_step(step, {})
@@ -233,23 +219,22 @@ class TestWorkflowEngine:
                     id="step1",
                     name="Check Condition",
                     type=StepType.CONDITION,
-                    parameters={"expression": "True"}
+                    parameters={"expression": "True"},
                 ),
                 WorkflowStep(
                     id="step2",
                     name="Log Success",
                     type=StepType.NOTIFICATION,
                     parameters={"message": "Condition met"},
-                    depends_on=["step1"]
-                )
-            ]
+                    depends_on=["step1"],
+                ),
+            ],
         )
 
         await engine.register_workflow(workflow)
 
         execution_id = await engine.trigger_workflow(
-            "complex_workflow",
-            {"test": "data"}
+            "complex_workflow", {"test": "data"}
         )
 
         # Wait for execution to complete
@@ -272,22 +257,22 @@ class TestWorkflowEngine:
                     id="parallel1",
                     name="Parallel Step 1",
                     type=StepType.NOTIFICATION,
-                    parameters={"message": "Step 1"}
+                    parameters={"message": "Step 1"},
                 ),
                 WorkflowStep(
                     id="parallel2",
                     name="Parallel Step 2",
                     type=StepType.NOTIFICATION,
-                    parameters={"message": "Step 2"}
+                    parameters={"message": "Step 2"},
                 ),
                 WorkflowStep(
                     id="final",
                     name="Final Step",
                     type=StepType.NOTIFICATION,
                     parameters={"message": "Done"},
-                    depends_on=["parallel1", "parallel2"]
-                )
-            ]
+                    depends_on=["parallel1", "parallel2"],
+                ),
+            ],
         )
 
         await engine.register_workflow(workflow)
@@ -313,15 +298,15 @@ class TestWorkflowEngine:
                     name="Error Step",
                     type=StepType.CONDITION,
                     parameters={"expression": "undefined_variable"},
-                    on_error="continue"
+                    on_error="continue",
                 ),
                 WorkflowStep(
                     id="recovery_step",
                     name="Recovery Step",
                     type=StepType.NOTIFICATION,
-                    parameters={"message": "Recovered from error"}
-                )
-            ]
+                    parameters={"message": "Recovered from error"},
+                ),
+            ],
         )
 
         await engine.register_workflow(workflow)
@@ -340,13 +325,12 @@ class TestWorkflowBuilder:
         builder = WorkflowBuilder("simple_workflow", "Simple Workflow")
 
         workflow = (
-            builder
-            .with_trigger(TriggerType.MANUAL)
+            builder.with_trigger(TriggerType.MANUAL)
             .add_step(
                 id="step1",
                 name="First Step",
                 type=StepType.NOTIFICATION,
-                parameters={"message": "Hello"}
+                parameters={"message": "Hello"},
             )
             .build()
         )
@@ -359,15 +343,16 @@ class TestWorkflowBuilder:
         builder = WorkflowBuilder("conditional_workflow", "Conditional Workflow")
 
         workflow = (
-            builder
-            .with_trigger(TriggerType.EVENT, {"event_type": "alert"})
-            .add_condition("check_severity", "Check Severity", "context['severity'] == 'high'")
+            builder.with_trigger(TriggerType.EVENT, {"event_type": "alert"})
+            .add_condition(
+                "check_severity", "Check Severity", "context['severity'] == 'high'"
+            )
             .add_device_command(
                 "restart_interface",
                 "Restart Interface",
                 device_id="device123",
                 command="interface restart",
-                depends_on=["check_severity"]
+                depends_on=["check_severity"],
             )
             .build()
         )
@@ -422,7 +407,7 @@ class TestWorkflowExecution:
             id="exec123",
             workflow_id="workflow123",
             trigger_data={"user": "test"},
-            started_at=datetime.now()
+            started_at=datetime.now(),
         )
 
         assert execution.id == "exec123"
@@ -434,7 +419,7 @@ class TestWorkflowExecution:
             id="exec123",
             workflow_id="workflow123",
             trigger_data={},
-            started_at=datetime.now()
+            started_at=datetime.now(),
         )
 
         # Start execution
@@ -452,7 +437,7 @@ class TestWorkflowExecution:
             id="exec123",
             workflow_id="workflow123",
             trigger_data={},
-            started_at=datetime.now()
+            started_at=datetime.now(),
         )
 
         execution.status = ExecutionStatus.FAILED
@@ -481,11 +466,13 @@ class TestWorkflowIntegration:
             "device_id": "switch123",
             "interface": "GigabitEthernet1/0/1",
             "flap_count": 5,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
 
         # Mock device command execution
-        with patch.object(engine, '_execute_device_command', new_callable=AsyncMock) as mock_cmd:
+        with patch.object(
+            engine, "_execute_device_command", new_callable=AsyncMock
+        ) as mock_cmd:
             mock_cmd.return_value = {"success": True, "output": "Interface disabled"}
 
             # Trigger workflow
@@ -509,16 +496,16 @@ class TestWorkflowIntegration:
             name="Scheduled Backup",
             trigger=WorkflowTrigger(
                 type=TriggerType.SCHEDULE,
-                conditions={"cron": "*/5 * * * *"}  # Every 5 minutes
+                conditions={"cron": "*/5 * * * *"},  # Every 5 minutes
             ),
             steps=[
                 WorkflowStep(
                     id="backup",
                     name="Backup Configs",
                     type=StepType.SCRIPT,
-                    parameters={"script": "backup_all_devices.py"}
+                    parameters={"script": "backup_all_devices.py"},
                 )
-            ]
+            ],
         )
 
         await engine.register_workflow(workflow)

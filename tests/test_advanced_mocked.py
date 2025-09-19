@@ -15,7 +15,7 @@ class TestMLAnomalyDetectionMocked:
     @pytest.mark.asyncio
     async def test_anomaly_detector_initialization(self):
         """Test that anomaly detector can be initialized"""
-        with patch('src.ml.anomaly_detection.IsolationForest') as mock_forest:
+        with patch("src.ml.anomaly_detection.IsolationForest") as mock_forest:
             from src.ml.anomaly_detection import AnomalyDetector, ModelType
 
             detector = AnomalyDetector(ModelType.ISOLATION_FOREST)
@@ -25,15 +25,16 @@ class TestMLAnomalyDetectionMocked:
     @pytest.mark.asyncio
     async def test_model_manager_creation(self):
         """Test model manager can create models"""
-        with patch('src.ml.anomaly_detection.IsolationForest'), \
-             patch('src.ml.anomaly_detection.RandomForestClassifier'):
+        with patch("src.ml.anomaly_detection.IsolationForest"), patch(
+            "src.ml.anomaly_detection.RandomForestClassifier"
+        ):
             from src.ml.anomaly_detection import ModelManager, ModelType
 
             manager = ModelManager()
             model_id = await manager.create_model(
                 name="test_model",
                 model_type=ModelType.ISOLATION_FOREST,
-                description="Test model"
+                description="Test model",
             )
 
             assert model_id in manager.models
@@ -52,7 +53,7 @@ class TestAutomationWorkflowsMocked:
             WorkflowStep,
             StepType,
             WorkflowTrigger,
-            TriggerType
+            TriggerType,
         )
 
         engine = WorkflowEngine()
@@ -61,19 +62,16 @@ class TestAutomationWorkflowsMocked:
             id="test_workflow",
             name="Test Workflow",
             description="Test workflow for unit testing",
-            trigger=WorkflowTrigger(
-                type=TriggerType.MANUAL,
-                conditions={}
-            ),
+            trigger=WorkflowTrigger(type=TriggerType.MANUAL, conditions={}),
             steps=[
                 WorkflowStep(
                     id="step1",
                     name="Test Step",
                     type=StepType.NOTIFICATION,
-                    parameters={"message": "Test message"}
+                    parameters={"message": "Test message"},
                 )
             ],
-            enabled=True
+            enabled=True,
         )
 
         success = await engine.register_workflow(workflow)
@@ -89,7 +87,7 @@ class TestAutomationWorkflowsMocked:
             WorkflowTrigger,
             TriggerType,
             WorkflowStep,
-            StepType
+            StepType,
         )
 
         engine = WorkflowEngine()
@@ -103,16 +101,15 @@ class TestAutomationWorkflowsMocked:
                     id="step1",
                     name="Log Step",
                     type=StepType.NOTIFICATION,
-                    parameters={"message": "Workflow executed"}
+                    parameters={"message": "Workflow executed"},
                 )
-            ]
+            ],
         )
 
         await engine.register_workflow(workflow)
 
         execution_id = await engine.trigger_workflow(
-            "manual_workflow",
-            {"user": "test_user"}
+            "manual_workflow", {"user": "test_user"}
         )
 
         assert execution_id is not None
@@ -129,7 +126,7 @@ class TestAutomationWorkflowsMocked:
             id="condition_step",
             name="Test Condition",
             type=StepType.CONDITION,
-            parameters={"expression": "context['value'] > 10"}
+            parameters={"expression": "context['value'] > 10"},
         )
 
         # Test condition met
@@ -183,7 +180,7 @@ class TestComplianceReportingMocked:
             status=ComplianceStatus.COMPLIANT,
             evidence=["Firewall configured", "Rules documented"],
             device_id="firewall1",
-            timestamp=datetime.now()
+            timestamp=datetime.now(),
         )
 
         assert check.control_id == "PCI-1.1"
@@ -198,19 +195,20 @@ class TestComplianceReportingMocked:
         manager = ComplianceManager()
 
         # Mock device configurations
-        with patch.object(manager, '_get_device_configs', new_callable=AsyncMock) as mock_configs:
+        with patch.object(
+            manager, "_get_device_configs", new_callable=AsyncMock
+        ) as mock_configs:
             mock_configs.return_value = [
                 {
                     "device_id": "router1",
                     "hostname": "test-router",
                     "ssh": {"enabled": True, "version": 2},
-                    "telnet": {"enabled": False}
+                    "telnet": {"enabled": False},
                 }
             ]
 
             checks = await manager.check_compliance(
-                framework=ComplianceFramework.PCI_DSS,
-                device_ids=["router1"]
+                framework=ComplianceFramework.PCI_DSS, device_ids=["router1"]
             )
 
             assert len(checks) > 0
@@ -223,13 +221,15 @@ class TestComplianceReportingMocked:
             ComplianceManager,
             ComplianceFramework,
             ComplianceCheck,
-            ComplianceStatus
+            ComplianceStatus,
         )
 
         manager = ComplianceManager()
 
         # Mock historical checks
-        with patch.object(manager, '_get_historical_checks', new_callable=AsyncMock) as mock_history:
+        with patch.object(
+            manager, "_get_historical_checks", new_callable=AsyncMock
+        ) as mock_history:
             mock_history.return_value = [
                 ComplianceCheck(
                     control_id="CIS-1.1",
@@ -237,7 +237,7 @@ class TestComplianceReportingMocked:
                     status=ComplianceStatus.COMPLIANT,
                     evidence=["Services reviewed"],
                     device_id="server1",
-                    timestamp=datetime.now()
+                    timestamp=datetime.now(),
                 ),
                 ComplianceCheck(
                     control_id="CIS-1.2",
@@ -246,14 +246,14 @@ class TestComplianceReportingMocked:
                     evidence=["Logging disabled"],
                     remediation="Enable logging service",
                     device_id="server1",
-                    timestamp=datetime.now()
-                )
+                    timestamp=datetime.now(),
+                ),
             ]
 
             report = await manager.generate_report(
                 framework=ComplianceFramework.CIS,
                 start_date=datetime.now() - timedelta(days=30),
-                end_date=datetime.now()
+                end_date=datetime.now(),
             )
 
             assert report.framework == ComplianceFramework.CIS
@@ -269,7 +269,7 @@ class TestComplianceReportingMocked:
             ComplianceReport,
             ComplianceFramework,
             ComplianceCheck,
-            ComplianceStatus
+            ComplianceStatus,
         )
 
         manager = ComplianceManager()
@@ -290,11 +290,11 @@ class TestComplianceReportingMocked:
                     status=ComplianceStatus.COMPLIANT,
                     evidence=["Policies documented"],
                     device_id="all",
-                    timestamp=datetime.now()
+                    timestamp=datetime.now(),
                 )
             ],
             summary={"critical": 0},
-            recommendations=["Review quarterly"]
+            recommendations=["Review quarterly"],
         )
 
         # Test JSON export
@@ -325,7 +325,7 @@ class TestComplianceReportingMocked:
             "ssh": {"enabled": True, "version": 2},
             "telnet": {"enabled": False},
             "snmp": {"version": 3, "encryption": "aes256"},
-            "password_policy": {"min_length": 12, "complexity": True}
+            "password_policy": {"min_length": 12, "complexity": True},
         }
 
         checks = await validator.validate_pci_dss(device_config)
@@ -336,7 +336,7 @@ class TestComplianceReportingMocked:
             "hostname": "server1",
             "encryption": {"data_at_rest": True, "data_in_transit": True},
             "access_control": {"unique_user_ids": True},
-            "audit_controls": {"enabled": True}
+            "audit_controls": {"enabled": True},
         }
 
         checks = await validator.validate_hipaa(device_config)
@@ -349,9 +349,14 @@ class TestIntegrationScenarios:
     @pytest.mark.asyncio
     async def test_anomaly_triggered_workflow(self):
         """Test workflow triggered by anomaly detection"""
-        with patch('src.ml.anomaly_detection.IsolationForest'):
+        with patch("src.ml.anomaly_detection.IsolationForest"):
             from src.ml.anomaly_detection import ModelManager, AnomalyScore
-            from src.automation.workflows import WorkflowEngine, Workflow, WorkflowTrigger, TriggerType
+            from src.automation.workflows import (
+                WorkflowEngine,
+                Workflow,
+                WorkflowTrigger,
+                TriggerType,
+            )
 
             # Setup anomaly detector
             model_manager = ModelManager()
@@ -365,9 +370,9 @@ class TestIntegrationScenarios:
                 name="Anomaly Response",
                 trigger=WorkflowTrigger(
                     type=TriggerType.EVENT,
-                    conditions={"event_type": "anomaly.detected"}
+                    conditions={"event_type": "anomaly.detected"},
                 ),
-                steps=[]
+                steps=[],
             )
 
             await workflow_engine.register_workflow(workflow)
@@ -378,21 +383,24 @@ class TestIntegrationScenarios:
                 is_anomaly=True,
                 confidence=0.9,
                 timestamp=datetime.now(),
-                features={}
+                features={},
             )
 
             # Trigger workflow based on anomaly
             if anomaly_score.is_anomaly:
                 execution_id = await workflow_engine.trigger_workflow(
-                    "anomaly_response",
-                    {"anomaly_score": anomaly_score.score}
+                    "anomaly_response", {"anomaly_score": anomaly_score.score}
                 )
                 assert execution_id is not None
 
     @pytest.mark.asyncio
     async def test_compliance_driven_remediation(self):
         """Test automated remediation based on compliance checks"""
-        from src.compliance.reporting import ComplianceManager, ComplianceFramework, ComplianceStatus
+        from src.compliance.reporting import (
+            ComplianceManager,
+            ComplianceFramework,
+            ComplianceStatus,
+        )
         from src.automation.workflows import WorkflowEngine, RemediationWorkflows
 
         compliance_manager = ComplianceManager()
@@ -404,23 +412,26 @@ class TestIntegrationScenarios:
         await workflow_engine.register_workflow(workflow)
 
         # Mock non-compliant check
-        with patch.object(compliance_manager, '_get_device_configs', new_callable=AsyncMock) as mock_configs:
+        with patch.object(
+            compliance_manager, "_get_device_configs", new_callable=AsyncMock
+        ) as mock_configs:
             mock_configs.return_value = [
                 {
                     "device_id": "switch1",
                     "hostname": "switch1",
                     "ssh": {"enabled": False},  # Non-compliant
-                    "telnet": {"enabled": True}  # Non-compliant
+                    "telnet": {"enabled": True},  # Non-compliant
                 }
             ]
 
             checks = await compliance_manager.check_compliance(
-                framework=ComplianceFramework.CIS,
-                device_ids=["switch1"]
+                framework=ComplianceFramework.CIS, device_ids=["switch1"]
             )
 
             # Find non-compliant checks
-            non_compliant = [c for c in checks if c.status == ComplianceStatus.NON_COMPLIANT]
+            non_compliant = [
+                c for c in checks if c.status == ComplianceStatus.NON_COMPLIANT
+            ]
 
             # Trigger remediation for each non-compliant check
             for check in non_compliant:
@@ -430,7 +441,7 @@ class TestIntegrationScenarios:
                         {
                             "device_id": check.device_id,
                             "control_id": check.control_id,
-                            "remediation": check.remediation
-                        }
+                            "remediation": check.remediation,
+                        },
                     )
                     assert execution_id is not None

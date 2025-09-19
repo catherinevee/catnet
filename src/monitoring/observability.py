@@ -746,3 +746,217 @@ class ObservabilityService:
                 "end": max(log.timestamp for log in logs).isoformat() if logs else None,
             },
         }
+
+
+class DistributedTracer:
+    """
+    Distributed tracing system for tracking requests across services
+    """
+
+    def __init__(self):
+        self.traces: Dict[str, Trace] = {}
+        self.spans: Dict[str, Span] = {}
+        self.completed_traces: List[Trace] = []
+
+    def start_span(
+        self,
+        operation_name: str,
+        kind: SpanKind = SpanKind.INTERNAL,
+        parent_span_id: Optional[str] = None,
+        attributes: Dict[str, Any] = None,
+    ) -> Span:
+        """Start a new span"""
+        trace_id = (
+            str(uuid.uuid4())
+            if not parent_span_id
+            else self._get_trace_id(parent_span_id)
+        )
+        span = Span(
+            trace_id=trace_id,
+            span_id=str(uuid.uuid4()),
+            parent_span_id=parent_span_id,
+            operation_name=operation_name,
+            start_time=datetime.now(),
+            end_time=None,
+            kind=kind,
+            attributes=attributes or {},
+            events=[],
+            status="in_progress",
+            tags={},
+        )
+        self.spans[span.span_id] = span
+        return span
+
+    def end_span(self, span_id: str, status: str = "ok", error: Optional[str] = None):
+        """End a span"""
+        if span_id in self.spans:
+            span = self.spans[span_id]
+            span.end_time = datetime.now()
+            span.status = status
+            if error:
+                span.attributes["error"] = error
+
+    def get_traces(self, service: Optional[str] = None) -> List[Trace]:
+        """Get traces, optionally filtered by service"""
+        traces = list(self.traces.values()) + self.completed_traces
+        if service:
+            traces = [t for t in traces if t.service_name == service]
+        return traces
+
+    def _get_trace_id(self, span_id: str) -> str:
+        """Get trace ID for a span"""
+        if span_id in self.spans:
+            return self.spans[span_id].trace_id
+        return str(uuid.uuid4())
+
+
+class LogAggregator:
+    """
+    Log aggregation system for centralized logging
+    """
+
+    def __init__(self):
+        self.log_buffer: List[LogEntry] = []
+        self.max_buffer_size = 10000
+
+    async def log(
+        self,
+        level: TraceLevel,
+        message: str,
+        service: str = "catnet",
+        metadata: Dict[str, Any] = None,
+    ):
+        """Add a log entry"""
+        entry = LogEntry(
+            timestamp=datetime.now(),
+            level=level,
+            message=message,
+            service=service,
+            metadata=metadata or {},
+            trace_id=None,
+            span_id=None,
+            tags={},
+        )
+        self.log_buffer.append(entry)
+
+        # Trim buffer if too large
+        if len(self.log_buffer) > self.max_buffer_size:
+            self.log_buffer = self.log_buffer[-self.max_buffer_size :]
+
+    async def query_logs(
+        self,
+        service: Optional[str] = None,
+        level: Optional[TraceLevel] = None,
+        limit: int = 100,
+    ) -> List[LogEntry]:
+        """Query logs with filters"""
+        logs = self.log_buffer
+
+        if service:
+            logs = [log for log in logs if log.service == service]
+        if level:
+            logs = [log for log in logs if log.level == level]
+
+        return logs[-limit:]
+
+
+class ObservabilityManager:
+    """
+    Main observability manager that coordinates all monitoring components
+    """
+
+    def __init__(self):
+        self.tracer = DistributedTracer()
+        self.log_aggregator = LogAggregator()
+        self.metrics = {}
+        self.health_checks = {}
+        self.initialized = False
+
+    async def initialize(self):
+        """Initialize observability components"""
+        self.initialized = True
+        return self
+
+    async def start_trace(self, operation: str, service: str = "catnet") -> Span:
+        """Start a new trace"""
+        return self.tracer.start_span(
+            operation_name=operation,
+            kind=SpanKind.INTERNAL,
+            attributes={"service": service},
+        )
+
+    async def log(
+        self, level: TraceLevel, message: str, service: str = "catnet", **metadata
+    ):
+        """Log a message"""
+        await self.log_aggregator.log(
+            level=level, message=message, service=service, metadata=metadata
+        )
+
+    async def record_metric(
+        self, name: str, value: float, labels: Dict[str, str] = None
+    ):
+        """Record a metric"""
+        key = f"{name}_{labels}" if labels else name
+        self.metrics[key] = {
+            "name": name,
+            "value": value,
+            "labels": labels or {},
+            "timestamp": datetime.now(),
+        }
+
+    async def check_health(self, component: str) -> bool:
+        """Check health of a component"""
+        return self.health_checks.get(component, True)
+
+    async def set_health(self, component: str, healthy: bool):
+        """Set health status of a component"""
+        self.health_checks[component] = healthy
+
+    async def get_traces(self, service: Optional[str] = None) -> List[Trace]:
+        """Get traces"""
+        return self.tracer.get_traces(service)
+
+    async def get_logs(
+        self,
+        service: Optional[str] = None,
+        level: Optional[TraceLevel] = None,
+        limit: int = 100,
+    ) -> List[LogEntry]:
+        """Get logs"""
+        return await self.log_aggregator.query_logs(
+            service=service, level=level, limit=limit
+        )
+
+    async def get_metrics_summary(self) -> Dict[str, Any]:
+        """Get metrics summary"""
+        return {
+            "metrics": self.metrics,
+            "health_status": self.health_checks,
+            "trace_count": len(self.tracer.traces),
+            "log_count": len(self.log_aggregator.log_buffer),
+        }
+
+    async def export_prometheus(self) -> str:
+        """Export metrics in Prometheus format"""
+        lines = []
+        for key, metric in self.metrics.items():
+            name = metric["name"]
+            value = metric["value"]
+            labels = metric.get("labels", {})
+
+            label_str = ""
+            if labels:
+                label_items = [f'{k}="{v}"' for k, v in labels.items()]
+                label_str = "{" + ",".join(label_items) + "}"
+
+            lines.append(f"# TYPE catnet_{name} gauge")
+            lines.append(f"catnet_{name}{label_str} {value}")
+
+        return "\n".join(lines)
+
+    async def shutdown(self):
+        """Shutdown observability components"""
+        self.initialized = False
+        self.metrics.clear()
+        self.health_checks.clear()

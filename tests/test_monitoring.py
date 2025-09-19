@@ -209,9 +209,7 @@ class TestAlertManager:
     def setup_method(self):
         """Setup test environment"""
         self.metrics_collector = MetricsCollector()
-        self.alert_manager = AlertManager(
-            metrics_collector=self.metrics_collector
-        )
+        self.alert_manager = AlertManager(metrics_collector=self.metrics_collector)
 
     def test_add_alert_rule(self):
         """Test adding alert rules"""

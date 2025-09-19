@@ -19,7 +19,14 @@ import hashlib
 import subprocess
 
 from git import Repo, GitCommandError
-import pygit2
+
+# pygit2 is optional, use GitPython as fallback
+try:
+    import pygit2
+
+    HAS_PYGIT2 = True
+except ImportError:
+    HAS_PYGIT2 = False
 
 
 @dataclass

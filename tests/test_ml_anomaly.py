@@ -8,7 +8,7 @@ from src.ml.anomaly_detection import (
     TrainingData,
     AnomalyScore,
     ModelManager,
-    FeatureExtractor
+    FeatureExtractor,
 )
 
 
@@ -24,7 +24,7 @@ class TestFeatureExtractor:
             "protocol_distribution": {"TCP": 0.7, "UDP": 0.2, "ICMP": 0.1},
             "port_distribution": {"80": 0.3, "443": 0.4, "22": 0.1, "other": 0.2},
             "avg_packet_size": 500,
-            "packet_rate": 100
+            "packet_rate": 100,
         }
 
         features = extractor.extract_traffic_features(traffic_data)
@@ -47,7 +47,7 @@ class TestFeatureExtractor:
             "has_encryption": True,
             "has_aaa": True,
             "has_logging": True,
-            "complexity_score": 0.75
+            "complexity_score": 0.75,
         }
 
         features = extractor.extract_config_features(config_data)
@@ -67,7 +67,7 @@ class TestFeatureExtractor:
             "packet_loss": 0.001,
             "latency": 25.5,
             "jitter": 2.3,
-            "temperature": 42.0
+            "temperature": 42.0,
         }
 
         features = extractor.extract_performance_features(perf_data)
@@ -96,7 +96,7 @@ class TestAnomalyDetector:
             data=normal_data.tolist(),
             feature_names=["f1", "f2", "f3", "f4", "f5"],
             timestamps=[datetime.now()] * 100,
-            labels=[0] * 100  # All normal
+            labels=[0] * 100,  # All normal
         )
 
         metrics = detector.train(training_data)
@@ -117,7 +117,7 @@ class TestAnomalyDetector:
             data=normal_data.tolist(),
             feature_names=["f1", "f2", "f3", "f4", "f5"],
             timestamps=[datetime.now()] * 100,
-            labels=[0] * 100
+            labels=[0] * 100,
         )
 
         detector.train(training_data)
@@ -128,7 +128,7 @@ class TestAnomalyDetector:
             "byte_count": 50000,
             "flow_count": 50,
             "error_rate": 0.02,
-            "protocol_distribution": {"TCP": 0.7}
+            "protocol_distribution": {"TCP": 0.7},
         }
 
         score = detector.detect(normal_sample)
@@ -158,7 +158,7 @@ class TestAnomalyDetector:
             data=all_data.tolist(),
             feature_names=["f1", "f2", "f3", "f4", "f5"],
             timestamps=[datetime.now()] * 100,
-            labels=labels
+            labels=labels,
         )
 
         metrics = detector.train(training_data)
@@ -177,7 +177,7 @@ class TestModelManager:
         model_id = await manager.create_model(
             name="test_model",
             model_type=ModelType.ISOLATION_FOREST,
-            description="Test anomaly detection model"
+            description="Test anomaly detection model",
         )
 
         assert model_id in manager.models
@@ -188,8 +188,7 @@ class TestModelManager:
         manager = ModelManager()
 
         model_id = await manager.create_model(
-            name="test_model",
-            model_type=ModelType.ISOLATION_FOREST
+            name="test_model", model_type=ModelType.ISOLATION_FOREST
         )
 
         # Create training data
@@ -200,7 +199,7 @@ class TestModelManager:
             data=data.tolist(),
             feature_names=["f1", "f2", "f3", "f4", "f5"],
             timestamps=[datetime.now()] * 100,
-            labels=[0] * 100
+            labels=[0] * 100,
         )
 
         success = await manager.train_model(model_id, training_data)
@@ -214,8 +213,7 @@ class TestModelManager:
         manager = ModelManager()
 
         model_id = await manager.create_model(
-            name="test_model",
-            model_type=ModelType.ISOLATION_FOREST
+            name="test_model", model_type=ModelType.ISOLATION_FOREST
         )
 
         # Train model
@@ -226,7 +224,7 @@ class TestModelManager:
             data=data.tolist(),
             feature_names=["f1", "f2", "f3", "f4", "f5"],
             timestamps=[datetime.now()] * 100,
-            labels=[0] * 100
+            labels=[0] * 100,
         )
 
         await manager.train_model(model_id, training_data)
@@ -237,7 +235,7 @@ class TestModelManager:
             "byte_count": 50000,
             "flow_count": 50,
             "error_rate": 0.02,
-            "protocol_distribution": {"TCP": 0.7}
+            "protocol_distribution": {"TCP": 0.7},
         }
 
         score = await manager.predict(model_id, test_data)
@@ -250,8 +248,7 @@ class TestModelManager:
         manager = ModelManager()
 
         model_id = await manager.create_model(
-            name="test_model",
-            model_type=ModelType.RANDOM_FOREST
+            name="test_model", model_type=ModelType.RANDOM_FOREST
         )
 
         # Train model with labeled data
@@ -266,7 +263,7 @@ class TestModelManager:
             data=all_data.tolist(),
             feature_names=["f1", "f2", "f3", "f4", "f5"],
             timestamps=[datetime.now()] * 100,
-            labels=labels
+            labels=labels,
         )
 
         await manager.train_model(model_id, training_data)
@@ -285,8 +282,7 @@ class TestModelManager:
         model_ids = []
         for model_type in [ModelType.ISOLATION_FOREST, ModelType.RANDOM_FOREST]:
             model_id = await manager.create_model(
-                name=f"model_{model_type.value}",
-                model_type=model_type
+                name=f"model_{model_type.value}", model_type=model_type
             )
             model_ids.append(model_id)
 
@@ -298,7 +294,7 @@ class TestModelManager:
                 data=data.tolist(),
                 feature_names=["f1", "f2", "f3", "f4", "f5"],
                 timestamps=[datetime.now()] * 100,
-                labels=[0] * 90 + [1] * 10  # Some anomalies for RF
+                labels=[0] * 90 + [1] * 10,  # Some anomalies for RF
             )
 
             await manager.train_model(model_id, training_data)
@@ -309,7 +305,7 @@ class TestModelManager:
             "byte_count": 50000,
             "flow_count": 50,
             "error_rate": 0.02,
-            "protocol_distribution": {"TCP": 0.7}
+            "protocol_distribution": {"TCP": 0.7},
         }
 
         ensemble_score = await manager.ensemble_predict(model_ids, test_data)
@@ -330,7 +326,7 @@ class TestAnomalyDetectionIntegration:
         model_id = await manager.create_model(
             name="network_anomaly_detector",
             model_type=ModelType.ISOLATION_FOREST,
-            description="Detects network traffic anomalies"
+            description="Detects network traffic anomalies",
         )
 
         # Simulate historical network data
@@ -347,19 +343,21 @@ class TestAnomalyDetectionIntegration:
                 packet_count = np.random.normal(5000, 500)  # DDoS pattern
                 error_rate = np.random.uniform(0.1, 0.3)  # High errors
 
-            historical_data.append([
-                packet_count,
-                packet_count * 50,  # byte_count
-                packet_count / 20,  # flow_count
-                error_rate,
-                np.random.uniform(0.6, 0.8)  # TCP ratio
-            ])
+            historical_data.append(
+                [
+                    packet_count,
+                    packet_count * 50,  # byte_count
+                    packet_count / 20,  # flow_count
+                    error_rate,
+                    np.random.uniform(0.6, 0.8),  # TCP ratio
+                ]
+            )
 
         training_data = TrainingData(
             data=historical_data,
             feature_names=["packets", "bytes", "flows", "errors", "tcp_ratio"],
             timestamps=[datetime.now() - timedelta(hours=i) for i in range(200)],
-            labels=[0] * 180 + [1] * 20
+            labels=[0] * 180 + [1] * 20,
         )
 
         await manager.train_model(model_id, training_data)
@@ -370,7 +368,7 @@ class TestAnomalyDetectionIntegration:
             "byte_count": 52500,
             "flow_count": 52,
             "error_rate": 0.03,
-            "protocol_distribution": {"TCP": 0.7}
+            "protocol_distribution": {"TCP": 0.7},
         }
 
         anomalous_traffic = {
@@ -378,7 +376,7 @@ class TestAnomalyDetectionIntegration:
             "byte_count": 275000,
             "flow_count": 275,
             "error_rate": 0.25,
-            "protocol_distribution": {"TCP": 0.7}
+            "protocol_distribution": {"TCP": 0.7},
         }
 
         normal_score = await manager.predict(model_id, normal_traffic)
@@ -396,8 +394,7 @@ class TestAnomalyDetectionIntegration:
 
         # Create and train model
         model_id = await manager.create_model(
-            name="persistent_model",
-            model_type=ModelType.RANDOM_FOREST
+            name="persistent_model", model_type=ModelType.RANDOM_FOREST
         )
 
         np.random.seed(42)
@@ -407,7 +404,7 @@ class TestAnomalyDetectionIntegration:
             data=data.tolist(),
             feature_names=["f1", "f2", "f3", "f4", "f5"],
             timestamps=[datetime.now()] * 100,
-            labels=[0] * 90 + [1] * 10
+            labels=[0] * 90 + [1] * 10,
         )
 
         await manager.train_model(model_id, training_data)
@@ -419,9 +416,7 @@ class TestAnomalyDetectionIntegration:
         # Create new manager and load model
         new_manager = ModelManager()
         loaded_id = await new_manager.load_model(
-            saved_path,
-            name="loaded_model",
-            model_type=ModelType.RANDOM_FOREST
+            saved_path, name="loaded_model", model_type=ModelType.RANDOM_FOREST
         )
 
         assert loaded_id is not None

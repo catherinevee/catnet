@@ -166,9 +166,7 @@ class TestDeviceManager:
 
         # Mock adapter and connections
         mock_adapter = Mock(spec=DeviceAdapter)
-        mock_adapter.execute_command = AsyncMock(
-            return_value="Command executed"
-        )
+        mock_adapter.execute_command = AsyncMock(return_value="Command executed")
 
         for device_id in device_ids:
             mock_connection = DeviceConnection(
@@ -341,9 +339,7 @@ class TestJuniperAdapter:
         """Test executing command on Juniper device"""
         # Create mock connection
         mock_device = Mock()
-        mock_device.cli = Mock(
-            return_value="ge-0/0/0 up up"
-        )
+        mock_device.cli = Mock(return_value="ge-0/0/0 up up")
 
         connection = DeviceConnection(
             device_id="dev-juniper-1",
@@ -532,9 +528,7 @@ class TestDeviceInventory:
 
         # Update to maintenance
         device.state = DeviceState.MAINTENANCE
-        maintenance_devices = self.manager.search_devices(
-            state=DeviceState.MAINTENANCE
-        )
+        maintenance_devices = self.manager.search_devices(state=DeviceState.MAINTENANCE)
         assert len(maintenance_devices) == 1
 
         # Update to decommissioned

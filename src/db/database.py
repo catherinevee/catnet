@@ -33,21 +33,31 @@ class DatabaseManager:
                 "postgresql://", "postgresql+asyncpg://"
             )
 
-        self.engine = create_async_engine(
-            self.database_url,
-            echo=echo,
-            pool_size=pool_size,
-            max_overflow=max_overflow,
-            pool_pre_ping=True,  # Verify connections before using
-            pool_recycle=3600,  # Recycle connections after 1 hour
-        )
+        # SQLite doesn't support pool settings
+        if "sqlite" in self.database_url.lower():
+            self.engine = create_async_engine(
+                self.database_url,
+                echo=echo,
+            )
+        else:
+            self.engine = create_async_engine(
+                self.database_url,
+                echo=echo,
+                pool_size=pool_size,
+                max_overflow=max_overflow,
+                pool_pre_ping=True,  # Verify connections before using
+                pool_recycle=3600,  # Recycle connections after 1 hour
+            )
 
         self.async_session = async_sessionmaker(
             self.engine, class_=AsyncSession, expire_on_commit=False
         )
 
         # For synchronous operations (migrations)
-        sync_url = self.database_url.replace("+asyncpg", "")
+        if "sqlite" in self.database_url:
+            sync_url = self.database_url.replace("+aiosqlite", "")
+        else:
+            sync_url = self.database_url.replace("+asyncpg", "")
         self.sync_engine = create_engine(sync_url, echo=echo)
 
     async def create_all(self):
@@ -86,8 +96,10 @@ class DatabaseManager:
 
     async def health_check(self) -> bool:
         try:
+            from sqlalchemy import text
+
             async with self.engine.begin() as conn:
-                await conn.execute("SELECT 1")
+                await conn.execute(text("SELECT 1"))
             return True
         except Exception as e:
             logger.error(f"Database health check failed: {e}")

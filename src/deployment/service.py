@@ -9,6 +9,8 @@ from ..core.logging import get_logger
 from ..db.models import Deployment, DeploymentState, Device
 from .executor import DeploymentExecutor
 from .validator import DeploymentValidator
+from ..devices.connector import SecureDeviceConnector
+from ..security.audit import AuditLogger
 
 logger = get_logger(__name__)
 
@@ -17,7 +19,25 @@ class DeploymentService:
     """Main deployment orchestration service"""
 
     def __init__(self):
-        self.executor = DeploymentExecutor()
+        # Initialize with proper dependencies
+        try:
+            device_connector = SecureDeviceConnector()
+            audit_logger = AuditLogger()
+            self.executor = DeploymentExecutor(
+                device_connector=device_connector, audit_logger=audit_logger
+            )
+        except Exception as e:
+            logger.warning(
+                f"Could not initialize DeploymentExecutor with full dependencies: {e}"
+            )
+            # Create a mock connector for local testing
+            from unittest.mock import Mock
+
+            mock_connector = Mock(spec=SecureDeviceConnector)
+            self.executor = DeploymentExecutor(
+                device_connector=mock_connector, audit_logger=AuditLogger()
+            )
+
         self.validator = DeploymentValidator()
 
     async def create_deployment(

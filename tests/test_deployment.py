@@ -73,8 +73,7 @@ class TestDeploymentManager:
             description="Test deployment description",
             devices=["device1", "device2"],
             configuration=(
-                "interface GigabitEthernet0/1\n"
-                " ip address 192.168.1.1 255.255.255.0"
+                "interface GigabitEthernet0/1\n" " ip address 192.168.1.1 255.255.255.0"
             ),
             config=DeploymentConfig(strategy=DeploymentStrategy.CANARY),
             created_by="testuser",
@@ -218,8 +217,7 @@ class TestDeploymentValidator:
             deployment_id="dep1",
             devices=["device1", "device2"],
             configuration=(
-                "interface GigabitEthernet0/1\n"
-                " ip address 192.168.1.1 255.255.255.0"
+                "interface GigabitEthernet0/1\n" " ip address 192.168.1.1 255.255.255.0"
             ),
             deployment_config={},
         )

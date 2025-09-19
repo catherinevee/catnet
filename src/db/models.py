@@ -9,13 +9,55 @@ from sqlalchemy import (
     ForeignKey,
     ARRAY,
     Enum as SQLEnum,
+    TypeDecorator,
+    CHAR,
 )
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID as postgresql_UUID
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 import uuid
 import enum
+
+
+# Custom UUID type that works with both PostgreSQL and SQLite
+class UUID(TypeDecorator):
+    """Platform-independent UUID type.
+
+    Uses PostgreSQL's UUID type when available,
+    otherwise stores as a 36-character string.
+    """
+
+    impl = CHAR
+    cache_ok = True
+
+    def load_dialect_impl(self, dialect):
+        if dialect.name == "postgresql":
+            return dialect.type_descriptor(postgresql_UUID())
+        else:
+            return dialect.type_descriptor(CHAR(36))
+
+    def process_bind_param(self, value, dialect):
+        if value is None:
+            return value
+        elif dialect.name == "postgresql":
+            return value
+        else:
+            if isinstance(value, uuid.UUID):
+                return str(value)
+            else:
+                return value
+
+    def process_result_value(self, value, dialect):
+        if value is None:
+            return value
+        elif dialect.name == "postgresql":
+            return value
+        else:
+            if not isinstance(value, uuid.UUID):
+                value = uuid.UUID(value)
+            return value
+
 
 Base = declarative_base()
 
@@ -39,14 +81,14 @@ class DeviceVendor(enum.Enum):
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(), primary_key=True, default=uuid.uuid4)
     username = Column(String(100), unique=True, nullable=False, index=True)
     email = Column(String(255), unique=True, nullable=False, index=True)
     password_hash = Column(String(255), nullable=False)
     mfa_secret = Column(String(255))
     is_active = Column(Boolean, default=True)
     is_superuser = Column(Boolean, default=False)
-    roles = Column(ARRAY(String), default=[])
+    roles = Column(JSON, default=list)  # Using JSON for SQLite compatibility
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     last_login = Column(DateTime(timezone=True))
@@ -73,7 +115,7 @@ class User(Base):
 class Device(Base):
     __tablename__ = "devices"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(), primary_key=True, default=uuid.uuid4)
     hostname = Column(String(255), nullable=False, unique=True, index=True)
     ip_address = Column(String(45), nullable=False, index=True)
     vendor = Column(SQLEnum(DeviceVendor), nullable=False)
@@ -114,11 +156,11 @@ class Device(Base):
 class Deployment(Base):
     __tablename__ = "deployments"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(), primary_key=True, default=uuid.uuid4)
     created_at = Column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
-    created_by = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    created_by = Column(UUID(), ForeignKey("users.id"), nullable=False)
     config_hash = Column(String(64), nullable=False)  # SHA-256
     signature = Column(Text, nullable=False)  # Digital signature
     encryption_key_id = Column(String(128))  # KMS key reference
@@ -127,7 +169,7 @@ class Deployment(Base):
         nullable=False,
         default=DeploymentState.PENDING,
     )
-    approved_by = Column(ARRAY(UUID(as_uuid=True)), default=[])
+    approved_by = Column(JSON, default=list)  # Stores list of user IDs as strings
     approval_required = Column(Boolean, default=True)
     approval_count = Column(Integer, default=2)  # Number of approvals needed
     strategy = Column(String(50), default="rolling")  # canary, rolling, blue-green
@@ -138,11 +180,11 @@ class Deployment(Base):
     error_message = Column(Text)
     audit_log = Column(JSON, nullable=False, default={})
     git_commit = Column(String(40))  # Git commit hash
-    git_repository_id = Column(UUID(as_uuid=True), ForeignKey("git_repositories.id"))
+    git_repository_id = Column(UUID(), ForeignKey("git_repositories.id"))
 
     # Signature fields
     config_signature = Column(Text)
-    signed_by = Column(UUID(as_uuid=True), ForeignKey("users.id"))
+    signed_by = Column(UUID(), ForeignKey("users.id"))
     signature_verified = Column(Boolean, default=False)
     signature_timestamp = Column(DateTime(timezone=True))
 
@@ -158,17 +200,15 @@ class Deployment(Base):
 class DeploymentDevice(Base):
     __tablename__ = "deployment_devices"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    deployment_id = Column(
-        UUID(as_uuid=True), ForeignKey("deployments.id"), nullable=False
-    )
-    device_id = Column(UUID(as_uuid=True), ForeignKey("devices.id"), nullable=False)
+    id = Column(UUID(), primary_key=True, default=uuid.uuid4)
+    deployment_id = Column(UUID(), ForeignKey("deployments.id"), nullable=False)
+    device_id = Column(UUID(), ForeignKey("devices.id"), nullable=False)
     status = Column(
         String(50), nullable=False
     )  # pending, in_progress, completed, failed
     started_at = Column(DateTime(timezone=True))
     completed_at = Column(DateTime(timezone=True))
-    backup_id = Column(UUID(as_uuid=True))
+    backup_id = Column(UUID())
     error_message = Column(Text)
     validation_results = Column(JSON)
 
@@ -180,7 +220,7 @@ class DeploymentDevice(Base):
 class GitRepository(Base):
     __tablename__ = "git_repositories"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(), primary_key=True, default=uuid.uuid4)
     url = Column(Text, nullable=False, unique=True)
     branch = Column(String(100), default="main")
     webhook_secret_ref = Column(String(256))  # Vault reference
@@ -201,15 +241,15 @@ class GitRepository(Base):
 class DeviceConfig(Base):
     __tablename__ = "device_configs"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    device_id = Column(UUID(as_uuid=True), ForeignKey("devices.id"), nullable=False)
+    id = Column(UUID(), primary_key=True, default=uuid.uuid4)
+    device_id = Column(UUID(), ForeignKey("devices.id"), nullable=False)
     config_encrypted = Column(Text, nullable=False)  # Encrypted content
     backup_location = Column(Text, nullable=False)
     version = Column(Integer, nullable=False)
     config_hash = Column(String(64), nullable=False)  # SHA-256 of plaintext
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    created_by = Column(UUID(as_uuid=True), ForeignKey("users.id"))
-    deployment_id = Column(UUID(as_uuid=True), ForeignKey("deployments.id"))
+    created_by = Column(UUID(), ForeignKey("users.id"))
+    deployment_id = Column(UUID(), ForeignKey("deployments.id"))
     is_active = Column(Boolean, default=False)
     validation_status = Column(String(50))
     validation_results = Column(JSON)
@@ -222,7 +262,7 @@ class DeviceConfig(Base):
 class AuditLog(Base):
     __tablename__ = "audit_logs"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(), primary_key=True, default=uuid.uuid4)
     timestamp = Column(
         DateTime(timezone=True),
         nullable=False,
@@ -230,7 +270,7 @@ class AuditLog(Base):
         index=True,
     )
     event_type = Column(String(100), nullable=False, index=True)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), index=True)
+    user_id = Column(UUID(), ForeignKey("users.id"), index=True)
     level = Column(
         String(20), nullable=False
     )  # INFO, WARNING, ERROR, CRITICAL, SECURITY
@@ -250,7 +290,7 @@ class AuditLog(Base):
 class ConfigTemplate(Base):
     __tablename__ = "config_templates"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(), primary_key=True, default=uuid.uuid4)
     name = Column(String(255), nullable=False, unique=True)
     vendor = Column(SQLEnum(DeviceVendor), nullable=False)
     template_content = Column(Text, nullable=False)
@@ -260,13 +300,13 @@ class ConfigTemplate(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-    created_by = Column(UUID(as_uuid=True), ForeignKey("users.id"))
+    created_by = Column(UUID(), ForeignKey("users.id"))
 
 
 class SecretRotation(Base):
     __tablename__ = "secret_rotations"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(), primary_key=True, default=uuid.uuid4)
     secret_path = Column(String(500), nullable=False)
     secret_type = Column(String(50), nullable=False)  # device_credential, api_key, etc.
     last_rotation = Column(DateTime(timezone=True), nullable=False)
@@ -281,8 +321,8 @@ class Session(Base):
     __tablename__ = "sessions"
 
     id = Column(String(255), primary_key=True)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
-    device_id = Column(UUID(as_uuid=True), ForeignKey("devices.id"))
+    user_id = Column(UUID(), ForeignKey("users.id"), nullable=False)
+    device_id = Column(UUID(), ForeignKey("devices.id"))
     started_at = Column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
@@ -295,8 +335,8 @@ class Session(Base):
 class UserSSHKey(Base):
     __tablename__ = "user_ssh_keys"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    id = Column(UUID(), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(), ForeignKey("users.id"), nullable=False)
     name = Column(String(255), nullable=False)
     public_key = Column(Text, nullable=False)
     fingerprint = Column(String(128), nullable=False, unique=True, index=True)
@@ -315,8 +355,8 @@ class UserSSHKey(Base):
 class SSHKey(Base):
     __tablename__ = "ssh_keys"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    device_id = Column(UUID(as_uuid=True), ForeignKey("devices.id"))
+    id = Column(UUID(), primary_key=True, default=uuid.uuid4)
+    device_id = Column(UUID(), ForeignKey("devices.id"))
     name = Column(String(255), nullable=False)
     vault_path = Column(String(500), nullable=False)  # Path in Vault
     fingerprint = Column(String(128), nullable=False, index=True)
