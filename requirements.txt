@@ -40,7 +40,8 @@ mfa==0.1.1
 pyotp==2.9.0
 qrcode==7.4.2  # For MFA QR code generation
 lxml==5.0.0  # For SAML support
-python-saml==2.5.0  # SAML authentication
+# Note: python-saml requires xmlsec which needs system libraries
+# For production, install python3-saml2 with system dependencies
 
 # Validation
 pydantic==2.5.2
