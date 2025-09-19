@@ -68,9 +68,7 @@ class TestDeploymentManager:
     async def test_create_deployment(self):
         """Test deployment creation"""
         # Setup mocks
-        self.manager._get_device_info = AsyncMock(
-            return_value={"hostname": "router1"}
-        )
+        self.manager._get_device_info = AsyncMock(return_value={"hostname": "router1"})
 
         # Create deployment
         deployment_id = await self.manager.create_deployment(
@@ -211,7 +209,9 @@ class TestDeploymentValidator:
         mock_validation = Mock()
         mock_validation.is_valid = True
         mock_validation.errors = []
-        self.config_validator.validate_configuration = Mock(return_value=mock_validation)
+        self.config_validator.validate_configuration = Mock(
+            return_value=mock_validation
+        )
 
         # Validate deployment
         result = await self.validator.validate_deployment(

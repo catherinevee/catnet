@@ -266,7 +266,9 @@ class DeploymentManager:
         total_devices = len(deployment.devices)
 
         # Calculate canary batch
-        canary_count = max(1, int(total_devices * deployment.config.canary_percentage / 100))
+        canary_count = max(
+            1, int(total_devices * deployment.config.canary_percentage / 100)
+        )
         canary_devices = deployment.devices[:canary_count]
         remaining_devices = deployment.devices[canary_count:]
 
@@ -435,7 +437,9 @@ class DeploymentManager:
                     return False
 
             # Verify configuration
-            if not await self._verify_configuration(device_id, deployment.configuration):
+            if not await self._verify_configuration(
+                device_id, deployment.configuration
+            ):
                 device_deployment.state = DeploymentState.FAILED
                 device_deployment.errors.append("Configuration verification failed")
                 return False
@@ -539,9 +543,7 @@ class DeploymentManager:
             return True
         return False
 
-    async def approve_deployment(
-        self, deployment_id: str, approved_by: str
-    ) -> bool:
+    async def approve_deployment(self, deployment_id: str, approved_by: str) -> bool:
         """
         Approve a deployment
 
@@ -556,16 +558,17 @@ class DeploymentManager:
             return False
 
         deployment = self.deployments[deployment_id]
-        if deployment.config.require_approval and deployment.state == DeploymentState.PENDING:
+        if (
+            deployment.config.require_approval
+            and deployment.state == DeploymentState.PENDING
+        ):
             deployment.approval_status = "approved"
             deployment.approved_by = approved_by
             asyncio.create_task(self.execute_deployment(deployment_id))
             return True
         return False
 
-    def get_deployment_status(
-        self, deployment_id: str
-    ) -> Optional[Dict[str, Any]]:
+    def get_deployment_status(self, deployment_id: str) -> Optional[Dict[str, Any]]:
         """
         Get deployment status
 
@@ -614,9 +617,7 @@ class DeploymentManager:
                 deployment.started_at.isoformat() if deployment.started_at else None
             ),
             "completed_at": (
-                deployment.completed_at.isoformat()
-                if deployment.completed_at
-                else None
+                deployment.completed_at.isoformat() if deployment.completed_at else None
             ),
             "errors": deployment.errors,
             "metadata": deployment.metadata,
@@ -641,24 +642,18 @@ class DeploymentManager:
             return await self.backup_service.restore_backup(device_id, backup_id)
         return True
 
-    async def _generate_diff(
-        self, device_id: str, new_config: str
-    ) -> str:
+    async def _generate_diff(self, device_id: str, new_config: str) -> str:
         """Generate configuration diff"""
         # Would compare with current device config
         return f"Diff for {device_id}"
 
-    async def _apply_configuration(
-        self, device_id: str, configuration: str
-    ) -> bool:
+    async def _apply_configuration(self, device_id: str, configuration: str) -> bool:
         """Apply configuration to device"""
         if self.device_service:
             return await self.device_service.apply_config(device_id, configuration)
         return True
 
-    async def _verify_configuration(
-        self, device_id: str, configuration: str
-    ) -> bool:
+    async def _verify_configuration(self, device_id: str, configuration: str) -> bool:
         """Verify configuration on device"""
         # Would verify configuration was applied correctly
         return True

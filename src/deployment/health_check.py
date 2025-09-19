@@ -161,7 +161,10 @@ class HealthCheckService:
             # Update overall status
             if result.status == HealthStatus.UNHEALTHY:
                 overall_status = HealthStatus.UNHEALTHY
-            elif result.status == HealthStatus.DEGRADED and overall_status != HealthStatus.UNHEALTHY:
+            elif (
+                result.status == HealthStatus.DEGRADED
+                and overall_status != HealthStatus.UNHEALTHY
+            ):
                 overall_status = HealthStatus.DEGRADED
 
         # Calculate duration
@@ -479,7 +482,9 @@ class HealthCheckService:
             metrics.append(memory_metric)
 
             # Determine overall status
-            unhealthy_metrics = [m for m in metrics if m.status == HealthStatus.UNHEALTHY]
+            unhealthy_metrics = [
+                m for m in metrics if m.status == HealthStatus.UNHEALTHY
+            ]
             degraded_metrics = [m for m in metrics if m.status == HealthStatus.DEGRADED]
 
             if unhealthy_metrics:
@@ -723,4 +728,6 @@ class HealthCheckService:
     ) -> None:
         """Trigger health alert"""
         # Would send actual alert
-        print(f"HEALTH ALERT: Device {device_id} is {result.status.value}: {result.message}")
+        print(
+            f"HEALTH ALERT: Device {device_id} is {result.status.value}: {result.message}"
+        )

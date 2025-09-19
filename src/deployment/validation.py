@@ -238,7 +238,9 @@ class DeploymentValidator:
                     else:
                         result.passed_checks += 1
 
-                    result.device_results[device_id]["config_valid"] = validation.is_valid
+                    result.device_results[device_id][
+                        "config_valid"
+                    ] = validation.is_valid
             else:
                 # Basic configuration checks
                 if not configuration or len(configuration.strip()) == 0:
@@ -471,7 +473,10 @@ class DeploymentValidator:
             result.warnings += 1
 
     async def _validate_dependencies(
-        self, devices: List[str], deployment_config: Dict[str, Any], result: ValidationResult
+        self,
+        devices: List[str],
+        deployment_config: Dict[str, Any],
+        result: ValidationResult,
     ) -> None:
         """
         Validate deployment dependencies
@@ -615,9 +620,7 @@ class DeploymentValidator:
         # Would check actual deployment status
         return "completed"
 
-    async def _check_device_dependencies(
-        self, device_id: str
-    ) -> List[Dict[str, Any]]:
+    async def _check_device_dependencies(self, device_id: str) -> List[Dict[str, Any]]:
         """Check device dependencies"""
         # Would check actual device dependencies
         return []

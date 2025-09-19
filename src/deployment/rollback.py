@@ -85,7 +85,9 @@ class RollbackManager:
         self.backup_service = backup_service
 
         self.rollback_operations: Dict[str, RollbackOperation] = {}
-        self.rollback_points: Dict[str, Dict[str, RollbackPoint]] = {}  # device_id -> points
+        self.rollback_points: Dict[
+            str, Dict[str, RollbackPoint]
+        ] = {}  # device_id -> points
         self.active_rollbacks: List[str] = []
 
     async def create_rollback_point(
@@ -271,9 +273,7 @@ class RollbackManager:
             print(f"Rollback failed for {device_id}: {str(e)}")
             return False
 
-    async def validate_rollback_capability(
-        self, devices: List[str]
-    ) -> Dict[str, bool]:
+    async def validate_rollback_capability(self, devices: List[str]) -> Dict[str, bool]:
         """
         Validate if devices can be rolled back
 
@@ -473,6 +473,4 @@ class RollbackManager:
         points_to_keep = points[:keep_last]
 
         # Rebuild dictionary with only points to keep
-        self.rollback_points[device_id] = {
-            p.id: p for p in points_to_keep
-        }
+        self.rollback_points[device_id] = {p.id: p for p in points_to_keep}

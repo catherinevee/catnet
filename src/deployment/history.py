@@ -320,9 +320,7 @@ class DeploymentHistory:
         # Convert to dictionaries and limit
         return [self._event_to_dict(e) for e in events[:limit]]
 
-    def get_deployment_summary(
-        self, deployment_id: str
-    ) -> Optional[Dict[str, Any]]:
+    def get_deployment_summary(self, deployment_id: str) -> Optional[Dict[str, Any]]:
         """
         Get deployment summary
 
@@ -340,7 +338,9 @@ class DeploymentHistory:
             "deployment_id": summary.deployment_id,
             "name": summary.name,
             "created_at": summary.created_at.isoformat(),
-            "completed_at": summary.completed_at.isoformat() if summary.completed_at else None,
+            "completed_at": summary.completed_at.isoformat()
+            if summary.completed_at
+            else None,
             "duration_minutes": summary.duration_minutes,
             "devices_total": summary.devices_total,
             "devices_successful": summary.devices_successful,
@@ -382,9 +382,13 @@ class DeploymentHistory:
                 if history.total_deployments > 0
                 else 0
             ),
-            "last_deployment": history.last_deployment.isoformat() if history.last_deployment else None,
+            "last_deployment": history.last_deployment.isoformat()
+            if history.last_deployment
+            else None,
             "average_deployment_time": history.average_deployment_time,
-            "last_health_check": history.last_health_check.isoformat() if history.last_health_check else None,
+            "last_health_check": history.last_health_check.isoformat()
+            if history.last_health_check
+            else None,
             "health_status": history.health_status,
             "recent_deployments": history.deployments[-10:],  # Last 10 deployments
         }
@@ -462,11 +466,7 @@ class DeploymentHistory:
         Returns:
             Compliance report
         """
-        events = [
-            e
-            for e in self.events
-            if start_date <= e.timestamp <= end_date
-        ]
+        events = [e for e in self.events if start_date <= e.timestamp <= end_date]
 
         # Group events by type
         events_by_type = defaultdict(list)
@@ -474,9 +474,15 @@ class DeploymentHistory:
             events_by_type[event.event_type.value].append(event)
 
         # Calculate compliance metrics
-        total_deployments = len(events_by_type[HistoryEventType.DEPLOYMENT_STARTED.value])
-        approved_deployments = len(events_by_type[HistoryEventType.DEPLOYMENT_APPROVED.value])
-        failed_deployments = len(events_by_type[HistoryEventType.DEPLOYMENT_FAILED.value])
+        total_deployments = len(
+            events_by_type[HistoryEventType.DEPLOYMENT_STARTED.value]
+        )
+        approved_deployments = len(
+            events_by_type[HistoryEventType.DEPLOYMENT_APPROVED.value]
+        )
+        failed_deployments = len(
+            events_by_type[HistoryEventType.DEPLOYMENT_FAILED.value]
+        )
         rollbacks = len(events_by_type[HistoryEventType.DEPLOYMENT_ROLLED_BACK.value])
 
         return {
