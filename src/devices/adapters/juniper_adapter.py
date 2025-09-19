@@ -75,11 +75,7 @@ class JuniperAdapter(DeviceAdapter):
 
             # Connect (run in executor for async)
             loop = asyncio.get_event_loop()
-            await loop.run_in_executor(
-                None,
-                dev.open,
-                self.auto_probe
-            )
+            await loop.run_in_executor(None, dev.open, self.auto_probe)
 
             # Bind configuration utility
             dev.bind(Config)
@@ -119,10 +115,7 @@ class JuniperAdapter(DeviceAdapter):
         try:
             if connection.session_data:
                 loop = asyncio.get_event_loop()
-                await loop.run_in_executor(
-                    None,
-                    connection.session_data.close
-                )
+                await loop.run_in_executor(None, connection.session_data.close)
 
             # Remove from connections
             if connection.connection_id in self.connections:
@@ -134,9 +127,7 @@ class JuniperAdapter(DeviceAdapter):
         except Exception:
             return False
 
-    async def execute_command(
-        self, connection: DeviceConnection, command: str
-    ) -> str:
+    async def execute_command(self, connection: DeviceConnection, command: str) -> str:
         """
         Execute command on Juniper device
 
@@ -157,28 +148,19 @@ class JuniperAdapter(DeviceAdapter):
             if command.startswith("show"):
                 # CLI command
                 result = await loop.run_in_executor(
-                    None,
-                    connection.session_data.cli,
-                    command,
-                    "text"
+                    None, connection.session_data.cli, command, "text"
                 )
             else:
                 # Try as RPC
                 rpc_cmd = command.replace(" ", "_").replace("-", "_")
                 rpc = getattr(connection.session_data.rpc, rpc_cmd, None)
                 if rpc:
-                    result = await loop.run_in_executor(
-                        None,
-                        rpc
-                    )
+                    result = await loop.run_in_executor(None, rpc)
                     result = str(result)
                 else:
                     # Fall back to CLI
                     result = await loop.run_in_executor(
-                        None,
-                        connection.session_data.cli,
-                        command,
-                        "text"
+                        None, connection.session_data.cli, command, "text"
                     )
 
             # Update metrics
@@ -235,25 +217,14 @@ class JuniperAdapter(DeviceAdapter):
             cu = connection.session_data.cu
 
             # Lock configuration
-            await loop.run_in_executor(
-                None,
-                cu.lock
-            )
+            await loop.run_in_executor(None, cu.lock)
 
             try:
                 # Load configuration
-                await loop.run_in_executor(
-                    None,
-                    cu.load,
-                    configuration,
-                    format="text"
-                )
+                await loop.run_in_executor(None, cu.load, configuration, format="text")
 
                 # Check for differences
-                diff = await loop.run_in_executor(
-                    None,
-                    cu.diff
-                )
+                diff = await loop.run_in_executor(None, cu.diff)
 
                 if diff:
                     # Commit configuration
@@ -261,7 +232,7 @@ class JuniperAdapter(DeviceAdapter):
                         None,
                         cu.commit,
                         comment="Applied by CatNet",
-                        timeout=self.commit_timeout
+                        timeout=self.commit_timeout,
                     )
                     success = True
                 else:
@@ -270,10 +241,7 @@ class JuniperAdapter(DeviceAdapter):
 
             finally:
                 # Unlock configuration
-                await loop.run_in_executor(
-                    None,
-                    cu.unlock
-                )
+                await loop.run_in_executor(None, cu.unlock)
 
             return success
 
@@ -283,10 +251,7 @@ class JuniperAdapter(DeviceAdapter):
             # Rollback on commit error
             try:
                 loop = asyncio.get_event_loop()
-                await loop.run_in_executor(
-                    None,
-                    connection.session_data.cu.rollback
-                )
+                await loop.run_in_executor(None, connection.session_data.cu.rollback)
             except:
                 pass
             raise Exception(f"Configuration commit failed: {str(e)}")
@@ -310,10 +275,7 @@ class JuniperAdapter(DeviceAdapter):
             cu = connection.session_data.cu
 
             # Sync configuration
-            await loop.run_in_executor(
-                None,
-                cu.sync
-            )
+            await loop.run_in_executor(None, cu.sync)
 
             return True
 
@@ -346,18 +308,10 @@ class JuniperAdapter(DeviceAdapter):
 
             try:
                 # Load configuration
-                await loop.run_in_executor(
-                    None,
-                    cu.load,
-                    configuration,
-                    format="text"
-                )
+                await loop.run_in_executor(None, cu.load, configuration, format="text")
 
                 # Commit check
-                result = await loop.run_in_executor(
-                    None,
-                    cu.commit_check
-                )
+                result = await loop.run_in_executor(None, cu.commit_check)
 
                 return result
 
@@ -394,18 +348,14 @@ class JuniperAdapter(DeviceAdapter):
 
             try:
                 # Rollback
-                await loop.run_in_executor(
-                    None,
-                    cu.rollback,
-                    rollback_id
-                )
+                await loop.run_in_executor(None, cu.rollback, rollback_id)
 
                 # Commit rollback
                 await loop.run_in_executor(
                     None,
                     cu.commit,
                     comment=f"Rollback to {rollback_id}",
-                    timeout=self.commit_timeout
+                    timeout=self.commit_timeout,
                 )
 
                 return True
@@ -455,11 +405,11 @@ class JuniperAdapter(DeviceAdapter):
             "configuration;",
         ]
 
-        for line in config.split('\n'):
+        for line in config.split("\n"):
             # Skip certain lines
             if any(pattern in line for pattern in skip_patterns):
                 continue
 
             lines.append(line)
 
-        return '\n'.join(lines)
+        return "\n".join(lines)

@@ -75,9 +75,7 @@ class MetricsCollector:
         """
         self.namespace = namespace
         self.metrics: Dict[str, Any] = {}
-        self.time_series: Dict[str, deque] = defaultdict(
-            lambda: deque(maxlen=1000)
-        )
+        self.time_series: Dict[str, deque] = defaultdict(lambda: deque(maxlen=1000))
 
         # Initialize default metrics
         self._initialize_default_metrics()
@@ -296,7 +294,9 @@ class MetricsCollector:
         # Store in time series
         self._store_time_series(name, value, labels)
 
-    def set_gauge(self, name: str, value: float, labels: Optional[Dict[str, str]] = None):
+    def set_gauge(
+        self, name: str, value: float, labels: Optional[Dict[str, str]] = None
+    ):
         """
         Set a gauge metric
 
@@ -366,9 +366,7 @@ class MetricsCollector:
         # Store in time series
         self._store_time_series(name, value, labels)
 
-    def _store_time_series(
-        self, name: str, value: float, labels: Dict[str, str]
-    ):
+    def _store_time_series(self, name: str, value: float, labels: Dict[str, str]):
         """Store metric value in time series"""
         key = f"{name}:{':'.join(f'{k}={v}' for k, v in sorted(labels.items()))}"
         metric_value = MetricValue(
@@ -439,7 +437,9 @@ class MetricsCollector:
 
         first_value = time_series[0].value
         last_value = time_series[-1].value
-        time_diff = (time_series[-1].timestamp - time_series[0].timestamp).total_seconds()
+        time_diff = (
+            time_series[-1].timestamp - time_series[0].timestamp
+        ).total_seconds()
 
         if time_diff == 0:
             return 0.0
@@ -523,7 +523,9 @@ class MetricsCollector:
         # Memory usage
         memory = psutil.virtual_memory()
         self.set_gauge("system_memory_usage", memory.percent, {"host": "localhost"})
-        self.set_gauge("system_memory_available", memory.available, {"host": "localhost"})
+        self.set_gauge(
+            "system_memory_available", memory.available, {"host": "localhost"}
+        )
 
         # Disk usage
         disk = psutil.disk_usage("/")
@@ -532,8 +534,12 @@ class MetricsCollector:
 
         # Network I/O
         net_io = psutil.net_io_counters()
-        self.set_gauge("system_network_bytes_sent", net_io.bytes_sent, {"host": "localhost"})
-        self.set_gauge("system_network_bytes_recv", net_io.bytes_recv, {"host": "localhost"})
+        self.set_gauge(
+            "system_network_bytes_sent", net_io.bytes_sent, {"host": "localhost"}
+        )
+        self.set_gauge(
+            "system_network_bytes_recv", net_io.bytes_recv, {"host": "localhost"}
+        )
 
     def export_metrics(self, format: str = "prometheus") -> str:
         """
@@ -547,9 +553,11 @@ class MetricsCollector:
         """
         if format == "prometheus":
             from prometheus_client import generate_latest
+
             return generate_latest().decode("utf-8")
         elif format == "json":
             import json
+
             metrics_data = {}
             for name, metric_info in self.metrics.items():
                 metrics_data[name] = {

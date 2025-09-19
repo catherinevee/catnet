@@ -257,9 +257,7 @@ class ObservabilityService:
 
         span = self.active_spans[span_id]
         span.end_time = datetime.utcnow()
-        span.duration_ms = (
-            span.end_time - span.start_time
-        ).total_seconds() * 1000
+        span.duration_ms = (span.end_time - span.start_time).total_seconds() * 1000
 
         # Remove from active spans
         del self.active_spans[span_id]
@@ -289,7 +287,11 @@ class ObservabilityService:
             self.active_spans[span_id].tags[key] = value
 
     def add_span_log(
-        self, span_id: str, level: TraceLevel, message: str, context: Optional[Dict[str, Any]] = None
+        self,
+        span_id: str,
+        level: TraceLevel,
+        message: str,
+        context: Optional[Dict[str, Any]] = None,
     ):
         """
         Add log to span
@@ -321,9 +323,7 @@ class ObservabilityService:
 
         trace = self.active_traces[trace_id]
         trace.end_time = datetime.utcnow()
-        trace.duration_ms = (
-            trace.end_time - trace.start_time
-        ).total_seconds() * 1000
+        trace.duration_ms = (trace.end_time - trace.start_time).total_seconds() * 1000
 
         # End root span if still active
         if trace.root_span.span_id in self.active_spans:
@@ -348,7 +348,8 @@ class ObservabilityService:
         """
         # Check for slow operations
         slow_spans = [
-            s for s in trace.spans
+            s
+            for s in trace.spans
             if s.duration_ms and s.duration_ms > 1000  # > 1 second
         ]
 
@@ -362,10 +363,7 @@ class ObservabilityService:
             )
 
         # Check for errors
-        error_spans = [
-            s for s in trace.spans
-            if s.status == "error"
-        ]
+        error_spans = [s for s in trace.spans if s.status == "error"]
 
         if error_spans:
             self.log(
@@ -384,8 +382,7 @@ class ObservabilityService:
         """Cleanup old completed traces"""
         cutoff = datetime.utcnow() - self.max_trace_duration
         self.completed_traces = [
-            t for t in self.completed_traces
-            if t.start_time > cutoff
+            t for t in self.completed_traces if t.start_time > cutoff
         ]
 
     def log(
@@ -443,10 +440,7 @@ class ObservabilityService:
     def _cleanup_old_logs(self):
         """Cleanup old log entries"""
         cutoff = datetime.utcnow() - self.log_retention
-        self.log_buffer = [
-            log for log in self.log_buffer
-            if log.timestamp > cutoff
-        ]
+        self.log_buffer = [log for log in self.log_buffer if log.timestamp > cutoff]
 
     def update_service_health(
         self,
@@ -527,33 +521,39 @@ class ObservabilityService:
 
         # Response time anomaly (> 2x baseline)
         if health.response_time_ms > baseline["response_time_ms"] * 2:
-            anomalies.append({
-                "type": "response_time",
-                "severity": "high",
-                "message": f"Response time 2x above baseline",
-                "current": health.response_time_ms,
-                "baseline": baseline["response_time_ms"],
-            })
+            anomalies.append(
+                {
+                    "type": "response_time",
+                    "severity": "high",
+                    "message": f"Response time 2x above baseline",
+                    "current": health.response_time_ms,
+                    "baseline": baseline["response_time_ms"],
+                }
+            )
 
         # Error rate anomaly (> 5x baseline)
         if health.error_rate > baseline["error_rate"] * 5:
-            anomalies.append({
-                "type": "error_rate",
-                "severity": "critical",
-                "message": f"Error rate 5x above baseline",
-                "current": health.error_rate,
-                "baseline": baseline["error_rate"],
-            })
+            anomalies.append(
+                {
+                    "type": "error_rate",
+                    "severity": "critical",
+                    "message": f"Error rate 5x above baseline",
+                    "current": health.error_rate,
+                    "baseline": baseline["error_rate"],
+                }
+            )
 
         # Throughput anomaly (< 50% baseline)
         if health.throughput_rps < baseline["throughput_rps"] * 0.5:
-            anomalies.append({
-                "type": "throughput",
-                "severity": "medium",
-                "message": f"Throughput 50% below baseline",
-                "current": health.throughput_rps,
-                "baseline": baseline["throughput_rps"],
-            })
+            anomalies.append(
+                {
+                    "type": "throughput",
+                    "severity": "medium",
+                    "message": f"Throughput 50% below baseline",
+                    "current": health.throughput_rps,
+                    "baseline": baseline["throughput_rps"],
+                }
+            )
 
         if anomalies:
             anomaly_detection = {
@@ -583,25 +583,29 @@ class ObservabilityService:
 
         # Create nodes for each service
         for service_name, health in self.service_map.items():
-            nodes.append({
-                "id": service_name,
-                "label": service_name,
-                "status": health.status,
-                "metrics": {
-                    "response_time_ms": health.response_time_ms,
-                    "error_rate": health.error_rate,
-                    "throughput_rps": health.throughput_rps,
-                },
-                "issues": health.issues,
-            })
+            nodes.append(
+                {
+                    "id": service_name,
+                    "label": service_name,
+                    "status": health.status,
+                    "metrics": {
+                        "response_time_ms": health.response_time_ms,
+                        "error_rate": health.error_rate,
+                        "throughput_rps": health.throughput_rps,
+                    },
+                    "issues": health.issues,
+                }
+            )
 
         # Create edges for dependencies
         for service, deps in self.service_dependencies.items():
             for dep in deps:
-                edges.append({
-                    "source": service,
-                    "target": dep,
-                })
+                edges.append(
+                    {
+                        "source": service,
+                        "target": dep,
+                    }
+                )
 
         return {
             "nodes": nodes,
@@ -625,8 +629,7 @@ class ObservabilityService:
         else:
             # Check completed traces
             trace = next(
-                (t for t in self.completed_traces if t.trace_id == trace_id),
-                None
+                (t for t in self.completed_traces if t.trace_id == trace_id), None
             )
 
         if not trace:
@@ -670,12 +673,14 @@ class ObservabilityService:
         children = []
         for span in span_map.values():
             if span.parent_span_id == parent_id:
-                children.append({
-                    "operation": span.operation_name,
-                    "duration_ms": span.duration_ms,
-                    "status": span.status,
-                    "children": self._get_child_spans(span.span_id, span_map),
-                })
+                children.append(
+                    {
+                        "operation": span.operation_name,
+                        "duration_ms": span.duration_ms,
+                        "status": span.status,
+                        "children": self._get_child_spans(span.span_id, span_map),
+                    }
+                )
         return children
 
     def get_log_insights(
@@ -720,7 +725,9 @@ class ObservabilityService:
 
         # Find error patterns
         error_patterns = defaultdict(int)
-        error_logs = [log for log in logs if log.level in [TraceLevel.ERROR, TraceLevel.CRITICAL]]
+        error_logs = [
+            log for log in logs if log.level in [TraceLevel.ERROR, TraceLevel.CRITICAL]
+        ]
         for log in error_logs:
             # Simple pattern extraction (would be more sophisticated)
             pattern = log.message[:50]
@@ -733,7 +740,9 @@ class ObservabilityService:
             "error_patterns": dict(error_patterns),
             "error_rate": len(error_logs) / len(logs) if logs else 0,
             "time_range": {
-                "start": min(log.timestamp for log in logs).isoformat() if logs else None,
+                "start": min(log.timestamp for log in logs).isoformat()
+                if logs
+                else None,
                 "end": max(log.timestamp for log in logs).isoformat() if logs else None,
             },
         }

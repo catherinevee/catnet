@@ -258,9 +258,7 @@ class VaultService:
             # Add TTL if specified
             if ttl:
                 secret_data["ttl"] = int(ttl.total_seconds())
-                secret_data["expires_at"] = (
-                    datetime.utcnow() + ttl
-                ).isoformat()
+                secret_data["expires_at"] = (datetime.utcnow() + ttl).isoformat()
 
             # Store in Vault
             if engine == SecretEngine.KV:
@@ -434,12 +432,7 @@ class VaultService:
                 }
 
                 # Audit log
-                self._audit_log(
-                    "generate_db_creds",
-                    database,
-                    role,
-                    success=True
-                )
+                self._audit_log("generate_db_creds", database, role, success=True)
 
                 return creds
 
@@ -447,11 +440,7 @@ class VaultService:
 
         except Exception as e:
             self._audit_log(
-                "generate_db_creds",
-                database,
-                role,
-                success=False,
-                error=str(e)
+                "generate_db_creds", database, role, success=False, error=str(e)
             )
             return None
 
@@ -495,11 +484,7 @@ class VaultService:
 
         except Exception as e:
             self._audit_log(
-                "generate_ssh_creds",
-                role,
-                username,
-                success=False,
-                error=str(e)
+                "generate_ssh_creds", role, username, success=False, error=str(e)
             )
             return None
 
@@ -658,10 +643,7 @@ class VaultService:
 
         except Exception as e:
             self._audit_log(
-                "issue_certificate",
-                common_name,
-                success=False,
-                error=str(e)
+                "issue_certificate", common_name, success=False, error=str(e)
             )
             return None
 
@@ -686,10 +668,7 @@ class VaultService:
 
         except Exception as e:
             self._audit_log(
-                "revoke_certificate",
-                serial_number,
-                success=False,
-                error=str(e)
+                "revoke_certificate", serial_number, success=False, error=str(e)
             )
             return False
 
@@ -780,13 +759,7 @@ class VaultService:
             return success
 
         except Exception as e:
-            self._audit_log(
-                "rotate_secret",
-                path,
-                key,
-                success=False,
-                error=str(e)
-            )
+            self._audit_log("rotate_secret", path, key, success=False, error=str(e))
             return False
 
     async def _schedule_version_deletion(
@@ -886,14 +859,12 @@ class VaultService:
 
         if start_time:
             logs = [
-                l for l in logs
-                if datetime.fromisoformat(l["timestamp"]) >= start_time
+                l for l in logs if datetime.fromisoformat(l["timestamp"]) >= start_time
             ]
 
         if end_time:
             logs = [
-                l for l in logs
-                if datetime.fromisoformat(l["timestamp"]) <= end_time
+                l for l in logs if datetime.fromisoformat(l["timestamp"]) <= end_time
             ]
 
         if action:

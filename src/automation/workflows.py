@@ -136,7 +136,7 @@ class WorkflowEngine:
         device_service=None,
         deployment_service=None,
         notification_service=None,
-        monitoring_service=None
+        monitoring_service=None,
     ):
         """
         Initialize workflow engine
@@ -198,9 +198,9 @@ class WorkflowEngine:
                         type=TriggerType.EVENT,
                         conditions={
                             "event_type": "alert.fired",
-                            "alert_name": "high_cpu"
+                            "alert_name": "high_cpu",
                         },
-                        cooldown=timedelta(minutes=15)
+                        cooldown=timedelta(minutes=15),
                     )
                 ],
                 actions=[
@@ -210,8 +210,8 @@ class WorkflowEngine:
                         type=ActionType.DEVICE_COMMAND,
                         parameters={
                             "command": "show processes cpu sorted",
-                            "parse_output": True
-                        }
+                            "parse_output": True,
+                        },
                     ),
                     WorkflowAction(
                         id="analyze_cause",
@@ -219,8 +219,8 @@ class WorkflowEngine:
                         type=ActionType.SCRIPT,
                         parameters={
                             "script": "analyze_cpu_usage.py",
-                            "input": "{{check_processes.output}}"
-                        }
+                            "input": "{{check_processes.output}}",
+                        },
                     ),
                     WorkflowAction(
                         id="remediate",
@@ -228,9 +228,9 @@ class WorkflowEngine:
                         type=ActionType.DEVICE_COMMAND,
                         parameters={
                             "command": "{{analyze_cause.remediation_command}}",
-                            "confirm": True
+                            "confirm": True,
                         },
-                        conditions={"analyze_cause.requires_action": True}
+                        conditions={"analyze_cause.requires_action": True},
                     ),
                     WorkflowAction(
                         id="notify",
@@ -238,10 +238,10 @@ class WorkflowEngine:
                         type=ActionType.NOTIFICATION,
                         parameters={
                             "channel": "slack",
-                            "message": "CPU remediation completed on {{device_id}}"
-                        }
-                    )
-                ]
+                            "message": "CPU remediation completed on {{device_id}}",
+                        },
+                    ),
+                ],
             )
         )
 
@@ -254,9 +254,7 @@ class WorkflowEngine:
                 triggers=[
                     WorkflowTrigger(
                         type=TriggerType.EVENT,
-                        conditions={
-                            "event_type": "deployment.starting"
-                        }
+                        conditions={"event_type": "deployment.starting"},
                     )
                 ],
                 actions=[
@@ -266,8 +264,8 @@ class WorkflowEngine:
                         type=ActionType.DEVICE_COMMAND,
                         parameters={
                             "command": "show running-config",
-                            "save_as": "backup_{{timestamp}}.cfg"
-                        }
+                            "save_as": "backup_{{timestamp}}.cfg",
+                        },
                     ),
                     WorkflowAction(
                         id="verify_backup",
@@ -275,8 +273,8 @@ class WorkflowEngine:
                         type=ActionType.SCRIPT,
                         parameters={
                             "script": "verify_backup.py",
-                            "backup_path": "{{create_backup.file_path}}"
-                        }
+                            "backup_path": "{{create_backup.file_path}}",
+                        },
                     ),
                     WorkflowAction(
                         id="proceed_or_abort",
@@ -285,10 +283,10 @@ class WorkflowEngine:
                         parameters={
                             "condition": "{{verify_backup.success}}",
                             "true_action": "continue",
-                            "false_action": "abort"
-                        }
-                    )
-                ]
+                            "false_action": "abort",
+                        },
+                    ),
+                ],
             )
         )
 
@@ -301,9 +299,7 @@ class WorkflowEngine:
                 triggers=[
                     WorkflowTrigger(
                         type=TriggerType.SCHEDULE,
-                        conditions={
-                            "cron": "0 2 * * *"  # Daily at 2 AM
-                        }
+                        conditions={"cron": "0 2 * * *"},  # Daily at 2 AM
                     )
                 ],
                 actions=[
@@ -313,8 +309,8 @@ class WorkflowEngine:
                         type=ActionType.SCRIPT,
                         parameters={
                             "script": "compliance_scan.py",
-                            "policy": "security_baseline"
-                        }
+                            "policy": "security_baseline",
+                        },
                     ),
                     WorkflowAction(
                         id="generate_report",
@@ -322,8 +318,8 @@ class WorkflowEngine:
                         type=ActionType.SCRIPT,
                         parameters={
                             "script": "generate_report.py",
-                            "scan_results": "{{scan_configs.results}}"
-                        }
+                            "scan_results": "{{scan_configs.results}}",
+                        },
                     ),
                     WorkflowAction(
                         id="auto_fix",
@@ -331,9 +327,9 @@ class WorkflowEngine:
                         type=ActionType.CONFIG_CHANGE,
                         parameters={
                             "changes": "{{scan_configs.remediation_commands}}",
-                            "approval_required": True
+                            "approval_required": True,
                         },
-                        conditions={"scan_configs.auto_fixable": True}
+                        conditions={"scan_configs.auto_fixable": True},
                     ),
                     WorkflowAction(
                         id="notify_team",
@@ -343,10 +339,10 @@ class WorkflowEngine:
                             "channel": "email",
                             "recipients": ["compliance@company.com"],
                             "subject": "Daily Compliance Report",
-                            "body": "{{generate_report.html}}"
-                        }
-                    )
-                ]
+                            "body": "{{generate_report.html}}",
+                        },
+                    ),
+                ],
             )
         )
 
@@ -383,7 +379,10 @@ class WorkflowEngine:
             for trigger in workflow.triggers:
                 if trigger.type == TriggerType.EVENT:
                     event_type = trigger.conditions.get("event_type")
-                    if event_type and workflow_id in self.event_subscriptions[event_type]:
+                    if (
+                        event_type
+                        and workflow_id in self.event_subscriptions[event_type]
+                    ):
                         self.event_subscriptions[event_type].remove(workflow_id)
 
             # Cancel scheduled tasks
@@ -394,9 +393,7 @@ class WorkflowEngine:
             del self.workflows[workflow_id]
 
     async def trigger_workflow(
-        self,
-        workflow_id: str,
-        trigger_event: Dict[str, Any]
+        self, workflow_id: str, trigger_event: Dict[str, Any]
     ) -> str:
         """
         Trigger a workflow execution
@@ -418,6 +415,7 @@ class WorkflowEngine:
 
         # Create execution
         import uuid
+
         execution_id = str(uuid.uuid4())[:12]
 
         execution = WorkflowExecution(
@@ -426,7 +424,7 @@ class WorkflowEngine:
             state=WorkflowState.PENDING,
             trigger_event=trigger_event,
             started_at=datetime.utcnow(),
-            context=workflow.variables.copy()
+            context=workflow.variables.copy(),
         )
 
         # Add trigger event to context
@@ -456,14 +454,13 @@ class WorkflowEngine:
             for action in workflow.actions:
                 # Check conditions
                 if action.conditions:
-                    if not self._evaluate_condition(action.conditions, execution.context):
+                    if not self._evaluate_condition(
+                        action.conditions, execution.context
+                    ):
                         continue
 
                 # Create step
-                step = WorkflowStep(
-                    action=action,
-                    state=WorkflowState.PENDING
-                )
+                step = WorkflowStep(action=action, state=WorkflowState.PENDING)
                 execution.steps.append(step)
 
                 # Execute action
@@ -508,11 +505,7 @@ class WorkflowEngine:
             if execution_id in self.running_executions:
                 del self.running_executions[execution_id]
 
-    async def _execute_action(
-        self,
-        step: WorkflowStep,
-        execution: WorkflowExecution
-    ):
+    async def _execute_action(self, step: WorkflowStep, execution: WorkflowExecution):
         """Execute a workflow action"""
         step.state = WorkflowState.RUNNING
         step.started_at = datetime.utcnow()
@@ -531,7 +524,7 @@ class WorkflowEngine:
                 # Execute with timeout
                 result = await asyncio.wait_for(
                     handler(step.action.parameters, execution.context),
-                    timeout=step.action.timeout.total_seconds()
+                    timeout=step.action.timeout.total_seconds(),
                 )
 
                 step.result = result
@@ -557,50 +550,46 @@ class WorkflowEngine:
     # Action Handlers
 
     async def _execute_device_command(
-        self,
-        parameters: Dict[str, Any],
-        context: Dict[str, Any]
+        self, parameters: Dict[str, Any], context: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Execute device command action"""
         if not self.device_service:
             raise ValueError("Device service not available")
 
         # Substitute variables
-        command = self._substitute_variables(parameters['command'], context)
-        device_id = parameters.get('device_id') or context.get('device_id')
+        command = self._substitute_variables(parameters["command"], context)
+        device_id = parameters.get("device_id") or context.get("device_id")
 
         # Execute command
         output = await self.device_service.execute_command(device_id, command)
 
-        result = {'output': output}
+        result = {"output": output}
 
         # Parse output if requested
-        if parameters.get('parse_output'):
+        if parameters.get("parse_output"):
             # Simple parsing logic
-            result['parsed'] = self._parse_output(output)
+            result["parsed"] = self._parse_output(output)
 
         # Save output if requested
-        if 'save_as' in parameters:
-            filename = self._substitute_variables(parameters['save_as'], context)
+        if "save_as" in parameters:
+            filename = self._substitute_variables(parameters["save_as"], context)
             # Save to file (implementation depends on storage service)
-            result['file_path'] = filename
+            result["file_path"] = filename
 
         return result
 
     async def _execute_config_change(
-        self,
-        parameters: Dict[str, Any],
-        context: Dict[str, Any]
+        self, parameters: Dict[str, Any], context: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Execute configuration change action"""
         if not self.deployment_service:
             raise ValueError("Deployment service not available")
 
-        changes = self._substitute_variables(str(parameters['changes']), context)
-        device_id = parameters.get('device_id') or context.get('device_id')
+        changes = self._substitute_variables(str(parameters["changes"]), context)
+        device_id = parameters.get("device_id") or context.get("device_id")
 
         # Check if approval required
-        if parameters.get('approval_required'):
+        if parameters.get("approval_required"):
             # Wait for approval (simplified)
             await asyncio.sleep(1)
 
@@ -609,97 +598,82 @@ class WorkflowEngine:
             name=f"Workflow config change",
             devices=[device_id],
             configuration=changes,
-            auto_execute=True
+            auto_execute=True,
         )
 
-        return {
-            'deployment_id': deployment_id,
-            'status': 'applied'
-        }
+        return {"deployment_id": deployment_id, "status": "applied"}
 
     async def _execute_rollback(
-        self,
-        parameters: Dict[str, Any],
-        context: Dict[str, Any]
+        self, parameters: Dict[str, Any], context: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Execute rollback action"""
         if not self.deployment_service:
             raise ValueError("Deployment service not available")
 
-        deployment_id = parameters.get('deployment_id') or context.get('deployment_id')
+        deployment_id = parameters.get("deployment_id") or context.get("deployment_id")
 
         # Trigger rollback
         success = await self.deployment_service.rollback_deployment(deployment_id)
 
-        return {
-            'success': success,
-            'rollback_completed': datetime.utcnow().isoformat()
-        }
+        return {"success": success, "rollback_completed": datetime.utcnow().isoformat()}
 
     async def _execute_notification(
-        self,
-        parameters: Dict[str, Any],
-        context: Dict[str, Any]
+        self, parameters: Dict[str, Any], context: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Execute notification action"""
         if not self.notification_service:
             # Fallback to print
-            message = self._substitute_variables(parameters['message'], context)
+            message = self._substitute_variables(parameters["message"], context)
             print(f"Notification: {message}")
-            return {'sent': True, 'method': 'console'}
+            return {"sent": True, "method": "console"}
 
-        channel = parameters['channel']
-        message = self._substitute_variables(parameters['message'], context)
+        channel = parameters["channel"]
+        message = self._substitute_variables(parameters["message"], context)
 
         # Send notification
         await self.notification_service.send(
-            channel=channel,
-            message=message,
-            **parameters
+            channel=channel, message=message, **parameters
         )
 
-        return {'sent': True, 'channel': channel}
+        return {"sent": True, "channel": channel}
 
     async def _execute_script(
-        self,
-        parameters: Dict[str, Any],
-        context: Dict[str, Any]
+        self, parameters: Dict[str, Any], context: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Execute script action"""
-        script = parameters['script']
-        input_data = parameters.get('input')
+        script = parameters["script"]
+        input_data = parameters.get("input")
 
         if input_data:
             input_data = self._substitute_variables(str(input_data), context)
 
         # Execute script (simplified - in production use proper sandboxing)
         import subprocess
+
         result = subprocess.run(
-            ['python', script],
+            ["python", script],
             input=input_data.encode() if input_data else None,
             capture_output=True,
             text=True,
-            timeout=60
+            timeout=60,
         )
 
         return {
-            'stdout': result.stdout,
-            'stderr': result.stderr,
-            'return_code': result.returncode
+            "stdout": result.stdout,
+            "stderr": result.stderr,
+            "return_code": result.returncode,
         }
 
     async def _execute_api_call(
-        self,
-        parameters: Dict[str, Any],
-        context: Dict[str, Any]
+        self, parameters: Dict[str, Any], context: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Execute API call action"""
         import aiohttp
 
-        url = self._substitute_variables(parameters['url'], context)
-        method = parameters.get('method', 'GET')
-        headers = parameters.get('headers', {})
-        body = parameters.get('body')
+        url = self._substitute_variables(parameters["url"], context)
+        method = parameters.get("method", "GET")
+        headers = parameters.get("headers", {})
+        body = parameters.get("body")
 
         if body:
             body = self._substitute_variables(json.dumps(body), context)
@@ -707,33 +681,28 @@ class WorkflowEngine:
 
         async with aiohttp.ClientSession() as session:
             async with session.request(
-                method,
-                url,
-                headers=headers,
-                json=body
+                method, url, headers=headers, json=body
             ) as response:
                 return {
-                    'status_code': response.status,
-                    'body': await response.json() if response.content_type == 'application/json' else await response.text()
+                    "status_code": response.status,
+                    "body": await response.json()
+                    if response.content_type == "application/json"
+                    else await response.text(),
                 }
 
     async def _execute_wait(
-        self,
-        parameters: Dict[str, Any],
-        context: Dict[str, Any]
+        self, parameters: Dict[str, Any], context: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Execute wait action"""
-        duration = parameters.get('duration', 60)
+        duration = parameters.get("duration", 60)
         await asyncio.sleep(duration)
-        return {'waited': duration}
+        return {"waited": duration}
 
     async def _execute_condition(
-        self,
-        parameters: Dict[str, Any],
-        context: Dict[str, Any]
+        self, parameters: Dict[str, Any], context: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Execute conditional action"""
-        condition = self._substitute_variables(parameters['condition'], context)
+        condition = self._substitute_variables(parameters["condition"], context)
 
         # Evaluate condition
         try:
@@ -742,41 +711,36 @@ class WorkflowEngine:
             result = False
 
         if result:
-            action = parameters.get('true_action', 'continue')
+            action = parameters.get("true_action", "continue")
         else:
-            action = parameters.get('false_action', 'continue')
+            action = parameters.get("false_action", "continue")
 
-        return {
-            'condition_result': result,
-            'action': action
-        }
+        return {"condition_result": result, "action": action}
 
     # Utility Methods
 
     def _substitute_variables(self, text: str, context: Dict[str, Any]) -> str:
         """Substitute variables in text"""
         # Simple variable substitution {{var}}
-        pattern = r'\{\{([^}]+)\}\}'
+        pattern = r"\{\{([^}]+)\}\}"
 
         def replace(match):
             path = match.group(1).strip()
-            parts = path.split('.')
+            parts = path.split(".")
 
             value = context
             for part in parts:
                 if isinstance(value, dict):
-                    value = value.get(part, '')
+                    value = value.get(part, "")
                 else:
-                    return ''
+                    return ""
 
             return str(value)
 
         return re.sub(pattern, replace, text)
 
     def _evaluate_condition(
-        self,
-        conditions: Dict[str, Any],
-        context: Dict[str, Any]
+        self, conditions: Dict[str, Any], context: Dict[str, Any]
     ) -> bool:
         """Evaluate conditions"""
         for key, expected in conditions.items():
@@ -788,11 +752,8 @@ class WorkflowEngine:
     def _parse_output(self, output: str) -> Dict[str, Any]:
         """Parse command output"""
         # Simple parsing - would be more sophisticated in production
-        lines = output.strip().split('\n')
-        return {
-            'lines': lines,
-            'line_count': len(lines)
-        }
+        lines = output.strip().split("\n")
+        return {"lines": lines, "line_count": len(lines)}
 
     def _schedule_workflow(self, workflow: Workflow):
         """Schedule a workflow"""
@@ -801,7 +762,7 @@ class WorkflowEngine:
 
     async def handle_event(self, event: Dict[str, Any]):
         """Handle an event that might trigger workflows"""
-        event_type = event.get('type')
+        event_type = event.get("type")
         if not event_type:
             return
 
@@ -819,21 +780,23 @@ class WorkflowEngine:
 
         execution = self.executions[execution_id]
         return {
-            'id': execution.id,
-            'workflow_id': execution.workflow_id,
-            'state': execution.state.value,
-            'started_at': execution.started_at.isoformat(),
-            'completed_at': execution.completed_at.isoformat() if execution.completed_at else None,
-            'steps': [
+            "id": execution.id,
+            "workflow_id": execution.workflow_id,
+            "state": execution.state.value,
+            "started_at": execution.started_at.isoformat(),
+            "completed_at": execution.completed_at.isoformat()
+            if execution.completed_at
+            else None,
+            "steps": [
                 {
-                    'action': step.action.name,
-                    'state': step.state.value,
-                    'attempts': step.attempts,
-                    'error': step.error
+                    "action": step.action.name,
+                    "state": step.state.value,
+                    "attempts": step.attempts,
+                    "error": step.error,
                 }
                 for step in execution.steps
             ],
-            'error': execution.error
+            "error": execution.error,
         }
 
     def get_workflow_metrics(self) -> Dict[str, Any]:
@@ -841,13 +804,15 @@ class WorkflowEngine:
         total = len(self.execution_history)
         if total == 0:
             return {
-                'total_executions': 0,
-                'success_rate': 0,
-                'average_duration': 0,
-                'by_workflow': {}
+                "total_executions": 0,
+                "success_rate": 0,
+                "average_duration": 0,
+                "by_workflow": {},
             }
 
-        successful = sum(1 for e in self.execution_history if e.state == WorkflowState.COMPLETED)
+        successful = sum(
+            1 for e in self.execution_history if e.state == WorkflowState.COMPLETED
+        )
 
         durations = []
         for e in self.execution_history:
@@ -855,17 +820,17 @@ class WorkflowEngine:
                 duration = (e.completed_at - e.started_at).total_seconds()
                 durations.append(duration)
 
-        by_workflow = defaultdict(lambda: {'total': 0, 'successful': 0})
+        by_workflow = defaultdict(lambda: {"total": 0, "successful": 0})
         for e in self.execution_history:
-            by_workflow[e.workflow_id]['total'] += 1
+            by_workflow[e.workflow_id]["total"] += 1
             if e.state == WorkflowState.COMPLETED:
-                by_workflow[e.workflow_id]['successful'] += 1
+                by_workflow[e.workflow_id]["successful"] += 1
 
         return {
-            'total_executions': total,
-            'successful_executions': successful,
-            'success_rate': successful / total if total > 0 else 0,
-            'average_duration': sum(durations) / len(durations) if durations else 0,
-            'active_executions': len(self.running_executions),
-            'by_workflow': dict(by_workflow)
+            "total_executions": total,
+            "successful_executions": successful,
+            "success_rate": successful / total if total > 0 else 0,
+            "average_duration": sum(durations) / len(durations) if durations else 0,
+            "active_executions": len(self.running_executions),
+            "by_workflow": dict(by_workflow),
         }

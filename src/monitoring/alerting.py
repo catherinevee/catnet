@@ -261,9 +261,7 @@ class AlertManager:
         """
         self.notification_configs[config.channel] = config
 
-    def register_notification_handler(
-        self, channel: AlertChannel, handler: Callable
-    ):
+    def register_notification_handler(self, channel: AlertChannel, handler: Callable):
         """
         Register a notification handler
 
@@ -446,9 +444,7 @@ class AlertManager:
         self.alert_history.append(alert)
         del self.active_alerts[rule_id]
 
-    async def _send_notifications(
-        self, alert: Alert, channels: List[AlertChannel]
-    ):
+    async def _send_notifications(self, alert: Alert, channels: List[AlertChannel]):
         """
         Send alert notifications
 
@@ -514,9 +510,7 @@ class AlertManager:
 
         return False
 
-    def _matches_suppression_rule(
-        self, alert: Alert, rule: Dict[str, Any]
-    ) -> bool:
+    def _matches_suppression_rule(self, alert: Alert, rule: Dict[str, Any]) -> bool:
         """Check if alert matches suppression rule"""
         # Check time window
         if "time_window" in rule:
@@ -561,9 +555,7 @@ class AlertManager:
                 if alert.escalation_level < level["level"]:
                     alert.escalation_level = level["level"]
                     # Send escalation notification
-                    await self._send_escalation_notification(
-                        alert, level["channels"]
-                    )
+                    await self._send_escalation_notification(alert, level["channels"])
 
     async def _send_escalation_notification(
         self, alert: Alert, channels: List[AlertChannel]
@@ -572,9 +564,7 @@ class AlertManager:
         alert.message = f"ESCALATED (Level {alert.escalation_level}): {alert.message}"
         await self._send_notifications(alert, channels)
 
-    def acknowledge_alert(
-        self, alert_id: str, acknowledged_by: str
-    ) -> bool:
+    def acknowledge_alert(self, alert_id: str, acknowledged_by: str) -> bool:
         """
         Acknowledge an alert
 
@@ -593,9 +583,7 @@ class AlertManager:
                 return True
         return False
 
-    def suppress_alert(
-        self, alert_id: str, duration: timedelta
-    ) -> bool:
+    def suppress_alert(self, alert_id: str, duration: timedelta) -> bool:
         """
         Suppress an alert
 
@@ -658,14 +646,14 @@ class AlertManager:
 
         # Calculate MTTR (Mean Time To Resolve)
         resolved_alerts = [
-            a for a in self.alert_history
+            a
+            for a in self.alert_history
             if a.ended_at and a.state == AlertState.RESOLVED
         ]
 
         if resolved_alerts:
             total_duration = sum(
-                (a.ended_at - a.started_at).total_seconds()
-                for a in resolved_alerts
+                (a.ended_at - a.started_at).total_seconds() for a in resolved_alerts
             )
             mttr = total_duration / len(resolved_alerts)
         else:

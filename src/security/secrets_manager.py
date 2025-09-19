@@ -444,9 +444,9 @@ class SecretsManager:
                 )
                 # Limit history size
                 if len(self.password_history[credential.name]) > policy.max_reuse * 2:
-                    self.password_history[credential.name] = (
-                        self.password_history[credential.name][-policy.max_reuse:]
-                    )
+                    self.password_history[credential.name] = self.password_history[
+                        credential.name
+                    ][-policy.max_reuse :]
 
             # Reschedule rotation
             if policy.require_rotation:
@@ -602,7 +602,7 @@ class SecretsManager:
         # Generate URL-safe base64 encoded random bytes
         num_bytes = (policy.min_length * 3) // 4  # Base64 encoding ratio
         random_bytes = secrets.token_urlsafe(num_bytes)
-        return random_bytes[:policy.min_length]
+        return random_bytes[: policy.min_length]
 
     def _generate_token(self, policy: SecretPolicy) -> str:
         """Generate a token"""
@@ -621,7 +621,9 @@ class SecretsManager:
             return False
         if policy.require_numbers and not any(c.isdigit() for c in value):
             return False
-        if policy.require_special and not any(c in policy.allowed_special for c in value):
+        if policy.require_special and not any(
+            c in policy.allowed_special for c in value
+        ):
             return False
 
         # Check complexity score

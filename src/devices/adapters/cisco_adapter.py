@@ -91,17 +91,13 @@ class CiscoAdapter(DeviceAdapter):
             # Connect using Netmiko (run in executor for async)
             loop = asyncio.get_event_loop()
             connection = await loop.run_in_executor(
-                None,
-                ConnectHandler,
-                **device_params
+                None, ConnectHandler, **device_params
             )
 
             # Enable mode if required
             if credentials.enable_password:
                 await loop.run_in_executor(
-                    None,
-                    connection.enable,
-                    credentials.enable_password
+                    None, connection.enable, credentials.enable_password
                 )
 
             # Create connection object
@@ -139,10 +135,7 @@ class CiscoAdapter(DeviceAdapter):
         try:
             if connection.session_data:
                 loop = asyncio.get_event_loop()
-                await loop.run_in_executor(
-                    None,
-                    connection.session_data.disconnect
-                )
+                await loop.run_in_executor(None, connection.session_data.disconnect)
 
             # Remove from connections
             if connection.connection_id in self.connections:
@@ -154,9 +147,7 @@ class CiscoAdapter(DeviceAdapter):
         except Exception:
             return False
 
-    async def execute_command(
-        self, connection: DeviceConnection, command: str
-    ) -> str:
+    async def execute_command(self, connection: DeviceConnection, command: str) -> str:
         """
         Execute command on Cisco device
 
@@ -176,7 +167,7 @@ class CiscoAdapter(DeviceAdapter):
                 None,
                 connection.session_data.send_command,
                 command,
-                self.command_timeout
+                self.command_timeout,
             )
 
             # Update metrics
@@ -237,16 +228,13 @@ class CiscoAdapter(DeviceAdapter):
             # Split configuration into lines
             config_lines = [
                 line.strip()
-                for line in configuration.split('\n')
-                if line.strip() and not line.strip().startswith('!')
+                for line in configuration.split("\n")
+                if line.strip() and not line.strip().startswith("!")
             ]
 
             # Enter configuration mode
             loop = asyncio.get_event_loop()
-            await loop.run_in_executor(
-                None,
-                connection.session_data.config_mode
-            )
+            await loop.run_in_executor(None, connection.session_data.config_mode)
 
             # Send configuration commands
             for line in config_lines:
@@ -254,14 +242,11 @@ class CiscoAdapter(DeviceAdapter):
                     None,
                     connection.session_data.send_command,
                     line,
-                    self.command_timeout
+                    self.command_timeout,
                 )
 
             # Exit configuration mode
-            await loop.run_in_executor(
-                None,
-                connection.session_data.exit_config_mode
-            )
+            await loop.run_in_executor(None, connection.session_data.exit_config_mode)
 
             return True
 
@@ -270,8 +255,7 @@ class CiscoAdapter(DeviceAdapter):
             try:
                 loop = asyncio.get_event_loop()
                 await loop.run_in_executor(
-                    None,
-                    connection.session_data.exit_config_mode
+                    None, connection.session_data.exit_config_mode
                 )
             except:
                 pass
@@ -318,9 +302,7 @@ class CiscoAdapter(DeviceAdapter):
     ) -> Dict[str, Any]:
         """Build Netmiko connection parameters"""
         params = {
-            "device_type": self.DEVICE_TYPE_MAP.get(
-                device.vendor, "cisco_ios"
-            ),
+            "device_type": self.DEVICE_TYPE_MAP.get(device.vendor, "cisco_ios"),
             "host": device.ip_address,
             "port": device.port,
             "username": credentials.username,
@@ -341,9 +323,7 @@ class CiscoAdapter(DeviceAdapter):
 
         return params
 
-    def _get_vendor_from_connection(
-        self, connection: DeviceConnection
-    ) -> DeviceVendor:
+    def _get_vendor_from_connection(self, connection: DeviceConnection) -> DeviceVendor:
         """Get device vendor from connection"""
         # In real implementation, would look up from device info
         return DeviceVendor.CISCO_IOS
@@ -359,7 +339,7 @@ class CiscoAdapter(DeviceAdapter):
             "startup-config",
         ]
 
-        for line in config.split('\n'):
+        for line in config.split("\n"):
             # Skip certain lines
             if any(pattern in line for pattern in skip_patterns):
                 continue
@@ -370,4 +350,4 @@ class CiscoAdapter(DeviceAdapter):
 
             lines.append(line)
 
-        return '\n'.join(lines)
+        return "\n".join(lines)

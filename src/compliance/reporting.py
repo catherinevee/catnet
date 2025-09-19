@@ -110,12 +110,7 @@ class ComplianceManager:
     Manages compliance checking and reporting
     """
 
-    def __init__(
-        self,
-        device_service=None,
-        config_service=None,
-        audit_service=None
-    ):
+    def __init__(self, device_service=None, config_service=None, audit_service=None):
         """
         Initialize compliance manager
 
@@ -130,7 +125,9 @@ class ComplianceManager:
 
         # Control definitions
         self.controls: Dict[str, ComplianceControl] = {}
-        self.framework_controls: Dict[ComplianceFramework, List[str]] = defaultdict(list)
+        self.framework_controls: Dict[ComplianceFramework, List[str]] = defaultdict(
+            list
+        )
 
         # Check results
         self.check_results: Dict[str, ComplianceCheck] = {}
@@ -155,10 +152,10 @@ class ComplianceManager:
                 requirements=[
                     "Firewall rules documented",
                     "Inbound traffic restricted",
-                    "Outbound traffic controlled"
+                    "Outbound traffic controlled",
                 ],
                 severity="high",
-                automated=True
+                automated=True,
             )
         )
 
@@ -172,10 +169,10 @@ class ComplianceManager:
                 requirements=[
                     "No default passwords",
                     "Strong password policy",
-                    "Password rotation enabled"
+                    "Password rotation enabled",
                 ],
                 severity="critical",
-                automated=True
+                automated=True,
             )
         )
 
@@ -190,10 +187,10 @@ class ComplianceManager:
                 requirements=[
                     "Complete device inventory",
                     "Regular inventory updates",
-                    "Unauthorized device detection"
+                    "Unauthorized device detection",
                 ],
                 severity="medium",
-                automated=True
+                automated=True,
             )
         )
 
@@ -207,10 +204,10 @@ class ComplianceManager:
                 requirements=[
                     "Limited admin accounts",
                     "Privilege escalation logging",
-                    "Regular privilege audits"
+                    "Regular privilege audits",
                 ],
                 severity="high",
-                automated=True
+                automated=True,
             )
         )
 
@@ -225,10 +222,10 @@ class ComplianceManager:
                 requirements=[
                     "Account creation process",
                     "Account review process",
-                    "Account termination process"
+                    "Account termination process",
                 ],
                 severity="high",
-                automated=True
+                automated=True,
             )
         )
 
@@ -242,10 +239,10 @@ class ComplianceManager:
                 requirements=[
                     "Authentication events logged",
                     "Authorization events logged",
-                    "System events logged"
+                    "System events logged",
                 ],
                 severity="medium",
-                automated=True
+                automated=True,
             )
         )
 
@@ -260,9 +257,7 @@ class ComplianceManager:
         self.framework_controls[control.framework].append(control.id)
 
     async def check_compliance(
-        self,
-        framework: ComplianceFramework,
-        device_ids: Optional[List[str]] = None
+        self, framework: ComplianceFramework, device_ids: Optional[List[str]] = None
     ) -> List[ComplianceCheck]:
         """
         Check compliance for specified framework
@@ -296,9 +291,7 @@ class ComplianceManager:
         return results
 
     async def _check_control(
-        self,
-        control: ComplianceControl,
-        device_id: str
+        self, control: ComplianceControl, device_id: str
     ) -> ComplianceCheck:
         """
         Check a specific control for a device
@@ -314,7 +307,7 @@ class ComplianceManager:
             control_id=control.id,
             device_id=device_id,
             status=ComplianceStatus.NOT_CHECKED,
-            checked_at=datetime.utcnow()
+            checked_at=datetime.utcnow(),
         )
 
         try:
@@ -334,15 +327,12 @@ class ComplianceManager:
 
         except Exception as e:
             check.status = ComplianceStatus.NOT_CHECKED
-            check.details['error'] = str(e)
+            check.details["error"] = str(e)
 
         return check
 
     async def _check_access_control(
-        self,
-        control: ComplianceControl,
-        device_id: str,
-        check: ComplianceCheck
+        self, control: ComplianceControl, device_id: str, check: ComplianceCheck
     ) -> ComplianceCheck:
         """Check access control compliance"""
         violations = []
@@ -357,7 +347,7 @@ class ComplianceManager:
                     "password cisco",
                     "password admin",
                     "password 123",
-                    "username admin password admin"
+                    "username admin password admin",
                 ]
 
                 for pattern in default_patterns:
@@ -386,10 +376,7 @@ class ComplianceManager:
         return check
 
     async def _check_network_security(
-        self,
-        control: ComplianceControl,
-        device_id: str,
-        check: ComplianceCheck
+        self, control: ComplianceControl, device_id: str, check: ComplianceCheck
     ) -> ComplianceCheck:
         """Check network security compliance"""
         violations = []
@@ -410,7 +397,7 @@ class ComplianceManager:
                 evidence.append("Firewall configuration analyzed")
 
         # Check for encryption
-        if "encryption" in ' '.join(control.requirements).lower():
+        if "encryption" in " ".join(control.requirements).lower():
             # Check for SSH v2
             if not await self._check_ssh_v2(device_id):
                 violations.append("SSH v2 not enabled")
@@ -429,10 +416,7 @@ class ComplianceManager:
         return check
 
     async def _check_audit_logging(
-        self,
-        control: ComplianceControl,
-        device_id: str,
-        check: ComplianceCheck
+        self, control: ComplianceControl, device_id: str, check: ComplianceCheck
     ) -> ComplianceCheck:
         """Check audit logging compliance"""
         violations = []
@@ -472,10 +456,7 @@ class ComplianceManager:
         return check
 
     async def _check_configuration(
-        self,
-        control: ComplianceControl,
-        device_id: str,
-        check: ComplianceCheck
+        self, control: ComplianceControl, device_id: str, check: ComplianceCheck
     ) -> ComplianceCheck:
         """Check configuration compliance"""
         violations = []
@@ -488,7 +469,7 @@ class ComplianceManager:
             required_configs = [
                 "service password-encryption",
                 "no ip http server",
-                "banner motd"
+                "banner motd",
             ]
 
             for req in required_configs:
@@ -517,10 +498,7 @@ class ComplianceManager:
         return check
 
     async def generate_report(
-        self,
-        framework: ComplianceFramework,
-        start_date: datetime,
-        end_date: datetime
+        self, framework: ComplianceFramework, start_date: datetime, end_date: datetime
     ) -> ComplianceReport:
         """
         Generate compliance report
@@ -538,14 +516,18 @@ class ComplianceManager:
         # Get checks for period
         checks = []
         for check in self.check_results.values():
-            if (check.control_id in self.framework_controls[framework] and
-                start_date <= check.checked_at <= end_date):
+            if (
+                check.control_id in self.framework_controls[framework]
+                and start_date <= check.checked_at <= end_date
+            ):
                 checks.append(check)
 
         # Calculate compliance score
         total = len(checks)
         compliant = sum(1 for c in checks if c.status == ComplianceStatus.COMPLIANT)
-        non_compliant = sum(1 for c in checks if c.status == ComplianceStatus.NON_COMPLIANT)
+        non_compliant = sum(
+            1 for c in checks if c.status == ComplianceStatus.NON_COMPLIANT
+        )
 
         compliance_score = (compliant / total * 100) if total > 0 else 0
 
@@ -576,7 +558,7 @@ class ComplianceManager:
             non_compliant_controls=non_compliant,
             checks=checks,
             summary=summary,
-            recommendations=recommendations
+            recommendations=recommendations,
         )
 
         # Store report
@@ -585,32 +567,30 @@ class ComplianceManager:
         return report
 
     def _generate_summary(
-        self,
-        checks: List[ComplianceCheck],
-        framework: ComplianceFramework
+        self, checks: List[ComplianceCheck], framework: ComplianceFramework
     ) -> Dict[str, Any]:
         """Generate report summary"""
         # Group by category
-        by_category = defaultdict(lambda: {'total': 0, 'compliant': 0})
+        by_category = defaultdict(lambda: {"total": 0, "compliant": 0})
 
         for check in checks:
             control = self.controls.get(check.control_id)
             if control:
                 category = control.category.value
-                by_category[category]['total'] += 1
+                by_category[category]["total"] += 1
                 if check.status == ComplianceStatus.COMPLIANT:
-                    by_category[category]['compliant'] += 1
+                    by_category[category]["compliant"] += 1
 
         # Group by severity
-        by_severity = defaultdict(lambda: {'total': 0, 'non_compliant': 0})
+        by_severity = defaultdict(lambda: {"total": 0, "non_compliant": 0})
 
         for check in checks:
             control = self.controls.get(check.control_id)
             if control:
                 severity = control.severity
-                by_severity[severity]['total'] += 1
+                by_severity[severity]["total"] += 1
                 if check.status == ComplianceStatus.NON_COMPLIANT:
-                    by_severity[severity]['non_compliant'] += 1
+                    by_severity[severity]["non_compliant"] += 1
 
         # Top violations
         violation_counts = defaultdict(int)
@@ -619,27 +599,24 @@ class ComplianceManager:
                 violation_counts[violation] += 1
 
         top_violations = sorted(
-            violation_counts.items(),
-            key=lambda x: x[1],
-            reverse=True
+            violation_counts.items(), key=lambda x: x[1], reverse=True
         )[:10]
 
         return {
-            'by_category': dict(by_category),
-            'by_severity': dict(by_severity),
-            'top_violations': top_violations,
-            'framework': framework.value
+            "by_category": dict(by_category),
+            "by_severity": dict(by_severity),
+            "top_violations": top_violations,
+            "framework": framework.value,
         }
 
-    def _generate_recommendations(
-        self,
-        checks: List[ComplianceCheck]
-    ) -> List[str]:
+    def _generate_recommendations(self, checks: List[ComplianceCheck]) -> List[str]:
         """Generate recommendations based on checks"""
         recommendations = []
 
         # Analyze non-compliant checks
-        non_compliant = [c for c in checks if c.status == ComplianceStatus.NON_COMPLIANT]
+        non_compliant = [
+            c for c in checks if c.status == ComplianceStatus.NON_COMPLIANT
+        ]
 
         # Group by control
         by_control = defaultdict(list)
@@ -661,24 +638,21 @@ class ComplianceManager:
 
         # Add priority recommendations
         critical_controls = [
-            c for c in non_compliant
-            if self.controls.get(c.control_id) and
-            self.controls[c.control_id].severity == "critical"
+            c
+            for c in non_compliant
+            if self.controls.get(c.control_id)
+            and self.controls[c.control_id].severity == "critical"
         ]
 
         if critical_controls:
             recommendations.insert(
                 0,
-                f"PRIORITY: Address {len(critical_controls)} critical control violations immediately"
+                f"PRIORITY: Address {len(critical_controls)} critical control violations immediately",
             )
 
         return recommendations[:20]  # Limit to top 20
 
-    def export_report(
-        self,
-        report: ComplianceReport,
-        format: str = "json"
-    ) -> str:
+    def export_report(self, report: ComplianceReport, format: str = "json") -> str:
         """
         Export report in specified format
 
@@ -701,31 +675,31 @@ class ComplianceManager:
     def _export_json(self, report: ComplianceReport) -> str:
         """Export report as JSON"""
         data = {
-            'id': report.id,
-            'framework': report.framework.value,
-            'generated_at': report.generated_at.isoformat(),
-            'period': {
-                'start': report.period_start.isoformat(),
-                'end': report.period_end.isoformat()
+            "id": report.id,
+            "framework": report.framework.value,
+            "generated_at": report.generated_at.isoformat(),
+            "period": {
+                "start": report.period_start.isoformat(),
+                "end": report.period_end.isoformat(),
             },
-            'overall_status': report.overall_status.value,
-            'compliance_score': report.compliance_score,
-            'statistics': {
-                'total_controls': report.total_controls,
-                'compliant': report.compliant_controls,
-                'non_compliant': report.non_compliant_controls
+            "overall_status": report.overall_status.value,
+            "compliance_score": report.compliance_score,
+            "statistics": {
+                "total_controls": report.total_controls,
+                "compliant": report.compliant_controls,
+                "non_compliant": report.non_compliant_controls,
             },
-            'summary': report.summary,
-            'recommendations': report.recommendations,
-            'checks': [
+            "summary": report.summary,
+            "recommendations": report.recommendations,
+            "checks": [
                 {
-                    'control_id': c.control_id,
-                    'device_id': c.device_id,
-                    'status': c.status.value,
-                    'violations': c.violations
+                    "control_id": c.control_id,
+                    "device_id": c.device_id,
+                    "status": c.status.value,
+                    "violations": c.violations,
                 }
                 for c in report.checks
-            ]
+            ],
         }
         return json.dumps(data, indent=2, default=str)
 
@@ -789,27 +763,26 @@ class ComplianceManager:
     def _export_csv(self, report: ComplianceReport) -> str:
         """Export report as CSV"""
         import io
+
         output = io.StringIO()
         writer = csv.writer(output)
 
         # Write header
-        writer.writerow([
-            'Control ID',
-            'Device ID',
-            'Status',
-            'Checked At',
-            'Violations'
-        ])
+        writer.writerow(
+            ["Control ID", "Device ID", "Status", "Checked At", "Violations"]
+        )
 
         # Write checks
         for check in report.checks:
-            writer.writerow([
-                check.control_id,
-                check.device_id,
-                check.status.value,
-                check.checked_at.isoformat(),
-                '; '.join(check.violations)
-            ])
+            writer.writerow(
+                [
+                    check.control_id,
+                    check.device_id,
+                    check.status.value,
+                    check.checked_at.isoformat(),
+                    "; ".join(check.violations),
+                ]
+            )
 
         return output.getvalue()
 
@@ -841,10 +814,7 @@ class ComplianceManager:
         return datetime.utcnow() - timedelta(days=3)  # Mock
 
     async def _run_validation_script(
-        self,
-        control: ComplianceControl,
-        device_id: str,
-        check: ComplianceCheck
+        self, control: ComplianceControl, device_id: str, check: ComplianceCheck
     ) -> ComplianceCheck:
         """Run custom validation script"""
         # Would execute validation script

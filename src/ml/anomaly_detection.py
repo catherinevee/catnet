@@ -23,7 +23,8 @@ from collections import deque, defaultdict
 import json
 import pickle
 import warnings
-warnings.filterwarnings('ignore', category=UserWarning)
+
+warnings.filterwarnings("ignore", category=UserWarning)
 
 
 class AnomalyType(Enum):
@@ -122,42 +123,28 @@ class AnomalyDetector:
     def _initialize_model(self):
         """Initialize ML model based on type"""
         if self.model_type == ModelType.ISOLATION_FOREST:
-            return IsolationForest(
-                n_estimators=100,
-                contamination=0.1,
-                random_state=42
-            )
+            return IsolationForest(n_estimators=100, contamination=0.1, random_state=42)
         elif self.model_type == ModelType.RANDOM_FOREST:
-            return RandomForestClassifier(
-                n_estimators=100,
-                random_state=42
-            )
+            return RandomForestClassifier(n_estimators=100, random_state=42)
         elif self.model_type == ModelType.DBSCAN:
-            return DBSCAN(
-                eps=0.5,
-                min_samples=5
-            )
+            return DBSCAN(eps=0.5, min_samples=5)
         else:
             # Default to Isolation Forest
-            return IsolationForest(
-                n_estimators=100,
-                contamination=0.1,
-                random_state=42
-            )
+            return IsolationForest(n_estimators=100, contamination=0.1, random_state=42)
 
     def _initialize_feature_extractors(self):
         """Initialize feature extraction functions"""
         # Traffic features
-        self.feature_extractors['traffic'] = self._extract_traffic_features
+        self.feature_extractors["traffic"] = self._extract_traffic_features
 
         # Performance features
-        self.feature_extractors['performance'] = self._extract_performance_features
+        self.feature_extractors["performance"] = self._extract_performance_features
 
         # Configuration features
-        self.feature_extractors['configuration'] = self._extract_config_features
+        self.feature_extractors["configuration"] = self._extract_config_features
 
         # Security features
-        self.feature_extractors['security'] = self._extract_security_features
+        self.feature_extractors["security"] = self._extract_security_features
 
     def train(self, training_data: TrainingData) -> ModelMetrics:
         """
@@ -248,7 +235,7 @@ class AnomalyDetector:
             features=dict(zip(self._get_feature_names(), features)),
             explanation=explanation,
             is_anomaly=is_anomaly,
-            severity=severity
+            severity=severity,
         )
 
         # Store in history
@@ -277,20 +264,20 @@ class AnomalyDetector:
         features = []
 
         # Extract traffic features
-        if 'traffic' in data:
-            features.extend(self._extract_traffic_features(data['traffic']))
+        if "traffic" in data:
+            features.extend(self._extract_traffic_features(data["traffic"]))
 
         # Extract performance features
-        if 'performance' in data:
-            features.extend(self._extract_performance_features(data['performance']))
+        if "performance" in data:
+            features.extend(self._extract_performance_features(data["performance"]))
 
         # Extract configuration features
-        if 'configuration' in data:
-            features.extend(self._extract_config_features(data['configuration']))
+        if "configuration" in data:
+            features.extend(self._extract_config_features(data["configuration"]))
 
         # Extract security features
-        if 'security' in data:
-            features.extend(self._extract_security_features(data['security']))
+        if "security" in data:
+            features.extend(self._extract_security_features(data["security"]))
 
         # Add temporal features
         features.extend(self._extract_temporal_features(data))
@@ -302,30 +289,30 @@ class AnomalyDetector:
         features = []
 
         # Packet rate
-        features.append(traffic_data.get('packet_rate', 0))
+        features.append(traffic_data.get("packet_rate", 0))
 
         # Bandwidth usage
-        features.append(traffic_data.get('bandwidth_mbps', 0))
+        features.append(traffic_data.get("bandwidth_mbps", 0))
 
         # Connection count
-        features.append(traffic_data.get('connection_count', 0))
+        features.append(traffic_data.get("connection_count", 0))
 
         # Error rate
-        features.append(traffic_data.get('error_rate', 0))
+        features.append(traffic_data.get("error_rate", 0))
 
         # Protocol distribution
-        tcp_ratio = traffic_data.get('tcp_ratio', 0)
-        udp_ratio = traffic_data.get('udp_ratio', 0)
+        tcp_ratio = traffic_data.get("tcp_ratio", 0)
+        udp_ratio = traffic_data.get("udp_ratio", 0)
         other_ratio = 1 - tcp_ratio - udp_ratio
         features.extend([tcp_ratio, udp_ratio, other_ratio])
 
         # Port diversity
-        unique_ports = len(set(traffic_data.get('destination_ports', [])))
+        unique_ports = len(set(traffic_data.get("destination_ports", [])))
         features.append(unique_ports)
 
         # Traffic patterns
-        features.append(traffic_data.get('burst_count', 0))
-        features.append(traffic_data.get('idle_time_ratio', 0))
+        features.append(traffic_data.get("burst_count", 0))
+        features.append(traffic_data.get("idle_time_ratio", 0))
 
         return features
 
@@ -334,32 +321,32 @@ class AnomalyDetector:
         features = []
 
         # CPU usage
-        features.append(perf_data.get('cpu_usage', 0))
+        features.append(perf_data.get("cpu_usage", 0))
 
         # Memory usage
-        features.append(perf_data.get('memory_usage', 0))
+        features.append(perf_data.get("memory_usage", 0))
 
         # Disk I/O
-        features.append(perf_data.get('disk_read_mbps', 0))
-        features.append(perf_data.get('disk_write_mbps', 0))
+        features.append(perf_data.get("disk_read_mbps", 0))
+        features.append(perf_data.get("disk_write_mbps", 0))
 
         # Network latency
-        features.append(perf_data.get('latency_ms', 0))
+        features.append(perf_data.get("latency_ms", 0))
 
         # Packet loss
-        features.append(perf_data.get('packet_loss', 0))
+        features.append(perf_data.get("packet_loss", 0))
 
         # Response time
-        features.append(perf_data.get('response_time_ms', 0))
+        features.append(perf_data.get("response_time_ms", 0))
 
         # Queue depth
-        features.append(perf_data.get('queue_depth', 0))
+        features.append(perf_data.get("queue_depth", 0))
 
         # Process count
-        features.append(perf_data.get('process_count', 0))
+        features.append(perf_data.get("process_count", 0))
 
         # Thread count
-        features.append(perf_data.get('thread_count', 0))
+        features.append(perf_data.get("thread_count", 0))
 
         return features
 
@@ -368,28 +355,28 @@ class AnomalyDetector:
         features = []
 
         # Configuration change rate
-        features.append(config_data.get('change_rate', 0))
+        features.append(config_data.get("change_rate", 0))
 
         # Configuration complexity
-        features.append(config_data.get('complexity_score', 0))
+        features.append(config_data.get("complexity_score", 0))
 
         # Drift from baseline
-        features.append(config_data.get('drift_score', 0))
+        features.append(config_data.get("drift_score", 0))
 
         # Policy violations
-        features.append(config_data.get('violation_count', 0))
+        features.append(config_data.get("violation_count", 0))
 
         # Configuration size
-        features.append(config_data.get('config_lines', 0))
+        features.append(config_data.get("config_lines", 0))
 
         # Interface changes
-        features.append(config_data.get('interface_changes', 0))
+        features.append(config_data.get("interface_changes", 0))
 
         # Routing changes
-        features.append(config_data.get('routing_changes', 0))
+        features.append(config_data.get("routing_changes", 0))
 
         # ACL changes
-        features.append(config_data.get('acl_changes', 0))
+        features.append(config_data.get("acl_changes", 0))
 
         return features
 
@@ -398,28 +385,28 @@ class AnomalyDetector:
         features = []
 
         # Failed authentication attempts
-        features.append(security_data.get('failed_auth_count', 0))
+        features.append(security_data.get("failed_auth_count", 0))
 
         # Privilege escalations
-        features.append(security_data.get('privilege_escalations', 0))
+        features.append(security_data.get("privilege_escalations", 0))
 
         # Suspicious commands
-        features.append(security_data.get('suspicious_commands', 0))
+        features.append(security_data.get("suspicious_commands", 0))
 
         # Port scans detected
-        features.append(security_data.get('port_scans', 0))
+        features.append(security_data.get("port_scans", 0))
 
         # Malformed packets
-        features.append(security_data.get('malformed_packets', 0))
+        features.append(security_data.get("malformed_packets", 0))
 
         # DDoS indicators
-        features.append(security_data.get('ddos_score', 0))
+        features.append(security_data.get("ddos_score", 0))
 
         # Encryption anomalies
-        features.append(security_data.get('encryption_errors', 0))
+        features.append(security_data.get("encryption_errors", 0))
 
         # Certificate issues
-        features.append(security_data.get('cert_issues', 0))
+        features.append(security_data.get("cert_issues", 0))
 
         return features
 
@@ -451,49 +438,80 @@ class AnomalyDetector:
         names = []
 
         # Traffic features
-        names.extend([
-            'packet_rate', 'bandwidth_mbps', 'connection_count', 'error_rate',
-            'tcp_ratio', 'udp_ratio', 'other_ratio', 'unique_ports',
-            'burst_count', 'idle_time_ratio'
-        ])
+        names.extend(
+            [
+                "packet_rate",
+                "bandwidth_mbps",
+                "connection_count",
+                "error_rate",
+                "tcp_ratio",
+                "udp_ratio",
+                "other_ratio",
+                "unique_ports",
+                "burst_count",
+                "idle_time_ratio",
+            ]
+        )
 
         # Performance features
-        names.extend([
-            'cpu_usage', 'memory_usage', 'disk_read_mbps', 'disk_write_mbps',
-            'latency_ms', 'packet_loss', 'response_time_ms', 'queue_depth',
-            'process_count', 'thread_count'
-        ])
+        names.extend(
+            [
+                "cpu_usage",
+                "memory_usage",
+                "disk_read_mbps",
+                "disk_write_mbps",
+                "latency_ms",
+                "packet_loss",
+                "response_time_ms",
+                "queue_depth",
+                "process_count",
+                "thread_count",
+            ]
+        )
 
         # Configuration features
-        names.extend([
-            'change_rate', 'complexity_score', 'drift_score', 'violation_count',
-            'config_lines', 'interface_changes', 'routing_changes', 'acl_changes'
-        ])
+        names.extend(
+            [
+                "change_rate",
+                "complexity_score",
+                "drift_score",
+                "violation_count",
+                "config_lines",
+                "interface_changes",
+                "routing_changes",
+                "acl_changes",
+            ]
+        )
 
         # Security features
-        names.extend([
-            'failed_auth_count', 'privilege_escalations', 'suspicious_commands',
-            'port_scans', 'malformed_packets', 'ddos_score', 'encryption_errors',
-            'cert_issues'
-        ])
+        names.extend(
+            [
+                "failed_auth_count",
+                "privilege_escalations",
+                "suspicious_commands",
+                "port_scans",
+                "malformed_packets",
+                "ddos_score",
+                "encryption_errors",
+                "cert_issues",
+            ]
+        )
 
         # Temporal features
-        names.extend([
-            'hour_norm', 'dow_norm', 'is_weekend', 'is_business'
-        ])
+        names.extend(["hour_norm", "dow_norm", "is_weekend", "is_business"])
 
         return names
 
     def _determine_anomaly_type(self, data: Dict[str, Any]) -> AnomalyType:
         """Determine the type of anomaly"""
         # Simple heuristic based on data keys
-        if 'traffic' in data:
+        if "traffic" in data:
             return AnomalyType.TRAFFIC
-        elif 'performance' in data:
+        elif "performance" in data:
             return AnomalyType.PERFORMANCE
-        elif 'configuration' in data:
+        elif "configuration" in data:
             return AnomalyType.CONFIGURATION
-        elif 'security' in data:
+        elif "security" in data:
             return AnomalyType.SECURITY
         else:
             return AnomalyType.BEHAVIORAL
@@ -513,7 +531,7 @@ class AnomalyDetector:
         """Calculate confidence in anomaly detection"""
         # Simple confidence based on feature distribution
         # In production, use model-specific confidence metrics
-        if hasattr(self.model, 'decision_function'):
+        if hasattr(self.model, "decision_function"):
             # Use decision function distance
             distance = abs(self.model.decision_function(features)[0])
             confidence = 1.0 - np.exp(-distance)
@@ -524,10 +542,7 @@ class AnomalyDetector:
         return min(max(confidence, 0), 1)
 
     def _generate_explanation(
-        self,
-        features: np.ndarray,
-        score: float,
-        data: Dict[str, Any]
+        self, features: np.ndarray, score: float, data: Dict[str, Any]
     ) -> str:
         """Generate human-readable explanation"""
         explanations = []
@@ -565,14 +580,23 @@ class AnomalyDetector:
 
         if training_data.labels is not None:
             # Calculate supervised metrics
-            from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+            from sklearn.metrics import (
+                accuracy_score,
+                precision_score,
+                recall_score,
+                f1_score,
+            )
 
-            predictions = self.model.predict(self.scaler.transform(training_data.features))
+            predictions = self.model.predict(
+                self.scaler.transform(training_data.features)
+            )
 
             accuracy = accuracy_score(training_data.labels, predictions)
-            precision = precision_score(training_data.labels, predictions, average='binary')
-            recall = recall_score(training_data.labels, predictions, average='binary')
-            f1 = f1_score(training_data.labels, predictions, average='binary')
+            precision = precision_score(
+                training_data.labels, predictions, average="binary"
+            )
+            recall = recall_score(training_data.labels, predictions, average="binary")
+            f1 = f1_score(training_data.labels, predictions, average="binary")
 
             # Calculate error rates
             false_positives = sum((predictions == 1) & (training_data.labels == 0))
@@ -598,7 +622,7 @@ class AnomalyDetector:
             false_positive_rate=fpr,
             false_negative_rate=fnr,
             last_trained=datetime.utcnow(),
-            training_samples=len(training_data.features)
+            training_samples=len(training_data.features),
         )
 
     def retrain(self) -> ModelMetrics:
@@ -611,9 +635,7 @@ class AnomalyDetector:
         labels = np.array([l for _, l in self.training_buffer])
 
         training_data = TrainingData(
-            features=features,
-            labels=labels,
-            feature_names=self._get_feature_names()
+            features=features, labels=labels, feature_names=self._get_feature_names()
         )
 
         # Retrain model
@@ -625,47 +647,43 @@ class AnomalyDetector:
             raise ValueError("Cannot save untrained model")
 
         model_data = {
-            'model': self.model,
-            'scaler': self.scaler,
-            'model_type': self.model_type.value,
-            'metrics': self.metrics,
-            'feature_names': self._get_feature_names(),
-            'anomaly_threshold': self.anomaly_threshold
+            "model": self.model,
+            "scaler": self.scaler,
+            "model_type": self.model_type.value,
+            "metrics": self.metrics,
+            "feature_names": self._get_feature_names(),
+            "anomaly_threshold": self.anomaly_threshold,
         }
 
-        with open(filepath, 'wb') as f:
+        with open(filepath, "wb") as f:
             pickle.dump(model_data, f)
 
     def load_model(self, filepath: str):
         """Load trained model from file"""
-        with open(filepath, 'rb') as f:
+        with open(filepath, "rb") as f:
             model_data = pickle.load(f)
 
-        self.model = model_data['model']
-        self.scaler = model_data['scaler']
-        self.model_type = ModelType(model_data['model_type'])
-        self.metrics = model_data['metrics']
-        self.anomaly_threshold = model_data['anomaly_threshold']
+        self.model = model_data["model"]
+        self.scaler = model_data["scaler"]
+        self.model_type = ModelType(model_data["model_type"])
+        self.metrics = model_data["metrics"]
+        self.anomaly_threshold = model_data["anomaly_threshold"]
         self.is_trained = True
 
     def get_anomaly_trends(
-        self,
-        window: timedelta = timedelta(hours=24)
+        self, window: timedelta = timedelta(hours=24)
     ) -> Dict[str, Any]:
         """Get anomaly detection trends"""
         cutoff = datetime.utcnow() - window
-        recent_anomalies = [
-            a for a in self.anomaly_history
-            if a.timestamp > cutoff
-        ]
+        recent_anomalies = [a for a in self.anomaly_history if a.timestamp > cutoff]
 
         if not recent_anomalies:
             return {
-                'total_count': 0,
-                'anomaly_rate': 0,
-                'avg_score': 0,
-                'by_type': {},
-                'by_severity': {}
+                "total_count": 0,
+                "anomaly_rate": 0,
+                "avg_score": 0,
+                "by_type": {},
+                "by_severity": {},
             }
 
         # Calculate statistics
@@ -686,11 +704,11 @@ class AnomalyDetector:
                 by_severity[a.severity] += 1
 
         return {
-            'total_count': total,
-            'anomaly_count': anomaly_count,
-            'anomaly_rate': anomaly_count / total if total > 0 else 0,
-            'avg_score': float(avg_score),
-            'by_type': dict(by_type),
-            'by_severity': dict(by_severity),
-            'time_window': window.total_seconds()
+            "total_count": total,
+            "anomaly_count": anomaly_count,
+            "anomaly_rate": anomaly_count / total if total > 0 else 0,
+            "avg_score": float(avg_score),
+            "by_type": dict(by_type),
+            "by_severity": dict(by_severity),
+            "time_window": window.total_seconds(),
         }
