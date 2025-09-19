@@ -11,7 +11,6 @@ from pathlib import Path
 
 from catnet_cli.cli import cli
 from catnet_cli.config import ConfigManager
-from catnet_cli.client import CatNetAPIClient
 
 
 @pytest.fixture
