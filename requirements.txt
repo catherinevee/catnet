@@ -38,6 +38,9 @@ python-jose[cryptography]==3.3.0
 hvac==2.1.0  # HashiCorp Vault client
 mfa==0.1.1
 pyotp==2.9.0
+qrcode==7.4.2  # For MFA QR code generation
+lxml==5.0.0  # For SAML support
+python-saml==2.5.0  # SAML authentication
 
 # Validation
 pydantic==2.5.2
