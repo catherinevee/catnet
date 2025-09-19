@@ -31,7 +31,8 @@ setup(
     install_requires=requirements,
     entry_points={
         "console_scripts": [
-            "catnet=src.main:cli",
+            "catnet=catnet_cli.cli:cli",
+            "catnet-legacy=src.main:cli",  # Keep legacy entry point for backward compatibility
         ],
     },
     include_package_data=True,
