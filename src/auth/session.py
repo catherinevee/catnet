@@ -109,7 +109,7 @@ class SessionManager:
                 # Remove oldest session
                 oldest_session_id = min(
                     self.user_sessions[user_id],
-                    key=lambda sid: self.sessions[sid].created_at
+                    key=lambda sid: self.sessions[sid].created_at,
                 )
                 self.terminate_session(oldest_session_id)
 
@@ -205,7 +205,7 @@ class SessionManager:
                     "session_id": session_id,
                     "original_ip": session.ip_address,
                     "current_ip": ip_address,
-                }
+                },
             )
             return False, "IP address mismatch"
 
@@ -219,7 +219,7 @@ class SessionManager:
                     "session_id": session_id,
                     "original_ua": session.user_agent,
                     "current_ua": user_agent,
-                }
+                },
             )
 
         return True, None
@@ -242,7 +242,9 @@ class SessionManager:
         session.last_activity = datetime.utcnow()
 
         # Optionally extend expiration on activity
-        session.expires_at = datetime.utcnow() + timedelta(seconds=self.session_lifetime)
+        session.expires_at = datetime.utcnow() + timedelta(
+            seconds=self.session_lifetime
+        )
 
         return True
 
@@ -404,14 +406,18 @@ class SessionManager:
 
         auth_methods = {}
         for session in self.sessions.values():
-            auth_methods[session.auth_method] = auth_methods.get(session.auth_method, 0) + 1
+            auth_methods[session.auth_method] = (
+                auth_methods.get(session.auth_method, 0) + 1
+            )
 
         return {
             "total_sessions": total_sessions,
             "total_users": total_users,
             "revoked_sessions": len(self.revoked_sessions),
             "auth_methods": auth_methods,
-            "average_sessions_per_user": total_sessions / total_users if total_users > 0 else 0,
+            "average_sessions_per_user": total_sessions / total_users
+            if total_users > 0
+            else 0,
         }
 
     def _generate_session_id(
@@ -432,11 +438,7 @@ class SessionManager:
         data = f"{user_id}:{ip_address}:{user_agent}:{datetime.utcnow().isoformat()}:{secrets.token_hex(16)}"
 
         # Create HMAC for integrity
-        h = hmac.new(
-            self.session_secret.encode(),
-            data.encode(),
-            hashlib.sha256
-        )
+        h = hmac.new(self.session_secret.encode(), data.encode(), hashlib.sha256)
 
         return h.hexdigest()
 

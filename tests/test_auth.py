@@ -29,7 +29,7 @@ class TestJWTHandler:
             username="testuser",
             roles=["admin", "operator"],
             permissions=["read", "write"],
-            token_type="access"
+            token_type="access",
         )
 
         assert token is not None
@@ -48,9 +48,7 @@ class TestJWTHandler:
         handler = JWTHandler(token_lifetime=1)  # 1 second
 
         token = handler.create_token(
-            user_id="user123",
-            username="testuser",
-            token_type="access"
+            user_id="user123", username="testuser", token_type="access"
         )
 
         # Token should be valid immediately
@@ -59,6 +57,7 @@ class TestJWTHandler:
 
         # Wait for expiration
         import time
+
         time.sleep(2)
 
         # Token should be expired
@@ -72,10 +71,7 @@ class TestJWTHandler:
 
         # Create refresh token
         refresh_token = handler.create_token(
-            user_id="user123",
-            username="testuser",
-            roles=["user"],
-            token_type="refresh"
+            user_id="user123", username="testuser", roles=["user"], token_type="refresh"
         )
 
         # Use refresh token to get new tokens
@@ -98,9 +94,7 @@ class TestJWTHandler:
         handler = JWTHandler()
 
         token = handler.create_token(
-            user_id="user123",
-            username="testuser",
-            token_type="access"
+            user_id="user123", username="testuser", token_type="access"
         )
 
         # Token should be valid
@@ -122,9 +116,7 @@ class TestJWTHandler:
 
         # Create access token
         token = handler.create_token(
-            user_id="user123",
-            username="testuser",
-            token_type="access"
+            user_id="user123", username="testuser", token_type="access"
         )
 
         # Try to verify as refresh token
@@ -140,10 +132,7 @@ class TestMFAProvider:
         """Test MFA enablement"""
         provider = MFAProvider()
 
-        result = provider.enable_mfa(
-            user_id="user123",
-            username="testuser"
-        )
+        result = provider.enable_mfa(user_id="user123", username="testuser")
 
         assert "secret" in result
         assert "qr_code" in result
@@ -239,7 +228,7 @@ class TestOAuth2Provider:
             provider_name="google",
             client_id="test_client_id",
             client_secret="test_client_secret",
-            redirect_uri="http://localhost/callback"
+            redirect_uri="http://localhost/callback",
         )
 
         assert config.provider_name == "google"
@@ -255,7 +244,7 @@ class TestOAuth2Provider:
             provider_name="github",
             client_id="test_client",
             client_secret="test_secret",
-            redirect_uri="http://localhost/callback"
+            redirect_uri="http://localhost/callback",
         )
 
         result = provider.generate_auth_url("github", use_pkce=True)
@@ -275,7 +264,7 @@ class TestOAuth2Provider:
             provider_name="google",
             client_id="test_client",
             client_secret="test_secret",
-            redirect_uri="http://localhost/callback"
+            redirect_uri="http://localhost/callback",
         )
 
         # Generate auth URL and state
@@ -289,14 +278,12 @@ class TestOAuth2Provider:
             mock_response.json.return_value = {
                 "access_token": "test_access_token",
                 "refresh_token": "test_refresh_token",
-                "expires_in": 3600
+                "expires_in": 3600,
             }
             mock_post.return_value = mock_response
 
             result = await provider.exchange_code(
-                provider_name="google",
-                code="test_code",
-                state=state
+                provider_name="google", code="test_code", state=state
             )
 
             assert result["access_token"] == "test_access_token"
@@ -311,7 +298,7 @@ class TestOAuth2Provider:
             provider_name="github",
             client_id="test_client",
             client_secret="test_secret",
-            redirect_uri="http://localhost/callback"
+            redirect_uri="http://localhost/callback",
         )
 
         with patch("httpx.AsyncClient.get") as mock_get:
@@ -320,7 +307,7 @@ class TestOAuth2Provider:
             mock_response.json.return_value = {
                 "id": "12345",
                 "login": "testuser",
-                "email": "test@example.com"
+                "email": "test@example.com",
             }
             mock_get.return_value = mock_response
 
@@ -344,7 +331,7 @@ class TestSAMLProvider:
             idp_entity_id="http://idp.example.com",
             idp_sso_url="http://idp.example.com/sso",
             idp_sls_url="http://idp.example.com/sls",
-            idp_cert="-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----"
+            idp_cert="-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----",
         )
 
         provider.register_config("test", config)
@@ -363,14 +350,13 @@ class TestSAMLProvider:
             idp_entity_id="http://idp.example.com",
             idp_sso_url="http://idp.example.com/sso",
             idp_sls_url="http://idp.example.com/sls",
-            idp_cert="cert"
+            idp_cert="cert",
         )
 
         provider.register_config("test", config)
 
         result = provider.create_authn_request(
-            config_name="test",
-            relay_state="test_state"
+            config_name="test", relay_state="test_state"
         )
 
         assert "request_url" in result
@@ -390,7 +376,7 @@ class TestSAMLProvider:
             idp_entity_id="http://idp.example.com",
             idp_sso_url="http://idp.example.com/sso",
             idp_sls_url="http://idp.example.com/sls",
-            idp_cert="cert"
+            idp_cert="cert",
         )
 
         provider.register_config("test", config)
@@ -398,7 +384,7 @@ class TestSAMLProvider:
         metadata = provider.generate_metadata("test")
 
         assert '<?xml version="1.0"?>' in metadata
-        assert 'EntityDescriptor' in metadata
+        assert "EntityDescriptor" in metadata
         assert config.entity_id in metadata
         assert config.acs_url in metadata
 
@@ -416,7 +402,7 @@ class TestSessionManager:
             ip_address="192.168.1.1",
             user_agent="TestBrowser/1.0",
             roles=["admin"],
-            permissions=["read", "write"]
+            permissions=["read", "write"],
         )
 
         assert session.session_id is not None
@@ -433,21 +419,19 @@ class TestSessionManager:
             user_id="user123",
             username="testuser",
             ip_address="192.168.1.1",
-            user_agent="TestBrowser/1.0"
+            user_agent="TestBrowser/1.0",
         )
 
         # Valid session
         is_valid, error = manager.validate_session(
-            session.session_id,
-            ip_address="192.168.1.1"
+            session.session_id, ip_address="192.168.1.1"
         )
         assert is_valid
         assert error is None
 
         # Invalid IP
         is_valid, error = manager.validate_session(
-            session.session_id,
-            ip_address="10.0.0.1"
+            session.session_id, ip_address="10.0.0.1"
         )
         assert not is_valid
         assert "IP address mismatch" in error
@@ -460,7 +444,7 @@ class TestSessionManager:
             user_id="user123",
             username="testuser",
             ip_address="192.168.1.1",
-            user_agent="TestBrowser/1.0"
+            user_agent="TestBrowser/1.0",
         )
 
         # Session should be valid immediately
@@ -469,6 +453,7 @@ class TestSessionManager:
 
         # Wait for expiration
         import time
+
         time.sleep(2)
 
         # Session should be expired
@@ -484,14 +469,14 @@ class TestSessionManager:
             user_id="user123",
             username="testuser",
             ip_address="192.168.1.1",
-            user_agent="Browser1"
+            user_agent="Browser1",
         )
 
         session2 = manager.create_session(
             user_id="user123",
             username="testuser",
             ip_address="192.168.1.2",
-            user_agent="Browser2"
+            user_agent="Browser2",
         )
 
         # Creating another should remove oldest
@@ -499,7 +484,7 @@ class TestSessionManager:
             user_id="user123",
             username="testuser",
             ip_address="192.168.1.3",
-            user_agent="Browser3"
+            user_agent="Browser3",
         )
 
         # First session should be terminated
@@ -515,7 +500,7 @@ class TestSessionManager:
             user_id="user123",
             username="testuser",
             ip_address="192.168.1.1",
-            user_agent="TestBrowser/1.0"
+            user_agent="TestBrowser/1.0",
         )
 
         # Terminate session
@@ -536,7 +521,7 @@ class TestSessionManager:
                 user_id="user123",
                 username="testuser",
                 ip_address=f"192.168.1.{i}",
-                user_agent="TestBrowser/1.0"
+                user_agent="TestBrowser/1.0",
             )
 
         # Terminate all
@@ -555,7 +540,7 @@ class TestSessionManager:
             user_id="user123",
             username="testuser",
             ip_address="192.168.1.1",
-            user_agent="TestBrowser/1.0"
+            user_agent="TestBrowser/1.0",
         )
 
         original_activity = session.last_activity
@@ -563,6 +548,7 @@ class TestSessionManager:
 
         # Wait a bit
         import time
+
         time.sleep(1)
 
         # Update activity
@@ -583,7 +569,7 @@ class TestSessionManager:
             username="testuser",
             ip_address="192.168.1.1",
             user_agent="TestBrowser/1.0",
-            mfa_verified=False
+            mfa_verified=False,
         )
 
         # Should require MFA for sensitive operations
@@ -600,7 +586,7 @@ class TestSessionManager:
             username="testuser2",
             ip_address="192.168.1.2",
             user_agent="TestBrowser/1.0",
-            mfa_verified=True
+            mfa_verified=True,
         )
 
         # Should not require MFA even for sensitive operations

@@ -38,7 +38,9 @@ class SAMLConfig:
     want_assertions_signed: bool = True
     want_assertions_encrypted: bool = False
     name_id_format: str = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
-    authn_context: str = "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport"
+    authn_context: str = (
+        "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport"
+    )
 
 
 class SAMLProvider:
@@ -186,9 +188,7 @@ class SAMLProvider:
                 return False, {"error": "Invalid conditions"}
 
             # Extract assertions
-            assertions = root.xpath(
-                "//saml:Assertion", namespaces=self.NAMESPACES
-            )
+            assertions = root.xpath("//saml:Assertion", namespaces=self.NAMESPACES)
             if not assertions:
                 return False, {"error": "No assertions found"}
 
@@ -246,7 +246,9 @@ class SAMLProvider:
         """
 
         if session_index:
-            logout_request += f"    <samlp:SessionIndex>{session_index}</samlp:SessionIndex>\n"
+            logout_request += (
+                f"    <samlp:SessionIndex>{session_index}</samlp:SessionIndex>\n"
+            )
 
         logout_request += "</samlp:LogoutRequest>"
 
@@ -325,8 +327,13 @@ class SAMLProvider:
             return False
 
         # Check Status
-        status = root.xpath("//samlp:Status/samlp:StatusCode", namespaces=self.NAMESPACES)
-        if not status or status[0].get("Value") != "urn:oasis:names:tc:SAML:2.0:status:Success":
+        status = root.xpath(
+            "//samlp:Status/samlp:StatusCode", namespaces=self.NAMESPACES
+        )
+        if (
+            not status
+            or status[0].get("Value") != "urn:oasis:names:tc:SAML:2.0:status:Success"
+        ):
             return False
 
         return True
@@ -378,8 +385,7 @@ class SAMLProvider:
 
         # Extract attributes
         attr_statements = assertion.xpath(
-            ".//saml:AttributeStatement/saml:Attribute",
-            namespaces=self.NAMESPACES
+            ".//saml:AttributeStatement/saml:Attribute", namespaces=self.NAMESPACES
         )
 
         for attr in attr_statements:
@@ -396,8 +402,7 @@ class SAMLProvider:
     def _extract_session_index(self, assertion: etree.Element) -> Optional[str]:
         """Extract session index from assertion"""
         authn_statements = assertion.xpath(
-            ".//saml:AuthnStatement",
-            namespaces=self.NAMESPACES
+            ".//saml:AuthnStatement", namespaces=self.NAMESPACES
         )
         if authn_statements:
             return authn_statements[0].get("SessionIndex")
