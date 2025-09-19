@@ -8,13 +8,12 @@ Scans configurations for secrets and sensitive data:
 - Connection strings
 """
 
+import os
 import re
-import hashlib
-from typing import Dict, Any, Optional, List, Tuple
+import json
+from typing import Dict, List, Any
 from dataclasses import dataclass, field
 from enum import Enum
-import base64
-import json
 
 
 class SecretType(Enum):

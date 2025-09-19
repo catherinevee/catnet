@@ -18,7 +18,6 @@ from pathlib import Path
 import hashlib
 import subprocess
 
-import git
 from git import Repo, GitCommandError
 import pygit2
 

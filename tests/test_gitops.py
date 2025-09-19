@@ -3,30 +3,25 @@ Comprehensive tests for CatNet GitOps Service
 """
 
 import pytest
-import asyncio
 import os
 import tempfile
 import shutil
-from unittest.mock import Mock, AsyncMock, patch, MagicMock
+from unittest.mock import Mock, patch, MagicMock
 from datetime import datetime
 
 from src.gitops.git_manager import GitManager, GitRepository
 from src.gitops.webhook_processor import (
     WebhookProcessor,
-    WebhookEvent,
-    EventType,
     WebhookProvider,
 )
 from src.gitops.config_validator import (
     ConfigValidator,
     ValidationResult,
     ValidationType,
-    Severity,
 )
 from src.gitops.secret_scanner import SecretScanner, SecretScanResult, SecretType
 from src.gitops.gitops_workflow import (
     GitOpsWorkflow,
-    DeploymentStrategy,
     WorkflowConfig,
     WorkflowState,
 )
@@ -117,7 +112,7 @@ class TestGitManager:
         # Mock git ls-files
         with patch.object(GitManager, "list_files") as mock_list:
             mock_list.return_value = ["config.yml", "router.yaml"]
-            files = self.git_manager.list_files(repo.id, pattern="*.yml")
+            self.git_manager.list_files(repo.id, pattern="*.yml")
             mock_list.assert_called_once()
 
 

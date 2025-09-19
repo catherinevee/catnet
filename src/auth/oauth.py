@@ -56,10 +56,14 @@ class OAuth2Provider:
             "scopes": ["user:email", "read:user"],
         },
         "azure": {
-            "authorize_url": "https://login.microsoftonline.com/{tenant}/oauth2/v2.0/authorize",
+            "authorize_url": (
+                "https://login.microsoftonline.com/{tenant}/oauth2/v2.0/authorize"
+            ),
             "token_url": "https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token",
             "userinfo_url": "https://graph.microsoft.com/v1.0/me",
-            "jwks_uri": "https://login.microsoftonline.com/{tenant}/discovery/v2.0/keys",
+            "jwks_uri": (
+                "https://login.microsoftonline.com/{tenant}/discovery/v2.0/keys"
+            ),
             "issuer": "https://login.microsoftonline.com/{tenant}/v2.0",
             "scopes": ["openid", "email", "profile"],
         },

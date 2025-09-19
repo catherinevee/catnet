@@ -1,24 +1,20 @@
 """
-Comprehensive tests for CatNet Authentication Service
+Comprehensive tests for CatNet Authentication
 """
 
 import pytest
-import asyncio
-from datetime import datetime, timedelta
-from unittest.mock import Mock, AsyncMock, patch
-import jwt
+from unittest.mock import Mock, patch
 import pyotp
-import base64
 
-from src.auth.jwt_handler import JWTHandler, create_access_token, verify_token
-from src.auth.mfa import MFAProvider, generate_totp_secret, verify_totp_token
-from src.auth.oauth import OAuth2Provider, OAuthConfig
-from src.auth.saml import SAMLProvider, SAMLConfig
-from src.auth.session import SessionManager, Session
+from src.auth.jwt_handler import JWTHandler
+from src.auth.mfa import MFAProvider
+from src.auth.oauth import OAuthProvider
+from src.auth.saml import SAMLProvider
+from src.auth.session import SessionManager
 
 
 class TestJWTHandler:
-    """Test JWT token handling"""
+    """Test JWT token handler"""
 
     def test_create_access_token(self):
         """Test access token creation"""
@@ -217,12 +213,12 @@ class TestMFAProvider:
         assert "MFA not enabled" in error
 
 
-class TestOAuth2Provider:
+class TestOAuthProvider:
     """Test OAuth2 authentication"""
 
     def test_register_provider(self):
         """Test OAuth provider registration"""
-        provider = OAuth2Provider()
+        provider = OAuthProvider()
 
         config = provider.register_provider(
             provider_name="google",
@@ -238,7 +234,7 @@ class TestOAuth2Provider:
 
     def test_generate_auth_url(self):
         """Test OAuth authorization URL generation"""
-        provider = OAuth2Provider()
+        provider = OAuthProvider()
 
         provider.register_provider(
             provider_name="github",
@@ -258,7 +254,7 @@ class TestOAuth2Provider:
     @pytest.mark.asyncio
     async def test_token_exchange(self):
         """Test OAuth code exchange"""
-        provider = OAuth2Provider()
+        provider = OAuthProvider()
 
         provider.register_provider(
             provider_name="google",
@@ -292,7 +288,7 @@ class TestOAuth2Provider:
     @pytest.mark.asyncio
     async def test_get_user_info(self):
         """Test fetching user info from OAuth provider"""
-        provider = OAuth2Provider()
+        provider = OAuthProvider()
 
         provider.register_provider(
             provider_name="github",
@@ -324,6 +320,8 @@ class TestSAMLProvider:
         """Test SAML configuration registration"""
         provider = SAMLProvider()
 
+        from src.auth.saml import SAMLConfig
+
         config = SAMLConfig(
             entity_id="http://localhost/saml",
             acs_url="http://localhost/saml/acs",
@@ -342,6 +340,8 @@ class TestSAMLProvider:
     def test_create_authn_request(self):
         """Test SAML authentication request creation"""
         provider = SAMLProvider()
+
+        from src.auth.saml import SAMLConfig
 
         config = SAMLConfig(
             entity_id="http://localhost/saml",
@@ -368,6 +368,8 @@ class TestSAMLProvider:
     def test_generate_metadata(self):
         """Test SAML metadata generation"""
         provider = SAMLProvider()
+
+        from src.auth.saml import SAMLConfig
 
         config = SAMLConfig(
             entity_id="http://localhost/saml",

@@ -15,7 +15,7 @@ from datetime import datetime
 from enum import Enum
 import json
 
-from .git_manager import GitManager, GitRepository
+from .git_manager import GitManager
 from .webhook_processor import WebhookProcessor, WebhookEvent, EventType
 from .config_validator import ConfigValidator, ValidationResult
 from .secret_scanner import SecretScanner, SecretScanResult
@@ -539,15 +539,6 @@ class GitOpsWorkflow:
         """
         # This would send actual webhook notification
         if config.notification_webhook:
-            notification = {
-                "execution_id": execution.id,
-                "state": execution.state.value,
-                "repository_id": execution.repository_id,
-                "completed_at": execution.completed_at.isoformat()
-                if execution.completed_at
-                else None,
-                "errors": execution.errors,
-            }
             # Would make HTTP POST to webhook URL
             execution.metadata["notification_sent"] = datetime.utcnow().isoformat()
 

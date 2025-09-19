@@ -9,12 +9,9 @@ Validates network device configurations:
 """
 
 import re
-import yaml
-import json
-from typing import Dict, Any, Optional, List, Tuple
+from typing import Dict, Any, Optional, List
 from dataclasses import dataclass, field
 from enum import Enum
-from pathlib import Path
 
 
 class ValidationType(Enum):
@@ -282,7 +279,6 @@ class ConfigValidator:
         lines = config.splitlines()
 
         # Check for hierarchy
-        hierarchy_stack = []
         brace_count = 0
 
         for line_num, line in enumerate(lines, 1):
