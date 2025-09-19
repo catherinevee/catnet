@@ -1,10 +1,27 @@
-from .connector import SecureDeviceConnector, DeviceConnection
-from .cisco_handler import CiscoHandler
-from .juniper_handler import JuniperHandler
+"""
+Device Management Module for CatNet
+"""
+
+from .device_manager import (
+    DeviceManager,
+    DeviceInfo,
+    DeviceConnection,
+    DeviceCredentials,
+    DeviceVendor,
+    DeviceType,
+    DeviceState,
+    ConnectionProtocol,
+    DeviceAdapter,
+)
 
 __all__ = [
-    "SecureDeviceConnector",
+    "DeviceManager",
+    "DeviceInfo",
     "DeviceConnection",
-    "CiscoHandler",
-    "JuniperHandler",
+    "DeviceCredentials",
+    "DeviceVendor",
+    "DeviceType",
+    "DeviceState",
+    "ConnectionProtocol",
+    "DeviceAdapter",
 ]
