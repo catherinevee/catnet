@@ -10,16 +10,14 @@ Implements SAML 2.0 authentication with support for:
 
 import base64
 import zlib
-from typing import Dict, Any, Optional, List, Tuple
+from typing import Dict, Any, Optional, Tuple
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
 from lxml import etree
-from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.x509 import load_pem_x509_certificate
 from cryptography.hazmat.backends import default_backend
 import uuid
-from urllib.parse import urlencode, quote
+from urllib.parse import urlencode
 
 
 @dataclass
@@ -343,7 +341,7 @@ class SAMLProvider:
         # This is a simplified signature validation
         # In production, use python-xmlsec or similar library
         try:
-            cert = load_pem_x509_certificate(cert_pem.encode(), default_backend())
+            load_pem_x509_certificate(cert_pem.encode(), default_backend())
             # Signature validation logic here
             return True
         except Exception:

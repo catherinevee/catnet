@@ -11,8 +11,6 @@ import io
 import base64
 import secrets
 from typing import Optional, Dict, List, Tuple
-from datetime import datetime, timedelta
-import hashlib
 
 
 class MFAProvider:

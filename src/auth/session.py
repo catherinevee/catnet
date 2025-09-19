@@ -9,10 +9,9 @@ Provides secure session handling with:
 - Session activity tracking
 """
 
-import uuid
 import hashlib
 import secrets
-from typing import Dict, Any, Optional, List, Set
+from typing import Dict, Any, Optional, List, Set, Tuple
 from datetime import datetime, timedelta
 from dataclasses import dataclass, field
 import json
@@ -435,7 +434,10 @@ class SessionManager:
             Session ID
         """
         # Combine entropy sources
-        data = f"{user_id}:{ip_address}:{user_agent}:{datetime.utcnow().isoformat()}:{secrets.token_hex(16)}"
+        data = (
+            f"{user_id}:{ip_address}:{user_agent}:"
+            f"{datetime.utcnow().isoformat()}:{secrets.token_hex(16)}"
+        )
 
         # Create HMAC for integrity
         h = hmac.new(self.session_secret.encode(), data.encode(), hashlib.sha256)
@@ -489,7 +491,3 @@ def get_session_manager() -> SessionManager:
     if _default_manager is None:
         _default_manager = SessionManager()
     return _default_manager
-
-
-# Tuple import for type hints
-from typing import Tuple

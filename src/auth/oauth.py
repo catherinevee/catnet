@@ -15,8 +15,7 @@ from typing import Dict, Any, Optional, List
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 import httpx
-from urllib.parse import urlencode, parse_qs, urlparse
-import json
+from urllib.parse import urlencode
 
 
 @dataclass
