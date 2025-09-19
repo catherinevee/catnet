@@ -156,9 +156,7 @@ class WebhookProcessor:
             print(f"Webhook processing error: {str(e)}")
             return False, None
 
-    def register_handler(
-        self, event_type: EventType, handler: callable
-    ) -> None:
+    def register_handler(self, event_type: EventType, handler: callable) -> None:
         """
         Register event handler
 
@@ -215,9 +213,14 @@ class WebhookProcessor:
                 return False
 
             # GitHub uses HMAC-SHA256
-            expected_signature = "sha256=" + hmac.new(
-                secret.encode(), body.encode() if isinstance(body, str) else body, hashlib.sha256
-            ).hexdigest()
+            expected_signature = (
+                "sha256="
+                + hmac.new(
+                    secret.encode(),
+                    body.encode() if isinstance(body, str) else body,
+                    hashlib.sha256,
+                ).hexdigest()
+            )
 
             return hmac.compare_digest(signature_header, expected_signature)
 
@@ -231,9 +234,14 @@ class WebhookProcessor:
                 return False
 
             # Bitbucket uses HMAC-SHA256
-            expected_signature = "sha256=" + hmac.new(
-                secret.encode(), body.encode() if isinstance(body, str) else body, hashlib.sha256
-            ).hexdigest()
+            expected_signature = (
+                "sha256="
+                + hmac.new(
+                    secret.encode(),
+                    body.encode() if isinstance(body, str) else body,
+                    hashlib.sha256,
+                ).hexdigest()
+            )
 
             return hmac.compare_digest(signature_header, expected_signature)
 
@@ -244,7 +252,9 @@ class WebhookProcessor:
                 return False
 
             expected_signature = hmac.new(
-                secret.encode(), body.encode() if isinstance(body, str) else body, hashlib.sha256
+                secret.encode(),
+                body.encode() if isinstance(body, str) else body,
+                hashlib.sha256,
             ).hexdigest()
 
             return hmac.compare_digest(signature_header, expected_signature)
@@ -270,7 +280,9 @@ class WebhookProcessor:
         event_type_map = {
             "push": EventType.PUSH,
             "pull_request": EventType.PULL_REQUEST,
-            "create": EventType.TAG if payload.get("ref_type") == "tag" else EventType.BRANCH_CREATE,
+            "create": EventType.TAG
+            if payload.get("ref_type") == "tag"
+            else EventType.BRANCH_CREATE,
             "delete": EventType.BRANCH_DELETE,
             "release": EventType.RELEASE,
             "commit_comment": EventType.COMMIT_COMMENT,
@@ -439,7 +451,12 @@ class WebhookProcessor:
                 change = changes[0]
                 branch = change.get("new", {}).get("name", "")
                 commit_hash = change.get("new", {}).get("target", {}).get("hash", "")
-                author = change.get("new", {}).get("target", {}).get("author", {}).get("raw", "")
+                author = (
+                    change.get("new", {})
+                    .get("target", {})
+                    .get("author", {})
+                    .get("raw", "")
+                )
 
                 return WebhookEvent(
                     id=headers_lower.get("x-request-uuid", ""),

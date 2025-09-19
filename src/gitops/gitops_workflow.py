@@ -132,7 +132,9 @@ class GitOpsWorkflow:
 
         # Register webhook secret if provided
         if webhook_secret:
-            self.webhook_processor.register_webhook_secret(repository_url, webhook_secret)
+            self.webhook_processor.register_webhook_secret(
+                repository_url, webhook_secret
+            )
 
         # Store workflow configuration
         workflow_config = workflow_config or WorkflowConfig()
@@ -214,11 +216,15 @@ class GitOpsWorkflow:
             execution: Workflow execution object
         """
         try:
-            config = self.workflow_configs.get(execution.repository_id, WorkflowConfig())
+            config = self.workflow_configs.get(
+                execution.repository_id, WorkflowConfig()
+            )
 
             # Step 1: Pull latest changes
             if execution.trigger_event:
-                success, changes = self.git_manager.pull_repository(execution.repository_id)
+                success, changes = self.git_manager.pull_repository(
+                    execution.repository_id
+                )
                 if not success:
                     await self._fail_workflow(
                         execution, f"Failed to pull changes: {changes.get('error')}"
@@ -243,9 +249,7 @@ class GitOpsWorkflow:
                 await self._validate_configurations(execution, config_files)
 
                 # Check validation results
-                has_critical = any(
-                    not r.is_valid for r in execution.validation_results
-                )
+                has_critical = any(not r.is_valid for r in execution.validation_results)
                 if has_critical:
                     await self._fail_workflow(
                         execution, "Configuration validation failed"
@@ -261,13 +265,17 @@ class GitOpsWorkflow:
                 has_secrets = any(r.has_secrets for r in execution.scan_results)
                 if has_secrets:
                     await self._quarantine_secrets(execution)
-                    await self._fail_workflow(execution, "Secrets detected in configuration")
+                    await self._fail_workflow(
+                        execution, "Secrets detected in configuration"
+                    )
                     return
 
             # Step 5: Create deployment
             if config.auto_deploy or not config.require_approval:
                 execution.state = WorkflowState.DEPLOYING
-                deployment_id = await self._create_deployment(execution, config_files, config)
+                deployment_id = await self._create_deployment(
+                    execution, config_files, config
+                )
                 execution.deployment_id = deployment_id
 
                 # Execute deployment
@@ -398,7 +406,10 @@ class GitOpsWorkflow:
         # This would integrate with the deployment service
         # For now, simulate canary deployment
         stages = [
-            {"percentage": config.canary_percentage, "wait": config.canary_wait_minutes},
+            {
+                "percentage": config.canary_percentage,
+                "wait": config.canary_wait_minutes,
+            },
             {"percentage": 50, "wait": 5},
             {"percentage": 100, "wait": 0},
         ]
@@ -532,7 +543,9 @@ class GitOpsWorkflow:
                 "execution_id": execution.id,
                 "state": execution.state.value,
                 "repository_id": execution.repository_id,
-                "completed_at": execution.completed_at.isoformat() if execution.completed_at else None,
+                "completed_at": execution.completed_at.isoformat()
+                if execution.completed_at
+                else None,
                 "errors": execution.errors,
             }
             # Would make HTTP POST to webhook URL
@@ -631,7 +644,9 @@ class GitOpsWorkflow:
             "id": execution.id,
             "state": execution.state.value,
             "started_at": execution.started_at.isoformat(),
-            "completed_at": execution.completed_at.isoformat() if execution.completed_at else None,
+            "completed_at": execution.completed_at.isoformat()
+            if execution.completed_at
+            else None,
             "validation_passed": all(r.is_valid for r in execution.validation_results),
             "secrets_detected": any(r.has_secrets for r in execution.scan_results),
             "deployment_id": execution.deployment_id,

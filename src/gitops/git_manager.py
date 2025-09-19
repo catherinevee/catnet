@@ -166,7 +166,10 @@ class GitManager:
             repo_size = self._get_directory_size(repo_config.local_path)
             if repo_size > self.max_repo_size:
                 shutil.rmtree(repo_config.local_path)
-                return False, f"Repository exceeds size limit ({repo_size} > {self.max_repo_size})"
+                return (
+                    False,
+                    f"Repository exceeds size limit ({repo_size} > {self.max_repo_size})",
+                )
 
             # Get latest commit
             repo = Repo(repo_config.local_path)
@@ -402,7 +405,9 @@ class GitManager:
         except Exception:
             return []
 
-    def create_branch(self, repo_id: str, branch_name: str) -> Tuple[bool, Optional[str]]:
+    def create_branch(
+        self, repo_id: str, branch_name: str
+    ) -> Tuple[bool, Optional[str]]:
         """
         Create a new branch
 
@@ -473,7 +478,7 @@ class GitManager:
 
         if repo_config.ssh_key_path:
             # Setup SSH command with specific key
-            ssh_cmd = f'ssh -i {repo_config.ssh_key_path} -o StrictHostKeyChecking=no'
+            ssh_cmd = f"ssh -i {repo_config.ssh_key_path} -o StrictHostKeyChecking=no"
             env["GIT_SSH_COMMAND"] = ssh_cmd
 
         return env
@@ -492,10 +497,7 @@ class GitManager:
         def credentials(url, username_from_url, allowed_types):
             if allowed_types & pygit2.credentials.GIT_CREDENTIAL_SSH_KEY:
                 return pygit2.Keypair(
-                    username_from_url,
-                    ssh_key_path + ".pub",
-                    ssh_key_path,
-                    ""
+                    username_from_url, ssh_key_path + ".pub", ssh_key_path, ""
                 )
             return None
 

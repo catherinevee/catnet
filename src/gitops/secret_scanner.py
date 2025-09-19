@@ -269,12 +269,16 @@ class SecretScanner:
         result.metadata = {
             "lines_scanned": len(lines),
             "patterns_used": len(self.patterns),
-            "high_confidence_secrets": len([s for s in result.secrets if s.confidence >= 0.8]),
+            "high_confidence_secrets": len(
+                [s for s in result.secrets if s.confidence >= 0.8]
+            ),
         }
 
         return result
 
-    def scan_directory(self, directory_path: str, extensions: List[str] = None) -> List[SecretScanResult]:
+    def scan_directory(
+        self, directory_path: str, extensions: List[str] = None
+    ) -> List[SecretScanResult]:
         """
         Scan directory for secrets
 
@@ -288,7 +292,15 @@ class SecretScanner:
         import os
 
         results = []
-        extensions = extensions or [".yml", ".yaml", ".json", ".conf", ".cfg", ".ini", ".env"]
+        extensions = extensions or [
+            ".yml",
+            ".yaml",
+            ".json",
+            ".conf",
+            ".cfg",
+            ".ini",
+            ".env",
+        ]
 
         for root, dirs, files in os.walk(directory_path):
             # Skip .git directory
@@ -301,7 +313,9 @@ class SecretScanner:
                 # Check extension
                 if any(file.endswith(ext) for ext in extensions):
                     try:
-                        with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+                        with open(
+                            file_path, "r", encoding="utf-8", errors="ignore"
+                        ) as f:
                             content = f.read()
                         result = self.scan_file(file_path, content)
                         if result.has_secrets:
@@ -392,7 +406,9 @@ class SecretScanner:
             redacted = "*" * len(secret_value)
         else:
             # Show first 2 and last 2 characters
-            redacted = secret_value[:2] + "*" * (len(secret_value) - 4) + secret_value[-2:]
+            redacted = (
+                secret_value[:2] + "*" * (len(secret_value) - 4) + secret_value[-2:]
+            )
 
         return full_text.replace(secret_value, redacted)
 
@@ -425,7 +441,9 @@ class SecretScanner:
             "quarantine_location": quarantine_file,
             "detected_secrets": len(scan_result.secrets),
             "secret_types": list(set(s.secret_type.value for s in scan_result.secrets)),
-            "high_confidence_count": len([s for s in scan_result.secrets if s.confidence >= 0.8]),
+            "high_confidence_count": len(
+                [s for s in scan_result.secrets if s.confidence >= 0.8]
+            ),
             "recommendations": [
                 "Remove all hardcoded secrets",
                 "Use environment variables or vault for sensitive data",

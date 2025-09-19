@@ -59,12 +59,18 @@ class TestGitManager:
     def test_validate_repository_url(self):
         """Test repository URL validation"""
         # Valid URLs
-        assert self.git_manager._validate_repository_url("https://github.com/test/repo.git")
+        assert self.git_manager._validate_repository_url(
+            "https://github.com/test/repo.git"
+        )
         assert self.git_manager._validate_repository_url("git@github.com:test/repo.git")
-        assert self.git_manager._validate_repository_url("https://gitlab.com/test/repo.git")
+        assert self.git_manager._validate_repository_url(
+            "https://gitlab.com/test/repo.git"
+        )
 
         # Invalid URLs
-        assert not self.git_manager._validate_repository_url("https://evil.com/repo.git")
+        assert not self.git_manager._validate_repository_url(
+            "https://evil.com/repo.git"
+        )
         assert not self.git_manager._validate_repository_url("ftp://github.com/repo")
 
     @patch("git.Repo.clone_from")
@@ -149,9 +155,10 @@ class TestWebhookProcessor:
         body = '{"test": "payload"}'
 
         # Generate valid signature
-        signature = "sha256=" + hmac.new(
-            secret.encode(), body.encode(), hashlib.sha256
-        ).hexdigest()
+        signature = (
+            "sha256="
+            + hmac.new(secret.encode(), body.encode(), hashlib.sha256).hexdigest()
+        )
 
         headers = {"X-Hub-Signature-256": signature}
 
@@ -264,7 +271,9 @@ snmp-server community public RO
         result = self.validator.validate_configuration(config, "cisco")
 
         assert not result.is_valid
-        security_issues = [i for i in result.issues if i.type == ValidationType.SECURITY]
+        security_issues = [
+            i for i in result.issues if i.type == ValidationType.SECURITY
+        ]
         assert len(security_issues) > 0
 
     def test_validate_ip_addresses(self):
@@ -287,7 +296,9 @@ interface GigabitEthernet0/2
 """
         result = self.validator.validate_configuration(config, "cisco")
 
-        conflict_issues = [i for i in result.issues if i.type == ValidationType.CONFLICT]
+        conflict_issues = [
+            i for i in result.issues if i.type == ValidationType.CONFLICT
+        ]
         assert len(conflict_issues) > 0  # Should detect duplicate IP
 
 
@@ -309,7 +320,9 @@ username admin password admin123
 
         assert result.has_secrets
         assert result.secret_count >= 3
-        password_secrets = [s for s in result.secrets if s.secret_type == SecretType.PASSWORD]
+        password_secrets = [
+            s for s in result.secrets if s.secret_type == SecretType.PASSWORD
+        ]
         assert len(password_secrets) > 0
 
     def test_detect_api_keys(self):
@@ -325,7 +338,8 @@ aws_access_key_id: AKIAIOSFODNN7EXAMPLE
         api_secrets = [
             s
             for s in result.secrets
-            if s.secret_type in [SecretType.API_KEY, SecretType.TOKEN, SecretType.AWS_CREDENTIALS]
+            if s.secret_type
+            in [SecretType.API_KEY, SecretType.TOKEN, SecretType.AWS_CREDENTIALS]
         ]
         assert len(api_secrets) > 0
 
@@ -339,7 +353,9 @@ MIIEpAIBAAKCAQEA...
         result = self.scanner.scan_file("key.pem", content)
 
         assert result.has_secrets
-        key_secrets = [s for s in result.secrets if s.secret_type == SecretType.PRIVATE_KEY]
+        key_secrets = [
+            s for s in result.secrets if s.secret_type == SecretType.PRIVATE_KEY
+        ]
         assert len(key_secrets) > 0
 
     def test_entropy_calculation(self):

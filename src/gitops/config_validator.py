@@ -265,7 +265,9 @@ class ConfigValidator:
                                 severity=Severity.HIGH,
                                 message="Invalid IP address configuration",
                                 line_number=line_num,
-                                config_section=interface_stack[-1] if interface_stack else None,
+                                config_section=interface_stack[-1]
+                                if interface_stack
+                                else None,
                             )
                         )
 
@@ -332,7 +334,9 @@ class ConfigValidator:
                 )
             )
 
-    def _validate_security(self, config: str, vendor: str, result: ValidationResult) -> None:
+    def _validate_security(
+        self, config: str, vendor: str, result: ValidationResult
+    ) -> None:
         """
         Validate security aspects of configuration
 
@@ -484,7 +488,9 @@ class ConfigValidator:
                         )
                     )
 
-    def _detect_conflicts(self, config: str, vendor: str, result: ValidationResult) -> None:
+    def _detect_conflicts(
+        self, config: str, vendor: str, result: ValidationResult
+    ) -> None:
         """
         Detect configuration conflicts
 
