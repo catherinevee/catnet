@@ -14,7 +14,6 @@ from datetime import datetime
 from enum import Enum
 
 
-
 class RollbackReason(Enum):
     """Reasons for rollback"""
 
@@ -25,7 +24,6 @@ class RollbackReason(Enum):
     TIMEOUT = "timeout"
     ERROR_THRESHOLD = "error_threshold"
     PERFORMANCE_DEGRADATION = "performance_degradation"
-
 
 
 class RollbackState(Enum):
@@ -39,7 +37,6 @@ class RollbackState(Enum):
 
 
 @dataclass
-
 class RollbackPoint:
     """Point-in-time snapshot for rollback"""
 
@@ -53,7 +50,6 @@ class RollbackPoint:
 
 
 @dataclass
-
 class RollbackOperation:
     """Rollback operation"""
 
@@ -69,7 +65,6 @@ class RollbackOperation:
     successful_devices: List[str] = field(default_factory=list)
     failed_devices: List[str] = field(default_factory=list)
     errors: List[str] = field(default_factory=list)
-
 
 
 class RollbackManager:
@@ -227,7 +222,7 @@ class RollbackManager:
 
             operation.completed_at = datetime.utcnow()
             return operation.state in [RollbackState.COMPLETED,
-                RollbackState.PARTIAL]
+                                       RollbackState.PARTIAL]
 
         except Exception as e:
             operation.state = RollbackState.FAILED
@@ -280,9 +275,9 @@ class RollbackManager:
             return False
 
         async def validate_rollback_capability(
-        self,
-        devices: List[str]
-    ) -> Dict[str, bool]:
+            self,
+            devices: List[str]
+        ) -> Dict[str, bool]:
         """
         Validate if devices can be rolled back
 
@@ -420,7 +415,7 @@ class RollbackManager:
         """Verify a rollback point is valid"""
         # Check backup exists
         if self.backup_service:
-            return await self.backup_service.verify_backup( \
+            return await self.backup_service.verify_backup(
                 point.backup_location)
         return True
 
@@ -429,7 +424,7 @@ class RollbackManager:
         if self.device_service:
             config = await self.device_service.get_config(device_id)
             if self.backup_service:
-                                return await self.backup_service.create_backup(
+                return await self.backup_service.create_backup(
                     device_id,
                     config
                 )
@@ -440,7 +435,7 @@ class RollbackManager:
     ) -> bool:
         """Apply rollback configuration to device"""
         if self.device_service:
-                        return await self.device_service.apply_config(
+            return await self.device_service.apply_config(
                 device_id,
                 configuration
             )
@@ -464,13 +459,13 @@ class RollbackManager:
         return True
 
         async def _restore_from_backup(
-        self,
-        device_id: str,
-        backup_id: str
-    ) -> bool:
+            self,
+            device_id: str,
+            backup_id: str
+        ) -> bool:
         """Restore device from backup"""
         if self.backup_service:
-                        return await self.backup_service.restore_backup(
+            return await self.backup_service.restore_backup(
                 device_id,
                 backup_id
             )
@@ -483,10 +478,10 @@ class RollbackManager:
         return True
 
         def _cleanup_rollback_points(
-        self,
-        device_id: str,
-        keep_last: int = 10
-    ) -> None:
+            self,
+            device_id: str,
+            keep_last: int = 10
+        ) -> None:
         """Cleanup old rollback points"""
         if device_id not in self.rollback_points:
             return

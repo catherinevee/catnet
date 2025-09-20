@@ -27,7 +27,6 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
-
 class DeploymentTask:
     """Simple deployment task"""
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
@@ -38,7 +37,6 @@ class DeploymentTask:
     completed_at: Optional[datetime] = None
     error_message: Optional[str] = None
     deployed_commands: List[str] = field(default_factory=list)
-
 
 
 class SimpleDeploymentPipeline:
@@ -122,9 +120,9 @@ class SimpleDeploymentPipeline:
 
                 # Track metrics
                 if METRICS_AVAILABLE:
-                    duration = (deployment.completed_at - \
+                    duration = (deployment.completed_at -
                         start_time).total_seconds()
-                    metrics_collector.track_deployment(deployment_id, 
+                    metrics_collector.track_deployment(deployment_id,
     "completed", duration)
             else:
                 deployment.status = "failed"
@@ -134,7 +132,7 @@ class SimpleDeploymentPipeline:
                 # Track metrics
                 if METRICS_AVAILABLE:
                     duration = (datetime.utcnow() - start_time).total_seconds()
-                    metrics_collector.track_deployment(deployment_id, "failed", 
+                    metrics_collector.track_deployment(deployment_id, "failed",
     duration)
 
         except Exception as e:
@@ -195,7 +193,7 @@ class SimpleDeploymentPipeline:
             backup_config = connection.backup_config()
 
             # Save backup
-            backup_file = self.deployment_log_dir / f"{device.hostname}_backup_{ \
+            backup_file = self.deployment_log_dir / f"{device.hostname}_backup_{
     datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.cfg"
             with open(backup_file, 'w') as f:
                 f.write(backup_config)
@@ -220,12 +218,12 @@ class SimpleDeploymentPipeline:
                 "backup_file": str(backup_file),
                 "save_success": save_success,
                 "result": "success" if save_success else "partial",
-                "connection_mode": "simulated" if \
+                "connection_mode": "simulated" if
     device_connector.simulation_mode else "real"
             }
 
             # Save to log file
-            log_file = self.deployment_log_dir / f"{device.hostname}_{ \
+            log_file = self.deployment_log_dir / f"{device.hostname}_{
     datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.json"
             with open(log_file, 'w') as f:
                 json.dump(deployment_log, f, indent=2)
@@ -276,7 +274,7 @@ class SimpleDeploymentPipeline:
                     {deployment_id}")
 
             # Save backup
-            backup_file = self.deployment_log_dir / f"{device.hostname}_backup_{ \
+            backup_file = self.deployment_log_dir / f"{device.hostname}_backup_{
     datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.cfg"
             with open(backup_file, 'w') as f:
                 f.write(backup_config)

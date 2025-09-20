@@ -18,7 +18,6 @@ from ..security.audit import AuditLogger
 logger = get_logger(__name__)
 
 
-
 class StrategyType(Enum):
     """Deployment strategy types."""
 
@@ -29,7 +28,6 @@ class StrategyType(Enum):
 
 
 @dataclass
-
 class DeploymentStage:
     """Represents a deployment stage."""
 
@@ -37,7 +35,6 @@ class DeploymentStage:
     wait_minutes: int
     validation_required: bool = True
     rollback_on_failure: bool = True
-
 
 
 class BaseStrategy:

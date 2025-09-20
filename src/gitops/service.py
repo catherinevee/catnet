@@ -43,18 +43,15 @@ class RepositoryConnect(BaseModel):
     config_path: str = "configs/"
 
 
-
 class WebhookPayload(BaseModel):
     provider: str  # github, gitlab, bitbucket
     payload: Dict[str, Any]
     signature: Optional[str] = None
 
 
-
 class ConfigSyncRequest(BaseModel):
     repository_id: str = Field(..., description="Repository UUID")
     force: bool = Field(False, description="Force sync even with conflicts")
-
 
 
 class DeploymentRequest(BaseModel):
@@ -63,7 +60,6 @@ class DeploymentRequest(BaseModel):
     target_devices: List[str]
     strategy: str = "canary"
     approval_required: bool = True
-
 
 
 class GitOpsService:

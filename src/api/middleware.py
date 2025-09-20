@@ -11,11 +11,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     """Add security headers to all responses."""
 
-        async def dispatch(
+    async def dispatch(
         self,
         request: Request,
         call_next: Callable
@@ -64,7 +63,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         return response
 
 
-
+    pass
 class RateLimitMiddleware(BaseHTTPMiddleware):
     """Rate limiting middleware."""
 
@@ -75,11 +74,11 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self.clients = {}
 
         async def dispatch(
-        self,
-        request: Request,
-        call_next: Callable
-    ) -> Response:
-        # Get client identifier (IP address)
+            self,
+            request: Request,
+            call_next: Callable
+        ) -> Response:
+            # Get client identifier (IP address)
         client_ip = request.client.host
 
         # Check rate limit
@@ -119,13 +118,13 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         remaining = self.calls - len(self.clients[client_ip])
         response.headers["X-RateLimit-Limit"] = str(self.calls)
         response.headers["X-RateLimit-Remaining"] = str(remaining)
-        response.headers["X-RateLimit-Reset"] = str(int(current_time + \
-            self.period))
+        response.headers["X-RateLimit-Reset"] = str(int(current_time +
+                                                        self.period))
 
         return response
 
 
-
+    pass
 class CORSMiddleware(BaseHTTPMiddleware):
     """CORS middleware with security considerations."""
 
@@ -134,11 +133,11 @@ class CORSMiddleware(BaseHTTPMiddleware):
         self.allowed_origins = allowed_origins or ["https://localhost:3000"]
 
         async def dispatch(
-        self,
-        request: Request,
-        call_next: Callable
-    ) -> Response:
-        # Handle preflight requests
+            self,
+            request: Request,
+            call_next: Callable
+        ) -> Response:
+            # Handle preflight requests
         if request.method == "OPTIONS":
             response = Response(status_code=200)
         else:
@@ -162,11 +161,11 @@ class CORSMiddleware(BaseHTTPMiddleware):
         return response
 
 
-
+    pass
 class AuditLoggingMiddleware(BaseHTTPMiddleware):
     """Log all API requests for audit purposes."""
 
-        async def dispatch(
+    async def dispatch(
         self,
         request: Request,
         call_next: Callable
@@ -224,7 +223,7 @@ class AuditLoggingMiddleware(BaseHTTPMiddleware):
             raise
 
 
-
+    pass
 def setup_middleware(app):
     """Configure all middleware for the application."""
 

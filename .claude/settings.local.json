@@ -31,7 +31,8 @@
       "Bash(grep:*)",
       "Bash(netstat:*)",
       "Bash(curl:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(autopep8:*)"
     ],
     "deny": [],
     "ask": []

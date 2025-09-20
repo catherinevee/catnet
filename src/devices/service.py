@@ -13,7 +13,6 @@ from ..security.vault import VaultClient
 logger = get_logger(__name__)
 
 
-
 class DeviceService:
     """Main device management service"""
 

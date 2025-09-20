@@ -28,7 +28,6 @@ from src.monitoring.observability import (
 )
 
 
-
 class TestMetricsCollector:
     """Test metrics collection"""
 
@@ -196,15 +195,13 @@ class TestMetricsCollector:
         assert data["test_metric"]["type"] == "gauge"
 
 
-
 class TestAlertManager:
     """Test alert management"""
 
     def setup_method(self):
         """Setup test environment"""
         self.metrics_collector = MetricsCollector()
-        self.alert_manager = AlertManager( \
-            metrics_collector=self.metrics_collector)
+        self.alert_manager = AlertManager(metrics_collector=self.metrics_collector)
 
     def test_add_alert_rule(self):
         """Test adding alert rules"""
@@ -336,7 +333,6 @@ class TestAlertManager:
         assert stats["severity_counts"]["high"] == 2
 
 
-
 class TestObservabilityService:
     """Test observability service"""
 
@@ -389,11 +385,7 @@ class TestObservabilityService:
 
         # Add tags
         self.observability.add_span_tag(span.span_id, "user_id", "12345")
-                self.observability.add_span_tag(
-            span.span_id,
-            "environment",
-            "production"
-        )
+        self.observability.add_span_tag(span.span_id, "environment", "production")
 
         # Add logs
         self.observability.add_span_log(
@@ -536,7 +528,6 @@ class TestObservabilityService:
             trace_id,
             "database_query",
             parent_span_id=self.observability.active_traces[trace_id].root_span.span_id,
-                
         )
         self.observability.end_span(span1.span_id)
 
@@ -544,7 +535,6 @@ class TestObservabilityService:
             trace_id,
             "cache_lookup",
             parent_span_id=self.observability.active_traces[trace_id].root_span.span_id,
-                
         )
         self.observability.end_span(span2.span_id)
 
@@ -557,7 +547,6 @@ class TestObservabilityService:
         assert summary is not None
         assert summary["trace_id"] == trace_id
         assert summary["span_count"] == 3  # root + 2 children
-
 
 
 class TestIntegration:

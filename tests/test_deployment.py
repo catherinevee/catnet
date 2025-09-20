@@ -36,7 +36,6 @@ from src.deployment.history import (
 )
 
 
-
 class TestDeploymentManager:
     """Test deployment manager"""
 
@@ -56,8 +55,7 @@ class TestDeploymentManager:
     async def test_create_deployment(self):
         """Test deployment creation"""
         # Setup mocks
-        self.manager._get_device_info = AsyncMock(return_value={"hostname": \
-            "router1"})
+        self.manager._get_device_info = AsyncMock(return_value={"hostname": "router1"})
 
         # Create deployment
         deployment_id = await self.manager.create_deployment(
@@ -65,7 +63,8 @@ class TestDeploymentManager:
             description="Test deployment description",
             devices=["device1", "device2"],
             configuration=(
-                "interface GigabitEthernet0/1\n" " ip address 192.168.1.1 \
+                "interface GigabitEthernet0/1\n"
+                " ip address 192.168.1.1 \
                     255.255.255.0"
             ),
             config=DeploymentConfig(strategy=DeploymentStrategy.CANARY),
@@ -125,13 +124,11 @@ class TestDeploymentManager:
 
         # Verify canary deployment was executed
         assert self.manager._deploy_to_devices.call_count == 2  # Canary + \
-            remaining
+        remaining
 
         # Check canary batch size
-        first_call_devices = self.manager._deploy_to_devices.call_args_list[0][ \
-            0][1]
+        first_call_devices = self.manager._deploy_to_devices.call_args_list[0][0][1]
         assert len(first_call_devices) == 2  # 50% of 4 devices
-
 
 
 class TestRollbackManager:
@@ -166,7 +163,6 @@ class TestRollbackManager:
         assert point.configuration == "current config"
         assert point.verified is True
         assert "device1" in self.manager.rollback_points
-
 
 
 class TestDeploymentValidator:
@@ -214,7 +210,8 @@ class TestDeploymentValidator:
             deployment_id="dep1",
             devices=["device1", "device2"],
             configuration=(
-                "interface GigabitEthernet0/1\n" " ip address 192.168.1.1 \
+                "interface GigabitEthernet0/1\n"
+                " ip address 192.168.1.1 \
                     255.255.255.0"
             ),
             deployment_config={},
@@ -224,7 +221,6 @@ class TestDeploymentValidator:
         assert result.status == ValidationStatus.PASSED
         assert result.failed_checks == 0
         assert result.total_checks > 0
-
 
 
 class TestHealthCheckService:
@@ -296,7 +292,6 @@ class TestHealthCheckService:
         assert result.status == HealthStatus.HEALTHY
         assert result.device_id == "device1"
         assert result.duration_ms is not None
-
 
 
 class TestDeploymentHistory:

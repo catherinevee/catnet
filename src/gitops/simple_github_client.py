@@ -11,7 +11,6 @@ from pathlib import Path
 
 
 @dataclass
-
 class RepositoryInfo:
     """Simple repository information"""
     url: str
@@ -25,7 +24,7 @@ class RepositoryInfo:
         """Parse owner and repo from URL"""
         if self.url and not self.owner:
             # Parse https://github.com/owner/repo format
-            parts = self.url.replace("https://github.com/", "").replace(".git", 
+            parts = self.url.replace("https://github.com/", "").replace(".git",
     "").split("/")
             if len(parts) >= 2:
                 self.owner = parts[0]
@@ -33,7 +32,6 @@ class RepositoryInfo:
 
 
 @dataclass
-
 class ConfigFile:
     """Configuration file information"""
     path: str
@@ -42,7 +40,6 @@ class ConfigFile:
     sha: str = ""
     size: int = 0
     retrieved_at: datetime = field(default_factory=datetime.utcnow)
-
 
 
 class SimpleGitHubClient:
@@ -57,7 +54,7 @@ class SimpleGitHubClient:
         self.cache_dir = Path("data/github_cache")
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
-    def connect_repository(self, repo_url: str, branch: str = "main", token: 
+    def connect_repository(self, repo_url: str, branch: str = "main", token:
     Optional[str] = None) -> RepositoryInfo:
         """Connect to a GitHub repository"""
         repo_info = RepositoryInfo(
@@ -87,10 +84,11 @@ class SimpleGitHubClient:
         except Exception:
             # Try raw URL as fallback (public repos)
             try:
-                raw_url = f"https://raw.githubusercontent.com/{repo.owner}/{ \
+                raw_url = f"https://raw.githubusercontent.com/{repo.owner}/{
     repo.repo}/{repo.branch}/README.md"
                 response = requests.get(raw_url, timeout=10)
-                                return response.status_code in [200, 404]  # 404 is OK (
+                                return response.status_code in [
+                                    200, 404]  # 404 is OK (
                     no README
                 )
             except Exception:

@@ -12,9 +12,9 @@ from src.security.simple_security import (
 from src.devices.async_device_connector import async_device_connector
 from src.devices.device_store import device_store
 
-print("="*60)
+print("=" * 60)
 print("Testing Enhanced Security Features")
-print("="*60)
+print("=" * 60)
 
 
 def test_webhook_verification():
@@ -38,7 +38,7 @@ def test_webhook_verification():
         hashlib.sha256
     ).hexdigest()
 
-        is_valid = webhook_verifier.verify_github_signature(
+    is_valid = webhook_verifier.verify_github_signature(
         payload,
         valid_signature,
         repo_id
@@ -47,7 +47,7 @@ def test_webhook_verification():
 
     # Test invalid signature
     invalid_signature = "sha256=invalid123"
-        is_invalid = webhook_verifier.verify_github_signature(
+    is_invalid = webhook_verifier.verify_github_signature(
         payload,
         invalid_signature,
         repo_id
@@ -73,8 +73,8 @@ def test_input_validation():
 
     for input_type, value in valid_tests:
         is_valid = input_validator.validate_input(value, input_type)
-        print(f"  Valid {input_type}: {value} - {'PASS' if is_valid else \
-            'FAIL'}")
+        print(f"  Valid {input_type}: {value} - {'PASS' if is_valid else
+                                                 'FAIL'}")
         if is_valid:
             tests_passed += 1
 
@@ -87,8 +87,8 @@ def test_input_validation():
 
     for input_type, value in invalid_tests:
         is_valid = input_validator.validate_input(value, input_type)
-        print(f"  Invalid {input_type}: {value} - {'PASS' if not is_valid else \
-            'FAIL'}")
+        print(f"  Invalid {input_type}: {value} - {'PASS' if not is_valid else
+                                                   'FAIL'}")
         if not is_valid:
             tests_passed += 1
 
@@ -111,8 +111,10 @@ def test_input_validation():
 
     print(f"  Command sanitization: {len(all_commands)} -> {len(sanitized)} \
         commands")
-    print(f"  Blocked {len(dangerous_commands)} dangerous commands: {'PASS' if \
-    len(sanitized) == len(safe_commands) else 'FAIL'}")
+    print(
+        f"  Blocked {
+            len(dangerous_commands)} dangerous commands: {
+            'PASS' if len(sanitized) == len(safe_commands) else 'FAIL'}")
 
     if len(sanitized) == len(safe_commands):
         tests_passed += 1
@@ -132,10 +134,10 @@ def test_rate_limiting():
     for i in range(65):
         allowed = rate_limiter.is_allowed(user_id, 'api_general')
         if i < 60 and not allowed:
-            print(f"  API rate limit failed at request {i+1}")
+            print(f"  API rate limit failed at request {i + 1}")
             break
         elif i >= 60 and allowed:
-            print(f"  API rate limit not enforced at request {i+1}")
+            print(f"  API rate limit not enforced at request {i + 1}")
             break
     else:
         print(f"  API rate limit: Correctly limited at 60 requests")
@@ -146,10 +148,10 @@ def test_rate_limiting():
     for i in range(7):
         allowed = rate_limiter.is_allowed(user_id2, 'deployment')
         if i < 5 and not allowed:
-            print(f"  Deployment rate limit failed at request {i+1}")
+            print(f"  Deployment rate limit failed at request {i + 1}")
             break
         elif i >= 5 and allowed:
-            print(f"  Deployment rate limit not enforced at request {i+1}")
+            print(f"  Deployment rate limit not enforced at request {i + 1}")
             break
     else:
         print(f"  Deployment rate limit: Correctly limited at 5 requests")
@@ -180,8 +182,8 @@ def test_secure_deployment():
     }
 
     result = secure_deployment_check(safe_config, 'test-user-safe')
-    print(f"  Safe deployment: {'PASS' if result['allowed'] else 'FAIL - ' + 
-    result['reason']}")
+    print(f"  Safe deployment: {'PASS' if result['allowed'] else 'FAIL - ' +
+                                result['reason']}")
 
     # Test with dangerous configuration
     dangerous_config = {
@@ -198,10 +200,11 @@ def test_secure_deployment():
     sanitized_commands = result['sanitized_config']['commands']
     print(f"  Dangerous commands blocked: {4 - len(sanitized_commands)} of 2 \
         dangerous")
-    print(f"  Sanitization: {'PASS' if len(sanitized_commands) == 2 else \
-        'FAIL'}")
+    print(f"  Sanitization: {'PASS' if len(sanitized_commands) == 2 else
+                             'FAIL'}")
 
     return result['allowed'] and len(sanitized_commands) == 2
+
 
 async def test_async_operations():
     """Test async device operations"""
@@ -221,7 +224,7 @@ async def test_async_operations():
 
     # Test async connection
     print("  Testing async connection...")
-    connection = await async_device_connector.connect_to_device_async( \
+    connection = await async_device_connector.connect_to_device_async(
         device.to_dict())
     print(f"  Async connection: {'PASS' if connection else 'FAIL'}")
 
@@ -282,6 +285,7 @@ def test_security_auditing():
         print(f"  Missing events: {expected - event_types}")
         return False
 
+
 if __name__ == "__main__":
     tests_passed = 0
     total_tests = 6
@@ -307,7 +311,7 @@ if __name__ == "__main__":
         tests_passed += 1
 
     # Results
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Test Results:")
     print("-" * 40)
     print(f"Tests Passed: {tests_passed}/{total_tests}")

@@ -16,10 +16,8 @@ from .ssh_manager import SSHKeyManager, SSHDeviceConnector
 # import paramiko  # Base SSH functionality
 
 
-
 class UnauthorizedException(Exception):
     pass
-
 
 
 class DeviceConnection:
@@ -149,7 +147,6 @@ class DeviceConnection:
                 self.handler.disconnect()
         except Exception:
             pass
-
 
 
 class SecureDeviceConnector:

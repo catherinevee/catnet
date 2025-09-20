@@ -16,7 +16,6 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 
-
 class SecretType(Enum):
     """Types of secrets"""
 
@@ -33,7 +32,6 @@ class SecretType(Enum):
 
 
 @dataclass
-
 class SecretMatch:
     """Represents a detected secret"""
 
@@ -49,7 +47,6 @@ class SecretMatch:
 
 
 @dataclass
-
 class SecretScanResult:
     """Result of secret scanning"""
 
@@ -59,7 +56,6 @@ class SecretScanResult:
     secrets: List[SecretMatch] = field(default_factory=list)
     scan_time: float = 0.0
     metadata: Dict[str, Any] = field(default_factory=dict)
-
 
 
 class SecretScanner:

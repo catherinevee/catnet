@@ -20,7 +20,6 @@ from collections import defaultdict
 import hashlib
 
 
-
 class CredentialType(Enum):
     """Types of credentials"""
 
@@ -31,7 +30,6 @@ class CredentialType(Enum):
     CERTIFICATE = "certificate"
     DATABASE = "database"
     SERVICE_ACCOUNT = "service_account"
-
 
 
 class AccessLevel(Enum):
@@ -45,7 +43,6 @@ class AccessLevel(Enum):
 
 
 @dataclass
-
 class Credential:
     """Credential object"""
 
@@ -66,7 +63,6 @@ class Credential:
 
 
 @dataclass
-
 class SecretPolicy:
     """Policy for secret management"""
 
@@ -87,7 +83,6 @@ class SecretPolicy:
 
 
 @dataclass
-
 class AccessRequest:
     """Request for secret access"""
 
@@ -102,7 +97,6 @@ class AccessRequest:
     approved_by: Optional[str] = None
     approved_at: Optional[datetime] = None
     revoked: bool = False
-
 
 
 class SecretsManager:

@@ -14,12 +14,10 @@ from ..devices.connector import SecureDeviceConnector
 from ..db.models import Device  # Deployment and DeploymentState for future use
 
 
-
 class DeploymentStrategy(Enum):
     CANARY = "canary"
     ROLLING = "rolling"
     BLUE_GREEN = "blue_green"
-
 
 
 class DeploymentResult:
@@ -32,7 +30,6 @@ class DeploymentResult:
         self.success = success
         self.devices = devices
         self.errors = errors or []
-
 
 
 class DeploymentExecutor:

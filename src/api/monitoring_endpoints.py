@@ -36,11 +36,8 @@ async def get_prometheus_metrics() -> str:
 
 @router.get("/metrics/recent")
 async def get_recent_metrics(
-        metric_name: Optional[str] = Query(
-        None,
-        description="Filter by metric name"
-    ),
-    minutes: int = Query(60, description="Time window in minutes")
+    metric_name: Optional[str] = Query(None, description="Filter by metric name"),
+    minutes: int = Query(60, description="Time window in minutes"),
 ) -> Dict[str, Any]:
     """
     Get recent metric events
@@ -48,8 +45,7 @@ async def get_recent_metrics(
     Useful for debugging and real-time monitoring
     """
     recent = metrics_collector.get_recent_metrics(
-        metric_name=metric_name,
-        minutes=minutes
+        metric_name=metric_name, minutes=minutes
     )
 
     return {
@@ -57,7 +53,7 @@ async def get_recent_metrics(
         "count": len(recent),
         "time_window_minutes": minutes,
         "filtered_by": metric_name,
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.utcnow().isoformat(),
     }
 
 
@@ -73,7 +69,7 @@ async def create_metrics_snapshot() -> Dict[str, Any]:
     return {
         "success": True,
         "snapshot_file": snapshot_file,
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.utcnow().isoformat(),
     }
 
 
@@ -112,11 +108,12 @@ async def get_system_health() -> Dict[str, Any]:
             "deployment_success_rate": success_rate,
             "total_deployments": total_deployments,
             "failed_deployments": failed_deployments,
-            "average_deployment_duration": summary["statistics"][ 
-    "average_deployment_duration_seconds"],
-            "total_operations": summary["statistics"]["total_operations"]
+            "average_deployment_duration": summary["statistics"][
+                "average_deployment_duration_seconds"
+            ],
+            "total_operations": summary["statistics"]["total_operations"],
         },
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.utcnow().isoformat(),
     }
 
 
@@ -128,47 +125,41 @@ async def get_monitoring_dashboard() -> Dict[str, Any]:
     Provides all metrics formatted for dashboard display
     """
     summary = metrics_collector.get_metrics_summary()
-        recent_deployments = metrics_collector.get_recent_metrics(
-        "deployments_total",
-        60
-    )
+    recent_deployments = metrics_collector.get_recent_metrics("deployments_total", 60)
     health = await get_system_health()
 
     return {
         "overview": {
             "health_status": health["status"],
             "health_score": health["score"],
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
         },
         "deployments": {
             "total": summary["counters"]["deployments"]["total"],
             "successful": summary["counters"]["deployments"]["success"],
             "failed": summary["counters"]["deployments"]["failed"],
             "success_rate": summary["statistics"]["deployment_success_rate"],
-            "avg_duration_seconds": summary["statistics"][ 
-    "average_deployment_duration_seconds"]
+            "avg_duration_seconds": summary["statistics"][
+                "average_deployment_duration_seconds"
+            ],
         },
         "rollbacks": {
             "total": summary["counters"]["rollbacks"]["total"],
             "successful": summary["counters"]["rollbacks"].get("success", 0),
-            "failed": summary["counters"]["rollbacks"].get("failed", 0)
+            "failed": summary["counters"]["rollbacks"].get("failed", 0),
         },
         "operations": {
             "health_checks": summary["counters"]["health_checks"],
             "device_connections": summary["counters"]["device_connections"],
             "github_connections": summary["counters"]["github_connections"],
-            "total": summary["statistics"]["total_operations"]
+            "total": summary["statistics"]["total_operations"],
         },
         "recent_activity": [
-            {
-                "type": "deployment",
-                "timestamp": m["timestamp"],
-                "value": m["value"]
-            } for m in recent_deployments[:10]  # Last 10 deployments
+            {"type": "deployment", "timestamp": m["timestamp"], "value": m["value"]}
+            for m in recent_deployments[:10]  # Last 10 deployments
         ],
-        "alerts": get_active_alerts(summary)
+        "alerts": get_active_alerts(summary),
     }
-
 
 
 def get_active_alerts(summary: Dict[str, Any]) -> List[Dict[str, str]]:
@@ -180,30 +171,34 @@ def get_active_alerts(summary: Dict[str, Any]) -> List[Dict[str, str]]:
     # Check deployment success rate
     success_rate = summary["statistics"]["deployment_success_rate"]
     if success_rate < 80:
-        alerts.append({
-            "severity": "high" if success_rate < 50 else "medium",
-            "message": f"Low deployment success rate: {success_rate}%",
-            "metric": "deployment_success_rate"
-        })
+        alerts.append(
+            {
+                "severity": "high" if success_rate < 50 else "medium",
+                "message": f"Low deployment success rate: {success_rate}%",
+                "metric": "deployment_success_rate",
+            }
+        )
 
     # Check for recent failures
     failed_deployments = summary["counters"]["deployments"]["failed"]
     if failed_deployments > 5:
-        alerts.append({
-            "severity": "medium",
-            "message": f"High number of failed deployments: {failed_deployments}",
-                
-            "metric": "deployments_failed"
-        })
+        alerts.append(
+            {
+                "severity": "medium",
+                "message": f"High number of failed deployments: {failed_deployments}",
+                "metric": "deployments_failed",
+            }
+        )
 
     # Check rollback activity
     rollback_total = summary["counters"]["rollbacks"]["total"]
     if rollback_total > 3:
-        alerts.append({
-            "severity": "low",
-            "message": f"Elevated rollback activity: {rollback_total} rollbacks",
-                
-            "metric": "rollbacks_total"
-        })
+        alerts.append(
+            {
+                "severity": "low",
+                "message": f"Elevated rollback activity: {rollback_total} rollbacks",
+                "metric": "rollbacks_total",
+            }
+        )
 
     return alerts

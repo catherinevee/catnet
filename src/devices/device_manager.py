@@ -16,7 +16,6 @@ import asyncio
 from abc import ABC, abstractmethod
 
 
-
 class DeviceVendor(Enum):
     """Supported device vendors"""
 
@@ -25,7 +24,6 @@ class DeviceVendor(Enum):
     CISCO_NXOS = "cisco_nxos"
     JUNIPER_JUNOS = "juniper_junos"
     ARISTA_EOS = "arista_eos"
-
 
 
 class DeviceType(Enum):
@@ -38,7 +36,6 @@ class DeviceType(Enum):
     WIRELESS_CONTROLLER = "wireless_controller"
 
 
-
 class ConnectionProtocol(Enum):
     """Connection protocols"""
 
@@ -47,7 +44,6 @@ class ConnectionProtocol(Enum):
     RESTCONF = "restconf"
     GNMI = "gnmi"
     API = "api"
-
 
 
 class DeviceState(Enum):
@@ -62,7 +58,6 @@ class DeviceState(Enum):
 
 
 @dataclass
-
 class DeviceCredentials:
     """Device credentials"""
 
@@ -75,7 +70,6 @@ class DeviceCredentials:
 
 
 @dataclass
-
 class DeviceInfo:
     """Device information"""
 
@@ -99,7 +93,6 @@ class DeviceInfo:
 
 
 @dataclass
-
 class DeviceConnection:
     """Active device connection"""
 
@@ -111,7 +104,6 @@ class DeviceConnection:
     is_active: bool = True
     commands_executed: int = 0
     bytes_transferred: int = 0
-
 
 
 class DeviceAdapter(ABC):
@@ -150,7 +142,6 @@ class DeviceAdapter(ABC):
     @abstractmethod
     async def save_configuration(self, connection: DeviceConnection) -> bool:
         """Save device configuration"""
-
 
 
 class DeviceManager:

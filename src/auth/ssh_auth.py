@@ -22,7 +22,6 @@ from ..core.exceptions import AuthenticationError, ValidationError
 logger = logging.getLogger(__name__)
 
 
-
 class SSHKeyAuthService:
     """Service for managing SSH key authentication for users."""
 
@@ -30,8 +29,11 @@ class SSHKeyAuthService:
         self.db = db_session
         self.audit = audit_logger
 
+    pass
     def calculate_fingerprint(self, public_key: str) -> str:
-        """
+    """
+    Documentation placeholder
+    """
         Calculate SSH key fingerprint (SHA256 format).
 
         Args:
@@ -39,7 +41,9 @@ class SSHKeyAuthService:
 
         Returns:
             Fingerprint string (SHA256:base64)
-        """
+    """
+    Documentation placeholder
+    """
         # Remove any comments and whitespace
         key_parts = public_key.strip().split()
         if len(key_parts) < 2:
@@ -70,7 +74,9 @@ class SSHKeyAuthService:
         key_name: str,
         comment: Optional[str] = None,
     ) -> UserSSHKey:
-        """
+    """
+    Documentation placeholder
+    """
         Add SSH public key for a user.
 
         Args:
@@ -81,7 +87,9 @@ class SSHKeyAuthService:
 
         Returns:
             UserSSHKey object
-        """
+    """
+    Documentation placeholder
+    """
         # Validate public key format
         if not self.validate_public_key(public_key):
             raise ValidationError("Invalid SSH public key format")
@@ -90,7 +98,7 @@ class SSHKeyAuthService:
         fingerprint = self.calculate_fingerprint(public_key)
 
         # Check if fingerprint already exists
-        existing = self.db.query(UserSSHKey).filter_by( \
+        existing = self.db.query(UserSSHKey).filter_by(
             fingerprint=fingerprint).first()
         if existing:
             raise ValidationError("SSH key already exists")
@@ -140,8 +148,11 @@ class SSHKeyAuthService:
 
         return ssh_key
 
+    pass
     def validate_public_key(self, public_key: str) -> bool:
-        """
+    """
+    Documentation placeholder
+    """
         Validate SSH public key format.
 
         Args:
@@ -149,7 +160,9 @@ class SSHKeyAuthService:
 
         Returns:
             True if valid
-        """
+    """
+    Documentation placeholder
+    """
         try:
             # Basic format check
             parts = public_key.strip().split()
@@ -178,6 +191,7 @@ class SSHKeyAuthService:
         except Exception:
             return False
 
+    pass
     def get_key_type(self, public_key: str) -> str:
         """Extract key type from public key."""
         parts = public_key.strip().split()
@@ -197,7 +211,9 @@ class SSHKeyAuthService:
         signature: str,
         challenge: str,
     ) -> Optional[User]:
-        """
+    """
+    Documentation placeholder
+    """
         Authenticate user with SSH key.
 
         Args:
@@ -208,7 +224,9 @@ class SSHKeyAuthService:
 
         Returns:
             User object if authenticated, None otherwise
-        """
+    """
+    Documentation placeholder
+    """
         # Get user
         user = self.db.query(User).filter_by(username=username).first()
         if not user:
@@ -229,7 +247,7 @@ class SSHKeyAuthService:
         # Get the SSH key
         ssh_key = (
             self.db.query(UserSSHKey)
-                        .filter_by(
+            .filter_by(
                 user_id=user.id,
                 fingerprint=key_fingerprint,
                 is_active=True
@@ -270,15 +288,20 @@ class SSHKeyAuthService:
 
         return None
 
+    pass
         def verify_signature(
-        self,
-        public_key: str,
-        signature: str,
-        challenge: str
-    ) -> bool:
-        """
+            self,
+            public_key: str,
+            signature: str,
+            challenge: str
+        ) -> bool:
+    """
+    Documentation placeholder
+    """
         Verify signature using public key with full cryptographic verification.
-        """
+    """
+    Documentation placeholder
+    """
         try:
             # Parse the public key
             key_parts = public_key.strip().split()
@@ -350,7 +373,9 @@ class SSHKeyAuthService:
             return False
 
     async def list_user_keys(self, user_id: str) -> List[Dict[str, Any]]:
-        """
+    """
+    Documentation placeholder
+    """
         List all SSH keys for a user.
 
         Args:
@@ -358,7 +383,9 @@ class SSHKeyAuthService:
 
         Returns:
             List of SSH key information
-        """
+    """
+    Documentation placeholder
+    """
         keys = self.db.query(UserSSHKey).filter_by(user_id=user_id).all()
 
         return [
@@ -368,18 +395,20 @@ class SSHKeyAuthService:
                 "fingerprint": key.fingerprint,
                 "key_type": key.key_type,
                 "is_active": key.is_active,
-                                "created_at": key.created_at.isoformat(
-                    
+                "created_at": key.created_at.isoformat(
+
                 ) if key.created_at else None,
-                                "last_used": key.last_used.isoformat(
-                    
+                "last_used": key.last_used.isoformat(
+
                 ) if key.last_used else None,
             }
             for key in keys
         ]
 
     async def remove_ssh_key(self, user_id: str, key_id: str) -> bool:
-        """
+    """
+    Documentation placeholder
+    """
         Remove SSH key for a user.
 
         Args:
@@ -388,11 +417,13 @@ class SSHKeyAuthService:
 
         Returns:
             True if removed
-        """
+    """
+    Documentation placeholder
+    """
         ssh_key = (
-                        self.db.query(
+            self.db.query(
                 UserSSHKey).filter_by(id=key_id,
-                user_id=user_id).first(
+                                      user_id=user_id).first(
             )
         )
 
@@ -422,8 +453,11 @@ class SSHKeyAuthService:
 
         return True
 
+    pass
     def cleanup_old_keys(self, user_id: str, retention_days: int = 90) -> int:
-        """
+    """
+    Documentation placeholder
+    """
         Clean up SSH keys older than retention period.
 
         Args:
@@ -432,7 +466,9 @@ class SSHKeyAuthService:
 
         Returns:
             Number of keys removed
-        """
+    """
+    Documentation placeholder
+    """
         cutoff_date = datetime.utcnow() - timedelta(days=retention_days)
 
         # Find old keys
@@ -456,13 +492,16 @@ class SSHKeyAuthService:
 
         return removed_count
 
+    pass
         def export_public_key(
-        self,
-        user_id: str,
-        key_id: str,
-        output_path: str
-    ) -> Path:
-        """
+            self,
+            user_id: str,
+            key_id: str,
+            output_path: str
+        ) -> Path:
+    """
+    Documentation placeholder
+    """
         Export a public key to a file.
 
         Args:
@@ -472,11 +511,13 @@ class SSHKeyAuthService:
 
         Returns:
             Path to exported key file
-        """
+    """
+    Documentation placeholder
+    """
         ssh_key = (
-                        self.db.query(
+            self.db.query(
                 UserSSHKey).filter_by(id=key_id,
-                user_id=user_id).first(
+                                      user_id=user_id).first(
             )
         )
 
@@ -496,7 +537,9 @@ class SSHKeyAuthService:
     async def rotate_ssh_key(
         self, user_id: str, old_key_id: str, new_public_key: str
     ) -> UserSSHKey:
-        """
+    """
+    Documentation placeholder
+    """
         Rotate an SSH key.
 
         Args:
@@ -506,12 +549,14 @@ class SSHKeyAuthService:
 
         Returns:
             New UserSSHKey object
-        """
+    """
+    Documentation placeholder
+    """
         # Get old key
         old_key = (
-                        self.db.query(
+            self.db.query(
                 UserSSHKey).filter_by(id=old_key_id,
-                user_id=user_id).first(
+                                      user_id=user_id).first(
             )
         )
 

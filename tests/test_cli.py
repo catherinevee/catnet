@@ -11,14 +11,12 @@ from catnet_cli.config import ConfigManager
 
 
 @pytest.fixture
-
 def runner():
     """Create a Click CLI test runner"""
     return CliRunner()
 
 
 @pytest.fixture
-
 def mock_config(tmp_path):
     """Create a temporary configuration file"""
     config_file = tmp_path / ".catnet.yml"
@@ -35,7 +33,6 @@ security:
 
 
 @pytest.fixture
-
 def mock_token_file(tmp_path):
     """Create a temporary token file"""
     token_dir = tmp_path / ".catnet"
@@ -51,7 +48,6 @@ def mock_token_file(tmp_path):
         )
     )
     return str(token_file)
-
 
 
 class TestCLICore:
@@ -80,15 +76,14 @@ class TestCLICore:
 
     def test_cli_config_option(self, runner, mock_config):
         """Test custom config file option"""
-                result = runner.invoke(
+        result = runner.invoke(
             cli,
             ["--config",
-            mock_config,
-            "device",
-            "--help"]
+             mock_config,
+             "device",
+             "--help"]
         )
         assert result.exit_code == 0
-
 
 
 class TestAuthCommands:
@@ -109,10 +104,10 @@ class TestAuthCommands:
             AsyncMock(return_value=mock_client)
         mock_client_class.return_value.__aexit__ = AsyncMock()
 
-                result = runner.invoke(
+        result = runner.invoke(
             cli,
             ["auth",
-            "login"],
+             "login"],
             input="testuser\ntestpass\n"
         )
         assert result.exit_code == 0
@@ -151,7 +146,6 @@ class TestAuthCommands:
         assert result.exit_code == 0
         assert "Username: testuser" in result.output
         assert "Email: test@example.com" in result.output
-
 
 
 class TestDeviceCommands:
@@ -238,7 +232,6 @@ class TestDeviceCommands:
         assert "CPU Usage: 45%" in result.output
 
 
-
 class TestDeployCommands:
     """Test deployment commands"""
 
@@ -318,12 +311,11 @@ class TestDeployCommands:
                 "--reason"
                 "Test rollback"
                 "--force"]
-                
+
         )
 
         assert result.exit_code == 0
         assert "Rollback initiated successfully" in result.output
-
 
 
 class TestGitOpsCommands:
@@ -374,17 +366,16 @@ class TestGitOpsCommands:
             AsyncMock(return_value=mock_client)
         mock_client_class.return_value.__aexit__ = AsyncMock()
 
-                result = runner.invoke(
+        result = runner.invoke(
             cli,
             ["gitops",
-            "sync",
-            "--repo-id",
-            "repo-123"]
+             "sync",
+             "--repo-id",
+             "repo-123"]
         )
         assert result.exit_code == 0
         assert "Repository synchronized successfully" in result.output
         assert "Files synced: 2" in result.output
-
 
 
 class TestVaultCommands:
@@ -407,7 +398,7 @@ class TestVaultCommands:
                 "devices/router1"
                 "--key"
                 "password"]
-                
+
             input="secretpass\n",
         )
 
@@ -445,18 +436,17 @@ class TestVaultCommands:
             AsyncMock(return_value=mock_client)
         mock_client_class.return_value.__aexit__ = AsyncMock()
 
-                result = runner.invoke(
+        result = runner.invoke(
             cli,
             ["vault",
-            "rotate",
-            "devices/router1",
-            "--force"]
+             "rotate",
+             "devices/router1",
+             "--force"]
         )
 
         assert result.exit_code == 0
         assert "Credentials rotated successfully" in result.output
         assert "New version: 2" in result.output
-
 
 
 class TestConfigManager:
@@ -511,7 +501,6 @@ api:
         assert retrieved["refresh_token"] == "refresh_token"
 
 
-
 class TestErrorHandling:
     """Test error handling and edge cases"""
 
@@ -540,7 +529,6 @@ class TestErrorHandling:
         assert result.exit_code != 0
         assert "Missing option" in result.output or "required" in \
             result.output.lower()
-
 
 
 class TestIntegration:

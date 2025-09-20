@@ -21,7 +21,6 @@ from ..db.database import get_db
 logger = get_logger(__name__)
 
 
-
 class GitOpsProcessor:
     """Processes Git events and manages configuration synchronization"""
 

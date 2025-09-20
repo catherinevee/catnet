@@ -20,7 +20,6 @@ logging.basicConfig(
 logger = logging.getLogger("catnet")
 
 
-
 class CatNetOrchestrator:
     def __init__(self):
         self.services = {}
@@ -96,7 +95,6 @@ class CatNetOrchestrator:
 
 
 @click.group()
-
 def cli():
     """CatNet - Network Configuration Deployment System"""
 
@@ -107,7 +105,6 @@ def cli():
     type=click.Choice(["all", "auth", "gitops", "deployment", "device"]),
     default="all",
 )
-
 def start(service):
     """Start CatNet services"""
     orchestrator = CatNetOrchestrator()
@@ -139,7 +136,6 @@ def start(service):
 
 
 @cli.command()
-
 def init():
     """Initialize CatNet database and configuration"""
 
@@ -173,7 +169,7 @@ def init():
             # Check if admin exists
             from sqlalchemy import select
 
-            result = await session.execute(select(User).where(User.username == \
+            result = await session.execute(select(User).where(User.username ==
                 "admin"))
             admin = result.scalar_one_or_none()
 

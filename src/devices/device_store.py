@@ -9,7 +9,6 @@ from dataclasses import dataclass, field, asdict
 
 
 @dataclass
-
 class DeviceInfo:
     """Simple device information model"""
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
@@ -32,7 +31,6 @@ class DeviceInfo:
         if self.last_seen:
             data['last_seen'] = self.last_seen.isoformat()
         return data
-
 
 
 class DeviceStore:

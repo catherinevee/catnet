@@ -40,7 +40,6 @@ import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 
 
-
 class AnomalyType(Enum):
     """Types of anomalies"""
 
@@ -49,7 +48,6 @@ class AnomalyType(Enum):
     CONFIGURATION = "configuration"
     SECURITY = "security"
     BEHAVIORAL = "behavioral"
-
 
 
 class ModelType(Enum):
@@ -63,7 +61,6 @@ class ModelType(Enum):
 
 
 @dataclass
-
 class AnomalyScore:
     """Anomaly detection score"""
 
@@ -78,7 +75,6 @@ class AnomalyScore:
 
 
 @dataclass
-
 class ModelMetrics:
     """Model performance metrics"""
 
@@ -93,7 +89,6 @@ class ModelMetrics:
 
 
 @dataclass
-
 class TrainingData:
     """Training data container"""
 
@@ -101,7 +96,6 @@ class TrainingData:
     labels: Optional[np.ndarray] = None
     feature_names: List[str] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
-
 
 
 class AnomalyDetector:
@@ -142,7 +136,7 @@ class AnomalyDetector:
     def _initialize_model(self):
         """Initialize ML model based on type"""
         if self.model_type == ModelType.ISOLATION_FOREST:
-                        return IsolationForest(
+            return IsolationForest(
                 n_estimators=100,
                 contamination=0.1,
                 random_state=42
@@ -153,7 +147,7 @@ class AnomalyDetector:
             return DBSCAN(eps=0.5, min_samples=5)
         else:
             # Default to Isolation Forest
-                        return IsolationForest(
+            return IsolationForest(
                 n_estimators=100,
                 contamination=0.1,
                 random_state=42
@@ -188,8 +182,7 @@ class AnomalyDetector:
         if len(training_data.features) < self.min_training_samples:
             raise ValueError(
                 f"Insufficient training samples: {len(training_data.features)} < \
-    {self.min_training_samples}"
-            )
+    {self.min_training_samples}")
 
         # Scale features
         X_scaled = self.scaler.fit_transform(training_data.features)
@@ -278,10 +271,10 @@ class AnomalyDetector:
         return score
 
         def batch_detect(
-        self,
-        data_list: List[Dict[str,
-        Any]]
-    ) -> List[AnomalyScore]:
+            self,
+            data_list: List[Dict[str,
+                                 Any]]
+        ) -> List[AnomalyScore]:
         """
         Detect anomalies in batch
 
@@ -303,12 +296,12 @@ class AnomalyDetector:
 
         # Extract performance features
         if "performance" in data:
-            features.extend(self._extract_performance_features( \
+            features.extend(self._extract_performance_features(
                 data["performance"]))
 
         # Extract configuration features
         if "configuration" in data:
-            features.extend(self._extract_config_features( \
+            features.extend(self._extract_config_features(
                 data["configuration"]))
 
         # Extract security features
@@ -321,10 +314,10 @@ class AnomalyDetector:
         return np.array(features)
 
         def _extract_traffic_features(
-        self,
-        traffic_data: Dict[str,
-        Any]
-    ) -> List[float]:
+            self,
+            traffic_data: Dict[str,
+                               Any]
+        ) -> List[float]:
         """Extract network traffic features"""
         features = []
 
@@ -357,10 +350,10 @@ class AnomalyDetector:
         return features
 
         def _extract_performance_features(
-        self,
-        perf_data: Dict[str,
-        Any]
-    ) -> List[float]:
+            self,
+            perf_data: Dict[str,
+                            Any]
+        ) -> List[float]:
         """Extract performance features"""
         features = []
 
@@ -395,10 +388,10 @@ class AnomalyDetector:
         return features
 
         def _extract_config_features(
-        self,
-        config_data: Dict[str,
-        Any]
-    ) -> List[float]:
+            self,
+            config_data: Dict[str,
+                              Any]
+        ) -> List[float]:
         """Extract configuration features"""
         features = []
 
@@ -429,10 +422,10 @@ class AnomalyDetector:
         return features
 
         def _extract_security_features(
-        self,
-        security_data: Dict[str,
-        Any]
-    ) -> List[float]:
+            self,
+            security_data: Dict[str,
+                                Any]
+        ) -> List[float]:
         """Extract security features"""
         features = []
 
@@ -648,7 +641,7 @@ class AnomalyDetector:
             precision = precision_score(
                 training_data.labels, predictions, average="binary"
             )
-                        recall = recall_score(
+            recall = recall_score(
                 training_data.labels,
                 predictions,
                 average="binary"
@@ -656,10 +649,10 @@ class AnomalyDetector:
             f1 = f1_score(training_data.labels, predictions, average="binary")
 
             # Calculate error rates
-            false_positives = sum((predictions == 1) & (training_data.labels \
-                == 0))
-            false_negatives = sum((predictions == 0) & (training_data.labels \
-                == 1))
+            false_positives = sum((predictions == 1) & (training_data.labels
+                                                        == 0))
+            false_negatives = sum((predictions == 0) & (training_data.labels
+                                                        == 1))
             total = len(training_data.labels)
 
             fpr = false_positives / total if total > 0 else 0
@@ -694,10 +687,9 @@ class AnomalyDetector:
         labels = np.array([l for _, l in self.training_buffer])
 
         training_data = TrainingData(
-                        features=features, labels=labels, feature_names=self._get_feature_names(
-                
-            )
-        )
+            features=features,
+            labels=labels,
+            feature_names=self._get_feature_names())
 
         # Retrain model
         return self.train(training_data)
@@ -736,8 +728,8 @@ class AnomalyDetector:
     ) -> Dict[str, Any]:
         """Get anomaly detection trends"""
         cutoff = datetime.utcnow() - window
-        recent_anomalies = [a for a in self.anomaly_history if a.timestamp > \
-            cutoff]
+        recent_anomalies = [a for a in self.anomaly_history if a.timestamp >
+                            cutoff]
 
         if not recent_anomalies:
             return {
@@ -774,7 +766,6 @@ class AnomalyDetector:
             "by_severity": dict(by_severity),
             "time_window": window.total_seconds(),
         }
-
 
 
 class FeatureExtractor:
@@ -827,10 +818,10 @@ class FeatureExtractor:
         }
 
         def extract_traffic_features(
-        self,
-        traffic_data: Dict[str,
-        Any]
-    ) -> np.ndarray:
+            self,
+            traffic_data: Dict[str,
+                               Any]
+        ) -> np.ndarray:
         """
         Extract features from network traffic data
 
@@ -863,10 +854,10 @@ class FeatureExtractor:
         return np.array(features)
 
         def extract_config_features(
-        self,
-        config_data: Dict[str,
-        Any]
-    ) -> np.ndarray:
+            self,
+            config_data: Dict[str,
+                              Any]
+        ) -> np.ndarray:
         """
         Extract features from configuration data
 
@@ -897,10 +888,10 @@ class FeatureExtractor:
         return np.array(features)
 
         def extract_performance_features(
-        self,
-        perf_data: Dict[str,
-        Any]
-    ) -> np.ndarray:
+            self,
+            perf_data: Dict[str,
+                            Any]
+        ) -> np.ndarray:
         """
         Extract features from performance data
 
@@ -976,7 +967,6 @@ class FeatureExtractor:
             ).flatten()
 
 
-
 class ModelManager:
     """
     Manages ML models for anomaly detection
@@ -1010,7 +1000,7 @@ class ModelManager:
 
         if model_type == ModelType.ISOLATION_FOREST:
             model = IsolationForest(
-                                contamination=config.get(
+                contamination=config.get(
                     "contamination",
                     0.1
                 ) if config else 0.1,
@@ -1018,7 +1008,7 @@ class ModelManager:
             )
         elif model_type == ModelType.RANDOM_FOREST:
             model = RandomForestClassifier(
-                                n_estimators=config.get(
+                n_estimators=config.get(
                     "n_estimators",
                     100
                 ) if config else 100,
@@ -1138,8 +1128,8 @@ class ModelManager:
                 prediction = model.predict(features_reshaped)[0]
                 is_anomaly = prediction == 1
                 if hasattr(model, "predict_proba"):
-                    confidence = model.predict_proba(features_reshaped)[0].max( \
-                        )
+                    confidence = model.predict_proba(features_reshaped)[0].max(
+                    )
                 else:
                     confidence = 0.5
 

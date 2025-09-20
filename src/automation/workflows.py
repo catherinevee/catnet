@@ -19,7 +19,6 @@ from collections import defaultdict
 import re
 
 
-
 class WorkflowState(Enum):
     """Workflow execution states"""
 
@@ -31,7 +30,6 @@ class WorkflowState(Enum):
     CANCELLED = "cancelled"
 
 
-
 class TriggerType(Enum):
     """Workflow trigger types"""
 
@@ -41,7 +39,6 @@ class TriggerType(Enum):
     CONDITION = "condition"
     WEBHOOK = "webhook"
     API = "api"
-
 
 
 class ActionType(Enum):
@@ -56,7 +53,6 @@ class ActionType(Enum):
     APPROVAL = "approval"
     WAIT = "wait"
     CONDITION = "condition"
-
 
 
 class StepType(Enum):
@@ -76,7 +72,6 @@ ExecutionStatus = WorkflowState
 
 
 @dataclass
-
 class WorkflowTrigger:
     """Workflow trigger definition"""
 
@@ -88,7 +83,6 @@ class WorkflowTrigger:
 
 
 @dataclass
-
 class WorkflowAction:
     """Workflow action definition"""
 
@@ -105,7 +99,6 @@ class WorkflowAction:
 
 
 @dataclass
-
 class WorkflowStep:
     """Workflow execution step"""
 
@@ -119,7 +112,6 @@ class WorkflowStep:
 
 
 @dataclass
-
 class Workflow:
     """Workflow definition"""
 
@@ -135,7 +127,6 @@ class Workflow:
 
 
 @dataclass
-
 class WorkflowExecution:
     """Workflow execution instance"""
 
@@ -148,7 +139,6 @@ class WorkflowExecution:
     steps: List[WorkflowStep] = field(default_factory=list)
     context: Dict[str, Any] = field(default_factory=dict)
     error: Optional[str] = None
-
 
 
 class WorkflowEngine:
@@ -267,7 +257,7 @@ class WorkflowEngine:
                         parameters={
                             "channel": "slack",
                             "message": "CPU remediation completed on {{device_id}}",
-                                
+
                         },
                     ),
                 ],
@@ -412,7 +402,7 @@ class WorkflowEngine:
                         event_type
                         and workflow_id in self.event_subscriptions[event_type]
                     ):
-                        self.event_subscriptions[event_type].remove( \
+                        self.event_subscriptions[event_type].remove(
                             workflow_id)
 
             # Cancel scheduled tasks
@@ -568,7 +558,7 @@ class WorkflowEngine:
             except asyncio.TimeoutError:
                 step.error = "Action timed out"
                 if attempt < step.action.retry_count - 1:
-                    await asyncio.sleep(step.action.retry_delay.total_seconds( \
+                    await asyncio.sleep(step.action.retry_delay.total_seconds(
                         ))
                 else:
                     step.state = WorkflowState.FAILED
@@ -576,7 +566,7 @@ class WorkflowEngine:
             except Exception as e:
                 step.error = str(e)
                 if attempt < step.action.retry_count - 1:
-                    await asyncio.sleep(step.action.retry_delay.total_seconds( \
+                    await asyncio.sleep(step.action.retry_delay.total_seconds(
                         ))
                 else:
                     step.state = WorkflowState.FAILED

@@ -14,7 +14,6 @@ from ..core.logging import get_logger
 logger = get_logger(__name__)
 
 
-
 class CORSConfig:
     """
     CORS configuration for production environment
@@ -135,7 +134,6 @@ class CORSConfig:
         return False
 
 
-
 class APIVersioning:
     """
     API versioning implementation
@@ -251,7 +249,6 @@ class APIVersioning:
     def get_router(self, version: str) -> APIRouter:
         """Get router for specific version"""
         return self.version_routers.get(version)
-
 
 
 class RequestValidation:

@@ -13,7 +13,6 @@ from .logging import get_logger
 logger = get_logger(__name__)
 
 
-
 class ValidationLevel(Enum):
     ERROR = "error"
     WARNING = "warning"
@@ -21,7 +20,6 @@ class ValidationLevel(Enum):
 
 
 @dataclass
-
 class ValidationResult:
     """Validation result container"""
 
@@ -39,7 +37,6 @@ class ValidationResult:
 
     def add_info(self, message: str):
         self.info.append(message)
-
 
 
 class ConfigValidator:
@@ -77,10 +74,10 @@ class ConfigValidator:
         ]
 
         async def validate_configuration(
-        self,
-        config: Dict[str,
-        Any]
-    ) -> ValidationResult:
+            self,
+            config: Dict[str,
+                         Any]
+        ) -> ValidationResult:
         """
         Main validation method following CLAUDE.md pattern
         """
@@ -124,10 +121,10 @@ class ConfigValidator:
         return result
 
         async def validate_schema(
-        self,
-        config: Dict[str,
-        Any]
-    ) -> ValidationResult:
+            self,
+            config: Dict[str,
+                         Any]
+        ) -> ValidationResult:
         """Layer 1: Schema validation"""
         result = ValidationResult()
 
@@ -211,10 +208,11 @@ class ConfigValidator:
                 match = re.search(r"ip address (\S+) (\S+)", line)
                 if match:
                     try:
-                        ipaddress.IPv4Interface(f"{match.group( \
+                        ipaddress.IPv4Interface(f"{match.group(
                             1)}/{match.group(2)}")
                     except ValueError:
-                        result.add_error(f"Line {line_num}: Invalid IP address \
+                        result.add_error(
+                            f"Line {line_num}: Invalid IP address \
                             or mask")
 
             # ACL validation
@@ -274,7 +272,8 @@ class ConfigValidator:
             # Delete commands
             elif line.startswith("delete "):
                 if not re.match(r"delete \S+", line):
-                    result.add_error(f"Line {line_num}: Invalid delete command \
+                    result.add_error(
+                        f"Line {line_num}: Invalid delete command \
                         syntax")
 
         return result
@@ -346,7 +345,7 @@ class ConfigValidator:
             return "Telnet access enabled - use SSH only"
 
         if "line vty" in config.lower() and "transport input ssh" not in \
-            config.lower():
+                config.lower():
             return "VTY lines should specify SSH-only access"
 
         return None
@@ -366,10 +365,10 @@ class ConfigValidator:
         return None
 
         async def check_business_rules(
-        self,
-        config: Dict[str,
-        Any]
-    ) -> ValidationResult:
+            self,
+            config: Dict[str,
+                         Any]
+        ) -> ValidationResult:
         """Layer 4: Business rules validation"""
         result = ValidationResult()
 
@@ -457,10 +456,10 @@ class ConfigValidator:
         return None
 
         async def detect_conflicts(
-        self,
-        config: Dict[str,
-        Any]
-    ) -> ValidationResult:
+            self,
+            config: Dict[str,
+                         Any]
+        ) -> ValidationResult:
         """Layer 5: Conflict detection"""
         result = ValidationResult()
 
@@ -505,11 +504,11 @@ class ConfigValidator:
         return result
 
         def dict_to_config_text(
-        self,
-        config_dict: Dict[str,
-        Any],
-        vendor: str
-    ) -> str:
+            self,
+            config_dict: Dict[str,
+                              Any],
+            vendor: str
+        ) -> str:
         """Convert configuration dictionary to text format"""
         # Simple conversion - would be more complex in production
         lines = []

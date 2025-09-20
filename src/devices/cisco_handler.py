@@ -17,7 +17,6 @@ from ..core.logging import get_logger
 logger = get_logger(__name__)
 
 
-
 class CiscoHandler:
     """
     Handler for Cisco IOS, IOS-XE, and NX-OS devices
@@ -33,7 +32,7 @@ class CiscoHandler:
         "nxos_rollback": "rollback running-config checkpoint backup_config",
     }
 
-        def __init__(
+    def __init__(
         self,
         connection: Any,
         audit_logger: Optional[AuditLogger] = None
@@ -57,10 +56,10 @@ class CiscoHandler:
             return "cisco_ios"  # Default
 
         async def execute_command(
-        self,
-        command: str,
-        enable_mode: bool = False
-    ) -> str:
+            self,
+            command: str,
+            enable_mode: bool = False
+        ) -> str:
         """Execute single command on Cisco device"""
         try:
             if enable_mode and hasattr(self.connection, "enable"):
@@ -128,9 +127,9 @@ class CiscoHandler:
         return output
 
         async def rollback_configuration(
-        self,
-        backup_file: str = "backup.cfg"
-    ) -> str:
+            self,
+            backup_file: str = "backup.cfg"
+        ) -> str:
         """Rollback to previous configuration"""
         if self.device_type == "cisco_nxos":
             # NX-OS rollback
@@ -214,9 +213,9 @@ class CiscoHandler:
             # Parse VLAN lines (format varies by platform)
             match = re.match(r"^(\d+)\s+(\S+)", line)
             if match:
-                                vlans.append(
+                vlans.append(
                     {"id": int(match.group(1)),
-                    "name": match.group(2)}
+                     "name": match.group(2)}
                 )
 
         return vlans
@@ -322,7 +321,7 @@ class CiscoHandler:
             else:
                 output = await self.execute_command("show processes cpu")
                 # Parse IOS CPU output
-                                match = re.search(
+                match = re.search(
                     r"CPU utilization for five seconds: (\d+)%",
                     output
                 )

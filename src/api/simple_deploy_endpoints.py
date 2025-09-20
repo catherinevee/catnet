@@ -1,7 +1,9 @@
 """
 Simple Deployment API Endpoints
 Phase 4 Implementation - Connect GitHub → Device deployment
-"""
+    """
+    Documentation placeholder
+    """
 from fastapi import APIRouter, HTTPException, status
 from typing import List, Optional
 from pydantic import BaseModel
@@ -14,14 +16,13 @@ from ..gitops.simple_github_client import github_client
 router = APIRouter(tags=["Deployment"])
 
 
-
 class CreateDeploymentRequest(BaseModel):
     """Request to create a deployment"""
     config_path: str
     device_id: str
 
 
-
+    pass
 class DeploymentResponse(BaseModel):
     """Deployment response model"""
     id: str
@@ -34,7 +35,6 @@ class DeploymentResponse(BaseModel):
     deployed_commands: List[str] = []
 
 
-
 class ExecuteDeploymentRequest(BaseModel):
     """Request to execute a deployment"""
     deployment_id: str
@@ -43,9 +43,13 @@ class ExecuteDeploymentRequest(BaseModel):
 @router.post("/create", response_model=DeploymentResponse)
 async def create_deployment(request: CreateDeploymentRequest):
     """
+    Documentation placeholder
+    """
     Create a new deployment task
 
     Links a GitHub config to a device for deployment
+    """
+    Documentation placeholder
     """
     try:
         # Validate device exists
@@ -60,7 +64,7 @@ async def create_deployment(request: CreateDeploymentRequest):
         if not github_client.connected_repo:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="No GitHub repository connected. Use 
+                detail="No GitHub repository connected. Use"
     /api/v1/gitops/connect first"
             )
 
@@ -93,9 +97,13 @@ async def create_deployment(request: CreateDeploymentRequest):
 @router.post("/execute")
 async def execute_deployment(request: ExecuteDeploymentRequest):
     """
+    Documentation placeholder
+    """
     Execute a pending deployment
 
     Fetches config from GitHub and deploys to device
+    """
+    Documentation placeholder
     """
     try:
         deployment = deployment_pipeline.execute_deployment( \
@@ -212,6 +220,8 @@ async def rollback_deployment(deployment_id: str):
 @router.post("/deploy-flow")
 async def full_deployment_flow(config_path: str, device_id: str):
     """
+    Documentation placeholder
+    """
     Complete deployment flow in one call
 
     1. Create deployment
@@ -219,6 +229,8 @@ async def full_deployment_flow(config_path: str, device_id: str):
     3. Return result
 
     This is the main endpoint that wires everything together!
+    """
+    Documentation placeholder
     """
     try:
         # Step 1: Create deployment

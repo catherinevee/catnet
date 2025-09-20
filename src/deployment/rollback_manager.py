@@ -16,7 +16,6 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
-
 class DeploymentSnapshot:
     """Snapshot of device state before deployment"""
     deployment_id: str
@@ -28,14 +27,12 @@ class DeploymentSnapshot:
 
 
 @dataclass
-
 class HealthCheck:
     """Health check result"""
     check_name: str
     status: str  # healthy, degraded, failed
     message: str
     timestamp: datetime = field(default_factory=datetime.utcnow)
-
 
 
 class RollbackManager:

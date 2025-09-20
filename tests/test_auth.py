@@ -13,7 +13,6 @@ from src.auth.saml import SAMLProvider
 from src.auth.session import SessionManager
 
 
-
 class TestJWTHandler:
     """Test JWT token handler"""
 
@@ -69,9 +68,9 @@ class TestJWTHandler:
         # Create refresh token
         refresh_token = handler.create_token(
             user_id="user123",
-                username="testuser"
-                roles=["user"]
-                token_type="refresh"
+            username="testuser"
+            roles=["user"]
+            token_type="refresh"
         )
 
         # Use refresh token to get new tokens
@@ -81,7 +80,7 @@ class TestJWTHandler:
         assert new_refresh is not None
 
         # Verify new access token
-                is_valid, claims = handler.verify_token(
+        is_valid, claims = handler.verify_token(
             new_access,
             token_type="access"
         )
@@ -126,7 +125,6 @@ class TestJWTHandler:
         is_valid, claims = handler.verify_token(token, token_type="refresh")
         assert not is_valid
         assert "Invalid token type" in claims["error"]
-
 
 
 class TestMFAProvider:
@@ -219,7 +217,6 @@ class TestMFAProvider:
         is_valid, error = provider.verify_totp("user123", "123456")
         assert not is_valid
         assert "MFA not enabled" in error
-
 
 
 class TestOAuthProvider:
@@ -322,7 +319,6 @@ class TestOAuthProvider:
             assert user_info["email"] == "test@example.com"
 
 
-
 class TestSAMLProvider:
     """Test SAML authentication"""
 
@@ -400,7 +396,6 @@ class TestSAMLProvider:
         assert "EntityDescriptor" in metadata
         assert config.entity_id in metadata
         assert config.acs_url in metadata
-
 
 
 class TestSessionManager:
@@ -604,7 +599,7 @@ class TestSessionManager:
         )
 
         # Should not require MFA even for sensitive operations
-                requires = manager.requires_mfa(
+        requires = manager.requires_mfa(
             session_mfa.session_id,
             "delete_device"
         )

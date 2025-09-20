@@ -13,7 +13,6 @@ from src.compliance.reporting import (
 )
 
 
-
 class TestComplianceFramework:
     def test_framework_enum_values(self):
         assert ComplianceFramework.PCI_DSS.value == "PCI-DSS"
@@ -22,7 +21,6 @@ class TestComplianceFramework:
         assert ComplianceFramework.ISO_27001.value == "ISO-27001"
         assert ComplianceFramework.NIST.value == "NIST"
         assert ComplianceFramework.CIS.value == "CIS"
-
 
 
 class TestComplianceCheck:
@@ -53,7 +51,6 @@ class TestComplianceCheck:
 
         assert check.status == ComplianceStatus.NON_COMPLIANT
         assert check.remediation is not None
-
 
 
 class TestComplianceValidator:
@@ -117,7 +114,7 @@ class TestComplianceValidator:
         assert len(checks) > 0
 
         # Verify access controls
-                access_check = next(
+        access_check = next(
             (c for c in checks if "164.312(a)" in c.control_id),
             None
         )
@@ -136,17 +133,17 @@ class TestComplianceValidator:
                 "proxy_arp": False,
             },
             "passwords": {"encrypted": True,
-                "min_length": 14
-                "lockout_attempts": 5}
-                
+                          "min_length": 14
+                          "lockout_attempts": 5}
+
             "banner": {
                 "login": "Authorized access only",
                 "motd": "This system is monitored",
             },
             "snmp": {"enabled": True,
-                "version": 3
-                "default_community": False}
-                
+                     "version": 3
+                     "default_community": False}
+
         }
 
         checks = await validator.validate_cis(device_config)
@@ -158,7 +155,6 @@ class TestComplianceValidator:
             (c for c in checks if "password" in c.description.lower()), None
         )
         assert password_check is not None
-
 
 
 class TestComplianceManager:
@@ -209,8 +205,8 @@ class TestComplianceManager:
 
             checks = await manager.check_compliance(
                 framework=ComplianceFramework.CIS,
-                    device_ids=["router1"
-                    "switch1"]
+                device_ids=["router1"
+                            "switch1"]
             )
 
             # Should have checks for both devices
@@ -373,7 +369,6 @@ class TestComplianceManager:
         assert "COMPLIANT" in csv_output
 
 
-
 class TestReportGenerator:
     def test_generate_html_report(self):
         generator = ReportGenerator()
@@ -437,7 +432,6 @@ class TestReportGenerator:
         assert len(lines) == 3  # Header + 2 checks
         assert "HIPAA-164.308" in lines[1]
         assert "NON_COMPLIANT" in lines[2]
-
 
 
 class TestComplianceIntegration:
@@ -542,8 +536,8 @@ class TestComplianceIntegration:
             assert len(all_checks) > 0
 
             # Verify different control IDs
-            control_prefixes = {check.control_id.split("-")[0] for check in \
-                all_checks}
+            control_prefixes = {check.control_id.split("-")[0] for check in
+                                all_checks}
             assert len(control_prefixes) >= 2  # Multiple framework prefixes
 
     @pytest.mark.asyncio

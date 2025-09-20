@@ -7,7 +7,6 @@ import asyncio
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 
-
 class VaultClient:
     def __init__(
         self,

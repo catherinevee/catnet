@@ -16,7 +16,6 @@ from datetime import datetime
 from enum import Enum
 
 
-
 class DeploymentStrategy(Enum):
     """Deployment strategies"""
 
@@ -24,7 +23,6 @@ class DeploymentStrategy(Enum):
     ROLLING = "rolling"
     BLUE_GREEN = "blue_green"
     DIRECT = "direct"
-
 
 
 class DeploymentState(Enum):
@@ -41,7 +39,6 @@ class DeploymentState(Enum):
     PAUSED = "paused"
 
 
-
 class HealthCheckType(Enum):
     """Types of health checks"""
 
@@ -53,7 +50,6 @@ class HealthCheckType(Enum):
 
 
 @dataclass
-
 class DeploymentConfig:
     """Deployment configuration"""
 
@@ -72,7 +68,6 @@ class DeploymentConfig:
 
 
 @dataclass
-
 class DeviceDeployment:
     """Individual device deployment"""
 
@@ -89,7 +84,6 @@ class DeviceDeployment:
 
 
 @dataclass
-
 class Deployment:
     """Deployment instance"""
 
@@ -112,7 +106,6 @@ class Deployment:
     approval_status: Optional[str] = None
     approved_by: Optional[str] = None
     rollback_from: Optional[str] = None
-
 
 
 class DeploymentManager:
@@ -657,11 +650,11 @@ class DeploymentManager:
                 ) if total > 0 else 0,
             },
             "started_at": (
-                deployment.started_at.isoformat() if deployment.started_at \
+                deployment.started_at.isoformat() if deployment.started_at
                     else None
             ),
             "completed_at": (
-                deployment.completed_at.isoformat() if deployment.completed_at \
+                deployment.completed_at.isoformat() if deployment.completed_at
                     else None
             ),
             "errors": deployment.errors,

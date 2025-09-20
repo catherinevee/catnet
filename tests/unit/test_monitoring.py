@@ -9,12 +9,11 @@ from src.gitops.simple_github_client import github_client
 from src.devices.device_store import device_store
 
 
-
 def test_metrics_collection():
     """Test metrics collection and reporting"""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Phase 7: Monitoring & Observability Test")
-    print("="*60)
+    print("=" * 60)
 
     # Simulate some activities to generate metrics
     print("\n1. Simulating deployment activities...")
@@ -23,11 +22,11 @@ def test_metrics_collection():
     for i in range(3):
         deployment_id = f"test-deploy-{i}"
         if i < 2:
-            metrics_collector.track_deployment(deployment_id, "completed", 
-    duration_seconds=10.5 + i)
+            metrics_collector.track_deployment(deployment_id, "completed",
+                                               duration_seconds=10.5 + i)
         else:
-            metrics_collector.track_deployment(deployment_id, "failed", 
-    duration_seconds=5.0)
+            metrics_collector.track_deployment(deployment_id, "failed",
+                                               duration_seconds=5.0)
 
     # Track some rollbacks
     print("2. Simulating rollback activities...")
@@ -85,14 +84,14 @@ def test_metrics_collection():
                 print(f"  Created deployment: {deployment.id}")
 
                 # Execute deployment (will generate metrics)
-                deployment = deployment_pipeline.execute_deployment( \
+                deployment = deployment_pipeline.execute_deployment(
                     deployment.id)
                 print(f"  Deployment status: {deployment.status}")
 
                 # Check updated metrics
                 summary = metrics_collector.get_metrics_summary()
-                print(f"  Total deployments after test: {summary['counters'][ 
-    'deployments']['total']}")
+                print(f"  Total deployments after test: {summary['counters'][
+                    'deployments']['total']}")
             except Exception as e:
                 print(f"  Deployment test failed: {e}")
         else:
@@ -101,7 +100,7 @@ def test_metrics_collection():
         print("\n9. No devices available for deployment test")
 
     # Calculate test results
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Test Results:")
     print("-" * 40)
 
@@ -157,7 +156,7 @@ def test_metrics_collection():
     else:
         print("✗ Prometheus export failed")
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print(f"PHASE 7 TEST COMPLETE: {tests_passed}/{tests_total} tests passed")
 
     if tests_passed == tests_total:

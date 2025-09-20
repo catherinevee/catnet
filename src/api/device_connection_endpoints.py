@@ -13,17 +13,17 @@ from ..devices.device_connector import device_connector
 router = APIRouter(tags=["Device Connection"])
 
 
-
 class ConnectionTestRequest(BaseModel):
     """Request for testing device connection"""
+
     device_id: str
     password: Optional[str] = None
     simulation_mode: bool = True
 
 
-
 class ConnectionTestResponse(BaseModel):
     """Response from connection test"""
+
     device_id: str
     hostname: str
     ip_address: str
@@ -33,9 +33,9 @@ class ConnectionTestResponse(BaseModel):
     timestamp: str
 
 
-
 class DeviceCommandRequest(BaseModel):
     """Request to send command to device"""
+
     device_id: str
     command: str
     password: Optional[str] = None
@@ -54,7 +54,7 @@ async def test_device_connection(request: ConnectionTestRequest):
     if not device:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Device {request.device_id} not found"
+            detail=f"Device {request.device_id} not found",
         )
 
     # Set connection mode
@@ -62,10 +62,7 @@ async def test_device_connection(request: ConnectionTestRequest):
 
     # Try to connect
     device_dict = device.to_dict()
-        connection = device_connector.connect_to_device(
-        device_dict,
-        request.password
-    )
+    connection = device_connector.connect_to_device(device_dict, request.password)
 
     if connection:
         # Test with a simple command
@@ -89,7 +86,7 @@ async def test_device_connection(request: ConnectionTestRequest):
         connection_successful=success,
         connection_mode="simulated" if request.simulation_mode else "real",
         message=message,
-        timestamp=datetime.utcnow().isoformat()
+        timestamp=datetime.utcnow().isoformat(),
     )
 
 
@@ -105,7 +102,7 @@ async def send_device_command(request: DeviceCommandRequest):
     if not device:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Device {request.device_id} not found"
+            detail=f"Device {request.device_id} not found",
         )
 
     # Set connection mode
@@ -113,15 +110,12 @@ async def send_device_command(request: DeviceCommandRequest):
 
     # Connect and send command
     device_dict = device.to_dict()
-        connection = device_connector.connect_to_device(
-        device_dict,
-        request.password
-    )
+    connection = device_connector.connect_to_device(device_dict, request.password)
 
     if not connection:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Failed to connect to device"
+            detail="Failed to connect to device",
         )
 
     try:
@@ -132,15 +126,14 @@ async def send_device_command(request: DeviceCommandRequest):
             "hostname": device.hostname,
             "command": request.command,
             "output": output,
-            "connection_mode": "simulated" if request.simulation_mode else \
-                "real",
-            "timestamp": datetime.utcnow().isoformat()
+            "connection_mode": "simulated" if request.simulation_mode else "real",
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Command execution failed: {e}"
+            detail=f"Command execution failed: {e}",
         )
 
     finally:
@@ -151,7 +144,7 @@ async def send_device_command(request: DeviceCommandRequest):
 async def backup_device_config(
     device_id: str,
     password: Optional[str] = None,
-    simulation_mode: bool = Query(True, description="Use simulation mode")
+    simulation_mode: bool = Query(True, description="Use simulation mode"),
 ):
     """
     Backup a device's current configuration
@@ -163,7 +156,7 @@ async def backup_device_config(
     if not device:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Device {device_id} not found"
+            detail=f"Device {device_id} not found",
         )
 
     # Set connection mode
@@ -176,7 +169,7 @@ async def backup_device_config(
     if not connection:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Failed to connect to device"
+            detail="Failed to connect to device",
         )
 
     try:
@@ -184,12 +177,15 @@ async def backup_device_config(
 
         # Save backup
         from pathlib import Path
+
         backup_dir = Path("data/backups")
         backup_dir.mkdir(parents=True, exist_ok=True)
 
-        backup_file = backup_dir / f"{device.hostname}_backup_{datetime.utcnow() \
-    .strftime('%Y%m%d_%H%M%S')}.cfg"
-        with open(backup_file, 'w') as f:
+        backup_file = (
+            backup_dir
+            / f"{device.hostname}_backup_{datetime.utcnow() .strftime('%Y%m%d_%H%M%S')}.cfg"
+        )
+        with open(backup_file, "w") as f:
             f.write(config)
 
         return {
@@ -198,13 +194,13 @@ async def backup_device_config(
             "backup_file": str(backup_file),
             "backup_size": len(config),
             "connection_mode": "simulated" if simulation_mode else "real",
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Backup failed: {e}"
+            detail=f"Backup failed: {e}",
         )
 
     finally:
@@ -226,11 +222,8 @@ async def get_connection_logs():
         return {"logs": [], "message": "No connection logs found"}
 
     logs = []
-        for log_file in sorted(
-        logs_dir.glob("*.jsonl"),
-        reverse=True
-    )[:5]:  # Last 5 files
-        with open(log_file, 'r') as f:
+    for log_file in sorted(logs_dir.glob("*.jsonl"), reverse=True)[:5]:  # Last 5 files
+        with open(log_file, "r") as f:
             for line in f:
                 try:
                     log_entry = json.loads(line.strip())
@@ -242,5 +235,5 @@ async def get_connection_logs():
     return {
         "logs": logs[:20],
         "total": len(logs),
-        "message": f"Showing last {min(20, len(logs))} connection attempts"
+        "message": f"Showing last {min(20, len(logs))} connection attempts",
     }

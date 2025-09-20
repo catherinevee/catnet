@@ -16,7 +16,6 @@ from src.automation.workflows import (
 )
 
 
-
 class TestWorkflow:
     def test_workflow_creation(self):
         workflow = Workflow(
@@ -61,7 +60,6 @@ class TestWorkflow:
         assert workflow.steps[1].type == StepType.NOTIFICATION
 
 
-
 class TestWorkflowTrigger:
     def test_event_trigger(self):
         trigger = WorkflowTrigger(
@@ -96,7 +94,6 @@ class TestWorkflowTrigger:
 
         assert trigger.type == TriggerType.THRESHOLD
         assert trigger.conditions["value"] == 90
-
 
 
 class TestWorkflowEngine:
@@ -176,7 +173,7 @@ class TestWorkflowEngine:
                 type=StepType.DEVICE_COMMAND,
                 parameters={"device_id": "device123",
                     "command": "show version"}
-                    
+
             )
 
             result = await engine._execute_step(step, {})
@@ -206,7 +203,7 @@ class TestWorkflowEngine:
                 type=StepType.API_CALL,
                 parameters={"url": "https://api.example.com/status",
                     "method": "GET"}
-                    
+
             )
 
             result = await engine._execute_step(step, {})
@@ -329,7 +326,6 @@ class TestWorkflowEngine:
         assert execution.status in [ExecutionStatus.COMPLETED,
             ExecutionStatus.FAILED]
         assert len(execution.step_results) >= 1
-
 
 
 class TestWorkflowBuilder:

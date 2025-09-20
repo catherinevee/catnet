@@ -32,7 +32,6 @@ from ..core.exceptions import SecurityError
 logger = get_logger(__name__)
 
 
-
 class DeviceCertificateManager:
     """Manages device certificates for authentication"""
 
@@ -95,13 +94,13 @@ class DeviceCertificateManager:
         subject = x509.Name(
             [
                 x509.NameAttribute(NameOID.COUNTRY_NAME, "US"),
-                                x509.NameAttribute(
+                x509.NameAttribute(
                     NameOID.STATE_OR_PROVINCE_NAME,
                     "California"
                 ),
                 x509.NameAttribute(NameOID.LOCALITY_NAME, "San Francisco"),
                 x509.NameAttribute(NameOID.ORGANIZATION_NAME, "CatNet"),
-                                x509.NameAttribute(
+                x509.NameAttribute(
                     NameOID.ORGANIZATIONAL_UNIT_NAME,
                     "Network Devices"
                 ),
@@ -166,14 +165,14 @@ class DeviceCertificateManager:
         )
 
         # Sign the certificate
-                device_cert = cert_builder.sign(
+        device_cert = cert_builder.sign(
             self.ca_key,
             hashes.SHA256(),
             default_backend()
         )
 
         # Serialize certificate and key
-        cert_pem = device_cert.public_bytes( \
+        cert_pem = device_cert.public_bytes(
             encoding=serialization.Encoding.PEM)
         key_pem = device_key.private_bytes(
             encoding=serialization.Encoding.PEM,
@@ -364,10 +363,10 @@ class DeviceCertificateManager:
             # In production, this would verify against the CA chain
             # For now, just check fingerprint
 
-                        fingerprint = hashes.Hash(
-                hashes.SHA256(),
-                backend=default_backend()
-            )
+                fingerprint = hashes.Hash(
+                    hashes.SHA256(),
+                    backend=default_backend()
+                )
             fingerprint.update(cert_data)
             cert_fingerprint = fingerprint.finalize().hex()
 
@@ -431,8 +430,8 @@ class DeviceCertificateManager:
                 stats["checked"] += 1
 
                 # Check if certificate needs rotation
-                if force or self._needs_rotation( \
-                    device.certificate_expires_at):
+                if force or self._needs_rotation(
+                        device.certificate_expires_at):
                     try:
                         # Issue new certificate
                         new_cert = await self.issue_device_cert(
@@ -458,10 +457,10 @@ class DeviceCertificateManager:
         return stats
 
         def _needs_rotation(
-        self,
-        expires_at: datetime,
-        days_before: int = 30
-    ) -> bool:
+            self,
+            expires_at: datetime,
+            days_before: int = 30
+        ) -> bool:
         """Check if certificate needs rotation"""
         if not expires_at:
             return True
@@ -510,8 +509,8 @@ class DeviceCertificateManager:
             Certificate status information
         """
         async with get_db() as session:
-            result = await session.execute(select(Device).where(Device.id == \
-                device_id))
+            result = await session.execute(select(Device).where(Device.id ==
+                                                                device_id))
             device = result.scalar_one_or_none()
 
             if device:
@@ -521,8 +520,8 @@ class DeviceCertificateManager:
                     "certificate_status": device.certificate_status,
                     "certificate_serial": device.certificate_serial,
                     "certificate_fingerprint": device.certificate_fingerprint,
-                    "certificate_expires_at": \
-                        device.certificate_expires_at.isoformat()
+                    "certificate_expires_at":
+                    device.certificate_expires_at.isoformat()
                     if device.certificate_expires_at
                     else None,
                     "needs_rotation": self._needs_rotation(

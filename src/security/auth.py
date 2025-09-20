@@ -13,7 +13,6 @@ from .audit import AuditLogger, AuditLevel
 security = HTTPBearer()
 
 
-
 class AuthManager:
     def __init__(
         self,

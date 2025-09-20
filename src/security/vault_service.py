@@ -22,7 +22,6 @@ from cryptography.hazmat.backends import default_backend
 import os
 
 
-
 class SecretType(Enum):
     """Types of secrets"""
 
@@ -31,7 +30,6 @@ class SecretType(Enum):
     ROTATING = "rotating"
     CERTIFICATE = "certificate"
     ENCRYPTION_KEY = "encryption_key"
-
 
 
 class SecretEngine(Enum):
@@ -47,7 +45,6 @@ class SecretEngine(Enum):
 
 
 @dataclass
-
 class Secret:
     """Secret object"""
 
@@ -64,7 +61,6 @@ class Secret:
 
 
 @dataclass
-
 class EncryptionKey:
     """Encryption key object"""
 
@@ -78,7 +74,6 @@ class EncryptionKey:
 
 
 @dataclass
-
 class Certificate:
     """Certificate object"""
 
@@ -91,7 +86,6 @@ class Certificate:
     issued_at: datetime = field(default_factory=datetime.utcnow)
     expires_at: Optional[datetime] = None
     revoked: bool = False
-
 
 
 class VaultService:
@@ -261,7 +255,7 @@ class VaultService:
             # Add TTL if specified
             if ttl:
                 secret_data["ttl"] = int(ttl.total_seconds())
-                secret_data["expires_at"] = (datetime.utcnow() + \
+                secret_data["expires_at"] = (datetime.utcnow() +
                     ttl).isoformat()
 
             # Store in Vault

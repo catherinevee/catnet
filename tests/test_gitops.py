@@ -31,7 +31,6 @@ from src.gitops.gitops_workflow import (
 )
 
 
-
 class TestGitManager:
     """Test Git repository manager"""
 
@@ -62,7 +61,7 @@ class TestGitManager:
         assert self.git_manager._validate_repository_url(
             "https://github.com/test/repo.git"
         )
-        assert self.git_manager._validate_repository_url( \
+        assert self.git_manager._validate_repository_url(
             "git@github.com:test/repo.git")
         assert self.git_manager._validate_repository_url(
             "https://gitlab.com/test/repo.git"
@@ -72,7 +71,7 @@ class TestGitManager:
         assert not self.git_manager._validate_repository_url(
             "https://evil.com/repo.git"
         )
-        assert not self.git_manager._validate_repository_url( \
+        assert not self.git_manager._validate_repository_url(
             "ftp://github.com/repo")
 
     @patch("git.Repo.clone_from")
@@ -80,7 +79,7 @@ class TestGitManager:
         """Test repository cloning"""
         mock_clone.return_value = MagicMock()
 
-        repo = self.git_manager.add_repository( \
+        repo = self.git_manager.add_repository(
             "https://github.com/test/repo.git")
 
         # Mock the repository directory
@@ -94,7 +93,7 @@ class TestGitManager:
 
     def test_get_file_content(self):
         """Test getting file content"""
-        repo = self.git_manager.add_repository( \
+        repo = self.git_manager.add_repository(
             "https://github.com/test/repo.git")
 
         # Create test file
@@ -109,7 +108,7 @@ class TestGitManager:
 
     def test_list_files(self):
         """Test listing repository files"""
-        repo = self.git_manager.add_repository( \
+        repo = self.git_manager.add_repository(
             "https://github.com/test/repo.git")
 
         # Create test files
@@ -124,7 +123,6 @@ class TestGitManager:
             mock_list.return_value = ["config.yml", "router.yaml"]
             self.git_manager.list_files(repo.id, pattern="*.yml")
             mock_list.assert_called_once()
-
 
 
 class TestWebhookProcessor:
@@ -167,7 +165,7 @@ class TestWebhookProcessor:
         # Generate valid signature
         signature = (
             "sha256="
-                        + hmac.new(
+            + hmac.new(
                 secret.encode(),
                 body.encode(),
                 hashlib.sha256).hexdigest(
@@ -176,7 +174,7 @@ class TestWebhookProcessor:
 
         headers = {"X-Hub-Signature-256": signature}
 
-                self.processor.register_webhook_secret(
+        self.processor.register_webhook_secret(
             "https://github.com/test/repo",
             secret
         )
@@ -229,7 +227,6 @@ class TestWebhookProcessor:
         for original, expected in urls:
             assert self.processor._normalize_repository_url(original) == \
                 expected
-
 
 
 class TestConfigValidator:
@@ -321,7 +318,6 @@ interface GigabitEthernet0/2
         assert len(conflict_issues) > 0  # Should detect duplicate IP
 
 
-
 class TestSecretScanner:
     """Test secret scanner"""
 
@@ -376,8 +372,8 @@ MIIEpAIBAAKCAQEA...
 
         assert result.has_secrets
         key_secrets = [
-            s for s in result.secrets if s.secret_type == \
-                SecretType.PRIVATE_KEY
+            s for s in result.secrets if s.secret_type ==
+            SecretType.PRIVATE_KEY
         ]
         assert len(key_secrets) > 0
 
@@ -417,7 +413,6 @@ MIIEpAIBAAKCAQEA...
         )
         assert "ab" in redacted and "op" in redacted
         assert "*" in redacted
-
 
 
 class TestGitOpsWorkflow:

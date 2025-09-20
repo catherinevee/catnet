@@ -21,6 +21,7 @@ import enum
 
 # Custom UUID type that works with both PostgreSQL and SQLite
 
+
 class UUID(TypeDecorator):
     """Platform-independent UUID type.
 
@@ -62,7 +63,6 @@ class UUID(TypeDecorator):
 Base = declarative_base()
 
 
-
 class DeploymentState(enum.Enum):
     PENDING = "pending"
     IN_PROGRESS = "in_progress"
@@ -72,13 +72,11 @@ class DeploymentState(enum.Enum):
     AWAITING_APPROVAL = "awaiting_approval"
 
 
-
 class DeviceVendor(enum.Enum):
     CISCO_IOS = "cisco_ios"
     CISCO_IOS_XE = "cisco_ios_xe"
     CISCO_NX_OS = "cisco_nx_os"
     JUNIPER_JUNOS = "juniper_junos"
-
 
 
 class User(Base):
@@ -107,17 +105,14 @@ class User(Base):
     # SSH key fields
     ssh_public_keys = Column(JSON, default=[])  # List of SSH public keys
     ssh_key_added_at = Column(DateTime(timezone=True))
-        ssh_key_fingerprints = Column(
-        JSON,
-        default=[]
-    )  # List of SSH key fingerprints
+    ssh_key_fingerprints = Column(JSON, default=[])  # List of SSH key fingerprints
 
     # Relationships - Specify foreign keys to avoid ambiguity
-    deployments = relationship("Deployment", 
-    foreign_keys="Deployment.created_by", back_populates="creator")
+    deployments = relationship(
+        "Deployment", foreign_keys="Deployment.created_by", back_populates="creator"
+    )
     audit_logs = relationship("AuditLog", back_populates="user")
     ssh_keys = relationship("UserSSHKey", back_populates="user")
-
 
 
 class Device(Base):
@@ -161,7 +156,6 @@ class Device(Base):
     deployments = relationship("DeploymentDevice", back_populates="device")
 
 
-
 class Deployment(Base):
     __tablename__ = "deployments"
 
@@ -178,16 +172,10 @@ class Deployment(Base):
         nullable=False,
         default=DeploymentState.PENDING,
     )
-        approved_by = Column(
-        JSON,
-        default=list
-    )  # Stores list of user IDs as strings
+    approved_by = Column(JSON, default=list)  # Stores list of user IDs as strings
     approval_required = Column(Boolean, default=True)
     approval_count = Column(Integer, default=2)  # Number of approvals needed
-        strategy = Column(
-        String(50),
-        default="rolling"
-    )  # canary, rolling, blue-green
+    strategy = Column(String(50), default="rolling")  # canary, rolling, blue-green
     rollback_config = Column(JSON)
     scheduled_at = Column(DateTime(timezone=True))
     started_at = Column(DateTime(timezone=True))
@@ -212,16 +200,11 @@ class Deployment(Base):
     devices = relationship("DeploymentDevice", back_populates="deployment")
 
 
-
 class DeploymentDevice(Base):
     __tablename__ = "deployment_devices"
 
     id = Column(UUID(), primary_key=True, default=uuid.uuid4)
-        deployment_id = Column(
-        UUID(),
-        ForeignKey("deployments.id"),
-        nullable=False
-    )
+    deployment_id = Column(UUID(), ForeignKey("deployments.id"), nullable=False)
     device_id = Column(UUID(), ForeignKey("devices.id"), nullable=False)
     status = Column(
         String(50), nullable=False
@@ -235,7 +218,6 @@ class DeploymentDevice(Base):
     # Relationships
     deployment = relationship("Deployment", back_populates="devices")
     device = relationship("Device", back_populates="deployments")
-
 
 
 class GitRepository(Base):
@@ -259,7 +241,6 @@ class GitRepository(Base):
     deployments = relationship("Deployment", back_populates="repository")
 
 
-
 class DeviceConfig(Base):
     __tablename__ = "device_configs"
 
@@ -279,7 +260,6 @@ class DeviceConfig(Base):
 
     # Relationships
     device = relationship("Device", back_populates="configs")
-
 
 
 class AuditLog(Base):
@@ -310,7 +290,6 @@ class AuditLog(Base):
     user = relationship("User", back_populates="audit_logs")
 
 
-
 class ConfigTemplate(Base):
     __tablename__ = "config_templates"
 
@@ -327,23 +306,18 @@ class ConfigTemplate(Base):
     created_by = Column(UUID(), ForeignKey("users.id"))
 
 
-
 class SecretRotation(Base):
     __tablename__ = "secret_rotations"
 
     id = Column(UUID(), primary_key=True, default=uuid.uuid4)
     secret_path = Column(String(500), nullable=False)
-        secret_type = Column(
-        String(50),
-        nullable=False
-    )  # device_credential, api_key, etc.
+    secret_type = Column(String(50), nullable=False)  # device_credential, api_key, etc.
     last_rotation = Column(DateTime(timezone=True), nullable=False)
     next_rotation = Column(DateTime(timezone=True), nullable=False)
     rotation_interval_days = Column(Integer, default=90)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     rotation_metadata = Column(JSON, default={})
-
 
 
 class Session(Base):
@@ -359,7 +333,6 @@ class Session(Base):
     commands = Column(JSON, default=[])  # List of executed commands
     is_active = Column(Boolean, default=True)
     recording_location = Column(String(500))  # Path to session recording
-
 
 
 class UserSSHKey(Base):
@@ -380,7 +353,6 @@ class UserSSHKey(Base):
 
     # Relationships
     user = relationship("User", back_populates="ssh_keys")
-
 
 
 class SSHKey(Base):

@@ -16,7 +16,6 @@ from prometheus_client import Counter, Histogram, Gauge, Summary
 from collections import defaultdict, deque
 
 
-
 class MetricType(Enum):
     """Types of metrics"""
 
@@ -24,7 +23,6 @@ class MetricType(Enum):
     GAUGE = "gauge"
     HISTOGRAM = "histogram"
     SUMMARY = "summary"
-
 
 
 class MetricUnit(Enum):
@@ -40,7 +38,6 @@ class MetricUnit(Enum):
 
 
 @dataclass
-
 class MetricValue:
     """Single metric value"""
 
@@ -51,7 +48,6 @@ class MetricValue:
 
 
 @dataclass
-
 class MetricDefinition:
     """Metric definition"""
 
@@ -62,7 +58,6 @@ class MetricDefinition:
     labels: List[str] = field(default_factory=list)
     buckets: Optional[List[float]] = None
     quantiles: Optional[List[float]] = None
-
 
 
 class MetricsCollector:
@@ -79,7 +74,7 @@ class MetricsCollector:
         """
         self.namespace = namespace
         self.metrics: Dict[str, Any] = {}
-                self.time_series: Dict[str, deque] = defaultdict(
+        self.time_series: Dict[str, deque] = defaultdict(
             lambda: deque(maxlen=1000)
         )
 
@@ -281,7 +276,7 @@ class MetricsCollector:
             name: str
             value: float = 1
             labels: Optional[Dict[str
-            str]] = None
+                                  str]] = None
     ):
         """
         Increment a counter metric
@@ -377,14 +372,14 @@ class MetricsCollector:
         self._store_time_series(name, value, labels)
 
         def _store_time_series(
-        self,
-        name: str,
-        value: float,
-        labels: Dict[str,
-        str]
-    ):
+            self,
+            name: str,
+            value: float,
+            labels: Dict[str,
+                         str]
+        ):
         """Store metric value in time series"""
-                key = f"{name}:{':'.join(
+        key = f"{name}:{':'.join(
             f'{k}={v}' for k,
             v in sorted(labels.items())
         )}"
@@ -416,7 +411,7 @@ class MetricsCollector:
             List of metric values
         """
         labels = labels or {}
-                key_prefix = f"{name}:{':'.join(
+        key_prefix = f"{name}:{':'.join(
             f'{k}={v}' for k,
             v in sorted(labels.items())
         )}"
@@ -544,7 +539,7 @@ class MetricsCollector:
 
         # Memory usage
         memory = psutil.virtual_memory()
-                self.set_gauge(
+        self.set_gauge(
             "system_memory_usage",
             memory.percent,
             {"host": "localhost"}
@@ -555,7 +550,7 @@ class MetricsCollector:
 
         # Disk usage
         disk = psutil.disk_usage("/")
-                self.set_gauge(
+        self.set_gauge(
             "system_disk_usage",
             disk.percent,
             {"host": "localhost"}
@@ -566,13 +561,13 @@ class MetricsCollector:
         net_io = psutil.net_io_counters()
         self.set_gauge(
             "system_network_bytes_sent",
-                net_io.bytes_sent
-                {"host": "localhost"}
+            net_io.bytes_sent
+            {"host": "localhost"}
         )
         self.set_gauge(
             "system_network_bytes_recv",
-                net_io.bytes_recv
-                {"host": "localhost"}
+            net_io.bytes_recv
+            {"host": "localhost"}
         )
 
     def export_metrics(self, format: str = "prometheus") -> str:

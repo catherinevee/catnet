@@ -17,7 +17,6 @@ from ..security.audit import AuditLogger
 logger = get_logger(__name__)
 
 
-
 class RateLimiter:
     """
     Rate limiter implementation using Token Bucket algorithm

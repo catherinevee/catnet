@@ -18,7 +18,6 @@ from enum import Enum
 import re
 
 
-
 class WebhookProvider(Enum):
     """Supported webhook providers"""
 
@@ -26,7 +25,6 @@ class WebhookProvider(Enum):
     GITLAB = "gitlab"
     BITBUCKET = "bitbucket"
     GENERIC = "generic"
-
 
 
 class EventType(Enum):
@@ -43,7 +41,6 @@ class EventType(Enum):
 
 
 @dataclass
-
 class WebhookEvent:
     """Represents a processed webhook event"""
 
@@ -59,7 +56,6 @@ class WebhookEvent:
     raw_payload: Dict[str, Any]
     verified: bool = False
     metadata: Dict[str, Any] = None
-
 
 
 class WebhookProcessor:

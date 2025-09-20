@@ -12,7 +12,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-
 class DeviceConnector:
     """
     Connects to network devices using SSH

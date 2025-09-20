@@ -11,7 +11,6 @@ from src.ml.anomaly_detection import (
 )
 
 
-
 class TestFeatureExtractor:
     def test_extract_traffic_features(self):
         extractor = FeatureExtractor()
@@ -23,10 +22,10 @@ class TestFeatureExtractor:
             "error_rate": 0.02,
             "protocol_distribution": {"TCP": 0.7, "UDP": 0.2, "ICMP": 0.1},
             "port_distribution": {"80": 0.3,
-                "443": 0.4
-                "22": 0.1
-                "other": 0.2}
-                
+                                  "443": 0.4
+                                  "22": 0.1
+                                  "other": 0.2}
+
             "avg_packet_size": 500,
             "packet_rate": 100,
         }
@@ -79,7 +78,6 @@ class TestFeatureExtractor:
         assert len(features) == 7
         assert features[0] == 45.5  # cpu_usage
         assert features[4] == 25.5  # latency
-
 
 
 class TestAnomalyDetector:
@@ -172,7 +170,6 @@ class TestAnomalyDetector:
         assert metrics.precision > 0
         assert metrics.recall > 0
         assert metrics.f1_score > 0
-
 
 
 class TestModelManager:
@@ -287,7 +284,7 @@ class TestModelManager:
         # Create multiple models
         model_ids = []
         for model_type in [ModelType.ISOLATION_FOREST,
-            ModelType.RANDOM_FOREST]:
+                           ModelType.RANDOM_FOREST]:
             model_id = await manager.create_model(
                 name=f"model_{model_type.value}", model_type=model_type
             )
@@ -320,7 +317,6 @@ class TestModelManager:
         assert ensemble_score is not None
         assert 0 <= ensemble_score.score <= 1
         assert ensemble_score.confidence is not None
-
 
 
 class TestAnomalyDetectionIntegration:
@@ -364,9 +360,9 @@ class TestAnomalyDetectionIntegration:
         training_data = TrainingData(
             data=historical_data,
             feature_names=["packets", "bytes", "flows", "errors", "tcp_ratio"],
-                        timestamps=[datetime.now(
-                ) - timedelta(hours=i) for i in range(200
-            )],
+            timestamps=[datetime.now(
+            ) - timedelta(hours=i) for i in range(200
+                                                  )],
             labels=[0] * 180 + [1] * 20,
         )
 

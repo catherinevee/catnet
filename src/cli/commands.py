@@ -26,7 +26,6 @@ from ..security.vault import VaultClient
 )
 @click.option("--debug/--no-debug", default=False, help="Enable debug mode")
 @click.pass_context
-
 def cli(ctx, config, debug):
     """CatNet - Secure Network Configuration Deployment System."""
     ctx.ensure_object(dict)
@@ -43,7 +42,6 @@ def cli(ctx, config, debug):
 
 @cli.group()
 @click.pass_context
-
 def auth(ctx):
     """Authentication and authorization commands."""
 
@@ -59,7 +57,6 @@ def auth(ctx):
 )
 @click.option("--mfa-token", "-m", prompt="MFA Token", help="MFA token")
 @click.pass_context
-
 def login(ctx, username, password, mfa_token):
     """Authenticate to CatNet."""
 

@@ -16,7 +16,6 @@ from ..core.logging import get_logger
 logger = get_logger(__name__)
 
 
-
 class GitHandler:
     def __init__(self, vault_client: Optional[VaultClient] = None):
         self.vault = vault_client or VaultClient()

@@ -18,7 +18,6 @@ from ..core.exceptions import SecurityError
 logger = get_logger(__name__)
 
 
-
 class MTLSManager:
     """Manages mTLS connections between services"""
 

@@ -14,7 +14,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-
 class WebhookVerifier:
     """Verify webhook signatures from GitHub/GitLab/Bitbucket"""
 
@@ -70,7 +69,6 @@ class WebhookVerifier:
 
         expected = self.secrets[repo_id]
         return hmac.compare_digest(expected, token)
-
 
 
 class InputValidator:

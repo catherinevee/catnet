@@ -22,7 +22,6 @@ from ..core.exceptions import SecurityError, DeviceConnectionError
 logger = logging.getLogger(__name__)
 
 
-
 class SSHKeyManager:
     """Manage SSH keys for device authentication."""
 

@@ -26,7 +26,6 @@ from ..device_manager import (
 )
 
 
-
 class CiscoAdapter(DeviceAdapter):
     """
     Cisco device adapter implementation
@@ -139,7 +138,7 @@ class CiscoAdapter(DeviceAdapter):
         try:
             if connection.session_data:
                 loop = asyncio.get_event_loop()
-                                await loop.run_in_executor(
+                await loop.run_in_executor(
                     None,
                     connection.session_data.disconnect
                 )
@@ -155,10 +154,10 @@ class CiscoAdapter(DeviceAdapter):
             return False
 
         async def execute_command(
-        self,
-        connection: DeviceConnection,
-        command: str
-    ) -> str:
+            self,
+            connection: DeviceConnection,
+            command: str
+        ) -> str:
         """
         Execute command on Cisco device
 
@@ -245,7 +244,7 @@ class CiscoAdapter(DeviceAdapter):
 
             # Enter configuration mode
             loop = asyncio.get_event_loop()
-                        await loop.run_in_executor(
+            await loop.run_in_executor(
                 None,
                 connection.session_data.config_mode
             )
@@ -260,10 +259,10 @@ class CiscoAdapter(DeviceAdapter):
                 )
 
             # Exit configuration mode
-                        await loop.run_in_executor(
-                None,
-                connection.session_data.exit_config_mode
-            )
+                await loop.run_in_executor(
+                    None,
+                    connection.session_data.exit_config_mode
+                )
 
             return True
 
@@ -319,7 +318,7 @@ class CiscoAdapter(DeviceAdapter):
     ) -> Dict[str, Any]:
         """Build Netmiko connection parameters"""
         params = {
-                        "device_type": self.DEVICE_TYPE_MAP.get(
+            "device_type": self.DEVICE_TYPE_MAP.get(
                 device.vendor,
                 "cisco_ios"
             ),
@@ -344,9 +343,9 @@ class CiscoAdapter(DeviceAdapter):
         return params
 
         def _get_vendor_from_connection(
-        self,
-        connection: DeviceConnection
-    ) -> DeviceVendor:
+            self,
+            connection: DeviceConnection
+        ) -> DeviceVendor:
         """Get device vendor from connection"""
         # In real implementation, would look up from device info
         return DeviceVendor.CISCO_IOS

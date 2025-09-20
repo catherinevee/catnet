@@ -15,7 +15,6 @@ from .device_store import device_store
 logger = logging.getLogger(__name__)
 
 
-
 class AsyncDeviceConnector:
     """
     Async wrapper for device operations
@@ -23,15 +22,15 @@ class AsyncDeviceConnector:
     """
 
     def __init__(self, max_workers: int = 5):
-        self.executor = concurrent.futures.ThreadPoolExecutor( \
+        self.executor = concurrent.futures.ThreadPoolExecutor(
             max_workers=max_workers)
         self.active_connections: Dict[str, Any] = {}
 
         async def connect_to_device_async(
-        self,
-        device_info: Dict[str,
-        Any]
-    ) -> Optional[Any]:
+            self,
+            device_info: Dict[str,
+                              Any]
+        ) -> Optional[Any]:
         """
         Connect to device asynchronously
         NEVER use synchronous blocking operations!
@@ -48,8 +47,8 @@ class AsyncDeviceConnector:
 
             if connection:
                 self.active_connections[device_info['id']] = connection
-                logger.info(f"Async connection established to {device_info.get( 
-    'hostname')}")
+                logger.info(f"Async connection established to {device_info.get(
+                    'hostname')}")
 
             return connection
 
@@ -58,10 +57,10 @@ class AsyncDeviceConnector:
             return None
 
         async def execute_commands_async(
-        self,
-        device_id: str,
-        commands: List[str]
-    ) -> Dict[str, Any]:
+            self,
+            device_id: str,
+            commands: List[str]
+        ) -> Dict[str, Any]:
         """
         Execute commands on device asynchronously
         Returns results without blocking
@@ -150,10 +149,10 @@ class AsyncDeviceConnector:
             }
 
         async def deploy_to_devices_parallel(
-        self,
-        devices: List[str],
-        commands: List[str]
-    ) -> Dict[str, Any]:
+            self,
+            devices: List[str],
+            commands: List[str]
+        ) -> Dict[str, Any]:
         """
         Deploy to multiple devices in parallel
         Much faster than sequential deployment!
@@ -191,9 +190,9 @@ class AsyncDeviceConnector:
         }
 
         async def health_check_parallel(
-        self,
-        devices: List[str]
-    ) -> Dict[str, Any]:
+            self,
+            devices: List[str]
+        ) -> Dict[str, Any]:
         """
         Perform health checks on multiple devices in parallel
         """
@@ -204,8 +203,8 @@ class AsyncDeviceConnector:
                 if not device:
                     return {'device_id': device_id, 'status': 'not_found'}
 
-                connection = await self.connect_to_device_async(device.to_dict( \
-                    ))
+                connection = await self.connect_to_device_async(device.to_dict(
+                ))
 
                 if connection:
                     # Disconnect after check
@@ -219,9 +218,10 @@ class AsyncDeviceConnector:
                     return {'device_id': device_id, 'status': 'unreachable'}
 
             except Exception as e:
-                                return {'device_id': device_id, 'status': 'error', 'error': str(
-                    e
-                )}
+                return {
+                    'device_id': device_id,
+                    'status': 'error',
+                    'error': str(e)}
 
         # Check all devices in parallel
         tasks = [check_device(device_id) for device_id in devices]
@@ -267,7 +267,7 @@ async def example_usage():
     commands = ['interface eth0', 'description Updated', 'no shutdown']
 
     print("Starting parallel deployment...")
-        result = await async_device_connector.deploy_to_devices_parallel(
+    result = await async_device_connector.deploy_to_devices_parallel(
         devices,
         commands
     )

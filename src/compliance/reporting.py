@@ -19,7 +19,6 @@ import html
 from collections import defaultdict
 
 
-
 class ComplianceFramework(Enum):
     """Supported compliance frameworks"""
 
@@ -33,7 +32,6 @@ class ComplianceFramework(Enum):
     CUSTOM = "custom"
 
 
-
 class ComplianceStatus(Enum):
     """Compliance check status"""
 
@@ -42,7 +40,6 @@ class ComplianceStatus(Enum):
     PARTIALLY_COMPLIANT = "partially_compliant"
     NOT_APPLICABLE = "not_applicable"
     NOT_CHECKED = "not_checked"
-
 
 
 class ControlCategory(Enum):
@@ -59,7 +56,6 @@ class ControlCategory(Enum):
 
 
 @dataclass
-
 class ComplianceControl:
     """Compliance control definition"""
 
@@ -76,7 +72,6 @@ class ComplianceControl:
 
 
 @dataclass
-
 class ComplianceCheck:
     """Compliance check result"""
 
@@ -91,7 +86,6 @@ class ComplianceCheck:
 
 
 @dataclass
-
 class ComplianceReport:
     """Compliance report"""
 
@@ -108,7 +102,6 @@ class ComplianceReport:
     checks: List[ComplianceCheck]
     summary: Dict[str, Any] = field(default_factory=dict)
     recommendations: List[str] = field(default_factory=list)
-
 
 
 class ComplianceManager:
@@ -367,7 +360,7 @@ class ComplianceManager:
         return check
 
     async def _check_access_control(
-        self, control: ComplianceControl, device_id: str, check: \
+        self, control: ComplianceControl, device_id: str, check:
             ComplianceCheck
     ) -> ComplianceCheck:
         """Check access control compliance"""
@@ -413,7 +406,7 @@ class ComplianceManager:
         return check
 
     async def _check_network_security(
-        self, control: ComplianceControl, device_id: str, check: \
+        self, control: ComplianceControl, device_id: str, check:
             ComplianceCheck
     ) -> ComplianceCheck:
         """Check network security compliance"""
@@ -455,7 +448,7 @@ class ComplianceManager:
         return check
 
     async def _check_audit_logging(
-        self, control: ComplianceControl, device_id: str, check: \
+        self, control: ComplianceControl, device_id: str, check:
             ComplianceCheck
     ) -> ComplianceCheck:
         """Check audit logging compliance"""
@@ -497,7 +490,7 @@ class ComplianceManager:
         return check
 
     async def _check_configuration(
-        self, control: ComplianceControl, device_id: str, check: \
+        self, control: ComplianceControl, device_id: str, check:
             ComplianceCheck
     ) -> ComplianceCheck:
         """Check configuration compliance"""
@@ -540,7 +533,7 @@ class ComplianceManager:
         return check
 
     async def generate_report(
-        self, framework: ComplianceFramework, start_date: datetime, end_date: \
+        self, framework: ComplianceFramework, start_date: datetime, end_date:
             datetime
     ) -> ComplianceReport:
         """
@@ -567,7 +560,7 @@ class ComplianceManager:
 
         # Calculate compliance score
         total = len(checks)
-        compliant = sum(1 for c in checks if c.status == \
+        compliant = sum(1 for c in checks if c.status ==
             ComplianceStatus.COMPLIANT)
         non_compliant = sum(
             1 for c in checks if c.status == ComplianceStatus.NON_COMPLIANT
@@ -680,7 +673,7 @@ class ComplianceManager:
                 else:
                     # Generic recommendation
                     recommendations.append(
-                        f"Address {control.name} violations on {len( 
+                        f"Address {control.name} violations on {len(
     control_checks)} devices"
                     )
 
@@ -782,7 +775,7 @@ class ComplianceManager:
                 {report.period_end.date()}</p>
 
             <h2>Overall Compliance Score</h2>
-            <div class="score {('compliant' if report.compliance_score >= 80 
+            <div class="score {('compliant' if report.compliance_score >= 80
     else 'non-compliant')}">
                 {report.compliance_score:.1f}%
             </div>
@@ -803,14 +796,14 @@ class ComplianceManager:
                 </tr>
                 <tr>
                     <td>Non-Compliant Controls</td>
-                    <td class="non-compliant">{ \
+                    <td class="non-compliant">{
                         report.non_compliant_controls}</td>
                 </tr>
             </table>
 
             <h2>Recommendations</h2>
             <ol>
-                {''.join(f'<li>{html.escape(rec)}</li>' for rec in \
+                {''.join(f'<li>{html.escape(rec)}</li>' for rec in
     report.recommendations)}
             </ol>
         </body>
@@ -875,14 +868,13 @@ class ComplianceManager:
         return datetime.utcnow() - timedelta(days=3)  # Mock
 
     async def _run_validation_script(
-        self, control: ComplianceControl, device_id: str, check: \
+        self, control: ComplianceControl, device_id: str, check:
             ComplianceCheck
     ) -> ComplianceCheck:
         """Run custom validation script"""
         # Would execute validation script
         check.status = ComplianceStatus.COMPLIANT
         return check
-
 
 
 class ComplianceValidator:
@@ -1101,7 +1093,6 @@ class ComplianceValidator:
         return bool(config.get("monitoring", {}).get("enabled", False))
 
 
-
 class ReportGenerator:
     """
     Generates compliance reports in various formats
@@ -1158,7 +1149,7 @@ class ReportGenerator:
     ) -> Dict[str, Any]:
         """Calculate compliance statistics"""
         total = len(checks)
-        compliant = sum(1 for c in checks if c.status == \
+        compliant = sum(1 for c in checks if c.status ==
             ComplianceStatus.COMPLIANT)
         non_compliant = sum(
             1 for c in checks if c.status == ComplianceStatus.NON_COMPLIANT

@@ -14,7 +14,6 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 
-
 class ValidationType(Enum):
     """Types of validation"""
 
@@ -23,7 +22,6 @@ class ValidationType(Enum):
     COMPLIANCE = "compliance"
     BUSINESS = "business"
     CONFLICT = "conflict"
-
 
 
 class Severity(Enum):
@@ -37,7 +35,6 @@ class Severity(Enum):
 
 
 @dataclass
-
 class ValidationIssue:
     """Represents a validation issue"""
 
@@ -50,7 +47,6 @@ class ValidationIssue:
 
 
 @dataclass
-
 class ValidationResult:
     """Result of configuration validation"""
 
@@ -60,7 +56,6 @@ class ValidationResult:
     issues: List[ValidationIssue] = field(default_factory=list)
     warnings: List[ValidationIssue] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
-
 
 
 class ConfigValidator:

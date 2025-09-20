@@ -15,7 +15,6 @@ from enum import Enum
 import asyncio
 
 
-
 class HealthCheckType(Enum):
     """Types of health checks"""
 
@@ -27,7 +26,6 @@ class HealthCheckType(Enum):
     CUSTOM = "custom"
 
 
-
 class HealthStatus(Enum):
     """Health status levels"""
 
@@ -35,7 +33,6 @@ class HealthStatus(Enum):
     DEGRADED = "degraded"
     UNHEALTHY = "unhealthy"
     UNKNOWN = "unknown"
-
 
 
 class MetricType(Enum):
@@ -50,7 +47,6 @@ class MetricType(Enum):
 
 
 @dataclass
-
 class HealthMetric:
     """Health metric"""
 
@@ -65,7 +61,6 @@ class HealthMetric:
 
 
 @dataclass
-
 class HealthCheckResult:
     """Health check result"""
 
@@ -80,7 +75,6 @@ class HealthCheckResult:
 
 
 @dataclass
-
 class HealthCheckConfig:
     """Health check configuration"""
 
@@ -104,7 +98,6 @@ class HealthCheckConfig:
             "interface_errors": {"warning": 10, "critical": 100},
         }
     )
-
 
 
 class HealthCheckService:
@@ -155,7 +148,7 @@ class HealthCheckService:
             elif check_type == HealthCheckType.SERVICE:
                 result = await self._check_services(device_id)
             elif check_type == HealthCheckType.PERFORMANCE:
-                                result = await self._check_performance(
+                result = await self._check_performance(
                     device_id,
                     config.thresholds
                 )
@@ -178,8 +171,8 @@ class HealthCheckService:
                 overall_status = HealthStatus.DEGRADED
 
         # Calculate duration
-        duration_ms = int((datetime.utcnow() - start_time).total_seconds() * \
-            1000)
+        duration_ms = int((datetime.utcnow() - start_time).total_seconds() *
+                          1000)
 
         # Create overall result
         overall_result = HealthCheckResult(
@@ -332,7 +325,7 @@ class HealthCheckService:
             unhealthy_protocols = []
 
             # Check routing protocols
-            routing_protocols = await self._get_routing_protocol_status( \
+            routing_protocols = await self._get_routing_protocol_status(
                 device_id)
             for protocol, status in routing_protocols.items():
                 protocol_status[protocol] = status
@@ -354,7 +347,7 @@ class HealthCheckService:
                 message = f"Protocol issue: {unhealthy_protocols[0]}"
             else:
                 status = HealthStatus.UNHEALTHY
-                                message = f"Multiple protocol issues: {', '.join(
+                message = f"Multiple protocol issues: {', '.join(
                     unhealthy_protocols
                 )}"
 
@@ -409,7 +402,7 @@ class HealthCheckService:
                 message = f"Service issue: {failed_services[0]}"
             else:
                 status = HealthStatus.UNHEALTHY
-                                message = f"Multiple service failures: {', '.join(
+                message = f"Multiple service failures: {', '.join(
                     failed_services
                 )}"
 
@@ -503,8 +496,8 @@ class HealthCheckService:
             unhealthy_metrics = [
                 m for m in metrics if m.status == HealthStatus.UNHEALTHY
             ]
-            degraded_metrics = [m for m in metrics if m.status == \
-                HealthStatus.DEGRADED]
+            degraded_metrics = [m for m in metrics if m.status ==
+                                HealthStatus.DEGRADED]
 
             if unhealthy_metrics:
                 status = HealthStatus.UNHEALTHY
@@ -549,7 +542,7 @@ class HealthCheckService:
 
         try:
             # Check configuration consistency
-            config_consistent = await self._verify_configuration_consistency( \
+            config_consistent = await self._verify_configuration_consistency(
                 device_id)
 
             # Check for configuration drift
@@ -613,9 +606,9 @@ class HealthCheckService:
                 results[check_name] = await check_func(device_id)
 
             # Aggregate results
-                        failed_checks = [name for name, result in results.items(
-                
-            ) if not result]
+                failed_checks = [name for name, result in results.items(
+
+                ) if not result]
 
             if not failed_checks:
                 status = HealthStatus.HEALTHY
@@ -705,9 +698,9 @@ class HealthCheckService:
         return True
 
         async def _get_routing_protocol_status(
-        self,
-        device_id: str
-    ) -> Dict[str, str]:
+            self,
+            device_id: str
+        ) -> Dict[str, str]:
         """Get routing protocol status"""
         if self.device_service:
             return await self.device_service.get_routing_protocols(device_id)
@@ -722,16 +715,16 @@ class HealthCheckService:
     async def _get_service_status(self, device_id: str, service: str) -> str:
         """Get service status"""
         if self.device_service:
-                        return await self.device_service.get_service_status(
+            return await self.device_service.get_service_status(
                 device_id,
                 service
             )
         return "running"
 
         async def _get_performance_metrics(
-        self,
-        device_id: str
-    ) -> Dict[str, float]:
+            self,
+            device_id: str
+        ) -> Dict[str, float]:
         """Get performance metrics"""
         if self.device_service:
             return await self.device_service.get_performance_metrics(device_id)
@@ -745,7 +738,7 @@ class HealthCheckService:
     async def _verify_configuration_consistency(self, device_id: str) -> bool:
         """Verify configuration consistency"""
         if self.device_service:
-            return await self.device_service.verify_config_consistency( \
+            return await self.device_service.verify_config_consistency(
                 device_id)
         return True
 
@@ -761,6 +754,6 @@ class HealthCheckService:
         """Trigger health alert"""
         # Would send actual alert
         print(
-            f"HEALTH ALERT: Device {device_id} is {result.status.value}: { 
-    result.message}"
+            f"HEALTH ALERT: Device {device_id} is {result.status.value}: {
+                result.message}"
         )

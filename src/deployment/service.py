@@ -15,7 +15,6 @@ from ..security.audit import AuditLogger
 logger = get_logger(__name__)
 
 
-
 class DeploymentService:
     """Main deployment orchestration service"""
 
@@ -64,8 +63,8 @@ class DeploymentService:
         # Create deployment record
         deployment = Deployment(
             id=deployment_uuid or deployment_id,
-            state=DeploymentState.PENDING if not dry_run else \
-                DeploymentState.DRY_RUN,
+            state=DeploymentState.PENDING if not dry_run else
+            DeploymentState.DRY_RUN,
             created_at=datetime.utcnow(),
             created_by=user_context.get("user_id"),
         )
@@ -120,9 +119,9 @@ class DeploymentService:
         }
 
         async def get_deployment_status(
-        self,
-        deployment_id: str
-    ) -> Dict[str, Any]:
+            self,
+            deployment_id: str
+        ) -> Dict[str, Any]:
         """Get deployment status"""
         # Would fetch from database
         return {

@@ -16,7 +16,6 @@ from ..core.logging import get_logger
 logger = get_logger(__name__)
 
 
-
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     """
     Middleware to add security headers to all responses
@@ -69,11 +68,11 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         return response
 
         def _add_security_headers(
-        self,
-        response: Response,
-        request: Request,
-        nonce: str
-    ):
+            self,
+            response: Response,
+            request: Request,
+            nonce: str
+        ):
         """Add security headers to response"""
 
         # X-Content-Type-Options
@@ -135,7 +134,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             if value:
                 # Add nonce to script-src if present
                 if key == "script-src" and nonce:
-                                        value = value.replace(
+                    value = value.replace(
                         "'unsafe-inline'",
                         f"'nonce-{nonce}'"
                     )
@@ -175,7 +174,6 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         return any(pattern in path for pattern in sensitive_patterns)
 
 
-
 class CSRFProtection:
     """
     CSRF Protection implementation
@@ -205,8 +203,8 @@ class CSRFProtection:
 
         # Create signed token
         payload = f"{random_data}.{timestamp}"
-        signature = hashlib.sha256(f"{payload}.{self.secret_key}".encode( \
-            )).hexdigest()
+        signature = hashlib.sha256(f"{payload}.{self.secret_key}".encode(
+        )).hexdigest()
 
         return f"{payload}.{signature}"
 
@@ -298,7 +296,6 @@ class CSRFProtection:
         return response
 
 
-
 class RequestSignatureVerification:
     """
     Request signature verification for API calls
@@ -374,7 +371,6 @@ class RequestSignatureVerification:
             return False
 
 
-
 def configure_security_headers(app, config: Dict[str, any] = None):
     """
     Configure all security headers for the application
@@ -391,7 +387,7 @@ def configure_security_headers(app, config: Dict[str, any] = None):
         enable_hsts=config.get("enable_hsts", True),
         enable_csp=config.get("enable_csp", True),
         enable_cors=config.get("enable_cors", True),
-                allowed_origins=config.get(
+        allowed_origins=config.get(
             "allowed_origins",
             ["https://catnet.local"]
         ),

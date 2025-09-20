@@ -6,7 +6,6 @@ from src.security.auth import AuthManager
 from src.security.vault import VaultClient
 
 
-
 class TestEncryption:
     def test_aes_gcm_encryption(self):
         encryption = EncryptionManager()
@@ -72,7 +71,6 @@ class TestEncryption:
         )
 
 
-
 class TestAuditLogger:
     @pytest.mark.asyncio
     async def test_log_event(self, tmp_path):
@@ -117,8 +115,8 @@ class TestAuditLogger:
         for i in range(5):
             await audit.log_event(
                 event_type=f"test_event_{i}",
-                    user_id=f"user_{i}"
-                    details={"index": i}
+                user_id=f"user_{i}"
+                details={"index": i}
             )
 
         # Verify integrity
@@ -137,12 +135,12 @@ class TestAuditLogger:
         )
 
         # Record commands
-                await audit.record_command(
+        await audit.record_command(
             session_id,
             "show version",
             "Cisco IOS 15.0"
         )
-                await audit.record_command(
+        await audit.record_command(
             session_id,
             "show running-config",
             "config output"
@@ -153,7 +151,6 @@ class TestAuditLogger:
 
         # Verify session is removed
         assert session_id not in audit.session_recordings
-
 
 
 class TestAuthManager:
@@ -221,11 +218,10 @@ class TestAuthManager:
         # Viewer user
         viewer_user = {"sub": "viewer_user", "roles": ["viewer"]}
         assert await auth.check_permission(viewer_user, "deployment.view")
-                assert not await auth.check_permission(
+        assert not await auth.check_permission(
             viewer_user,
             "deployment.create"
         )
-
 
 
 class TestVaultClient:
@@ -271,7 +267,6 @@ class TestVaultClient:
         assert creds["ssh_key"] == "ssh_key_content"
 
 
-
 class TestSecurityIntegration:
     @pytest.mark.asyncio
     async def test_end_to_end_encryption_and_audit(self, tmp_path):
@@ -304,7 +299,7 @@ class TestSecurityIntegration:
             event_type="config_decrypted",
             user_id="security_admin",
             details={
-                "config_hash": encryption.calculate_hash( \
+                "config_hash": encryption.calculate_hash(
                     decrypted_config.encode())
             },
             level=AuditLevel.INFO,
@@ -329,7 +324,7 @@ class TestSecurityIntegration:
         # Verify the query is safe
         assert ":name" in str(safe_query)  # Query uses parameters
         assert params["name"] == malicious_input  # Parameters contain the \
-            input
+        input
 
         # The parameters are properly escaped by SQLAlchemy
         assert "DROP TABLE" in malicious_input  # Input contains SQL injection

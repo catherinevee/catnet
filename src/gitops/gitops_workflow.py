@@ -21,7 +21,6 @@ from .config_validator import ConfigValidator, ValidationResult
 from .secret_scanner import SecretScanner, SecretScanResult
 
 
-
 class DeploymentStrategy(Enum):
     """Deployment strategies"""
 
@@ -29,7 +28,6 @@ class DeploymentStrategy(Enum):
     ROLLING = "rolling"
     BLUE_GREEN = "blue_green"
     DIRECT = "direct"
-
 
 
 class WorkflowState(Enum):
@@ -46,7 +44,6 @@ class WorkflowState(Enum):
 
 
 @dataclass
-
 class WorkflowConfig:
     """GitOps workflow configuration"""
 
@@ -62,7 +59,6 @@ class WorkflowConfig:
 
 
 @dataclass
-
 class WorkflowExecution:
     """Represents a workflow execution"""
 
@@ -77,7 +73,6 @@ class WorkflowExecution:
     deployment_id: Optional[str] = None
     errors: List[str] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
-
 
 
 class GitOpsWorkflow:

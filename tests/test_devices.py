@@ -152,7 +152,7 @@ class TestDeviceManager:
         for i in range(3):
             device_id = await self.manager.add_device(
                 hostname=f"device{i}",
-                ip_address=f"192.168.1.{10+i}",
+                ip_address=f"192.168.1.{10 + i}",
                 vendor=DeviceVendor.CISCO_IOS,
                 device_type=DeviceType.SWITCH,
                 model="Catalyst3850",

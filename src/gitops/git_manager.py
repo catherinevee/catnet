@@ -30,7 +30,6 @@ except ImportError:
 
 
 @dataclass
-
 class GitRepository:
     """Represents a Git repository configuration"""
 
@@ -44,7 +43,6 @@ class GitRepository:
     sync_interval: int = 300  # seconds
     last_commit: Optional[str] = None
     last_sync: Optional[datetime] = None
-
 
 
 class GitManager:
@@ -154,7 +152,7 @@ class GitManager:
             if repo_config.ssh_key_path:
                 # Use pygit2 for SSH key authentication
                 callbacks = pygit2.RemoteCallbacks(
-                    credentials=self._ssh_key_credentials( \
+                    credentials=self._ssh_key_credentials(
                         repo_config.ssh_key_path)
                 )
                 pygit2.clone_repository(
@@ -178,8 +176,8 @@ class GitManager:
                 shutil.rmtree(repo_config.local_path)
                 return (
                     False,
-                    f"Repository exceeds size limit ({repo_size} > { 
-    self.max_repo_size})",
+                    f"Repository exceeds size limit ({repo_size} > {
+                        self.max_repo_size})",
                 )
 
             # Get latest commit
@@ -258,7 +256,7 @@ class GitManager:
                     # Rollback to previous commit
                     repo.git.reset("--hard", old_commit)
                     return False,
-                        {"error": "GPG signature verification failed"}
+                    {"error": "GPG signature verification failed"}
 
             # Get changed files
             changed_files = []
@@ -477,9 +475,9 @@ class GitManager:
         return any(allowed in host for allowed in self.allowed_hosts)
 
         def _setup_git_environment(
-        self,
-        repo_config: GitRepository
-    ) -> Dict[str, str]:
+            self,
+            repo_config: GitRepository
+        ) -> Dict[str, str]:
         """
         Setup Git environment variables
 

@@ -19,7 +19,6 @@ import hmac
 
 
 @dataclass
-
 class Session:
     """Represents a user session"""
 
@@ -38,7 +37,6 @@ class Session:
     refresh_token: Optional[str] = None
     mfa_verified: bool = False
     auth_method: str = "password"  # password, oauth, saml, ssh
-
 
 
 class SessionManager:
@@ -444,7 +442,7 @@ class SessionManager:
         )
 
         # Create HMAC for integrity
-                h = hmac.new(
+        h = hmac.new(
             self.session_secret.encode(),
             data.encode(),
             hashlib.sha256
@@ -472,11 +470,11 @@ class SessionManager:
             self.terminate_session(session_id)
 
         def _log_security_event(
-        self,
-        event_type: str,
-        details: Dict[str,
-        Any]
-    ) -> None:
+            self,
+            event_type: str,
+            details: Dict[str,
+                          Any]
+        ) -> None:
         """
         Log security events
 
@@ -496,7 +494,6 @@ class SessionManager:
 
 # Convenience functions
 _default_manager = None
-
 
 
 def get_session_manager() -> SessionManager:

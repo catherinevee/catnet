@@ -14,7 +14,6 @@ from datetime import datetime
 from enum import Enum
 
 
-
 class ValidationType(Enum):
     """Types of validation"""
 
@@ -26,14 +25,12 @@ class ValidationType(Enum):
     DEPENDENCY = "dependency"
 
 
-
 class ValidationSeverity(Enum):
     """Validation severity levels"""
 
     CRITICAL = "critical"
     WARNING = "warning"
     INFO = "info"
-
 
 
 class ValidationStatus(Enum):
@@ -46,7 +43,6 @@ class ValidationStatus(Enum):
 
 
 @dataclass
-
 class ValidationIssue:
     """Validation issue"""
 
@@ -59,7 +55,6 @@ class ValidationIssue:
 
 
 @dataclass
-
 class ValidationResult:
     """Validation result"""
 
@@ -74,7 +69,6 @@ class ValidationResult:
     issues: List[ValidationIssue] = field(default_factory=list)
     device_results: Dict[str, Dict[str, Any]] = field(default_factory=dict)
     metadata: Dict[str, Any] = field(default_factory=dict)
-
 
 
 class DeploymentValidator:
@@ -236,7 +230,7 @@ class DeploymentValidator:
                             ValidationIssue(
                                 type=ValidationType.CONFIGURATION,
                                 severity=ValidationSeverity.CRITICAL,
-                                message=f"Configuration validation failed for { 
+                                message=f"Configuration validation failed for {
     device_id}",
                                 device_id=device_id,
                                 details={"errors": validation.errors},
@@ -361,7 +355,7 @@ class DeploymentValidator:
                             type=ValidationType.RESOURCE,
                             severity=ValidationSeverity.WARNING,
                             message=f"High CPU usage on {device_id}: {cpu_usage}%",
-                                
+
                             device_id=device_id,
                             details={"cpu_usage": cpu_usage},
                             recommendation="Wait for lower CPU usage before \
@@ -377,7 +371,7 @@ class DeploymentValidator:
                         ValidationIssue(
                             type=ValidationType.RESOURCE,
                             severity=ValidationSeverity.WARNING,
-                            message=f"High memory usage on {device_id}: { 
+                            message=f"High memory usage on {device_id}: {
     memory_usage}%",
                             device_id=device_id,
                             details={"memory_usage": memory_usage},
@@ -393,7 +387,7 @@ class DeploymentValidator:
                         ValidationIssue(
                             type=ValidationType.RESOURCE,
                             severity=ValidationSeverity.CRITICAL,
-                            message=f"Low storage space on {device_id}: { 
+                            message=f"Low storage space on {device_id}: {
     storage_free}MB",
                             device_id=device_id,
                             details={"storage_free_mb": storage_free},

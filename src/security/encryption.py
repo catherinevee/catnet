@@ -15,7 +15,6 @@ import hashlib
 import secrets
 
 
-
 class EncryptionManager:
     def __init__(self, key: Optional[bytes] = None):
         self.backend = default_backend()

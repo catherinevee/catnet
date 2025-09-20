@@ -1,6 +1,8 @@
 """
 Deployment Service Endpoints - Dry-run, metrics, and scheduling
-"""
+    """
+    Documentation placeholder
+    """
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, status
 from typing import Dict, Optional, List, Any
 from datetime import datetime, timedelta
@@ -23,7 +25,6 @@ logger = get_logger(__name__)
 router = APIRouter(prefix="/deploy", tags=["deployment"])
 
 
-
 class DryRunRequest(BaseModel):
     """Dry run deployment request"""
 
@@ -33,7 +34,7 @@ class DryRunRequest(BaseModel):
     validation_only: bool = False
 
 
-
+    pass
 class DryRunResponse(BaseModel):
     """Dry run deployment response"""
 
@@ -44,7 +45,6 @@ class DryRunResponse(BaseModel):
     warnings: List[str]
     errors: List[str]
     recommendations: List[str]
-
 
 
 class DeploymentMetrics(BaseModel):
@@ -61,7 +61,6 @@ class DeploymentMetrics(BaseModel):
     recent_deployments: List[Dict[str, Any]]
 
 
-
 class ScheduledDeploymentRequest(BaseModel):
     """Scheduled deployment request"""
 
@@ -74,7 +73,7 @@ class ScheduledDeploymentRequest(BaseModel):
     maintenance_window_id: Optional[str] = None
 
 
-
+    pass
 class ScheduledDeploymentResponse(BaseModel):
     """Scheduled deployment response"""
 
@@ -91,6 +90,8 @@ async def dry_run_deployment(
     db: AsyncSession = Depends(get_db),
 ):
     """
+    Documentation placeholder
+    """
     Perform a dry-run deployment simulation
 
     This endpoint:
@@ -98,6 +99,8 @@ async def dry_run_deployment(
     - Simulates deployment execution
     - Identifies potential issues
     - Provides recommendations
+    """
+    Documentation placeholder
     """
     logger.info(
         f"Dry-run deployment requested by {current_user.username} "
@@ -159,9 +162,9 @@ async def dry_run_deployment(
                 backup_age = (datetime.utcnow() - device.last_backup).days
                 if backup_age > 7:
                     warnings.append(
-                        f"Device {device.hostname} backup is {backup_age} days \
-                            old"
-                    )
+                        f"Device {device_id}"
+                            device.hostname} backup is {backup_age} days \
+                            old")
             else:
                 warnings.append(f"Device {device.hostname} has no backup")
 
@@ -251,6 +254,8 @@ async def get_deployment_metrics(
     db: AsyncSession = Depends(get_db),
 ):
     """
+    Documentation placeholder
+    """
     Get deployment metrics and statistics
 
     Provides:
@@ -258,6 +263,8 @@ async def get_deployment_metrics(
     - Average duration
     - Strategy breakdown
     - Recent deployment history
+    """
+    Documentation placeholder
     """
     logger.info(f"Deployment metrics requested by {current_user.username}")
 
@@ -283,7 +290,7 @@ async def get_deployment_metrics(
                     )
                 ).label("successful"),
                 func.sum(
-                                        func.cast(
+                    func.cast(
                         Deployment.state == DeploymentState.FAILED,
                         type_=int
                     )
@@ -347,7 +354,7 @@ async def get_deployment_metrics(
                 "state": deployment.state.value,
                 "strategy": deployment.strategy,
                 "duration": (
-                    (deployment.completed_at - \
+                    (deployment.completed_at -
                         deployment.started_at).total_seconds()
                     if deployment.completed_at and deployment.started_at
                     else None
@@ -398,6 +405,8 @@ async def schedule_deployment(
     db: AsyncSession = Depends(get_db),
 ):
     """
+    Documentation placeholder
+    """
     Schedule a deployment for future execution
 
     Features:
@@ -405,6 +414,8 @@ async def schedule_deployment(
     - Maintenance window validation
     - Email notifications
     - Automatic execution
+    """
+    Documentation placeholder
     """
     logger.info(
         f"Scheduled deployment requested by {current_user.username} "
@@ -438,7 +449,7 @@ async def schedule_deployment(
         deployment = Deployment(
             created_by=current_user.id,
             config_hash="pending",  # Will be calculated when configs are \
-                loaded
+            loaded
             signature="pending",  # Will be signed before execution
             state=DeploymentState.PENDING,
             strategy=request.strategy,

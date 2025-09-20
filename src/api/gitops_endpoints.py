@@ -1,6 +1,8 @@
 """
 GitOps Service Endpoints - Webhook handlers and configuration management
-"""
+    """
+    Documentation placeholder
+    """
 from fastapi import APIRouter, Request, HTTPException, Depends, Header, status
 from typing import Dict, Optional, List, Any
 from datetime import datetime
@@ -23,7 +25,6 @@ logger = get_logger(__name__)
 router = APIRouter(prefix="/git", tags=["gitops"])
 
 
-
 class WebhookPayload(BaseModel):
     """Generic webhook payload"""
 
@@ -32,7 +33,6 @@ class WebhookPayload(BaseModel):
     commits: List[Dict[str, Any]]
     pusher: Dict[str, str]
     sender: Dict[str, Any]
-
 
 
 class ConfigDiff(BaseModel):
@@ -48,7 +48,7 @@ class ConfigDiff(BaseModel):
     diff_content: str
 
 
-
+    pass
 def verify_github_signature(
     payload: bytes,
     signature: str,
@@ -57,7 +57,6 @@ def verify_github_signature(
     """Verify GitHub webhook signature"""
     expected = hmac.new(secret.encode(), payload, hashlib.sha256).hexdigest()
     return hmac.compare_digest(f"sha256={expected}", signature)
-
 
 
 def verify_gitlab_signature(payload: bytes, token: str, secret: str) -> bool:
@@ -73,6 +72,8 @@ async def handle_github_webhook(
     db: AsyncSession = Depends(get_db),
 ):
     """
+    Documentation placeholder
+    """
     Handle GitHub webhook events
 
     Processes:
@@ -84,6 +85,8 @@ async def handle_github_webhook(
     - Validates webhook signature
     - Scans for secrets
     - Triggers validation pipeline
+    """
+    Documentation placeholder
     """
     logger.info(f"GitHub webhook received: {x_github_event}")
 
@@ -199,6 +202,8 @@ async def handle_gitlab_webhook(
     db: AsyncSession = Depends(get_db),
 ):
     """
+    Documentation placeholder
+    """
     Handle GitLab webhook events
 
     Processes:
@@ -210,6 +215,8 @@ async def handle_gitlab_webhook(
     - Validates webhook token
     - Scans for secrets
     - Triggers validation pipeline
+    """
+    Documentation placeholder
     """
     logger.info(f"GitLab webhook received: {x_gitlab_event}")
 
@@ -327,6 +334,8 @@ async def get_configuration_diff(
     db: AsyncSession = Depends(get_db),
 ):
     """
+    Documentation placeholder
+    """
     Get configuration diff for a specific commit
 
     Shows:
@@ -334,6 +343,8 @@ async def get_configuration_diff(
     - Lines added/removed
     - Full diff content
     - Commit metadata
+    """
+    Documentation placeholder
     """
     logger.info(f"Configuration diff requested for commit {commit_sha}")
 

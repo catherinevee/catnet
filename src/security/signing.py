@@ -27,7 +27,6 @@ from ..core.exceptions import SecurityError
 logger = get_logger(__name__)
 
 
-
 class SignatureManager:
     """Manages digital signatures for configurations and commits"""
 

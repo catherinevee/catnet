@@ -26,7 +26,6 @@ from ..device_manager import (
 )
 
 
-
 class JuniperAdapter(DeviceAdapter):
     """
     Juniper device adapter implementation
