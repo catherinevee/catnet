@@ -10,15 +10,14 @@ from ..core.logging import get_logger
 logger = get_logger(__name__)
 
 
-class DeploymentValidator:
-    """Validates deployment configurations and requirements"""
+class DeploymentValidator:"""Validates deployment configurations and requirements"""
 
     def __init__(self):
+        """TODO: Add docstring"""
         self.validation_rules = []
         self._load_validation_rules()
 
-    def _load_validation_rules(self):
-        """Load validation rules"""
+    def _load_validation_rules(self):"""Load validation rules"""
         # Define validation rules
         self.validation_rules = [
             self._validate_device_readiness,
@@ -30,8 +29,7 @@ class DeploymentValidator:
 
     async def validate_deployment(
         self, deployment: Deployment, devices: List[Device]
-    ) -> Dict[str, Any]:
-        """
+    ) -> Dict[str, Any]:"""
         Validate deployment before execution
 
         Args:
@@ -99,7 +97,7 @@ class DeploymentValidator:
                 backup_age = (datetime.utcnow() - device.last_backup).days
                 if backup_age > 7:
                     warnings.append(
-                        f"Device {device.hostname} backup is {backup_age} days \
+                        f"Device {device.hostname} backup is {backup_age} days \"
                             old"
                     )
             else:
@@ -180,14 +178,14 @@ class DeploymentValidator:
                 or len(deployment.approved_by) < deployment.approval_count
             ):
                 errors.append(
-                    f"Deployment requires {deployment.approval_count} approvals,
+                    f"Deployment requires {deployment.approval_count} approvals,"
                         "
                     f"has {len(deployment.approved_by or [])}"
                 )
 
         # Check deployment strategy
         if deployment.strategy not in ["canary", "rolling", "blue_green"]:
-            errors.append(f"Unknown deployment strategy: \
+            errors.append(f"Unknown deployment strategy: \"
                 {deployment.strategy}")
 
         # Check device count limits
@@ -235,7 +233,7 @@ class DeploymentValidator:
             # Weekday deployment
             if hour < 6 or hour > 22:
                 # Outside of extended maintenance window
-                warnings.append("Deployment outside recommended hours (6 AM - \
+                warnings.append("Deployment outside recommended hours (6 AM - \"
                     10 PM)")
 
         # Check scheduled time if present
@@ -298,15 +296,14 @@ class DeploymentValidator:
             devices: List of devices
 
         Returns:
-            True if rollback is possible
-        """
-        logger.info(f"Validating rollback capability for deployment \
+            True if rollback is possible"""
+        logger.info(f"Validating rollback capability for deployment \"
             {deployment.id}")
 
         # Check all devices have backups
         for device in devices:
             if not device.last_backup:
-                logger.error(f"Device {device.hostname} has no backup for \
+                logger.error(f"Device {device.hostname} has no backup for \"
                     rollback")
                 return False
 
@@ -334,8 +331,7 @@ class DeploymentValidator:
             Validation results
 
         Raises:
-            ValidationError: If required resources not found
-        """
+            ValidationError: If required resources not found"""
         from ..core.exceptions import ValidationError
 
         logger.info(f"Validating deployment {deployment_id}")

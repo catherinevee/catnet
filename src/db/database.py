@@ -61,10 +61,12 @@ class DatabaseManager:
         self.sync_engine = create_engine(sync_url, echo=echo)
 
     async def create_all(self):
+        """TODO: Add docstring"""
         async with self.engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
 
     async def drop_all(self):
+        """TODO: Add docstring"""
         async with self.engine.begin() as conn:
             await conn.run_sync(Base.metadata.drop_all)
 
@@ -81,6 +83,7 @@ class DatabaseManager:
 
     @asynccontextmanager
     async def session_scope(self):
+        """TODO: Add docstring"""
         async with self.async_session() as session:
             try:
                 yield session
@@ -92,6 +95,7 @@ class DatabaseManager:
                 await session.close()
 
     async def close(self):
+        """TODO: Add docstring"""
         await self.engine.dispose()
 
     async def health_check(self) -> bool:
@@ -106,6 +110,7 @@ class DatabaseManager:
             return False
 
     def get_sync_session(self):
+        """TODO: Add docstring"""
         Session = sessionmaker(bind=self.sync_engine)
         return Session()
 

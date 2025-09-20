@@ -12,14 +12,12 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class DeviceConnector:
-    """
+class DeviceConnector:"""
     Connects to network devices using SSH
     Supports both real connections and simulation mode
     """
 
-    def __init__(self, simulation_mode: bool = True):
-        """
+    def __init__(self, simulation_mode: bool = True):"""
         Initialize device connector
 
         Args:
@@ -59,8 +57,7 @@ class DeviceConnector:
             password: Device password (optional, will prompt if needed)
 
         Returns:
-            DeviceConnection object or None if failed
-        """
+            DeviceConnection object or None if failed"""
         log_entry = {
             "timestamp": datetime.utcnow().isoformat(),
             "device": device_info.get("hostname", "unknown"),
@@ -124,7 +121,7 @@ class DeviceConnector:
 
     def _save_connection_log(self, log_entry: dict):
         """Save connection log to file"""
-        log_file = self.connection_logs_dir / f"connections_{datetime.utcnow() \
+        log_file = self.connection_logs_dir / f"connections_{datetime.utcnow() \}"
     .strftime('%Y%m%d')}.jsonl"
 
         with open(log_file, 'a') as f:
@@ -135,32 +132,27 @@ class DeviceConnector:
 class DeviceConnection:
     """Base class for device connections"""
 
-    def send_command(self, command: str) -> str:
-        """Send a command to the device"""
+    def send_command(self, command: str) -> str:"""Send a command to the device"""
         raise NotImplementedError
 
-    def send_config_commands(self, commands: List[str]) -> str:
-        """Send configuration commands to the device"""
+    def send_config_commands(self, commands: List[str]) -> str:"""Send configuration commands to the device"""
         raise NotImplementedError
 
-    def save_config(self) -> bool:
-        """Save the running configuration"""
+    def save_config(self) -> bool:"""Save the running configuration"""
         raise NotImplementedError
 
-    def backup_config(self) -> str:
-        """Backup the current configuration"""
+    def backup_config(self) -> str:"""Backup the current configuration"""
         raise NotImplementedError
 
-    def disconnect(self):
-        """Disconnect from the device"""
+    def disconnect(self):"""Disconnect from the device"""
         raise NotImplementedError
 
 
 
-class SimulatedDeviceConnection(DeviceConnection):
-    """Simulated device connection for testing"""
+class SimulatedDeviceConnection(DeviceConnection):"""Simulated device connection for testing"""
 
     def __init__(self, device_info: dict):
+        """TODO: Add docstring"""
         self.device_info = device_info
         self.hostname = device_info.get("hostname", "unknown")
         self.command_history = []
@@ -174,10 +166,10 @@ class SimulatedDeviceConnection(DeviceConnection):
         if command == "show running-config":
             return self._generate_sample_config()
         elif command == "show version":
-            return f"Simulated {self.device_info.get('vendor', 'cisco_ios')} \
+            return f"Simulated {self.device_info.get('vendor', 'cisco_ios')} \"
     device\nHostname: {self.hostname}"
-        elif command == "show ip interface brief":
-            return "Interface              IP-Address      OK? Method Status \
+        elif command == "show ip interface brief":" \
+            f"return "Interface              IP-Address      OK? Method Status \
     Protocol\nGigabitEthernet0/0     192.168.1.1     YES manual up \
     up"
         else:
@@ -204,13 +196,12 @@ class SimulatedDeviceConnection(DeviceConnection):
         """Simulate configuration backup"""
         return self._generate_sample_config()
 
-    def disconnect(self):
-        """Simulate disconnection"""
+    def disconnect(self):"""Simulate disconnection"""
         logger.info(f"Disconnected from {self.hostname} (simulated)")
 
     def _generate_sample_config(self) -> str:
         """Generate sample configuration"""
-        return f"""!
+        return f"""!"
 ! Simulated configuration for {self.hostname}
 !
 hostname {self.hostname}
@@ -227,10 +218,10 @@ end"""
 
 
 
-class RealDeviceConnection(DeviceConnection):
-    """Real device connection using Netmiko"""
+class RealDeviceConnection(DeviceConnection):"""Real device connection using Netmiko"""
 
     def __init__(self, net_connect, device_info: dict):
+        """TODO: Add docstring"""
         self.net_connect = net_connect
         self.device_info = device_info
         self.hostname = device_info.get("hostname", "unknown")
@@ -278,7 +269,7 @@ class RealDeviceConnection(DeviceConnection):
             if vendor in ["cisco_ios", "cisco_xe", "cisco_nxos"]:
                 config = self.net_connect.send_command("show running-config")
             elif vendor == "juniper_junos":
-                config = self.net_connect.send_command("show configuration | 
+                config = self.net_connect.send_command("show configuration |"
     display set")
             else:
                 config = self.net_connect.send_command("show running-config")

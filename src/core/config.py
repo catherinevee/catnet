@@ -12,8 +12,7 @@ except ImportError:
 from pydantic import Field
 
 
-class Settings(BaseSettings):
-    """Application settings"""
+class Settings(BaseSettings):"""Application settings"""
 
     # Application
     app_name: str = "CatNet"
@@ -83,24 +82,21 @@ class ConfigManager:
     """Configuration manager for CatNet"""
 
     def __init__(self):
+        """TODO: Add docstring"""
         self.settings = settings
         self._ensure_directories()
 
-    def _ensure_directories(self):
-        """Ensure required directories exist"""
+    def _ensure_directories(self):"""Ensure required directories exist"""
         for directory in [self.settings.data_dir, self.settings.logs_dir]:
             directory.mkdir(parents=True, exist_ok=True)
 
-    def get(self, key: str, default: Any = None) -> Any:
-        """Get configuration value by key"""
+    def get(self, key: str, default: Any = None) -> Any:"""Get configuration value by key"""
         return getattr(self.settings, key, default)
 
-    def set(self, key: str, value: Any):
-        """Set configuration value"""
+    def set(self, key: str, value: Any):"""Set configuration value"""
         setattr(self.settings, key, value)
 
-    def get_database_url(self) -> str:
-        """Get database URL with proper formatting"""
+    def get_database_url(self) -> str:"""Get database URL with proper formatting"""
         url = self.settings.database_url
 
         # Convert sqlite URLs for async
@@ -154,11 +150,9 @@ config = ConfigManager()
 # Helper functions for backward compatibility
 
 
-def get_settings() -> Settings:
-    """Get settings instance"""
+def get_settings() -> Settings:"""Get settings instance"""
     return settings
 
 
-def get_config() -> ConfigManager:
-    """Get config manager instance"""
+def get_config() -> ConfigManager:"""Get config manager instance"""
     return config

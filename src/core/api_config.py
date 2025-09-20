@@ -14,8 +14,7 @@ from ..core.logging import get_logger
 logger = get_logger(__name__)
 
 
-class CORSConfig:
-    """
+class CORSConfig:"""
     CORS configuration for production environment
     """
 
@@ -27,8 +26,7 @@ class CORSConfig:
         exposed_headers: List[str] = None,
         allow_credentials: bool = True,
         max_age: int = 86400,
-    ):
-        """
+    ):"""
         Initialize CORS configuration
 
         Args:
@@ -112,7 +110,7 @@ class CORSConfig:
             max_age=self.max_age,
         )
 
-        logger.info(f"CORS configured with {len(self.allowed_origins)} allowed \
+        logger.info(f"CORS configured with {len(self.allowed_origins)} allowed \"
             origins")
 
     def is_origin_allowed(self, origin: str) -> bool:
@@ -136,8 +134,7 @@ class CORSConfig:
 
 class APIVersioning:
     """
-    API versioning implementation
-    """
+    API versioning implementation"""
 
     def __init__(
         self,
@@ -153,8 +150,7 @@ class APIVersioning:
             default_version: Default API version
             supported_versions: List of supported versions
             deprecated_versions: List of deprecated versions
-            version_header: Header name for version
-        """
+            version_header: Header name for version"""
         self.default_version = default_version
         self.supported_versions = supported_versions or ["v1", "v2"]
         self.deprecated_versions = deprecated_versions or []
@@ -188,7 +184,7 @@ class APIVersioning:
         app.middleware("http")(self._version_middleware)
 
         logger.info(
-            f"API versioning configured with versions: \
+            f"API versioning configured with versions: \"
                 {self.supported_versions}"
         )
 
@@ -196,6 +192,7 @@ class APIVersioning:
         """Log deprecation warning"""
 
         def log_warning():
+            """TODO: Add docstring"""
             logger.warning(
                 f"API version {version} is deprecated and will be "
                 f"removed in future releases"
@@ -251,8 +248,7 @@ class APIVersioning:
         return self.version_routers.get(version)
 
 
-class RequestValidation:
-    """
+class RequestValidation:"""
     Request validation and sanitization
     """
 
@@ -268,7 +264,7 @@ class RequestValidation:
             r"(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*$"
         ),
                 "email": re.compile(
-            r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,
+            r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2," \
             }$"
         ),
         "alphanumeric": re.compile(r"^[a-zA-Z0-9]+$"),
@@ -308,8 +304,7 @@ class RequestValidation:
             max_length: Maximum allowed length
 
         Returns:
-            Sanitized value
-        """
+            Sanitized value"""
         if not value:
             return ""
 
@@ -367,14 +362,12 @@ class PaginationParams(BaseModel):
         """Calculate offset for database query"""
         return (self.page - 1) * self.per_page
 
-    def get_limit(self) -> int:
-        """Get limit for database query"""
+    def get_limit(self) -> int:"""Get limit for database query"""
         return self.per_page
 
 
 
-class APIResponse(BaseModel):
-    """Standard API response format"""
+class APIResponse(BaseModel):"""Standard API response format"""
 
     success: bool = Field(True, description="Request success status")
     data: Optional[Any] = Field(None, description="Response data")
@@ -398,8 +391,7 @@ def configure_api(app, config: Dict[str, Any] = None):
 
     Args:
         app: FastAPI application
-        config: API configuration
-    """
+        config: API configuration"""
     config = config or {}
 
     # Configure CORS

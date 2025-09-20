@@ -1,8 +1,5 @@
 """
 Extended Authentication Service Endpoints
-    """
-    Documentation placeholder
-    """
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import Dict, Optional, List
@@ -40,8 +37,9 @@ class LoginRequest(BaseModel):
     mfa_code: Optional[str] = None
 
 
-    pass
 class LoginResponse(BaseModel):
+
+
     """Login response model"""
     access_token: str
     token_type: str = "bearer"
@@ -50,7 +48,6 @@ class LoginResponse(BaseModel):
     mfa_required: bool = False
 
 
-    pass
 class MFAEnrollRequest(BaseModel):
     """MFA enrollment request"""
 
@@ -59,8 +56,9 @@ class MFAEnrollRequest(BaseModel):
     backup_email: Optional[EmailStr] = None
 
 
-    pass
 class MFAEnrollResponse(BaseModel):
+
+
     """MFA enrollment response"""
 
     method: str
@@ -69,16 +67,18 @@ class MFAEnrollResponse(BaseModel):
     enrolled_at: datetime
 
 
-    pass
 class CertificateValidationRequest(BaseModel):
+
+
     """Certificate validation request"""
 
     certificate: str  # PEM encoded certificate
     device_id: Optional[str] = None
 
 
-    pass
 class CertificateValidationResponse(BaseModel):
+
+
     """Certificate validation response"""
 
     valid: bool
@@ -90,8 +90,9 @@ class CertificateValidationResponse(BaseModel):
     device_id: Optional[str] = None
 
 
-    pass
 class SessionInfo(BaseModel):
+
+
     """Session information"""
 
     session_id: str
@@ -113,9 +114,6 @@ async def login(
 
     Authenticates user with username/password.
     Returns JWT tokens on success.
-    """
-    Documentation placeholder
-    """
     logger.info(f"Login attempt for user {form_data.username}")
 
     # Get user from database
@@ -202,9 +200,6 @@ async def logout(
     """User logout endpoint
 
     Invalidates the current session.
-    """
-    Documentation placeholder
-    """
     logger.info(f"Logout request for user {current_user.username}")
 
     # Log logout event
@@ -227,9 +222,6 @@ async def refresh_token(
     """Refresh access token
 
     Exchanges a refresh token for a new access token.
-    """
-    Documentation placeholder
-    """
     try:
         # Verify refresh token
         payload = auth_manager.decode_token(refresh_token)
@@ -278,18 +270,12 @@ async def enroll_mfa(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    Documentation placeholder
-    """
     Enroll user in Multi-Factor Authentication
 
     Methods supported:
     - TOTP (Time-based One-Time Password)
     - SMS (future implementation)
     - Email (future implementation)
-    """
-    Documentation placeholder
-    """
     logger.info(f"MFA enrollment requested for user {current_user.username}")
 
     try:
@@ -377,9 +363,6 @@ async def validate_certificate(
     request: CertificateValidationRequest,
     current_user: User = Depends(get_current_user),
 ):
-    """
-    Documentation placeholder
-    """
     Validate X.509 certificate for device or service authentication
 
     This endpoint:
@@ -387,9 +370,6 @@ async def validate_certificate(
     - Checks certificate expiration
     - Verifies certificate chain
     - Optionally maps to device
-    """
-    Documentation placeholder
-    """
     logger.info(f"Certificate validation requested by {current_user.username}")
 
     try:
@@ -464,9 +444,6 @@ async def get_active_sessions(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    Documentation placeholder
-    """
     Get all active sessions for the current user
 
     Returns list of active sessions with:
@@ -475,9 +452,6 @@ async def get_active_sessions(
     - Last activity
     - IP address
     - User agent
-    """
-    Documentation placeholder
-    """
     logger.info(f"Session list requested by {current_user.username}")
 
     try:
@@ -524,17 +498,11 @@ async def terminate_session(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    Documentation placeholder
-    """
     Terminate a specific session
 
     Allows users to remotely log out sessions
-    """
-    Documentation placeholder
-    """
     logger.info(
-        f"Session termination requested by {current_user.username} for \
+        f"Session termination requested by {current_user.username} for \"
             {session_id}"
     )
 

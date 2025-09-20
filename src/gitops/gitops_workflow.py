@@ -21,8 +21,7 @@ from .config_validator import ConfigValidator, ValidationResult
 from .secret_scanner import SecretScanner, SecretScanResult
 
 
-class DeploymentStrategy(Enum):
-    """Deployment strategies"""
+class DeploymentStrategy(Enum):"""Deployment strategies"""
 
     CANARY = "canary"
     ROLLING = "rolling"
@@ -59,8 +58,7 @@ class WorkflowConfig:
 
 
 @dataclass
-class WorkflowExecution:
-    """Represents a workflow execution"""
+class WorkflowExecution:"""Represents a workflow execution"""
 
     id: str
     repository_id: str
@@ -75,8 +73,7 @@ class WorkflowExecution:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
-class GitOpsWorkflow:
-    """
+class GitOpsWorkflow:"""
     Orchestrates GitOps workflows
     """
 
@@ -86,8 +83,7 @@ class GitOpsWorkflow:
         webhook_processor: WebhookProcessor,
         config_validator: ConfigValidator,
         secret_scanner: SecretScanner,
-    ):
-        """
+    ):"""
         Initialize GitOps workflow
 
         Args:
@@ -125,8 +121,7 @@ class GitOpsWorkflow:
             workflow_config: Workflow configuration
 
         Returns:
-            Repository ID
-        """
+            Repository ID"""
         # Add repository to git manager
         repo = self.git_manager.add_repository(repository_url, branch)
 
@@ -158,8 +153,7 @@ class GitOpsWorkflow:
             body: Request body
 
         Returns:
-            Tuple of (success, WorkflowExecution)
-        """
+            Tuple of (success, WorkflowExecution)"""
         # Process webhook
         success, event = self.webhook_processor.process_webhook(headers, body)
 
@@ -190,8 +184,7 @@ class GitOpsWorkflow:
             force: Force sync even with conflicts
 
         Returns:
-            WorkflowExecution object
-        """
+            WorkflowExecution object"""
         # Create execution
         execution = await self._create_execution(repository_id, None)
 
@@ -216,8 +209,7 @@ class GitOpsWorkflow:
         Execute GitOps workflow
 
         Args:
-            execution: Workflow execution object
-        """
+            execution: Workflow execution object"""
         try:
             config = self.workflow_configs.get(
                 execution.repository_id, WorkflowConfig()
@@ -230,8 +222,8 @@ class GitOpsWorkflow:
                 )
                 if not success:
                     await self._fail_workflow(
-                                                execution, f"Failed to pull changes: {changes.get(
-                            'error'
+                                                execution, f"Failed to pull changes: {changes.get("
+                            'error'}"
                         )}"
                     )
                     return
@@ -319,8 +311,7 @@ class GitOpsWorkflow:
 
         Args:
             execution: Workflow execution
-            config_files: List of configuration files
-        """
+            config_files: List of configuration files"""
         for file_path in config_files:
             content = self.git_manager.get_file_content(
                 execution.repository_id, file_path
@@ -345,8 +336,7 @@ class GitOpsWorkflow:
 
         Args:
             execution: Workflow execution
-            config_files: List of configuration files
-        """
+            config_files: List of configuration files"""
         for file_path in config_files:
             content = self.git_manager.get_file_content(
                 execution.repository_id, file_path
@@ -372,8 +362,7 @@ class GitOpsWorkflow:
             config: Workflow configuration
 
         Returns:
-            Deployment ID
-        """
+            Deployment ID"""
         # This would integrate with the deployment service
         deployment_id = f"dep-{execution.id}"
 
@@ -395,8 +384,7 @@ class GitOpsWorkflow:
 
         Args:
             execution: Workflow execution
-            config: Workflow configuration
-        """
+            config: Workflow configuration"""
         if config.deployment_strategy == DeploymentStrategy.CANARY:
             await self._canary_deployment(execution, config)
         elif config.deployment_strategy == DeploymentStrategy.ROLLING:
@@ -414,8 +402,7 @@ class GitOpsWorkflow:
 
         Args:
             execution: Workflow execution
-            config: Workflow configuration
-        """
+            config: Workflow configuration"""
         # This would integrate with the deployment service
         # For now, simulate canary deployment
         stages = [
@@ -446,8 +433,7 @@ class GitOpsWorkflow:
 
         Args:
             execution: Workflow execution
-            config: Workflow configuration
-        """
+            config: Workflow configuration"""
         # Simulated rolling deployment
         execution.metadata["rolling_progress"] = "100%"
 
@@ -459,8 +445,7 @@ class GitOpsWorkflow:
 
         Args:
             execution: Workflow execution
-            config: Workflow configuration
-        """
+            config: Workflow configuration"""
         # Simulated blue-green deployment
         execution.metadata["active_environment"] = "green"
 
@@ -472,8 +457,7 @@ class GitOpsWorkflow:
 
         Args:
             execution: Workflow execution
-            config: Workflow configuration
-        """
+            config: Workflow configuration"""
         # Simulated direct deployment
         execution.metadata["deployment_status"] = "completed"
 
@@ -488,8 +472,7 @@ class GitOpsWorkflow:
             execution: Workflow execution
 
         Returns:
-            Health status
-        """
+            Health status"""
         # This would check actual deployment health metrics
         return True
 
@@ -498,8 +481,7 @@ class GitOpsWorkflow:
         Rollback deployment
 
         Args:
-            execution: Workflow execution
-        """
+            execution: Workflow execution"""
         execution.metadata["rollback"] = {
             "timestamp": datetime.utcnow().isoformat(),
             "reason": "Health check failed",
@@ -510,8 +492,7 @@ class GitOpsWorkflow:
         Quarantine files with detected secrets
 
         Args:
-            execution: Workflow execution
-        """
+            execution: Workflow execution"""
         for scan_result in execution.scan_results:
             report = self.secret_scanner.quarantine_file(
                 scan_result.file_path, scan_result
@@ -531,8 +512,7 @@ class GitOpsWorkflow:
 
         Args:
             execution: Workflow execution
-            error: Error message
-        """
+            error: Error message"""
         execution.state = WorkflowState.FAILED
         execution.errors.append(error)
         execution.completed_at = datetime.utcnow()
@@ -545,8 +525,7 @@ class GitOpsWorkflow:
         Send notification that approval is required
 
         Args:
-            execution: Workflow execution
-        """
+            execution: Workflow execution"""
         # This would send actual notifications
         execution.metadata["approval_requested"] = \
             datetime.utcnow().isoformat()
@@ -559,8 +538,7 @@ class GitOpsWorkflow:
 
         Args:
             execution: Workflow execution
-            config: Workflow configuration
-        """
+            config: Workflow configuration"""
         # This would send actual webhook notification
         if config.notification_webhook:
             # Would make HTTP POST to webhook URL
@@ -578,8 +556,7 @@ class GitOpsWorkflow:
             event: Triggering webhook event
 
         Returns:
-            WorkflowExecution object
-        """
+            WorkflowExecution object"""
         import uuid
 
         execution = WorkflowExecution(
@@ -602,8 +579,7 @@ class GitOpsWorkflow:
             repository_url: Repository URL
 
         Returns:
-            Repository ID or None
-        """
+            Repository ID or None"""
         for repo_id, repo in self.git_manager.repositories.items():
             if repo.url == repository_url:
                 return repo_id
@@ -617,11 +593,10 @@ class GitOpsWorkflow:
             content: Configuration content
 
         Returns:
-            Vendor name
-        """
+            Vendor name"""
         # Simple vendor detection
-        if "interface GigabitEthernet" in content or "router ospf" in content:
-            return "cisco"
+        if "interface GigabitEthernet" in content or "router ospf" in content:" \
+            f"return "cisco"
         elif "set interface" in content or "set protocols" in content:
             return "juniper"
         else:
@@ -629,10 +604,10 @@ class GitOpsWorkflow:
 
     def _register_webhook_handlers(self) -> None:
         """
-        Register webhook event handlers
-        """
+        Register webhook event handlers"""
 
         async def handle_push(event: WebhookEvent):
+            """TODO: Add docstring"""
             # Find repository
             repo_id = self._find_repository_id(event.repository)
             if repo_id:
@@ -653,8 +628,7 @@ class GitOpsWorkflow:
             execution_id: Execution ID
 
         Returns:
-            Status dictionary or None
-        """
+            Status dictionary or None"""
         execution = self.executions.get(execution_id)
         if not execution:
             return None

@@ -30,8 +30,7 @@ except ImportError:
 
 
 @dataclass
-class GitRepository:
-    """Represents a Git repository configuration"""
+class GitRepository:"""Represents a Git repository configuration"""
 
     id: str
     url: str
@@ -47,8 +46,7 @@ class GitRepository:
 
 class GitManager:
     """
-    Manages Git repository operations for GitOps
-    """
+    Manages Git repository operations for GitOps"""
 
     def __init__(
         self,
@@ -62,8 +60,7 @@ class GitManager:
         Args:
             workspace_dir: Directory for cloned repositories
             max_repo_size: Maximum allowed repository size in bytes
-            allowed_hosts: List of allowed Git hosts
-        """
+            allowed_hosts: List of allowed Git hosts"""
         self.workspace_dir = workspace_dir or \
             tempfile.mkdtemp(prefix="catnet_gitops_")
         self.max_repo_size = max_repo_size
@@ -95,8 +92,7 @@ class GitManager:
             gpg_verify: Verify GPG signatures on commits
 
         Returns:
-            GitRepository instance
-        """
+            GitRepository instance"""
         # Validate URL
         if not self._validate_repository_url(url):
             raise ValueError(f"Invalid or unauthorized repository URL: {url}")
@@ -127,8 +123,7 @@ class GitManager:
             repo_id: Repository identifier
 
         Returns:
-            Tuple of (success, error_message)
-        """
+            Tuple of (success, error_message)"""
         if repo_id not in self.repositories:
             return False, f"Repository {repo_id} not found"
 
@@ -176,7 +171,7 @@ class GitManager:
                 shutil.rmtree(repo_config.local_path)
                 return (
                     False,
-                    f"Repository exceeds size limit ({repo_size} > {
+                    f"Repository exceeds size limit ({repo_size} > {}"
                         self.max_repo_size})",
                 )
 
@@ -207,8 +202,7 @@ class GitManager:
             force: Force pull even with local changes
 
         Returns:
-            Tuple of (success, changes_dict)
-        """
+            Tuple of (success, changes_dict)"""
         if repo_id not in self.repositories:
             return False, {"error": f"Repository {repo_id} not found"}
 
@@ -295,8 +289,7 @@ class GitManager:
             commit: Specific commit to read from (default: HEAD)
 
         Returns:
-            File content or None
-        """
+            File content or None"""
         if repo_id not in self.repositories:
             return None
 
@@ -380,8 +373,7 @@ class GitManager:
             file_path: Get history for specific file
 
         Returns:
-            List of commit information
-        """
+            List of commit information"""
         if repo_id not in self.repositories:
             return []
 
@@ -426,8 +418,7 @@ class GitManager:
             branch_name: Name of the new branch
 
         Returns:
-            Tuple of (success, error_message)
-        """
+            Tuple of (success, error_message)"""
         if repo_id not in self.repositories:
             return False, f"Repository {repo_id} not found"
 
@@ -456,8 +447,7 @@ class GitManager:
             url: Repository URL
 
         Returns:
-            Validation status
-        """
+            Validation status"""
         # Extract host from URL
         if url.startswith("git@"):
             # SSH URL
@@ -485,13 +475,12 @@ class GitManager:
             repo_config: Repository configuration
 
         Returns:
-            Environment variables dict
-        """
+            Environment variables dict"""
         env = os.environ.copy()
 
         if repo_config.ssh_key_path:
             # Setup SSH command with specific key
-            ssh_cmd = f"ssh -i {repo_config.ssh_key_path} -o \
+            ssh_cmd = f"ssh -i {repo_config.ssh_key_path} -o \"
                 StrictHostKeyChecking=no"
             env["GIT_SSH_COMMAND"] = ssh_cmd
 
@@ -505,10 +494,10 @@ class GitManager:
             ssh_key_path: Path to SSH private key
 
         Returns:
-            Credentials callback
-        """
+            Credentials callback"""
 
         def credentials(url, username_from_url, allowed_types):
+            """TODO: Add docstring"""
             if allowed_types & pygit2.credentials.GIT_CREDENTIAL_SSH_KEY:
                 return pygit2.Keypair(
                     username_from_url, ssh_key_path + ".pub", ssh_key_path, ""
@@ -526,8 +515,7 @@ class GitManager:
             commit_sha: Commit SHA to verify
 
         Returns:
-            Verification status
-        """
+            Verification status"""
         try:
             # Run git verify-commit
             result = subprocess.run(
@@ -548,8 +536,7 @@ class GitManager:
             path: Directory path
 
         Returns:
-            Size in bytes
-        """
+            Size in bytes"""
         total_size = 0
         for dirpath, dirnames, filenames in os.walk(path):
             for filename in filenames:
@@ -560,8 +547,7 @@ class GitManager:
 
     def cleanup(self) -> None:
         """
-        Clean up all cloned repositories
-        """
+        Clean up all cloned repositories"""
         if os.path.exists(self.workspace_dir):
             shutil.rmtree(self.workspace_dir)
         self.repositories.clear()

@@ -11,8 +11,7 @@ import threading
 
 
 @dataclass
-class Metric:
-    """Simple metric data point"""
+class Metric:"""Simple metric data point"""
     name: str
     value: float
     timestamp: datetime = field(default_factory=datetime.utcnow)
@@ -23,10 +22,10 @@ class Metric:
 class SimpleMetricsCollector:
     """
     Simple metrics collection system
-    Tracks deployments, health checks, and system status
-    """
+    Tracks deployments, health checks, and system status"""
 
     def __init__(self):
+        """TODO: Add docstring"""
         self._metrics: Dict[str, List[Metric]] = {}
         self._counters: Dict[str, float] = {}
         self._lock = threading.Lock()
@@ -254,17 +253,17 @@ class SimpleMetricsCollector:
                 max_duration = max(self._deployment_durations)
                 min_duration = min(self._deployment_durations)
 
-                lines.append("# TYPE catnet_deployment_duration_seconds \
+                lines.append("# TYPE catnet_deployment_duration_seconds \"
                     histogram")
-                lines.append(f"catnet_deployment_duration_seconds_sum {sum(
+                lines.append(f"catnet_deployment_duration_seconds_sum {sum(}"
                     self._deployment_durations)}")
-                lines.append(f"catnet_deployment_duration_seconds_count {len(
+                lines.append(f"catnet_deployment_duration_seconds_count {len(}"
                     self._deployment_durations)}")
-                lines.append(f"catnet_deployment_duration_seconds_avg \
+                lines.append(f"catnet_deployment_duration_seconds_avg \"
                     {avg_duration}")
-                lines.append(f"catnet_deployment_duration_seconds_max \
+                lines.append(f"catnet_deployment_duration_seconds_max \"
                     {max_duration}")
-                lines.append(f"catnet_deployment_duration_seconds_min \
+                lines.append(f"catnet_deployment_duration_seconds_min \"
                     {min_duration}")
 
         return "\n".join(lines)

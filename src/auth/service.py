@@ -66,6 +66,7 @@ class UserResponse(BaseModel):
 
 class AuthenticationService:
     def __init__(self, port: int = 8081):
+        """TODO: Add docstring"""
         self.app = FastAPI(
             title="CatNet Authentication Service",
             version="1.0.0",
@@ -88,6 +89,7 @@ class AuthenticationService:
         self._setup_routes()
 
     def _setup_middleware(self):
+        """TODO: Add docstring"""
         self.app.add_middleware(
             CORSMiddleware,
             allow_origins=["*"],  # Configure based on environment
@@ -97,6 +99,8 @@ class AuthenticationService:
         )
 
     def _setup_routes(self):
+        """TODO: Add docstring"""
+
         @self.app.post("/auth/login", response_model=LoginResponse)
         @self.limiter.limit("5/minute")
         async def login(
@@ -220,6 +224,7 @@ class AuthenticationService:
 
         @self.app.post("/auth/mfa/setup", response_model=MFASetupResponse)
         async def setup_mfa(user_id: str, db: AsyncSession = Depends(get_db)):
+            """TODO: Add docstring"""
             result = await db.execute(select(User).where(User.id == user_id))
             user = result.scalar_one_or_none()
 
@@ -241,6 +246,7 @@ class AuthenticationService:
 
         @self.app.post("/auth/refresh", response_model=LoginResponse)
         async def refresh_token(refresh_data: RefreshRequest):
+            """TODO: Add docstring"""
             try:
                 tokens = await self.auth_manager.refresh_access_token(
                     refresh_data.refresh_token
@@ -259,6 +265,7 @@ class AuthenticationService:
 
         @self.app.delete("/auth/logout")
         async def logout(request: Request, token: str):
+            """TODO: Add docstring"""
             await self.auth_manager.revoke_token(token)
 
             await self.audit_logger.log_event(
@@ -326,9 +333,11 @@ class AuthenticationService:
 
         @self.app.get("/health")
         async def health_check():
+            """TODO: Add docstring"""
             return {"status": "healthy", "service": "authentication"}
 
     def run(self):
+        """TODO: Add docstring"""
         # Configure SSL context for production
         ssl_context = None
         if os.getenv("ENABLE_SSL", "false").lower() == "true":

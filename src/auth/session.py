@@ -19,8 +19,7 @@ import hmac
 
 
 @dataclass
-class Session:
-    """Represents a user session"""
+class Session:"""Represents a user session"""
 
     session_id: str
     user_id: str
@@ -41,8 +40,7 @@ class Session:
 
 class SessionManager:
     """
-    Manages user sessions with security features
-    """
+    Manages user sessions with security features"""
 
     def __init__(
         self,
@@ -58,8 +56,7 @@ class SessionManager:
             session_lifetime: Session lifetime in seconds
             max_sessions_per_user: Maximum concurrent sessions per user
             require_mfa_for_sensitive: Require MFA for sensitive operations
-            session_secret: Secret for session ID generation
-        """
+            session_secret: Secret for session ID generation"""
         self.session_lifetime = session_lifetime
         self.max_sessions_per_user = max_sessions_per_user
         self.require_mfa_for_sensitive = require_mfa_for_sensitive
@@ -97,8 +94,7 @@ class SessionManager:
             metadata: Additional session metadata
 
         Returns:
-            Created session object
-        """
+            Created session object"""
         # Clean up old sessions for user
         self._cleanup_user_sessions(user_id)
 
@@ -151,8 +147,7 @@ class SessionManager:
             session_id: Session identifier
 
         Returns:
-            Session object or None
-        """
+            Session object or None"""
         # Check if revoked
         if session_id in self.revoked_sessions:
             return None
@@ -188,8 +183,7 @@ class SessionManager:
             user_agent: Client user agent for validation
 
         Returns:
-            Tuple of (is_valid, error_message)
-        """
+            Tuple of (is_valid, error_message)"""
         session = self.get_session(session_id)
 
         if not session:
@@ -231,8 +225,7 @@ class SessionManager:
             session_id: Session identifier
 
         Returns:
-            Success status
-        """
+            Success status"""
         session = self.get_session(session_id)
 
         if not session:
@@ -259,8 +252,7 @@ class SessionManager:
                 session_lifetime)
 
         Returns:
-            Success status
-        """
+            Success status"""
         session = self.get_session(session_id)
 
         if not session:
@@ -280,8 +272,7 @@ class SessionManager:
             session_id: Session identifier
 
         Returns:
-            Success status
-        """
+            Success status"""
         if session_id not in self.sessions:
             return False
 
@@ -310,8 +301,7 @@ class SessionManager:
             user_id: User identifier
 
         Returns:
-            Number of sessions terminated
-        """
+            Number of sessions terminated"""
         if user_id not in self.user_sessions:
             return 0
 
@@ -332,8 +322,7 @@ class SessionManager:
             user_id: User identifier
 
         Returns:
-            List of active sessions
-        """
+            List of active sessions"""
         if user_id not in self.user_sessions:
             return []
 
@@ -354,8 +343,7 @@ class SessionManager:
             operation: Operation to perform
 
         Returns:
-            Whether MFA is required
-        """
+            Whether MFA is required"""
         if not self.require_mfa_for_sensitive:
             return False
 
@@ -381,8 +369,7 @@ class SessionManager:
         Clean up expired sessions
 
         Returns:
-            Number of sessions cleaned
-        """
+            Number of sessions cleaned"""
         now = datetime.utcnow()
         expired = []
 
@@ -400,8 +387,7 @@ class SessionManager:
         Get session statistics
 
         Returns:
-            Statistics dictionary
-        """
+            Statistics dictionary"""
         total_sessions = len(self.sessions)
         total_users = len(self.user_sessions)
 
@@ -433,8 +419,7 @@ class SessionManager:
             user_agent: Client user agent
 
         Returns:
-            Session ID
-        """
+            Session ID"""
         # Combine entropy sources
         data = (
             f"{user_id}:{ip_address}:{user_agent}:"
@@ -455,8 +440,7 @@ class SessionManager:
         Clean up expired sessions for a user
 
         Args:
-            user_id: User identifier
-        """
+            user_id: User identifier"""
         if user_id not in self.user_sessions:
             return
 
@@ -480,8 +464,7 @@ class SessionManager:
 
         Args:
             event_type: Type of security event
-            details: Event details
-        """
+            details: Event details"""
         # In production, send to SIEM or security logging system
         event = {
             "timestamp": datetime.utcnow().isoformat(),

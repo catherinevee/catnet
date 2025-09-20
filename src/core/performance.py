@@ -24,8 +24,7 @@ from ..core.config import settings
 logger = get_logger(__name__)
 
 
-class DatabasePoolManager:
-    """
+class DatabasePoolManager:"""
     Manages database connection pooling for optimal performance
     """
 
@@ -37,8 +36,7 @@ class DatabasePoolManager:
         pool_timeout: int = 30,
         pool_recycle: int = 3600,
         use_null_pool: bool = False,
-    ):
-        """
+    ):"""
         Initialize database pool manager
 
         Args:
@@ -58,8 +56,7 @@ class DatabasePoolManager:
         self.engine = None
         self.session_factory = None
 
-    async def initialize(self):
-        """Initialize connection pool"""
+    async def initialize(self):"""Initialize connection pool"""
         try:
             # Choose pool class based on configuration
             pool_class = NullPool if self.use_null_pool else QueuePool
@@ -89,7 +86,7 @@ class DatabasePoolManager:
                 await conn.execute("SELECT 1")
 
             logger.info(
-                f"Database pool initialized with {self.pool_size} \
+                f"Database pool initialized with {self.pool_size} \"
                 connections"
             )
 
@@ -116,8 +113,7 @@ class DatabasePoolManager:
             finally:
                 await session.close()
 
-    async def get_pool_status(self) -> Dict[str, int]:
-        """Get current pool status"""
+    async def get_pool_status(self) -> Dict[str, int]:"""Get current pool status"""
         if self.engine and hasattr(self.engine.pool, "status"):
             return {
                 "size": self.engine.pool.size(),
@@ -131,8 +127,7 @@ class DatabasePoolManager:
 
 class RedisCacheManager:
     """
-    Redis caching manager for improved performance
-    """
+    Redis caching manager for improved performance"""
 
     def __init__(
         self,
@@ -148,8 +143,7 @@ class RedisCacheManager:
             redis_url: Redis connection URL
             default_ttl: Default TTL in seconds
             key_prefix: Prefix for all cache keys
-            max_connections: Maximum connections in pool
-        """
+            max_connections: Maximum connections in pool"""
         self.redis_url = redis_url
         self.default_ttl = default_ttl
         self.key_prefix = key_prefix
@@ -181,8 +175,7 @@ class RedisCacheManager:
         if self.redis_client:
             await self.redis_client.close()
 
-    def _make_key(self, key: str) -> str:
-        """Create namespaced cache key"""
+    def _make_key(self, key: str) -> str:"""Create namespaced cache key"""
         return f"{self.key_prefix}{key}"
 
     async def get(
@@ -279,7 +272,7 @@ class RedisCacheManager:
 
         except Exception as e:
             logger.error(
-                f"Cache invalidation error for pattern {pattern}: \
+                f"Cache invalidation error for pattern {pattern}: \"
                 {e}"
             )
             return 0
@@ -301,12 +294,14 @@ class RedisCacheManager:
         Example:
             @cache.cached(ttl=300)
             async def get_expensive_data(param):
-                return await expensive_operation(param)
-        """
+                """TODO: Add docstring"""
+                return await expensive_operation(param)"""
 
         def decorator(func):
+            """TODO: Add docstring"""
             @wraps(func)
             async def wrapper(*args, **kwargs):
+                """TODO: Add docstring"""
                 # Generate cache key
                 if key_func:
                     cache_key = key_func(*args, **kwargs)
@@ -339,8 +334,7 @@ class RedisCacheManager:
 
 class AsyncTaskQueue:
     """
-    Async task queue using Celery for background processing
-    """
+    Async task queue using Celery for background processing"""
 
     def __init__(
         self,
@@ -354,8 +348,7 @@ class AsyncTaskQueue:
         Args:
             broker_url: Message broker URL (Redis/RabbitMQ)
             backend_url: Result backend URL
-            task_default_queue: Default queue name
-        """
+            task_default_queue: Default queue name"""
         self.app = Celery(
             "catnet",
             broker=broker_url,
@@ -394,8 +387,7 @@ class AsyncTaskQueue:
         priority: int = 5,
         countdown: Union[int, timedelta] = None,
         eta: datetime = None,
-    ) -> str:
-        """
+    ) -> str:"""
         Send task to queue
 
         Args:
@@ -425,8 +417,7 @@ class AsyncTaskQueue:
         )
         return result.id
 
-    async def get_task_result(self, task_id: str, timeout: int = None) -> Any:
-        """Get task result by ID"""
+    async def get_task_result(self, task_id: str, timeout: int = None) -> Any:"""Get task result by ID"""
         result = self.app.AsyncResult(task_id)
 
         if timeout:
@@ -437,14 +428,12 @@ class AsyncTaskQueue:
         else:
             return await asyncio.to_thread(result.get)
 
-    def get_task_status(self, task_id: str) -> str:
-        """Get task status"""
+    def get_task_status(self, task_id: str) -> str:"""Get task status"""
         result = self.app.AsyncResult(task_id)
         return result.status
 
 
-class HTTPConnectionPool:
-    """
+class HTTPConnectionPool:"""
     HTTP connection pooling for external API calls
     """
 
@@ -453,8 +442,7 @@ class HTTPConnectionPool:
         connector_limit: int = 100,
         connector_limit_per_host: int = 30,
         timeout: int = 30,
-    ):
-        """
+    ):"""
         Initialize HTTP connection pool
 
         Args:
@@ -468,8 +456,7 @@ class HTTPConnectionPool:
         self.connector_limit = connector_limit
         self.connector_limit_per_host = connector_limit_per_host
 
-    async def initialize(self):
-        """Initialize connection pool"""
+    async def initialize(self):"""Initialize connection pool"""
         self.connector = aiohttp.TCPConnector(
             limit=self.connector_limit,
             limit_per_host=self.connector_limit_per_host,
@@ -497,8 +484,7 @@ class HTTPConnectionPool:
         method: str,
         url: str,
         **kwargs,
-    ) -> aiohttp.ClientResponse:
-        """Make HTTP request using connection pool"""
+    ) -> aiohttp.ClientResponse:"""Make HTTP request using connection pool"""
         if not self.session:
             await self.initialize()
 
@@ -525,8 +511,7 @@ task_queue = AsyncTaskQueue(
 http_pool = HTTPConnectionPool()
 
 
-async def initialize_performance_systems():
-    """Initialize all performance systems"""
+async def initialize_performance_systems():"""Initialize all performance systems"""
     await db_pool.initialize()
     await cache.initialize()
     await http_pool.initialize()

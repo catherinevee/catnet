@@ -8,6 +8,7 @@ from ..security.vault import VaultClient
 
 class WebhookHandler:
     def __init__(self, vault_client: Optional[VaultClient] = None):
+        """TODO: Add docstring"""
         self.vault = vault_client or VaultClient()
 
     async def verify_github_signature(

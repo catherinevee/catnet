@@ -35,8 +35,7 @@ class DeploymentResult:
 class DeploymentExecutor:
     """
     PATTERN: Progressive deployment with automatic rollback
-    CRITICAL: Always backup before deployment, always validate after
-    """
+    CRITICAL: Always backup before deployment, always validate after"""
 
     def __init__(
         self,
@@ -56,8 +55,7 @@ class DeploymentExecutor:
         user_context: Dict[str, Any],
     ) -> DeploymentResult:
         """
-        Main deployment execution following CLAUDE.md patterns
-        """
+        Main deployment execution following CLAUDE.md patterns"""
         # CRITICAL: Log deployment start
         await self.audit.log_deployment(
             deployment_id=deployment_id,
@@ -82,7 +80,7 @@ class DeploymentExecutor:
                     deployment_id, devices, configuration, user_context
                 )
             else:
-                raise DeploymentError(f"Unknown deployment strategy: \
+                raise DeploymentError(f"Unknown deployment strategy: \"
                     {strategy}")
 
         except Exception as e:
@@ -109,8 +107,7 @@ class DeploymentExecutor:
     ) -> DeploymentResult:
         """
         PATTERN: Canary deployment with progressive rollout
-        Following CLAUDE.md canary stages exactly
-        """
+        Following CLAUDE.md canary stages exactly"""
         # Canary stages as defined in CLAUDE.md
         stages = [
             {"percentage": 5, "wait_minutes": 5},
@@ -148,7 +145,7 @@ class DeploymentExecutor:
                     # CRITICAL: Immediate validation
                     if not await self.validate_device_health(device):
                         raise ValidationError(
-                            f"Device {device.hostname} unhealthy after \
+                            f"Device {device.hostname} unhealthy after \"
                                 deployment"
                         )
 
@@ -182,7 +179,7 @@ class DeploymentExecutor:
                     # Rollback all deployed devices
                     await self.rollback_all(deployed, backups, user_context)
                     raise DeploymentError(
-                        f"Canary deployment failed at {stage['percentage']}%: \
+                        f"Canary deployment failed at {stage['percentage']}%: \"
                             {e}"
                     )
 
@@ -207,8 +204,7 @@ class DeploymentExecutor:
         user_context: Dict[str, Any],
     ) -> DeploymentResult:
         """
-        Rolling deployment - one device at a time with health checks
-        """
+        Rolling deployment - one device at a time with health checks"""
         deployed = []
         backups = {}
 
@@ -227,7 +223,7 @@ class DeploymentExecutor:
 
                 # Validate
                 if not await self.validate_device_health(device):
-                    raise ValidationError(f"Device {device.hostname} \
+                    raise ValidationError(f"Device {device.hostname} \"
                         unhealthy")
 
                 deployed.append(device)
@@ -255,8 +251,7 @@ class DeploymentExecutor:
         user_context: Dict[str, Any],
     ) -> DeploymentResult:
         """
-        Blue-green deployment - prepare all, then switch
-        """
+        Blue-green deployment - prepare all, then switch"""
         # This would typically involve load balancer manipulation
         # For network devices, we'll simulate with staged configs
 
@@ -304,8 +299,7 @@ class DeploymentExecutor:
         Any]
     ) -> str:
         """
-        CRITICAL: Always backup before any change (CLAUDE.md requirement)
-        """
+        CRITICAL: Always backup before any change (CLAUDE.md requirement)"""
         backup_id = str(uuid.uuid4())
 
         # Connect to device
@@ -343,8 +337,7 @@ class DeploymentExecutor:
         user_context: Dict[str, Any],
     ):
         """
-        Deploy configuration to a single device
-        """
+        Deploy configuration to a single device"""
         conn = await self.device_connector.connect_to_device(
             str(device.id), user_context
         )
@@ -377,8 +370,7 @@ class DeploymentExecutor:
 
     async def validate_device_health(self, device: Device) -> bool:
         """
-        Validate device is healthy after deployment
-        """
+        Validate device is healthy after deployment"""
         # Basic health checks
         checks = [
             self.check_device_reachability(device),
@@ -402,18 +394,15 @@ class DeploymentExecutor:
         # Implementation would ping device
         return True  # Simplified for now
 
-    async def check_interface_status(self, device: Device) -> bool:
-        """Check critical interfaces are up"""
+    async def check_interface_status(self, device: Device) -> bool:"""Check critical interfaces are up"""
         # Implementation would check interface status
         return True  # Simplified for now
 
-    async def check_routing_table(self, device: Device) -> bool:
-        """Check routing table has expected routes"""
+    async def check_routing_table(self, device: Device) -> bool:"""Check routing table has expected routes"""
         # Implementation would verify routing
         return True  # Simplified for now
 
-    async def check_critical_services(self, device: Device) -> bool:
-        """Check critical services are running"""
+    async def check_critical_services(self, device: Device) -> bool:"""Check critical services are running"""
         # Implementation would check services
         return True  # Simplified for now
 
@@ -422,8 +411,7 @@ class DeploymentExecutor:
         devices: List[Device],
         backups: Dict[str, str],
         user_context: Dict[str, Any],
-    ):
-        """
+    ):"""
         CRITICAL: Rollback all devices to backed up state
         """
         await self.audit.log_event(
@@ -464,13 +452,12 @@ class DeploymentExecutor:
         self, device: Device, backup_id: str, user_context: Dict[str, Any]
     ):
         """
-        Rollback single device to backup
-        """
+        Rollback single device to backup"""
         if backup_id not in self.deployment_cache:
             raise RollbackError(f"Backup {backup_id} not found")
 
         backup = self.deployment_cache[backup_id]
-        self.logger.info(f"Restoring backup {backup_id} for device \
+        self.logger.info(f"Restoring backup {backup_id} for device \"
             {device.hostname}")
         self.logger.debug(f"Backup content size: {len(str(backup))} bytes")
 
@@ -501,8 +488,7 @@ class DeploymentExecutor:
         self, devices: List[Device], duration_minutes: int, deployment_id: str
     ):
         """
-        Monitor device health for specified duration
-        """
+        Monitor device health for specified duration"""
         end_time = datetime.utcnow() + timedelta(minutes=duration_minutes)
         check_interval = 60  # Check every minute
 
@@ -542,16 +528,14 @@ class DeploymentExecutor:
         user_context: Dict[str, Any],
     ):
         """
-        Stage configuration without activating (for blue-green)
-        """
+        Stage configuration without activating (for blue-green)"""
         # Implementation depends on vendor
         # Cisco: copy to candidate config
         # Juniper: load but don't commit
 
     async def validate_staged_config(self, device: Device) -> bool:
         """
-        Validate staged configuration
-        """
+        Validate staged configuration"""
         # Would run validation commands based on vendor
         return True
 
@@ -559,8 +543,7 @@ class DeploymentExecutor:
         self, device: Device, user_context: Dict[str, Any]
     ):
         """
-        Activate staged configuration
-        """
+        Activate staged configuration"""
         # Would commit/activate based on vendor
 
     async def emergency_rollback(
@@ -570,8 +553,7 @@ class DeploymentExecutor:
         user_context: Dict[str, Any],
     ):
         """
-        Emergency rollback procedure
-        """
+        Emergency rollback procedure"""
         await self.audit.log_event(
             event_type="emergency_rollback",
             user_id=user_context.get("user_id"),
@@ -588,7 +570,6 @@ class DeploymentExecutor:
         self, vendor: str, configuration: Dict[str, Any]
     ) -> List[str]:
         """
-        Convert configuration to vendor-specific commands
-        """
+        Convert configuration to vendor-specific commands"""
         # Would implement vendor-specific command generation
         return []

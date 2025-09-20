@@ -16,8 +16,7 @@ from datetime import datetime
 from enum import Enum
 
 
-class DeploymentStrategy(Enum):
-    """Deployment strategies"""
+class DeploymentStrategy(Enum):"""Deployment strategies"""
 
     CANARY = "canary"
     ROLLING = "rolling"
@@ -68,8 +67,7 @@ class DeploymentConfig:
 
 
 @dataclass
-class DeviceDeployment:
-    """Individual device deployment"""
+class DeviceDeployment:"""Individual device deployment"""
 
     device_id: str
     device_hostname: str
@@ -84,8 +82,7 @@ class DeviceDeployment:
 
 
 @dataclass
-class Deployment:
-    """Deployment instance"""
+class Deployment:"""Deployment instance"""
 
     id: str
     name: str
@@ -108,8 +105,7 @@ class Deployment:
     rollback_from: Optional[str] = None
 
 
-class DeploymentManager:
-    """
+class DeploymentManager:"""
     Manages network configuration deployments
     """
 
@@ -118,8 +114,7 @@ class DeploymentManager:
         device_service=None,
         backup_service=None,
         health_service=None
-    ):
-        """
+    ):"""
         Initialize deployment manager
 
         Args:
@@ -156,8 +151,7 @@ class DeploymentManager:
             created_by: User creating deployment
 
         Returns:
-            Deployment ID
-        """
+            Deployment ID"""
         deployment_id = str(uuid.uuid4())[:12]
         config = config or DeploymentConfig()
 
@@ -203,8 +197,7 @@ class DeploymentManager:
             deployment_id: Deployment ID
 
         Returns:
-            Success status
-        """
+            Success status"""
         if deployment_id not in self.deployments:
             return False
 
@@ -266,8 +259,7 @@ class DeploymentManager:
             deployment: Deployment instance
 
         Returns:
-            Success status
-        """
+            Success status"""
         deployment.state = DeploymentState.IN_PROGRESS
         total_devices = len(deployment.devices)
 
@@ -308,8 +300,7 @@ class DeploymentManager:
             deployment: Deployment instance
 
         Returns:
-            Success status
-        """
+            Success status"""
         deployment.state = DeploymentState.IN_PROGRESS
         batch_size = deployment.config.rolling_batch_size
         delay = deployment.config.rolling_delay_seconds
@@ -340,8 +331,7 @@ class DeploymentManager:
             deployment: Deployment instance
 
         Returns:
-            Success status
-        """
+            Success status"""
         deployment.state = DeploymentState.IN_PROGRESS
 
         # Deploy to green environment (standby)
@@ -372,8 +362,7 @@ class DeploymentManager:
             deployment: Deployment instance
 
         Returns:
-            Success status
-        """
+            Success status"""
         deployment.state = DeploymentState.IN_PROGRESS
         return await self._deploy_to_devices(deployment, deployment.devices)
 
@@ -388,8 +377,7 @@ class DeploymentManager:
             devices: List of device IDs
 
         Returns:
-            Success status
-        """
+            Success status"""
         tasks = []
         for device_id in devices:
             if deployment.config.parallel_deployments > 1:
@@ -426,8 +414,7 @@ class DeploymentManager:
             device_id: Device ID
 
         Returns:
-            Success status
-        """
+            Success status"""
         device_deployment = deployment.device_deployments[device_id]
         device_deployment.state = DeploymentState.IN_PROGRESS
         device_deployment.started_at = datetime.utcnow()
@@ -452,7 +439,7 @@ class DeploymentManager:
                 )
                 if not success:
                     device_deployment.state = DeploymentState.FAILED
-                    device_deployment.errors.append("Configuration apply \
+                    device_deployment.errors.append("Configuration apply \"
                         failed")
                     return False
 
@@ -461,7 +448,7 @@ class DeploymentManager:
                 device_id, deployment.configuration
             ):
                 device_deployment.state = DeploymentState.FAILED
-                device_deployment.errors.append("Configuration verification \
+                device_deployment.errors.append("Configuration verification \"
                     failed")
                 return False
 
@@ -494,8 +481,7 @@ class DeploymentManager:
             target_devices: Specific devices to rollback (None for all)
 
         Returns:
-            Success status
-        """
+            Success status"""
         if deployment_id not in self.deployments:
             return False
 
@@ -539,8 +525,7 @@ class DeploymentManager:
             deployment_id: Deployment ID
 
         Returns:
-            Success status
-        """
+            Success status"""
         if deployment_id not in self.deployments:
             return False
 
@@ -558,8 +543,7 @@ class DeploymentManager:
             deployment_id: Deployment ID
 
         Returns:
-            Success status
-        """
+            Success status"""
         if deployment_id not in self.deployments:
             return False
 
@@ -583,8 +567,7 @@ class DeploymentManager:
             approved_by: Approver
 
         Returns:
-            Success status
-        """
+            Success status"""
         if deployment_id not in self.deployments:
             return False
 
@@ -610,8 +593,7 @@ class DeploymentManager:
             deployment_id: Deployment ID
 
         Returns:
-            Status dictionary or None
-        """
+            Status dictionary or None"""
         if deployment_id not in self.deployments:
             return None
 
@@ -683,8 +665,7 @@ class DeploymentManager:
             )
         return True
 
-    async def _generate_diff(self, device_id: str, new_config: str) -> str:
-        """Generate configuration diff"""
+    async def _generate_diff(self, device_id: str, new_config: str) -> str:"""Generate configuration diff"""
         # Would compare with current device config
         return f"Diff for {device_id}"
 
@@ -705,13 +686,11 @@ class DeploymentManager:
         self,
         device_id: str,
         configuration: str
-    ) -> bool:
-        """Verify configuration on device"""
+    ) -> bool:"""Verify configuration on device"""
         # Would verify configuration was applied correctly
         return True
 
-    async def _pre_flight_checks(self, deployment: Deployment) -> bool:
-        """Run pre-flight checks"""
+    async def _pre_flight_checks(self, deployment: Deployment) -> bool:"""Run pre-flight checks"""
         # Verify devices are reachable
         # Verify user has permissions
         # Verify configuration is valid
@@ -719,8 +698,7 @@ class DeploymentManager:
 
     async def _check_deployment_health(
         self, deployment: Deployment, devices: List[str]
-    ) -> bool:
-        """Check deployment health"""
+    ) -> bool:"""Check deployment health"""
         for device_id in devices:
             device_deployment = deployment.device_deployments[device_id]
                         if not await self._device_health_check(
@@ -732,8 +710,7 @@ class DeploymentManager:
 
     async def _device_health_check(
         self, device_id: str, device_deployment: DeviceDeployment
-    ) -> bool:
-        """Check device health"""
+    ) -> bool:"""Check device health"""
         if self.health_service:
             health = await self.health_service.check_health(device_id)
             device_deployment.health_checks = health

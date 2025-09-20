@@ -165,6 +165,7 @@ class AuthManager:
         ) else False
 
     async def revoke_token(self, token: str):
+        """TODO: Add docstring"""
         try:
                         payload = jwt.decode(
                 token,
@@ -368,8 +369,7 @@ async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
 ) -> Dict[str, Any]:
     """
-    FastAPI dependency to get the current authenticated user from JWT token
-    """
+    FastAPI dependency to get the current authenticated user from JWT token"""
     if auth_manager is None:
         init_auth()
 
@@ -394,8 +394,7 @@ async def get_current_user(
 
 async def check_permission(user: Dict[str, Any], permission: str) -> bool:
     """
-    Check if user has a specific permission
-    """
+    Check if user has a specific permission"""
     if auth_manager is None:
         init_auth()
 

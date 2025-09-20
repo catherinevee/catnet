@@ -15,8 +15,7 @@ from enum import Enum
 import asyncio
 
 
-class HealthCheckType(Enum):
-    """Types of health checks"""
+class HealthCheckType(Enum):"""Types of health checks"""
 
     CONNECTIVITY = "connectivity"
     PROTOCOL = "protocol"
@@ -61,8 +60,7 @@ class HealthMetric:
 
 
 @dataclass
-class HealthCheckResult:
-    """Health check result"""
+class HealthCheckResult:"""Health check result"""
 
     check_type: HealthCheckType
     status: HealthStatus
@@ -75,8 +73,7 @@ class HealthCheckResult:
 
 
 @dataclass
-class HealthCheckConfig:
-    """Health check configuration"""
+class HealthCheckConfig:"""Health check configuration"""
 
     enabled: bool = True
     interval_seconds: int = 60
@@ -102,16 +99,14 @@ class HealthCheckConfig:
 
 class HealthCheckService:
     """
-    Health check service for deployments
-    """
+    Health check service for deployments"""
 
     def __init__(self, device_service=None):
         """
         Initialize health check service
 
         Args:
-            device_service: Service for device operations
-        """
+            device_service: Service for device operations"""
         self.device_service = device_service
         self.health_checks: Dict[str, List[HealthCheckResult]] = {}
         self.active_monitors: Dict[str, asyncio.Task] = {}
@@ -130,8 +125,7 @@ class HealthCheckService:
             config: Health check configuration
 
         Returns:
-            HealthCheckResult
-        """
+            HealthCheckResult"""
         config = config or HealthCheckConfig()
         start_time = datetime.utcnow()
 
@@ -209,8 +203,7 @@ class HealthCheckService:
         Args:
             device_id: Device ID
             config: Health check configuration
-            callback: Callback for health check results
-        """
+            callback: Callback for health check results"""
         config = config or HealthCheckConfig()
 
         # Stop existing monitor if running
@@ -218,6 +211,7 @@ class HealthCheckService:
 
         # Create monitoring task
         async def monitor():
+            """TODO: Add docstring"""
             while True:
                 try:
                     result = await self.check_device_health(device_id, config)
@@ -247,8 +241,7 @@ class HealthCheckService:
         Stop health monitoring
 
         Args:
-            device_id: Device ID
-        """
+            device_id: Device ID"""
         if device_id in self.active_monitors:
             self.active_monitors[device_id].cancel()
             try:
@@ -265,8 +258,7 @@ class HealthCheckService:
             device_id: Device ID
 
         Returns:
-            HealthCheckResult
-        """
+            HealthCheckResult"""
         start_time = datetime.utcnow()
 
         try:
@@ -316,8 +308,7 @@ class HealthCheckService:
             device_id: Device ID
 
         Returns:
-            HealthCheckResult
-        """
+            HealthCheckResult"""
         start_time = datetime.utcnow()
 
         try:
@@ -347,8 +338,8 @@ class HealthCheckService:
                 message = f"Protocol issue: {unhealthy_protocols[0]}"
             else:
                 status = HealthStatus.UNHEALTHY
-                message = f"Multiple protocol issues: {', '.join(
-                    unhealthy_protocols
+                message = f"Multiple protocol issues: {', '.join("
+                    unhealthy_protocols}"
                 )}"
 
             return HealthCheckResult(
@@ -377,8 +368,7 @@ class HealthCheckService:
             device_id: Device ID
 
         Returns:
-            HealthCheckResult
-        """
+            HealthCheckResult"""
         start_time = datetime.utcnow()
 
         try:
@@ -402,8 +392,8 @@ class HealthCheckService:
                 message = f"Service issue: {failed_services[0]}"
             else:
                 status = HealthStatus.UNHEALTHY
-                message = f"Multiple service failures: {', '.join(
-                    failed_services
+                message = f"Multiple service failures: {', '.join("
+                    failed_services}"
                 )}"
 
             return HealthCheckResult(
@@ -435,8 +425,7 @@ class HealthCheckService:
             thresholds: Performance thresholds
 
         Returns:
-            HealthCheckResult
-        """
+            HealthCheckResult"""
         start_time = datetime.utcnow()
 
         try:
@@ -536,8 +525,7 @@ class HealthCheckService:
             device_id: Device ID
 
         Returns:
-            HealthCheckResult
-        """
+            HealthCheckResult"""
         start_time = datetime.utcnow()
 
         try:
@@ -587,8 +575,7 @@ class HealthCheckService:
             device_id: Device ID
 
         Returns:
-            HealthCheckResult
-        """
+            HealthCheckResult"""
         start_time = datetime.utcnow()
 
         if not self.custom_checks:
@@ -641,8 +628,7 @@ class HealthCheckService:
 
         Args:
             name: Check name
-            check_func: Check function
-        """
+            check_func: Check function"""
         self.custom_checks[name] = check_func
 
     def get_health_history(
@@ -658,8 +644,7 @@ class HealthCheckService:
             hours: Hours of history
 
         Returns:
-            List of health check results
-        """
+            List of health check results"""
         if device_id not in self.health_checks:
             return []
 
@@ -691,8 +676,7 @@ class HealthCheckService:
             return await self.device_service.ping(device_id)
         return True
 
-    async def _check_management_access(self, device_id: str) -> bool:
-        """Check management access"""
+    async def _check_management_access(self, device_id: str) -> bool:"""Check management access"""
         if self.device_service:
             return await self.device_service.check_management_access(device_id)
         return True
@@ -700,8 +684,7 @@ class HealthCheckService:
         async def _get_routing_protocol_status(
             self,
             device_id: str
-        ) -> Dict[str, str]:
-        """Get routing protocol status"""
+        ) -> Dict[str, str]:"""Get routing protocol status"""
         if self.device_service:
             return await self.device_service.get_routing_protocols(device_id)
         return {"ospf": "up", "bgp": "up"}
@@ -742,18 +725,16 @@ class HealthCheckService:
                 device_id)
         return True
 
-    async def _check_configuration_drift(self, device_id: str) -> bool:
-        """Check for configuration drift"""
+    async def _check_configuration_drift(self, device_id: str) -> bool:"""Check for configuration drift"""
         if self.device_service:
             return await self.device_service.check_config_drift(device_id)
         return False
 
     async def _trigger_health_alert(
         self, device_id: str, result: HealthCheckResult
-    ) -> None:
-        """Trigger health alert"""
+    ) -> None:"""Trigger health alert"""
         # Would send actual alert
         print(
-            f"HEALTH ALERT: Device {device_id} is {result.status.value}: {
+            f"HEALTH ALERT: Device {device_id} is {result.status.value}: {}"
                 result.message}"
         )

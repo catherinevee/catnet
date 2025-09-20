@@ -75,8 +75,7 @@ class AnomalyScore:
 
 
 @dataclass
-class ModelMetrics:
-    """Model performance metrics"""
+class ModelMetrics:"""Model performance metrics"""
 
     accuracy: float
     precision: float
@@ -89,8 +88,7 @@ class ModelMetrics:
 
 
 @dataclass
-class TrainingData:
-    """Training data container"""
+class TrainingData:"""Training data container"""
 
     features: np.ndarray
     labels: Optional[np.ndarray] = None
@@ -98,13 +96,11 @@ class TrainingData:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
-class AnomalyDetector:
-    """
+class AnomalyDetector:"""
     Machine learning-based anomaly detection
     """
 
-    def __init__(self, model_type: ModelType = ModelType.ISOLATION_FOREST):
-        """
+    def __init__(self, model_type: ModelType = ModelType.ISOLATION_FOREST):"""
         Initialize anomaly detector
 
         Args:
@@ -133,8 +129,7 @@ class AnomalyDetector:
         # Initialize feature extractors
         self._initialize_feature_extractors()
 
-    def _initialize_model(self):
-        """Initialize ML model based on type"""
+    def _initialize_model(self):"""Initialize ML model based on type"""
         if self.model_type == ModelType.ISOLATION_FOREST:
             return IsolationForest(
                 n_estimators=100,
@@ -153,8 +148,7 @@ class AnomalyDetector:
                 random_state=42
             )
 
-    def _initialize_feature_extractors(self):
-        """Initialize feature extraction functions"""
+    def _initialize_feature_extractors(self):"""Initialize feature extraction functions"""
         # Traffic features
         self.feature_extractors["traffic"] = self._extract_traffic_features
 
@@ -177,11 +171,10 @@ class AnomalyDetector:
             training_data: Training data
 
         Returns:
-            Model performance metrics
-        """
+            Model performance metrics"""
         if len(training_data.features) < self.min_training_samples:
             raise ValueError(
-                f"Insufficient training samples: {len(training_data.features)} < \
+                f"Insufficient training samples: {len(training_data.features)} < \"
     {self.min_training_samples}")
 
         # Scale features
@@ -212,8 +205,7 @@ class AnomalyDetector:
             data: Input data
 
         Returns:
-            Anomaly score
-        """
+            Anomaly score"""
         if not self.is_trained:
             raise ValueError("Model not trained. Call train() first.")
 
@@ -282,8 +274,7 @@ class AnomalyDetector:
             data_list: List of input data
 
         Returns:
-            List of anomaly scores
-        """
+            List of anomaly scores"""
         return [self.detect(data) for data in data_list]
 
     def _extract_features(self, data: Dict[str, Any]) -> np.ndarray:
@@ -478,8 +469,7 @@ class AnomalyDetector:
 
         return features
 
-    def _get_feature_names(self) -> List[str]:
-        """Get feature names"""
+    def _get_feature_names(self) -> List[str]:"""Get feature names"""
         names = []
 
         # Traffic features
@@ -610,7 +600,7 @@ class AnomalyDetector:
 
             if deviation > 1.5:  # Significant deviation
                 explanations.append(
-                    f"{feature_name}: {value:.2f} (deviation: \
+                    f"{feature_name}: {value:.2f} (deviation: \"
                         {deviation:.2f}σ)"
                 )
 
@@ -770,16 +760,14 @@ class AnomalyDetector:
 
 class FeatureExtractor:
     """
-    Extracts features from various data sources for ML models
-    """
+    Extracts features from various data sources for ML models"""
 
     def __init__(self):
         """Initialize feature extractor"""
         self.feature_definitions = self._init_feature_definitions()
         self.scalers = {}
 
-    def _init_feature_definitions(self) -> Dict[str, List[str]]:
-        """Initialize feature definitions for different data types"""
+    def _init_feature_definitions(self) -> Dict[str, List[str]]:"""Initialize feature definitions for different data types"""
         return {
             "traffic": [
                 "packets_per_second",
@@ -829,8 +817,7 @@ class FeatureExtractor:
             traffic_data: Traffic data dictionary
 
         Returns:
-            Feature vector
-        """
+            Feature vector"""
         features = []
 
         # Extract packet statistics
@@ -865,8 +852,7 @@ class FeatureExtractor:
             config_data: Configuration data dictionary
 
         Returns:
-            Feature vector
-        """
+            Feature vector"""
         features = []
 
         # Configuration metrics
@@ -899,8 +885,7 @@ class FeatureExtractor:
             perf_data: Performance data dictionary
 
         Returns:
-            Feature vector
-        """
+            Feature vector"""
         features = []
 
         # Resource utilization
@@ -932,8 +917,7 @@ class FeatureExtractor:
             feature_type: Type of features to extract
 
         Returns:
-            Feature vector
-        """
+            Feature vector"""
         if feature_type == "traffic":
             return self.extract_traffic_features(data)
         elif feature_type == "configuration":
@@ -954,8 +938,7 @@ class FeatureExtractor:
             feature_type: Type of features
 
         Returns:
-            Normalized features
-        """
+            Normalized features"""
         if feature_type not in self.scalers:
             self.scalers[feature_type] = StandardScaler()
             return self.scalers[feature_type].fit_transform(
@@ -969,8 +952,7 @@ class FeatureExtractor:
 
 class ModelManager:
     """
-    Manages ML models for anomaly detection
-    """
+    Manages ML models for anomaly detection"""
 
     def __init__(self):
         """Initialize model manager"""
@@ -984,8 +966,7 @@ class ModelManager:
         name: str,
         model_type: ModelType,
         config: Optional[Dict[str, Any]] = None,
-    ) -> str:
-        """
+    ) -> str:"""
         Create a new ML model
 
         Args:
@@ -1044,8 +1025,7 @@ class ModelManager:
             validation_split: Validation split ratio
 
         Returns:
-            Model metrics
-        """
+            Model metrics"""
         if model_id not in self.models:
             raise ValueError(f"Model {model_id} not found")
 
@@ -1103,8 +1083,7 @@ class ModelManager:
             features: Feature vector
 
         Returns:
-            Tuple of (is_anomaly, confidence_score)
-        """
+            Tuple of (is_anomaly, confidence_score)"""
         if model_id not in self.models:
             raise ValueError(f"Model {model_id} not found")
 
@@ -1145,8 +1124,7 @@ class ModelManager:
             model_id: Model ID
 
         Returns:
-            Model metrics or None
-        """
+            Model metrics or None"""
         return self.model_metrics.get(model_id)
 
     async def save_model(self, model_id: str, path: str) -> bool:
@@ -1158,8 +1136,7 @@ class ModelManager:
             path: Save path
 
         Returns:
-            Success status
-        """
+            Success status"""
         if model_id not in self.models:
             return False
 
@@ -1190,8 +1167,7 @@ class ModelManager:
             model_type: Model type
 
         Returns:
-            Model ID or None
-        """
+            Model ID or None"""
         try:
             with open(path, "rb") as f:
                 model_data = pickle.load(f)
@@ -1218,8 +1194,7 @@ class ModelManager:
             features: Feature vector
 
         Returns:
-            Tuple of (is_anomaly, confidence_score)
-        """
+            Tuple of (is_anomaly, confidence_score)"""
         predictions = []
         confidences = []
 

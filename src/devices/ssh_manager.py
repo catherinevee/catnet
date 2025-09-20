@@ -22,10 +22,10 @@ from ..core.exceptions import SecurityError, DeviceConnectionError
 logger = logging.getLogger(__name__)
 
 
-class SSHKeyManager:
-    """Manage SSH keys for device authentication."""
+class SSHKeyManager:"""Manage SSH keys for device authentication."""
 
     def __init__(self, vault_client: VaultClient):
+        """TODO: Add docstring"""
         self.vault = vault_client
         self.key_storage_path = Path.home() / ".catnet" / "keys"
         self.key_storage_path.mkdir(parents=True, exist_ok=True)
@@ -45,8 +45,7 @@ class SSHKeyManager:
             comment: Optional comment for the key
 
         Returns:
-            Tuple of (private_key, public_key) in PEM format
-        """
+            Tuple of (private_key, public_key) in PEM format"""
         if key_type == "ed25519":
             # Generate Ed25519 key (more secure, smaller)
             private_key = ed25519.Ed25519PrivateKey.generate()
@@ -115,8 +114,7 @@ class SSHKeyManager:
             key_name: Optional key name
 
         Returns:
-            Dictionary with Vault paths
-        """
+            Dictionary with Vault paths"""
         key_name = key_name or f"{device_id}_key"
 
         # Store in Vault
@@ -133,7 +131,7 @@ class SSHKeyManager:
             },
         )
 
-        logger.info(f"Stored SSH key for device {device_id} in Vault at \
+        logger.info(f"Stored SSH key for device {device_id} in Vault at \"
             {vault_path}")
 
         return {"vault_path": vault_path, "key_name": key_name}
@@ -149,8 +147,7 @@ class SSHKeyManager:
             key_name: Optional key name
 
         Returns:
-            Dictionary with private and public keys
-        """
+            Dictionary with private and public keys"""
         key_name = key_name or f"{device_id}_key"
         vault_path = f"ssh-keys/{device_id}/{key_name}"
 
@@ -173,19 +170,18 @@ class SSHKeyManager:
             device_id: Device identifier
 
         Returns:
-            New key information
-        """
+            New key information"""
         # Generate new key pair
         private_key, public_key = await self.generate_ssh_keypair()
 
         # Archive old key
         old_key_name = f"{device_id}_key"
                 logger.info(
-            f"Rotating SSH key for device {device_id},
+            f"Rotating SSH key for device {device_id},"
             old key: {old_key_name}"
         )
         archive_name = (
-            f"{device_id}_key_archived_{datetime.utcnow().strftime( \
+            f"{device_id}_key_archived_{datetime.utcnow().strftime( \}"
                 '%Y%m%d_%H%M%S')}"
         )
 
@@ -225,8 +221,7 @@ class SSHKeyManager:
             username: Username for the key
 
         Returns:
-            True if successful
-        """
+            True if successful"""
         # Commands vary by vendor
         if device.vendor.lower() == "cisco":
             commands = [
@@ -272,8 +267,7 @@ class SSHKeyManager:
             port: SSH port
 
         Returns:
-            True if connection successful
-        """
+            True if connection successful"""
         try:
             # Create SSH client
             client = SSHClient()
@@ -324,8 +318,7 @@ class SSHKeyManager:
             device_id: Optional device ID to filter
 
         Returns:
-            List of key information
-        """
+            List of key information"""
         if device_id:
             path = f"ssh-keys/{device_id}"
         else:
@@ -361,8 +354,7 @@ class SSHKeyManager:
             key_name: Optional key name
 
         Returns:
-            True if removed successfully
-        """
+            True if removed successfully"""
         key_name = key_name or f"{device_id}_key"
         vault_path = f"ssh-keys/{device_id}/{key_name}"
 
@@ -378,12 +370,12 @@ class SSHDeviceConnector:
     """Connect to devices using SSH key authentication."""
 
     def __init__(self, ssh_manager: SSHKeyManager):
+        """TODO: Add docstring"""
         self.ssh_manager = ssh_manager
 
     async def connect_with_key(
         self, device: Device, username: Optional[str] = None
-    ) -> SSHClient:
-        """
+    ) -> SSHClient:"""
         Connect to device using SSH key authentication.
 
         Args:
@@ -428,7 +420,7 @@ class SSHDeviceConnector:
             )
 
             logger.info(
-                f"Connected to device {device.hostname} using SSH key \
+                f"Connected to device {device.hostname} using SSH key \"
                     authentication"
             )
 
@@ -450,8 +442,7 @@ class SSHDeviceConnector:
             username: Optional username override
 
         Returns:
-            Command output
-        """
+            Command output"""
         client = await self.connect_with_key(device, username)
 
         try:

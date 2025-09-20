@@ -17,8 +17,7 @@ from contextlib import asynccontextmanager
 import uuid
 
 
-class TraceLevel(Enum):
-    """Trace levels"""
+class TraceLevel(Enum):"""Trace levels"""
 
     DEBUG = "debug"
     INFO = "info"
@@ -69,8 +68,7 @@ class Trace:
 
 
 @dataclass
-class LogEntry:
-    """Structured log entry"""
+class LogEntry:"""Structured log entry"""
 
     timestamp: datetime
     level: TraceLevel
@@ -83,8 +81,7 @@ class LogEntry:
 
 
 @dataclass
-class ServiceHealth:
-    """Service health status"""
+class ServiceHealth:"""Service health status"""
 
     service_name: str
     status: str  # healthy, degraded, unhealthy
@@ -96,13 +93,11 @@ class ServiceHealth:
     issues: List[str] = field(default_factory=list)
 
 
-class ObservabilityService:
-    """
+class ObservabilityService:"""
     Provides comprehensive observability features
     """
 
-    def __init__(self, metrics_collector=None, alert_manager=None):
-        """
+    def __init__(self, metrics_collector=None, alert_manager=None):"""
         Initialize observability service
 
         Args:
@@ -147,8 +142,7 @@ class ObservabilityService:
             service_name: Service name
 
         Returns:
-            Trace ID
-        """
+            Trace ID"""
         trace_id = str(uuid.uuid4())
         span_id = str(uuid.uuid4())[:12]
 
@@ -190,8 +184,7 @@ class ObservabilityService:
             trace_id: Trace ID
             operation_name: Operation name
             parent_span_id: Parent span ID
-            kind: Span kind
-        """
+            kind: Span kind"""
         span = self.start_span(trace_id, operation_name, parent_span_id, kind)
 
         try:
@@ -225,8 +218,7 @@ class ObservabilityService:
             kind: Span kind
 
         Returns:
-            Span instance
-        """
+            Span instance"""
         span_id = str(uuid.uuid4())[:12]
 
         span = Span(
@@ -252,8 +244,7 @@ class ObservabilityService:
         End a span
 
         Args:
-            span_id: Span ID
-        """
+            span_id: Span ID"""
         if span_id not in self.active_spans:
             return
 
@@ -284,8 +275,7 @@ class ObservabilityService:
         Args:
             span_id: Span ID
             key: Tag key
-            value: Tag value
-        """
+            value: Tag value"""
         if span_id in self.active_spans:
             self.active_spans[span_id].tags[key] = value
 
@@ -303,8 +293,7 @@ class ObservabilityService:
             span_id: Span ID
             level: Log level
             message: Log message
-            context: Additional context
-        """
+            context: Additional context"""
         if span_id in self.active_spans:
             log_entry = {
                 "timestamp": datetime.utcnow().isoformat(),
@@ -319,8 +308,7 @@ class ObservabilityService:
         End a trace
 
         Args:
-            trace_id: Trace ID
-        """
+            trace_id: Trace ID"""
         if trace_id not in self.active_traces:
             return
 
@@ -348,8 +336,7 @@ class ObservabilityService:
         Analyze trace for performance issues
 
         Args:
-            trace: Trace to analyze
-        """
+            trace: Trace to analyze"""
         # Check for slow operations
         slow_spans = [
             s
@@ -398,8 +385,7 @@ class ObservabilityService:
         span_id: Optional[str] = None,
         context: Optional[Dict[str, Any]] = None,
         tags: Optional[Dict[str, Any]] = None,
-    ):
-        """
+    ):"""
         Log a message
 
         Args:
@@ -435,14 +421,12 @@ class ObservabilityService:
         # Clean up old logs
         self._cleanup_old_logs()
 
-    def _handle_critical_log(self, log_entry: LogEntry):
-        """Handle critical log entries"""
+    def _handle_critical_log(self, log_entry: LogEntry):"""Handle critical log entries"""
         if self.alert_manager:
             # Create alert for critical log
             pass  # Would trigger alert
 
-    def _cleanup_old_logs(self):
-        """Cleanup old log entries"""
+    def _cleanup_old_logs(self):"""Cleanup old log entries"""
         cutoff = datetime.utcnow() - self.log_retention
         self.log_buffer = [log for log in self.log_buffer if log.timestamp >
                            cutoff]
@@ -454,8 +438,7 @@ class ObservabilityService:
         error_rate: float,
         throughput_rps: float,
         dependencies: Optional[List[str]] = None,
-    ):
-        """
+    ):"""
         Update service health status
 
         Args:
@@ -508,8 +491,7 @@ class ObservabilityService:
 
         Args:
             service_name: Service name
-            health: Service health
-        """
+            health: Service health"""
         if service_name not in self.performance_baselines:
             # Establish baseline
             self.performance_baselines[service_name] = {
@@ -581,8 +563,7 @@ class ObservabilityService:
         Get service topology map
 
         Returns:
-            Service topology
-        """
+            Service topology"""
         nodes = []
         edges = []
 
@@ -626,8 +607,7 @@ class ObservabilityService:
             trace_id: Trace ID
 
         Returns:
-            Trace summary
-        """
+            Trace summary"""
         # Check active traces
         if trace_id in self.active_traces:
             trace = self.active_traces[trace_id]
@@ -710,8 +690,7 @@ class ObservabilityService:
             end_time: End time filter
 
         Returns:
-            Log insights
-        """
+            Log insights"""
         # Filter logs
         logs = self.log_buffer
         if service:
@@ -763,10 +742,10 @@ class ObservabilityService:
 
 class DistributedTracer:
     """
-    Distributed tracing system for tracking requests across services
-    """
+    Distributed tracing system for tracking requests across services"""
 
     def __init__(self):
+        """TODO: Add docstring"""
         self.traces: Dict[str, Trace] = {}
         self.spans: Dict[str, Span] = {}
         self.completed_traces: List[Trace] = []
@@ -821,19 +800,18 @@ class DistributedTracer:
             traces = [t for t in traces if t.service_name == service]
         return traces
 
-    def _get_trace_id(self, span_id: str) -> str:
-        """Get trace ID for a span"""
+    def _get_trace_id(self, span_id: str) -> str:"""Get trace ID for a span"""
         if span_id in self.spans:
             return self.spans[span_id].trace_id
         return str(uuid.uuid4())
 
 
-class LogAggregator:
-    """
+class LogAggregator:"""
     Log aggregation system for centralized logging
     """
 
     def __init__(self):
+        """TODO: Add docstring"""
         self.log_buffer: List[LogEntry] = []
         self.max_buffer_size = 10000
 
@@ -866,8 +844,7 @@ class LogAggregator:
         service: Optional[str] = None,
         level: Optional[TraceLevel] = None,
         limit: int = 100,
-    ) -> List[LogEntry]:
-        """Query logs with filters"""
+    ) -> List[LogEntry]:"""Query logs with filters"""
         logs = self.log_buffer
 
         if service:
@@ -878,20 +855,19 @@ class LogAggregator:
         return logs[-limit:]
 
 
-class ObservabilityManager:
-    """
+class ObservabilityManager:"""
     Main observability manager that coordinates all monitoring components
     """
 
     def __init__(self):
+        """TODO: Add docstring"""
         self.tracer = DistributedTracer()
         self.log_aggregator = LogAggregator()
         self.metrics = {}
         self.health_checks = {}
         self.initialized = False
 
-    async def initialize(self):
-        """Initialize observability components"""
+    async def initialize(self):"""Initialize observability components"""
         self.initialized = True
         return self
 
@@ -918,8 +894,7 @@ class ObservabilityManager:
 
     async def record_metric(
         self, name: str, value: float, labels: Dict[str, str] = None
-    ):
-        """Record a metric"""
+    ):"""Record a metric"""
         key = f"{name}_{labels}" if labels else name
         self.metrics[key] = {
             "name": name,
@@ -932,12 +907,10 @@ class ObservabilityManager:
         """Check health of a component"""
         return self.health_checks.get(component, True)
 
-    async def set_health(self, component: str, healthy: bool):
-        """Set health status of a component"""
+    async def set_health(self, component: str, healthy: bool):"""Set health status of a component"""
         self.health_checks[component] = healthy
 
-    async def get_traces(self, service: Optional[str] = None) -> List[Trace]:
-        """Get traces"""
+    async def get_traces(self, service: Optional[str] = None) -> List[Trace]:"""Get traces"""
         return self.tracer.get_traces(service)
 
     async def get_logs(
@@ -945,14 +918,12 @@ class ObservabilityManager:
         service: Optional[str] = None,
         level: Optional[TraceLevel] = None,
         limit: int = 100,
-    ) -> List[LogEntry]:
-        """Get logs"""
+    ) -> List[LogEntry]:"""Get logs"""
         return await self.log_aggregator.query_logs(
             service=service, level=level, limit=limit
         )
 
-    async def get_metrics_summary(self) -> Dict[str, Any]:
-        """Get metrics summary"""
+    async def get_metrics_summary(self) -> Dict[str, Any]:"""Get metrics summary"""
         return {
             "metrics": self.metrics,
             "health_status": self.health_checks,

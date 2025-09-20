@@ -17,8 +17,7 @@ from ..security.audit import AuditLogger
 logger = get_logger(__name__)
 
 
-class RateLimiter:
-    """
+class RateLimiter:"""
     Rate limiter implementation using Token Bucket algorithm
     Supports per-user and per-IP rate limiting with Redis backend
     """
@@ -35,8 +34,7 @@ class RateLimiter:
         Args:
             redis_url: Redis connection URL
             default_rate: Default requests per period
-            default_period: Default period in seconds
-        """
+            default_period: Default period in seconds"""
         self.redis_url = redis_url
         self.redis_client = None
         self.default_rate = default_rate
@@ -55,7 +53,7 @@ class RateLimiter:
             logger.info("Rate limiter initialized with Redis backend")
         except Exception as e:
                         logger.warning(
-                f"Redis not available,
+                f"Redis not available,"
                 using in-memory rate limiting: {e}"
             )
             self.redis_client = None
@@ -71,8 +69,7 @@ class RateLimiter:
         key: str,
         rate: Optional[int] = None,
         period: Optional[int] = None,
-    ) -> Dict[str, any]:
-        """
+    ) -> Dict[str, any]:"""
         Check if request is within rate limit
 
         Args:
@@ -93,8 +90,7 @@ class RateLimiter:
 
     async def _check_redis_limit(
         self, key: str, rate: int, period: int
-    ) -> Dict[str, any]:
-        """Check rate limit using Redis"""
+    ) -> Dict[str, any]:"""Check rate limit using Redis"""
         try:
             # Use sliding window algorithm
             now = time.time()
@@ -200,12 +196,15 @@ class RateLimiter:
         Example:
             @rate_limiter.limit(rate=10, period=60)
             async def my_endpoint(request: Request):
+                """TODO: Add docstring"""
                 return {"message": "success"}
         """
 
         def decorator(func):
+            """TODO: Add docstring"""
             @wraps(func)
             async def wrapper(request: Request, *args, **kwargs):
+                """TODO: Add docstring"""
                 # Generate rate limit key
                 if key_func:
                     key = key_func(request)
@@ -264,8 +263,7 @@ class RateLimiter:
 
 class EndpointRateLimits:
     """
-    Predefined rate limits for different endpoint categories
-    """
+    Predefined rate limits for different endpoint categories"""
 
     # Authentication endpoints - strict limits
     AUTH_LOGIN = {"rate": 5, "period": 60}  # 5 per minute

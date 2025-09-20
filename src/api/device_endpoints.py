@@ -35,8 +35,7 @@ class DeviceUpdateRequest(BaseModel):
     tags: Optional[List[str]] = None
 
 
-class DeviceResponse(BaseModel):
-    """Response model for device information"""
+class DeviceResponse(BaseModel):"""Response model for device information"""
 
     id: str
     hostname: str
@@ -55,8 +54,7 @@ async def create_device(request: DeviceCreateRequest):
     """
     Add a new device to the inventory
 
-    Simple implementation - no complex validation
-    """
+    Simple implementation - no complex validation"""
     try:
         device = DeviceInfo(
             hostname=request.hostname,
@@ -89,8 +87,7 @@ async def list_devices(
     """
     List all devices in the inventory
 
-    Supports basic filtering
-    """
+    Supports basic filtering"""
     devices = device_store.list_devices(active_only=active_only)
 
     # Apply filters
@@ -199,8 +196,7 @@ async def add_sample_devices():
     """
     Add sample devices for testing
 
-    Useful for quick testing without complex setup
-    """
+    Useful for quick testing without complex setup"""
     try:
         devices = device_store.add_sample_devices()
         return {
@@ -219,6 +215,5 @@ async def clear_all_devices():
     """
     Clear all devices from inventory
 
-    WARNING: This deletes all devices. Use with caution!
-    """
+    WARNING: This deletes all devices. Use with caution!"""
     device_store.clear_all()

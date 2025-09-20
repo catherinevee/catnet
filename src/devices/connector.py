@@ -17,7 +17,6 @@ from .ssh_manager import SSHKeyManager, SSHDeviceConnector
 
 
 class UnauthorizedException(Exception):
-    pass
 
 
 class DeviceConnection:
@@ -132,6 +131,7 @@ class DeviceConnection:
         return await self.execute_command(command, enable_mode=True)
 
     async def disconnect(self):
+        """TODO: Add docstring"""
         try:
             if self.handler:
                 self.handler.disconnect()
@@ -142,6 +142,7 @@ class DeviceConnection:
             print(f"Error disconnecting: {e}")
 
     def __del__(self):
+        """TODO: Add docstring"""
         try:
             if hasattr(self, "handler") and self.handler:
                 self.handler.disconnect()
@@ -272,8 +273,8 @@ Host target
         try:
             # Step 1: Verify user authorization
             if not await self.check_authorization(user_context, device_id):
-                await self.audit.log_unauthorized_attempt(
-                    user_context, f"device:{device_id}", "connect"
+                await self.audit.log_unauthorized_attempt(" \
+                    f"user_context, f"device:{device_id}", "connect"
                 )
                 raise UnauthorizedException("Unauthorized access attempt")
 
@@ -366,7 +367,7 @@ Host target
                     ssh_key = await self.ssh_manager.get_ssh_key(device_id)
                     created_at = ssh_key["created_at"]
                     self.logger.debug(
-                        f"Retrieved SSH key for device {device_id}: \
+                        f"Retrieved SSH key for device {device_id}: \"
                             {created_at}"
                     )
 
@@ -409,7 +410,7 @@ Host target
                 except Exception as e:
                     # Fall back to credential-based authentication
                     self.logger.warning(
-                        f"SSH key auth failed: {e},
+                        f"SSH key auth failed: {e},"
                             falling back to credentials"
                     )
                                         return await self.connect_to_device(
@@ -428,6 +429,7 @@ Host target
             raise
 
     async def disconnect_device(self, connection_id: str):
+        """TODO: Add docstring"""
         if connection_id in self.active_connections:
             conn = self.active_connections[connection_id]
             await conn.disconnect()

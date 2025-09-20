@@ -26,8 +26,7 @@ from ..device_manager import (
 )
 
 
-class JuniperAdapter(DeviceAdapter):
-    """
+class JuniperAdapter(DeviceAdapter):"""
     Juniper device adapter implementation
     """
 
@@ -50,8 +49,7 @@ class JuniperAdapter(DeviceAdapter):
 
     async def connect(
         self, device: DeviceInfo, credentials: DeviceCredentials
-    ) -> DeviceConnection:
-        """
+    ) -> DeviceConnection:"""
         Connect to Juniper device
 
         Args:
@@ -109,8 +107,7 @@ class JuniperAdapter(DeviceAdapter):
             connection: Device connection
 
         Returns:
-            Success status
-        """
+            Success status"""
         try:
             if connection.session_data:
                 loop = asyncio.get_event_loop()
@@ -139,8 +136,7 @@ class JuniperAdapter(DeviceAdapter):
             command: Command to execute
 
         Returns:
-            Command output
-        """
+            Command output"""
         if not connection.is_active or not connection.session_data:
             raise Exception("Connection not active")
 
@@ -186,8 +182,7 @@ class JuniperAdapter(DeviceAdapter):
             config_type: Configuration type (running/candidate)
 
         Returns:
-            Configuration
-        """
+            Configuration"""
         # Get command for config type
         command = self.CONFIG_COMMANDS.get(config_type, "show configuration")
 
@@ -210,8 +205,7 @@ class JuniperAdapter(DeviceAdapter):
             configuration: Configuration to apply
 
         Returns:
-            Success status
-        """
+            Success status"""
         if not connection.is_active or not connection.session_data:
             raise Exception("Connection not active")
 
@@ -277,8 +271,7 @@ class JuniperAdapter(DeviceAdapter):
             connection: Device connection
 
         Returns:
-            Success status
-        """
+            Success status"""
         # Junos automatically saves committed configuration
         # This method ensures the configuration is synced
         try:
@@ -305,8 +298,7 @@ class JuniperAdapter(DeviceAdapter):
             configuration: Configuration to check
 
         Returns:
-            True if configuration is valid
-        """
+            True if configuration is valid"""
         if not connection.is_active or not connection.session_data:
             raise Exception("Connection not active")
 
@@ -350,8 +342,7 @@ class JuniperAdapter(DeviceAdapter):
             rollback_id: Rollback ID (0-49)
 
         Returns:
-            Success status
-        """
+            Success status"""
         if not connection.is_active or not connection.session_data:
             raise Exception("Connection not active")
 
@@ -405,8 +396,8 @@ class JuniperAdapter(DeviceAdapter):
         # Set mode based on protocol
         if device.protocol == ConnectionProtocol.NETCONF:
             params["mode"] = "netconf"
-        else:
-            params["mode"] = "ssh"
+        else:" \
+            f"params["mode"] = "ssh"
             params["port"] = device.port
 
         return params

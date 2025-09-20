@@ -16,8 +16,7 @@ from prometheus_client import Counter, Histogram, Gauge, Summary
 from collections import defaultdict, deque
 
 
-class MetricType(Enum):
-    """Types of metrics"""
+class MetricType(Enum):"""Types of metrics"""
 
     COUNTER = "counter"
     GAUGE = "gauge"
@@ -48,8 +47,7 @@ class MetricValue:
 
 
 @dataclass
-class MetricDefinition:
-    """Metric definition"""
+class MetricDefinition:"""Metric definition"""
 
     name: str
     type: MetricType
@@ -60,8 +58,7 @@ class MetricDefinition:
     quantiles: Optional[List[float]] = None
 
 
-class MetricsCollector:
-    """
+class MetricsCollector:"""
     Collects and manages metrics
     """
 
@@ -70,8 +67,7 @@ class MetricsCollector:
         Initialize metrics collector
 
         Args:
-            namespace: Prometheus namespace
-        """
+            namespace: Prometheus namespace"""
         self.namespace = namespace
         self.metrics: Dict[str, Any] = {}
         self.time_series: Dict[str, deque] = defaultdict(
@@ -230,8 +226,7 @@ class MetricsCollector:
         Register a new metric
 
         Args:
-            definition: Metric definition
-        """
+            definition: Metric definition"""
         metric_name = f"{self.namespace}_{definition.name}"
 
         if definition.type == MetricType.COUNTER:
@@ -284,8 +279,7 @@ class MetricsCollector:
         Args:
             name: Metric name
             value: Increment value
-            labels: Metric labels
-        """
+            labels: Metric labels"""
         if name not in self.metrics:
             raise ValueError(f"Metric {name} not found")
 
@@ -308,8 +302,7 @@ class MetricsCollector:
         Args:
             name: Metric name
             value: Gauge value
-            labels: Metric labels
-        """
+            labels: Metric labels"""
         if name not in self.metrics:
             raise ValueError(f"Metric {name} not found")
 
@@ -332,8 +325,7 @@ class MetricsCollector:
         Args:
             name: Metric name
             value: Observed value
-            labels: Metric labels
-        """
+            labels: Metric labels"""
         if name not in self.metrics:
             raise ValueError(f"Metric {name} not found")
 
@@ -356,8 +348,7 @@ class MetricsCollector:
         Args:
             name: Metric name
             value: Observed value
-            labels: Metric labels
-        """
+            labels: Metric labels"""
         if name not in self.metrics:
             raise ValueError(f"Metric {name} not found")
 
@@ -379,7 +370,7 @@ class MetricsCollector:
                          str]
         ):
         """Store metric value in time series"""
-        key = f"{name}:{':'.join(
+        key = f"{name}:{':'.join(}"
             f'{k}={v}' for k,
             v in sorted(labels.items())
         )}"
@@ -408,10 +399,9 @@ class MetricsCollector:
             end_time: End time filter
 
         Returns:
-            List of metric values
-        """
+            List of metric values"""
         labels = labels or {}
-        key_prefix = f"{name}:{':'.join(
+        key_prefix = f"{name}:{':'.join(}"
             f'{k}={v}' for k,
             v in sorted(labels.items())
         )}"
@@ -443,8 +433,7 @@ class MetricsCollector:
             window: Time window
 
         Returns:
-            Rate of change
-        """
+            Rate of change"""
         end_time = datetime.utcnow()
         start_time = end_time - window
 
@@ -480,8 +469,7 @@ class MetricsCollector:
             window: Time window
 
         Returns:
-            Percentile value
-        """
+            Percentile value"""
         end_time = datetime.utcnow()
         start_time = end_time - window
 
@@ -504,8 +492,7 @@ class MetricsCollector:
             labels: Metric labels
 
         Returns:
-            Summary statistics
-        """
+            Summary statistics"""
         time_series = self.get_time_series(name, labels)
         if not time_series:
             return {
@@ -578,8 +565,7 @@ class MetricsCollector:
             format: Export format (prometheus, json)
 
         Returns:
-            Exported metrics
-        """
+            Exported metrics"""
         if format == "prometheus":
             from prometheus_client import generate_latest
 

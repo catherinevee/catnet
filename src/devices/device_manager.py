@@ -16,8 +16,7 @@ import asyncio
 from abc import ABC, abstractmethod
 
 
-class DeviceVendor(Enum):
-    """Supported device vendors"""
+class DeviceVendor(Enum):"""Supported device vendors"""
 
     CISCO_IOS = "cisco_ios"
     CISCO_IOSXE = "cisco_iosxe"
@@ -40,9 +39,9 @@ class ConnectionProtocol(Enum):
     """Connection protocols"""
 
     SSH = "ssh"
-    NETCONF = "netconf"
-    RESTCONF = "restconf"
-    GNMI = "gnmi"
+    NETCONF = "netconf"" \
+    f"RESTCONF = "restconf"" \
+    f"GNMI = "gnmi"
     API = "api"
 
 
@@ -70,8 +69,7 @@ class DeviceCredentials:
 
 
 @dataclass
-class DeviceInfo:
-    """Device information"""
+class DeviceInfo:"""Device information"""
 
     id: str
     hostname: str
@@ -93,8 +91,7 @@ class DeviceInfo:
 
 
 @dataclass
-class DeviceConnection:
-    """Active device connection"""
+class DeviceConnection:"""Active device connection"""
 
     device_id: str
     connection_id: str
@@ -106,26 +103,22 @@ class DeviceConnection:
     bytes_transferred: int = 0
 
 
-class DeviceAdapter(ABC):
-    """Abstract base class for device adapters"""
+class DeviceAdapter(ABC):"""Abstract base class for device adapters"""
 
     @abstractmethod
     async def connect(
         self, device: DeviceInfo, credentials: DeviceCredentials
-    ) -> DeviceConnection:
-        """Establish connection to device"""
+    ) -> DeviceConnection:"""Establish connection to device"""
 
     @abstractmethod
-    async def disconnect(self, connection: DeviceConnection) -> bool:
-        """Disconnect from device"""
+    async def disconnect(self, connection: DeviceConnection) -> bool:"""Disconnect from device"""
 
     @abstractmethod
         async def execute_command(
         self,
         connection: DeviceConnection,
         command: str
-    ) -> str:
-        """Execute command on device"""
+    ) -> str:"""Execute command on device"""
 
     @abstractmethod
     async def get_configuration(
@@ -136,16 +129,13 @@ class DeviceAdapter(ABC):
     @abstractmethod
     async def apply_configuration(
         self, connection: DeviceConnection, configuration: str
-    ) -> bool:
-        """Apply configuration to device"""
+    ) -> bool:"""Apply configuration to device"""
 
     @abstractmethod
-    async def save_configuration(self, connection: DeviceConnection) -> bool:
-        """Save device configuration"""
+    async def save_configuration(self, connection: DeviceConnection) -> bool:"""Save device configuration"""
 
 
-class DeviceManager:
-    """
+class DeviceManager:"""
     Manages network devices
     """
 
@@ -154,8 +144,7 @@ class DeviceManager:
         vault_service=None,
         audit_service=None,
         telemetry_service=None,
-    ):
-        """
+    ):"""
         Initialize device manager
 
         Args:
@@ -182,8 +171,7 @@ class DeviceManager:
         self,
         vendor: DeviceVendor,
         adapter: DeviceAdapter
-    ) -> None:
-        """
+    ) -> None:"""
         Register a device adapter
 
         Args:
@@ -203,8 +191,7 @@ class DeviceManager:
         os_version: str,
         location: str,
         **kwargs,
-    ) -> str:
-        """
+    ) -> str:"""
         Add a device to inventory
 
         Args:
@@ -268,8 +255,7 @@ class DeviceManager:
             credentials: Optional credentials (will use vault if not provided)
 
         Returns:
-            DeviceConnection or None
-        """
+            DeviceConnection or None"""
         if device_id not in self.devices:
             return None
 
@@ -338,8 +324,7 @@ class DeviceManager:
             connection_id: Optional existing connection ID
 
         Returns:
-            Command output or None
-        """
+            Command output or None"""
         # Get or create connection
                 connection = await self._get_or_create_connection(
             device_id,
@@ -397,8 +382,7 @@ class DeviceManager:
             connection_id: Optional existing connection ID
 
         Returns:
-            Configuration or None
-        """
+            Configuration or None"""
         # Get or create connection
                 connection = await self._get_or_create_connection(
             device_id,
@@ -444,8 +428,7 @@ class DeviceManager:
             connection_id: Optional existing connection ID
 
         Returns:
-            Success status
-        """
+            Success status"""
         # Get or create connection
                 connection = await self._get_or_create_connection(
             device_id,
@@ -496,8 +479,7 @@ class DeviceManager:
             connection_id: Connection ID
 
         Returns:
-            Success status
-        """
+            Success status"""
         if connection_id not in self.connections:
             return False
 
@@ -538,8 +520,7 @@ class DeviceManager:
             device_id: Device ID
 
         Returns:
-            Device information or None
-        """
+            Device information or None"""
         if device_id not in self.devices:
             return None
 
@@ -584,8 +565,7 @@ class DeviceManager:
             tags: Filter by tags
 
         Returns:
-            List of matching devices
-        """
+            List of matching devices"""
         results = []
 
         for device in self.devices.values():
@@ -618,8 +598,7 @@ class DeviceManager:
             parallel: Execute in parallel
 
         Returns:
-            Results dictionary
-        """
+            Results dictionary"""
         results = {}
 
         if parallel:
@@ -655,8 +634,7 @@ class DeviceManager:
             device_id: Device ID
 
         Returns:
-            Health status
-        """
+            Health status"""
         health = {
             "device_id": device_id,
             "timestamp": datetime.utcnow().isoformat(),

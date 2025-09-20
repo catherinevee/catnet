@@ -18,10 +18,10 @@ from ..core.exceptions import SecurityError
 logger = get_logger(__name__)
 
 
-class MTLSManager:
-    """Manages mTLS connections between services"""
+class MTLSManager:"""Manages mTLS connections between services"""
 
     def __init__(self, service_name: str, certs_dir: str = "certs"):
+        """TODO: Add docstring"""
         self.service_name = service_name
         # Allow override via environment variable
         certs_dir = os.getenv("CATNET_CERTS_DIR", certs_dir)
@@ -43,8 +43,7 @@ class MTLSManager:
             verify_mode: SSL verification mode
 
         Returns:
-            Configured SSL context for mTLS
-        """
+            Configured SSL context for mTLS"""
         # Check cache first
         cache_key = f"{self.service_name}-{target_service or 'server'}"
         if cache_key in self._ssl_contexts:
@@ -133,8 +132,7 @@ class MTLSManager:
             base_url: Base URL for the target service
 
         Returns:
-            Configured aiohttp ClientSession
-        """
+            Configured aiohttp ClientSession"""
         ssl_context = await self.create_ssl_context(target_service)
 
         # Create custom connector with SSL context
@@ -171,8 +169,7 @@ class MTLSManager:
             Certificate information if valid
 
         Raises:
-            SecurityError: If certificate is invalid
-        """
+            SecurityError: If certificate is invalid"""
         from cryptography import x509
         from cryptography.hazmat.backends import default_backend
         from cryptography.x509.oid import NameOID
@@ -199,7 +196,7 @@ class MTLSManager:
             expiry_threshold = now + timedelta(days=30)
             if cert.not_valid_after < expiry_threshold:
                 logger.warning(
-                    f"Certificate for {cn} expires soon: \
+                    f"Certificate for {cn} expires soon: \"
                         {cert.not_valid_after}"
                 )
 
@@ -229,8 +226,7 @@ class MTLSManager:
         Rotate service certificate
 
         Returns:
-            True if rotation successful
-        """
+            True if rotation successful"""
         logger.info(f"Starting certificate rotation for {self.service_name}")
 
         try:
@@ -239,7 +235,7 @@ class MTLSManager:
             self._ssl_contexts.clear()
             self._cert_cache.clear()
 
-            logger.info(f"Certificate rotation completed for \
+            logger.info(f"Certificate rotation completed for \"
                 {self.service_name}")
             return True
 
@@ -257,8 +253,7 @@ class MTLSManager:
             name: Certificate name in Vault
 
         Returns:
-            Tuple of (certificate, private_key) or (None, None) if not found
-        """
+            Tuple of (certificate, private_key) or (None, None) if not found"""
         if name in self._cert_cache:
             return self._cert_cache[name]
 
@@ -282,8 +277,7 @@ class MTLSManager:
             service_name: Service name
 
         Returns:
-            Port number for the service
-        """
+            Port number for the service"""
         service_ports = {
             "auth-service": 8081,
             "gitops-service": 8082,
@@ -306,8 +300,7 @@ class MTLSManager:
             use_mtls: Whether to use HTTPS (mTLS) or HTTP
 
         Returns:
-            Service URL
-        """
+            Service URL"""
         port = await self.get_service_port(service_name)
         scheme = "https" if use_mtls else "http"
 
@@ -325,8 +318,7 @@ class MTLSManager:
             service_name: Target service name
 
         Returns:
-            True if service is healthy
-        """
+            True if service is healthy"""
         try:
             url = await self.get_service_url(service_name)
                         async with await self.create_client_session(
@@ -345,11 +337,11 @@ class MTLSServer:
     """Helper class for setting up mTLS server"""
 
     def __init__(self, service_name: str):
+        """TODO: Add docstring"""
         self.service_name = service_name
         self.mtls_manager = MTLSManager(service_name)
 
-    async def get_ssl_context(self) -> ssl.SSLContext:
-        """
+    async def get_ssl_context(self) -> ssl.SSLContext:"""
         Get SSL context for server
 
         Returns:
@@ -376,8 +368,7 @@ class MTLSServer:
             Client certificate information
 
         Raises:
-            SecurityError: If client certificate is invalid
-        """
+            SecurityError: If client certificate is invalid"""
         # Extract client certificate from request
         # This depends on the web framework being used
         # For FastAPI with uvicorn:
@@ -399,11 +390,13 @@ class MTLSMiddleware:
     """Middleware to enforce mTLS for all requests"""
 
     def __init__(self, app, service_name: str, exclude_paths: list = None):
+        """TODO: Add docstring"""
         self.app = app
         self.mtls_server = MTLSServer(service_name)
         self.exclude_paths = exclude_paths or ["/health", "/metrics"]
 
     async def __call__(self, scope, receive, send):
+        """TODO: Add docstring"""
         if scope["type"] == "http":
             path = scope["path"]
 

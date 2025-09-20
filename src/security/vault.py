@@ -24,6 +24,7 @@ class VaultClient:
         self._initialize_client()
 
     def _initialize_client(self):
+        """TODO: Add docstring"""
         self.client = hvac.Client(url=self.vault_url, token=self.vault_token)
 
         if not self.client.is_authenticated():
@@ -45,6 +46,7 @@ class VaultClient:
         return response["data"]["data"]
 
     async def store_secret(self, path: str, secret: Dict[str, Any]):
+        """TODO: Add docstring"""
         loop = asyncio.get_event_loop()
                 return await loop.run_in_executor(
             None,
@@ -54,6 +56,7 @@ class VaultClient:
         )
 
     def _store_secret_sync(self, path: str, secret: Dict[str, Any]):
+        """TODO: Add docstring"""
         full_path = f"{self.namespace}/{path}"
         self.client.secrets.kv.v2.create_or_update_secret(
             path=full_path, secret=secret, mount_point="secret"
@@ -104,8 +107,8 @@ class VaultClient:
                         "expires_at": (
                 datetime.utcnow() + timedelta(seconds=ttl)).isoformat(
             ),
-                        "lease_id": f"{device_id}-{requestor}-{datetime.utcnow(
-                ).timestamp(
+                        "lease_id": f"{device_id}-{requestor}-{datetime.utcnow("
+                ).timestamp(}"
             )}",
         }
 
@@ -136,6 +139,7 @@ class VaultClient:
         return base64.b64decode(key_b64)
 
     async def rotate_secret(self, path: str, new_secret: Dict[str, Any]):
+        """TODO: Add docstring"""
         # Get current secret for backup
         current = await self.get_secret(path)
 
@@ -195,6 +199,7 @@ class VaultClient:
         }
 
     async def revoke_token(self, token: str):
+        """TODO: Add docstring"""
         loop = asyncio.get_event_loop()
                 return await loop.run_in_executor(
             None,
@@ -211,15 +216,18 @@ class VaultClient:
         )
 
     def _enable_audit_sync(self, device_type: str, path: str):
+        """TODO: Add docstring"""
         self.client.sys.enable_audit_device(
             device_type=device_type, options={"file_path": path}
         )
 
     async def seal_vault(self):
+        """TODO: Add docstring"""
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(None, self.client.sys.seal)
 
     async def unseal_vault(self, keys: List[str]):
+        """TODO: Add docstring"""
         loop = asyncio.get_event_loop()
         for key in keys:
                         await loop.run_in_executor(

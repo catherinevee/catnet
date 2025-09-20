@@ -56,8 +56,7 @@ async def connect_repository(request: ConnectRepoRequest):
     """
     Connect to a GitHub repository
 
-    Simple implementation - just validates and stores connection
-    """
+    Simple implementation - just validates and stores connection"""
     try:
         repo_info = github_client.connect_repository(
             repo_url=request.repository_url, branch=request.branch, token=request.token
@@ -101,8 +100,7 @@ async def list_configurations(
     """
     List configuration files in the connected repository
 
-    Returns all .cfg, .conf, .yaml, .yml, and .json files
-    """
+    Returns all .cfg, .conf, .yaml, .yml, and .json files"""
     if not github_client.connected_repo:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -135,8 +133,7 @@ async def get_configuration(config_path: str):
     """
     Get the content of a specific configuration file
 
-    Returns the actual configuration content
-    """
+    Returns the actual configuration content"""
     if not github_client.connected_repo:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -201,8 +198,7 @@ async def sync_configurations():
     """
     Sync configurations from GitHub
 
-    Simple implementation - just refreshes the file list
-    """
+    Simple implementation - just refreshes the file list"""
     if not github_client.connected_repo:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="No repository connected"
@@ -235,8 +231,7 @@ async def connect_sample_repository():
     """
     Connect to a sample repository for testing
 
-    Uses a public Cisco configuration examples repository
-    """
+    Uses a public Cisco configuration examples repository"""
     try:
         # Use a real public repo with network configs
         repo_info = github_client.connect_repository(

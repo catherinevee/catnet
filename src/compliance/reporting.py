@@ -19,8 +19,7 @@ import html
 from collections import defaultdict
 
 
-class ComplianceFramework(Enum):
-    """Supported compliance frameworks"""
+class ComplianceFramework(Enum):"""Supported compliance frameworks"""
 
     PCI_DSS = "pci_dss"
     HIPAA = "hipaa"
@@ -86,8 +85,7 @@ class ComplianceCheck:
 
 
 @dataclass
-class ComplianceReport:
-    """Compliance report"""
+class ComplianceReport:"""Compliance report"""
 
     id: str
     framework: ComplianceFramework
@@ -104,8 +102,7 @@ class ComplianceReport:
     recommendations: List[str] = field(default_factory=list)
 
 
-class ComplianceManager:
-    """
+class ComplianceManager:"""
     Manages compliance checking and reporting
     """
 
@@ -114,8 +111,7 @@ class ComplianceManager:
         device_service=None,
         config_service=None,
         audit_service=None
-    ):
-        """
+    ):"""
         Initialize compliance manager
 
         Args:
@@ -144,8 +140,7 @@ class ComplianceManager:
         # Initialize controls
         self._initialize_controls()
 
-    def _initialize_controls(self):
-        """Initialize compliance controls"""
+    def _initialize_controls(self):"""Initialize compliance controls"""
         # PCI DSS Controls
         self.add_control(
             ComplianceControl(
@@ -257,8 +252,7 @@ class ComplianceManager:
         Add a compliance control
 
         Args:
-            control: Control definition
-        """
+            control: Control definition"""
         self.controls[control.id] = control
         self.framework_controls[control.framework].append(control.id)
 
@@ -275,8 +269,7 @@ class ComplianceManager:
             device_ids: Devices to check (all if None)
 
         Returns:
-            List of compliance check results
-        """
+            List of compliance check results"""
         # Get applicable controls
         control_ids = self.framework_controls.get(framework, [])
 
@@ -309,8 +302,7 @@ class ComplianceManager:
             device_id: Device ID
 
         Returns:
-            Check result
-        """
+            Check result"""
         check = ComplianceCheck(
             control_id=control.id,
             device_id=device_id,
@@ -381,7 +373,7 @@ class ComplianceManager:
 
                 for pattern in default_patterns:
                     if pattern in config.lower():
-                        violations.append(f"Default password pattern found: \
+                        violations.append(f"Default password pattern found: \"
                             {pattern}")
 
                 evidence.append(f"Configuration checked for default passwords")
@@ -419,7 +411,7 @@ class ComplianceManager:
             if config:
                 # Check for any-any rules
                 if "permit any any" in config:
-                    violations.append("Overly permissive firewall rule \
+                    violations.append("Overly permissive firewall rule \"
                         detected")
 
                 # Check for documented rules
@@ -545,8 +537,7 @@ class ComplianceManager:
             end_date: Report end date
 
         Returns:
-            Compliance report
-        """
+            Compliance report"""
         import uuid
 
         # Get checks for period
@@ -673,7 +664,7 @@ class ComplianceManager:
                 else:
                     # Generic recommendation
                     recommendations.append(
-                        f"Address {control.name} violations on {len(
+                        f"Address {control.name} violations on {len(}"
     control_checks)} devices"
                     )
 
@@ -688,7 +679,7 @@ class ComplianceManager:
         if critical_controls:
             recommendations.insert(
                 0,
-                f"PRIORITY: Address {len(critical_controls)} critical control \
+                f"PRIORITY: Address {len(critical_controls)} critical control \"
     violations immediately",
             )
 
@@ -707,8 +698,7 @@ class ComplianceManager:
             format: Export format (json, html, csv)
 
         Returns:
-            Exported report
-        """
+            Exported report"""
         if format == "json":
             return self._export_json(report)
         elif format == "html":
@@ -811,8 +801,7 @@ class ComplianceManager:
         """
         return html_content
 
-    def _export_csv(self, report: ComplianceReport) -> str:
-        """Export report as CSV"""
+    def _export_csv(self, report: ComplianceReport) -> str:"""Export report as CSV"""
         import io
 
         output = io.StringIO()
@@ -844,8 +833,7 @@ class ComplianceManager:
             return await self.device_service.get_configuration(device_id)
         return None
 
-    async def _count_admin_accounts(self, device_id: str) -> int:
-        """Count admin accounts on device"""
+    async def _count_admin_accounts(self, device_id: str) -> int:"""Count admin accounts on device"""
         # Simplified implementation
         config = await self._get_device_config(device_id)
         if config:
@@ -870,27 +858,23 @@ class ComplianceManager:
     async def _run_validation_script(
         self, control: ComplianceControl, device_id: str, check:
             ComplianceCheck
-    ) -> ComplianceCheck:
-        """Run custom validation script"""
+    ) -> ComplianceCheck:"""Run custom validation script"""
         # Would execute validation script
         check.status = ComplianceStatus.COMPLIANT
         return check
 
 
-class ComplianceValidator:
-    """
+class ComplianceValidator:"""
     Validates compliance against various frameworks
     """
 
-    def __init__(self):
-        """Initialize compliance validator"""
+    def __init__(self):"""Initialize compliance validator"""
         self.framework_rules = self._initialize_framework_rules()
         self.validation_cache = {}
 
         def _initialize_framework_rules(
         self
-    ) -> Dict[ComplianceFramework, Dict[str, Any]]:
-        """Initialize validation rules for each framework"""
+    ) -> Dict[ComplianceFramework, Dict[str, Any]]:"""Initialize validation rules for each framework"""
         return {
             ComplianceFramework.PCI_DSS: {
                 "firewall_required": True,
@@ -939,8 +923,7 @@ class ComplianceValidator:
             device_config: Device configuration
 
         Returns:
-            Validation results
-        """
+            Validation results"""
         results = {
             "compliant": True,
             "violations": [],
@@ -955,7 +938,7 @@ class ComplianceValidator:
             results["checks"]["firewall"] = has_firewall
             if not has_firewall:
                 results["compliant"] = False
-                results["violations"].append("Firewall not properly \
+                results["violations"].append("Firewall not properly \"
                     configured")
 
         # Check encryption
@@ -972,7 +955,7 @@ class ComplianceValidator:
             results["checks"]["access_control"] = has_access_control
             if not has_access_control:
                 results["compliant"] = False
-                results["violations"].append("Access control not properly \
+                results["violations"].append("Access control not properly \"
                     configured")
 
         return results
@@ -987,8 +970,7 @@ class ComplianceValidator:
             device_config: Device configuration
 
         Returns:
-            Validation results
-        """
+            Validation results"""
         results = {
             "compliant": True,
             "violations": [],
@@ -1003,7 +985,7 @@ class ComplianceValidator:
             results["checks"]["access_control"] = has_access_control
             if not has_access_control:
                 results["compliant"] = False
-                results["violations"].append("Access control requirements not \
+                results["violations"].append("Access control requirements not \"
                     met")
 
         # Check audit logging
@@ -1034,8 +1016,7 @@ class ComplianceValidator:
             device_config: Device configuration
 
         Returns:
-            Validation results
-        """
+            Validation results"""
         results = {
             "compliant": True,
             "violations": [],
@@ -1050,7 +1031,7 @@ class ComplianceValidator:
             results["checks"]["security_controls"] = has_security
             if not has_security:
                 results["compliant"] = False
-                results["violations"].append("Security controls not \
+                results["violations"].append("Security controls not \"
                     implemented")
 
         # Check availability monitoring
@@ -1059,7 +1040,7 @@ class ComplianceValidator:
             results["checks"]["availability_monitoring"] = has_monitoring
             if not has_monitoring:
                 results["compliant"] = False
-                results["violations"].append("Availability monitoring not \
+                results["violations"].append("Availability monitoring not \"
                     configured")
 
         return results
@@ -1095,8 +1076,7 @@ class ComplianceValidator:
 
 class ReportGenerator:
     """
-    Generates compliance reports in various formats
-    """
+    Generates compliance reports in various formats"""
 
     def __init__(self):
         """Initialize report generator"""
@@ -1104,8 +1084,8 @@ class ReportGenerator:
         self.formatters = {
             "json": self._format_json,
             "html": self._format_html,
-            "pdf": self._format_pdf,
-            "csv": self._format_csv,
+            "pdf": self._format_pdf," \
+           f" "csv": self._format_csv,
             "xml": self._format_xml,
         }
 
@@ -1124,8 +1104,7 @@ class ReportGenerator:
             format: Report format
 
         Returns:
-            Generated report
-        """
+            Generated report"""
         # Calculate statistics
         stats = self._calculate_statistics(checks)
 
@@ -1181,8 +1160,7 @@ class ReportGenerator:
 
         return (weighted_score / total_weight * 100) if total_weight > 0 else 0
 
-    def _get_check_weight(self, check: ComplianceCheck) -> float:
-        """Get weight for compliance check"""
+    def _get_check_weight(self, check: ComplianceCheck) -> float:"""Get weight for compliance check"""
         # Critical controls have higher weight
         critical_controls = ["PCI_1.1", "PCI_2.1", "HIPAA_164.312"]
         if check.control_id in critical_controls:
@@ -1215,8 +1193,7 @@ class ReportGenerator:
         def _generate_recommendations(
         self,
         checks: List[ComplianceCheck]
-    ) -> List[str]:
-        """Generate compliance recommendations"""
+    ) -> List[str]:"""Generate compliance recommendations"""
         recommendations = []
 
         non_compliant = [
@@ -1259,8 +1236,7 @@ class ReportGenerator:
         """Format report as JSON"""
         return json.dumps(data, indent=2)
 
-    async def _format_html(self, data: Dict[str, Any]) -> str:
-        """Format report as HTML"""
+    async def _format_html(self, data: Dict[str, Any]) -> str:"""Format report as HTML"""
         html_content = f"""
         <!DOCTYPE html>
         <html>
@@ -1286,8 +1262,7 @@ class ReportGenerator:
             <p>Compliant: {data['statistics']['compliant']}</p>
             <p>Non-Compliant: {data['statistics']['non_compliant']}</p>
         </body>
-        </html>
-        """
+        </html>"""
         return html_content
 
     async def _format_pdf(self, data: Dict[str, Any]) -> str:
@@ -1303,7 +1278,7 @@ class ReportGenerator:
         for check in data["checks"]:
             violations = ";".join(check["violations"])
             output.append(
-                f"{check['control_id']},
+                f"{check['control_id']},"
                     {check['device_id']}
                     {check['status']}
                     "
@@ -1314,7 +1289,7 @@ class ReportGenerator:
 
     async def _format_xml(self, data: Dict[str, Any]) -> str:
         """Format report as XML"""
-        xml_content = f"""<?xml version="1.0" encoding="UTF-8"?>
+        xml_content = f"""<?xml version="1.0" encoding="UTF-8"?>"
 <ComplianceReport>
     <Framework>{html.escape(data['framework'])}</Framework>
     <GeneratedAt>{html.escape(data['generated_at'])}</GeneratedAt>

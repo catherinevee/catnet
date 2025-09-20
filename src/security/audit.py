@@ -78,9 +78,11 @@ class AuditLogger:
         self._ensure_log_dir()
 
     def _ensure_log_dir(self):
+        """TODO: Add docstring"""
         self.log_file.parent.mkdir(parents=True, exist_ok=True)
 
     def _setup_logger(self):
+        """TODO: Add docstring"""
         if self.enable_console:
             handler = logging.StreamHandler()
             formatter = logging.Formatter(
@@ -132,10 +134,12 @@ class AuditLogger:
         return event.id
 
     async def _write_to_file(self, event: AuditEvent):
+        """TODO: Add docstring"""
         async with aiofiles.open(self.log_file, "a") as f:
             await f.write(json.dumps(event.to_dict()) + "\n")
 
     async def _write_to_db(self, event: AuditEvent):
+        """TODO: Add docstring"""
         # This would write to database - implementation depends on your ORM
         pass
 
@@ -245,6 +249,7 @@ class AuditLogger:
         )
 
     async def record_command(self, session_id: str, command: str, output: str):
+        """TODO: Add docstring"""
         if session_id in self.session_recordings:
             self.session_recordings[session_id]["commands"].append(
                 {
@@ -255,6 +260,7 @@ class AuditLogger:
             )
 
     async def end_session_recording(self, session_id: str):
+        """TODO: Add docstring"""
         if session_id in self.session_recordings:
             session = self.session_recordings[session_id]
             await self.log_event(

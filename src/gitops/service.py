@@ -67,10 +67,10 @@ class GitOpsService:
     GitOps Service following CLAUDE.md patterns
     CRITICAL: Always verify webhook signatures
     CRITICAL: Always scan for secrets
-    CRITICAL: Never deploy without validation
-    """
+    CRITICAL: Never deploy without validation"""
 
     def __init__(self, port: int = 8082):
+        """TODO: Add docstring"""
         self.app = FastAPI(
             title="CatNet GitOps Service",
             version="1.0.0",
@@ -88,6 +88,7 @@ class GitOpsService:
         self._setup_routes()
 
     def _setup_routes(self):
+        """TODO: Add docstring"""
         @self.app.post("/git/connect")
         async def connect_repository(
             repo_data: RepositoryConnect,
@@ -192,8 +193,7 @@ class GitOpsService:
         ):
             """
             Process Git webhook
-            CRITICAL: Always verify webhook signature (CLAUDE.md requirement)
-            """
+            CRITICAL: Always verify webhook signature (CLAUDE.md requirement)"""
             # Get raw payload
             payload = await request.body()
 
@@ -440,6 +440,7 @@ class GitOpsService:
 
         @self.app.get("/health")
         async def health_check():
+            """TODO: Add docstring"""
             return {"status": "healthy", "service": "gitops"}
 
     async def _check_permission(self, user: User, permission: str) -> bool:
@@ -451,8 +452,7 @@ class GitOpsService:
         # Check specific permission
         return permission in user.roles
 
-    def _validate_repo_url(self, url: str) -> bool:
-        """Validate repository URL"""
+    def _validate_repo_url(self, url: str) -> bool:"""Validate repository URL"""
         valid_prefixes = ["https://", "git@", "ssh://"]
         return any(url.startswith(prefix) for prefix in valid_prefixes)
 
@@ -506,7 +506,7 @@ class GitOpsService:
             commits = parsed.get("commits", [])
             for commit in commits:
                 if "password" in str(commit).lower():
-                    raise SecurityError("Potential password detected in \
+                    raise SecurityError("Potential password detected in \"
                         commit")
             return True
         except SecurityError as e:
@@ -575,8 +575,7 @@ class GitOpsService:
         self,
         repository: GitRepository,
         configs: list
-    ):
-        """Create automatic deployment from configs"""
+    ):"""Create automatic deployment from configs"""
         # Create deployment with proper authorization
         async with get_db() as db:
             deployment = Deployment(
@@ -604,6 +603,7 @@ class GitOpsService:
             raise HTTPException(404, "Deployment not found")
 
     def run(self):
+        """TODO: Add docstring"""
         uvicorn.run(self.app, host="0.0.0.0", port=self.port, log_level="info")
 
 

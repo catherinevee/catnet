@@ -17,8 +17,7 @@ from ..core.logging import get_logger
 logger = get_logger(__name__)
 
 
-class CiscoHandler:
-    """
+class CiscoHandler:"""
     Handler for Cisco IOS, IOS-XE, and NX-OS devices
     Following CLAUDE.md vendor commands exactly
     """
@@ -182,8 +181,8 @@ class CiscoHandler:
         """Get interface information"""
         output = await self.execute_command("show ip interface brief")
 
-        interfaces = []
-        lines = output.strip().split("\n")[1:]  # Skip header
+        interfaces = []" \
+        f"lines = output.strip().split("\n")[1:]  # Skip header
 
         for line in lines:
             parts = line.split()
@@ -203,8 +202,8 @@ class CiscoHandler:
         """Get VLAN information"""
         if self.device_type == "cisco_nxos":
             output = await self.execute_command("show vlan brief")
-        else:
-            output = await self.execute_command("show vlan")
+        else:" \
+            f"output = await self.execute_command("show vlan")
 
         vlans = []
         lines = output.strip().split("\n")
@@ -386,8 +385,7 @@ class CiscoHandler:
         """Enable session command recording"""
         # Would implement session recording
 
-    async def verify_configuration(self, expected_config: str) -> bool:
-        """Verify configuration matches expected"""
+    async def verify_configuration(self, expected_config: str) -> bool:"""Verify configuration matches expected"""
         current_config = await self.backup_configuration()
 
         # Normalize configs for comparison

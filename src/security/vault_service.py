@@ -22,8 +22,7 @@ from cryptography.hazmat.backends import default_backend
 import os
 
 
-class SecretType(Enum):
-    """Types of secrets"""
+class SecretType(Enum):"""Types of secrets"""
 
     STATIC = "static"
     DYNAMIC = "dynamic"
@@ -61,8 +60,7 @@ class Secret:
 
 
 @dataclass
-class EncryptionKey:
-    """Encryption key object"""
+class EncryptionKey:"""Encryption key object"""
 
     key_id: str
     key_material: bytes
@@ -74,8 +72,7 @@ class EncryptionKey:
 
 
 @dataclass
-class Certificate:
-    """Certificate object"""
+class Certificate:"""Certificate object"""
 
     cert_id: str
     common_name: str
@@ -90,8 +87,7 @@ class Certificate:
 
 class VaultService:
     """
-    HashiCorp Vault integration service
-    """
+    HashiCorp Vault integration service"""
 
     def __init__(
         self,
@@ -107,8 +103,7 @@ class VaultService:
             vault_url: Vault server URL
             vault_token: Vault token
             vault_namespace: Vault namespace
-            use_tls: Use TLS for connection
-        """
+            use_tls: Use TLS for connection"""
         self.vault_url = vault_url
         self.vault_namespace = vault_namespace
         self.use_tls = use_tls
@@ -137,8 +132,7 @@ class VaultService:
         Initialize Vault connection and setup
 
         Returns:
-            Success status
-        """
+            Success status"""
         try:
             # Check if Vault is initialized and unsealed
             if not self.client.sys.is_initialized():
@@ -241,8 +235,7 @@ class VaultService:
             ttl: Time to live
 
         Returns:
-            Success status
-        """
+            Success status"""
         try:
             # Prepare secret data
             secret_data = {
@@ -306,8 +299,7 @@ class VaultService:
             use_cache: Use cached value if available
 
         Returns:
-            Secret object or None
-        """
+            Secret object or None"""
         try:
             cache_key = f"{path}:{key or '*'}"
 
@@ -381,8 +373,7 @@ class VaultService:
             versions: Specific versions to delete
 
         Returns:
-            Success status
-        """
+            Success status"""
         try:
             if versions:
                 # Delete specific versions
@@ -435,8 +426,7 @@ class VaultService:
             ttl: Credential lifetime
 
         Returns:
-            Credentials dictionary
-        """
+            Credentials dictionary"""
         try:
             response = self.client.read(
                 f"database/creds/{role}",
@@ -487,8 +477,7 @@ class VaultService:
             ttl: Credential lifetime
 
         Returns:
-            SSH credentials
-        """
+            SSH credentials"""
         try:
             response = self.client.write(
                 f"ssh/creds/{role}",
@@ -531,8 +520,7 @@ class VaultService:
             key_id: Encryption key ID
 
         Returns:
-            Tuple of (encrypted data, key ID used)
-        """
+            Tuple of (encrypted data, key ID used)"""
         try:
             # Use current key if not specified
             key_id = key_id or self.current_key_id
@@ -568,8 +556,7 @@ class VaultService:
             key_id: Encryption key ID
 
         Returns:
-            Decrypted data
-        """
+            Decrypted data"""
         try:
             if self.use_tls and self.client.is_authenticated():
                 # Use Vault's transit engine
@@ -645,8 +632,7 @@ class VaultService:
             ttl: Certificate lifetime
 
         Returns:
-            Certificate object
-        """
+            Certificate object"""
         try:
             response = self.client.write(
                 "pki/issue/catnet",
@@ -683,8 +669,7 @@ class VaultService:
             serial_number: Certificate serial number
 
         Returns:
-            Success status
-        """
+            Success status"""
         try:
             self.client.write(
                 "pki/revoke",
@@ -709,8 +694,7 @@ class VaultService:
         Rotate encryption key
 
         Returns:
-            New key ID
-        """
+            New key ID"""
         try:
             # Generate new key
             new_key_id = f"key-{datetime.utcnow().timestamp()}"
@@ -758,8 +742,7 @@ class VaultService:
             new_value: New secret value
 
         Returns:
-            Success status
-        """
+            Success status"""
         try:
             # Get current secret
             current = await self.get_secret(path, key)
@@ -814,8 +797,7 @@ class VaultService:
         self,
         name: str,
         rules: Dict[str, Any],
-    ) -> bool:
-        """
+    ) -> bool:"""
         Create Vault policy
 
         Args:
@@ -840,8 +822,7 @@ class VaultService:
         self,
         entity: str,
         policies: List[str],
-    ) -> bool:
-        """
+    ) -> bool:"""
         Assign policies to entity
 
         Args:
@@ -860,8 +841,7 @@ class VaultService:
 
     # Audit
 
-    def _audit_log(self, action: str, *args, **kwargs):
-        """Add entry to audit log"""
+    def _audit_log(self, action: str, *args, **kwargs):"""Add entry to audit log"""
         entry = {
             "timestamp": datetime.utcnow().isoformat(),
             "action": action,
@@ -889,8 +869,7 @@ class VaultService:
             action: Filter by action
 
         Returns:
-            Filtered audit log entries
-        """
+            Filtered audit log entries"""
         logs = self.audit_log
 
         if start_time:

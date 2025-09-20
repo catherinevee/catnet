@@ -20,8 +20,7 @@ from collections import defaultdict
 import hashlib
 
 
-class CredentialType(Enum):
-    """Types of credentials"""
+class CredentialType(Enum):"""Types of credentials"""
 
     PASSWORD = "password"
     API_KEY = "api_key"
@@ -63,8 +62,7 @@ class Credential:
 
 
 @dataclass
-class SecretPolicy:
-    """Policy for secret management"""
+class SecretPolicy:"""Policy for secret management"""
 
     name: str
     credential_types: List[CredentialType]
@@ -99,13 +97,11 @@ class AccessRequest:
     revoked: bool = False
 
 
-class SecretsManager:
-    """
+class SecretsManager:"""
     Manages secrets and credentials
     """
 
-    def __init__(self, vault_service=None, audit_service=None):
-        """
+    def __init__(self, vault_service=None, audit_service=None):"""
         Initialize secrets manager
 
         Args:
@@ -136,8 +132,7 @@ class SecretsManager:
         # Rotation scheduler
         self.rotation_tasks: Dict[str, asyncio.Task] = {}
 
-    def _initialize_default_policies(self):
-        """Initialize default security policies"""
+    def _initialize_default_policies(self):"""Initialize default security policies"""
         # Strong password policy
         self.policies["strong_password"] = SecretPolicy(
             name="strong_password",
@@ -222,8 +217,7 @@ class SecretsManager:
             auto_rotate: Enable automatic rotation
 
         Returns:
-            Created credential
-        """
+            Created credential"""
         import uuid
 
         # Get applicable policy
@@ -323,8 +317,7 @@ class SecretsManager:
             decrypt: Whether to decrypt the value
 
         Returns:
-            Credential value or None
-        """
+            Credential value or None"""
         if credential_id not in self.credentials:
             return None
 
@@ -396,8 +389,7 @@ class SecretsManager:
             new_value: New value (generated if not provided)
 
         Returns:
-            Success status
-        """
+            Success status"""
         if credential_id not in self.credentials:
             return False
 
@@ -494,8 +486,7 @@ class SecretsManager:
             requester: Who is requesting deletion
 
         Returns:
-            Success status
-        """
+            Success status"""
         if credential_id not in self.credentials:
             return False
 
@@ -545,8 +536,7 @@ class SecretsManager:
         Args:
             credential_id: Credential ID
             principal: User/service to grant access
-            access_levels: Access levels to grant
-        """
+            access_levels: Access levels to grant"""
         self.access_control[credential_id][principal].update(access_levels)
 
     def revoke_access(
@@ -561,8 +551,7 @@ class SecretsManager:
         Args:
             credential_id: Credential ID
             principal: User/service to revoke access
-            access_levels: Specific levels to revoke (all if None)
-        """
+            access_levels: Specific levels to revoke (all if None)"""
         if access_levels:
             self.access_control[credential_id][principal] -= access_levels
         else:
@@ -620,12 +609,10 @@ class SecretsManager:
         random_bytes = secrets.token_urlsafe(num_bytes)
         return random_bytes[: policy.min_length]
 
-    def _generate_token(self, policy: SecretPolicy) -> str:
-        """Generate a token"""
+    def _generate_token(self, policy: SecretPolicy) -> str:"""Generate a token"""
         return secrets.token_hex(policy.min_length // 2)
 
-    def _validate_credential(self, value: str, policy: SecretPolicy) -> bool:
-        """Validate credential against policy"""
+    def _validate_credential(self, value: str, policy: SecretPolicy) -> bool:"""Validate credential against policy"""
         # Check length
         if not (policy.min_length <= len(value) <= policy.max_length):
             return False
@@ -649,8 +636,7 @@ class SecretsManager:
 
         return True
 
-    def _calculate_complexity(self, value: str) -> int:
-        """Calculate password complexity score (1-5)"""
+    def _calculate_complexity(self, value: str) -> int:"""Calculate password complexity score (1-5)"""
         score = 0
 
         # Length score
@@ -693,8 +679,7 @@ class SecretsManager:
         self,
         type: CredentialType,
         policy_name: Optional[str] = None,
-    ) -> SecretPolicy:
-        """Get applicable policy for credential type"""
+    ) -> SecretPolicy:"""Get applicable policy for credential type"""
         if policy_name and policy_name in self.policies:
             return self.policies[policy_name]
 
@@ -726,8 +711,7 @@ class SecretsManager:
         purpose: str,
         access_level: AccessLevel,
         duration: timedelta = timedelta(hours=1),
-    ) -> AccessRequest:
-        """Create an access request"""
+    ) -> AccessRequest:"""Create an access request"""
         import uuid
 
         request = AccessRequest(
@@ -747,14 +731,14 @@ class SecretsManager:
         self,
         credential_id: str,
         interval: timedelta,
-    ):
-        """Schedule credential rotation"""
+    ):"""Schedule credential rotation"""
         # Cancel existing task if any
         if credential_id in self.rotation_tasks:
             self.rotation_tasks[credential_id].cancel()
 
         # Create new rotation task
         async def rotate_task():
+            """TODO: Add docstring"""
             await asyncio.sleep(interval.total_seconds())
             await self.rotate_credential(credential_id)
 
@@ -763,8 +747,7 @@ class SecretsManager:
     def get_expiring_credentials(
         self,
         days: int = 7,
-    ) -> List[Credential]:
-        """Get credentials expiring soon"""
+    ) -> List[Credential]:"""Get credentials expiring soon"""
         cutoff = datetime.utcnow() + timedelta(days=days)
         expiring = []
 
@@ -774,8 +757,7 @@ class SecretsManager:
 
         return sorted(expiring, key=lambda c: c.expires_at)
 
-    def get_rotation_due(self) -> List[Credential]:
-        """Get credentials due for rotation"""
+    def get_rotation_due(self) -> List[Credential]:"""Get credentials due for rotation"""
         due = []
 
         for credential in self.credentials.values():

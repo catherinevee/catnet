@@ -14,8 +14,7 @@ from collections import defaultdict, deque
 import statistics
 
 
-class MetricType(Enum):
-    """Types of metrics we collect"""
+class MetricType(Enum):"""Types of metrics we collect"""
 
     COUNTER = "counter"
     GAUGE = "gauge"
@@ -41,6 +40,7 @@ class MetricsCollector:
     """Collects and manages system metrics"""
 
     def __init__(self, namespace: str = "catnet"):
+        """TODO: Add docstring"""
         self.namespace = namespace
         self.metrics: Dict[str, List[Metric]] = defaultdict(list)
         self.counters: Dict[str, float] = defaultdict(float)
@@ -72,8 +72,7 @@ class MetricsCollector:
             value: float,
             labels: Dict[str,
                          str] = None
-        ):
-        """Set a gauge metric value"""
+        ):"""Set a gauge metric value"""
         key = self._make_key(name, labels)
         self.gauges[key] = value
         self.metrics[name].append(
@@ -92,8 +91,7 @@ class MetricsCollector:
             value: float,
             labels: Dict[str,
                          str] = None
-        ):
-        """Add an observation to a histogram"""
+        ):"""Add an observation to a histogram"""
         key = self._make_key(name, labels)
         self.histograms[key].append(value)
         self.metrics[name].append(
@@ -106,8 +104,7 @@ class MetricsCollector:
             )
         )
 
-    def start_timer(self, name: str) -> str:
-        """Start a timer and return its ID"""
+    def start_timer(self, name: str) -> str:"""Start a timer and return its ID"""
         timer_id = f"{name}_{time.time()}"
         self.timers[timer_id] = time.time()
         return timer_id
@@ -127,8 +124,7 @@ class MetricsCollector:
         """Get all collected metrics"""
         return dict(self.metrics)
 
-    def get_summary(self, name: str) -> Dict[str, Any]:
-        """Get summary statistics for a metric"""
+    def get_summary(self, name: str) -> Dict[str, Any]:"""Get summary statistics for a metric"""
         if name not in self.metrics:
             return {}
 
@@ -179,22 +175,22 @@ class MetricsCollector:
                 count = sum(1 for v in values if v <= bucket)
                 bucket_labels = {**labels, "le": str(bucket)}
                 lines.append(
-                    f"{self.namespace}_{name}_bucket{self._format_labels(
+                    f"{self.namespace}_{name}_bucket{self._format_labels(}"
                         bucket_labels)} {count}"
                 )
 
             # Add +Inf bucket and summary
             lines.append(
-                f"{self.namespace}_{name}_bucket{self._format_labels({**labels,
+                f"{self.namespace}_{name}_bucket{self._format_labels({**labels,}"
                                                                       'le': '+Inf'})} {len(values)}"
             )
             lines.append(
-                f"{self.namespace}_{name}_sum{self._format_labels(labels)} \
-                    {sum(
+                f"{self.namespace}_{name}_sum{self._format_labels(labels)} \"
+                    {sum(}"
                     values)}"
             )
             lines.append(
-                f"{self.namespace}_{name}_count{self._format_labels(labels)} {
+                f"{self.namespace}_{name}_count{self._format_labels(labels)} {}"
                     len(values)}"
             )
 
@@ -237,10 +233,10 @@ class MetricsCollector:
         self.timers.clear()
 
 
-class DeploymentMetrics:
-    """Specialized metrics for deployment tracking"""
+class DeploymentMetrics:"""Specialized metrics for deployment tracking"""
 
     def __init__(self, collector: Optional[MetricsCollector] = None):
+        """TODO: Add docstring"""
         self.collector = collector or MetricsCollector("catnet_deployments")
 
     def record_deployment_start(
@@ -345,6 +341,7 @@ class SystemMetrics:
     """System-wide metrics collection"""
 
     def __init__(self):
+        """TODO: Add docstring"""
         self.collector = MetricsCollector("catnet_system")
         self.deployment_metrics = DeploymentMetrics(self.collector)
 

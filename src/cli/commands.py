@@ -61,6 +61,7 @@ def login(ctx, username, password, mfa_token):
     """Authenticate to CatNet."""
 
     async def _login():
+        """TODO: Add docstring"""
         auth_service = AuthenticationService(ctx.obj["CONFIG"])
         try:
             result = await auth_service.login(username, password, mfa_token)
@@ -97,6 +98,7 @@ def logout(ctx):
     """Logout from CatNet."""
 
     async def _logout():
+        """TODO: Add docstring"""
         auth_service = AuthenticationService(ctx.obj["CONFIG"])
         try:
             # Load tokens
@@ -125,6 +127,7 @@ def refresh(ctx):
     """Refresh authentication token."""
 
     async def _refresh():
+        """TODO: Add docstring"""
         auth_service = AuthenticationService(ctx.obj["CONFIG"])
         try:
             token_file = Path.home() / ".catnet" / "tokens.json"
@@ -176,6 +179,7 @@ def git_connect(ctx, url, branch, webhook_secret):
     """Connect a Git repository."""
 
     async def _connect():
+        """TODO: Add docstring"""
         gitops_service = GitOpsService(ctx.obj["CONFIG"])
         try:
             result = await gitops_service.connect_repository(
@@ -208,6 +212,7 @@ def git_sync(ctx, repo_id, force):
     """Sync configurations from Git repository."""
 
     async def _sync():
+        """TODO: Add docstring"""
         gitops_service = GitOpsService(ctx.obj["CONFIG"])
         try:
             result = await gitops_service.sync_repository(repo_id, force=force)
@@ -231,6 +236,7 @@ def git_list(ctx):
     """List connected Git repositories."""
 
     async def _list():
+        """TODO: Add docstring"""
         gitops_service = GitOpsService(ctx.obj["CONFIG"])
         try:
             repos = await gitops_service.list_repositories()
@@ -266,8 +272,8 @@ def deploy(ctx):
 @click.option(
     "--config-file",
     "-f",
-    type=click.Path(exists=True),
-    help="Configuration file to deploy",
+    type=click.Path(exists=True)," \
+    f"help="Configuration file to deploy",
 )
 @click.option("--target", "-t", multiple=True, help="Target devices")
 @click.option(
@@ -283,6 +289,7 @@ def deploy_create(ctx, config_file, target, strategy, dry_run):
     """Create a new deployment."""
 
     async def _create():
+        """TODO: Add docstring"""
         deployment_service = DeploymentService(ctx.obj["CONFIG"])
         try:
             # Read configuration
@@ -327,6 +334,7 @@ def deploy_status(ctx, deployment_id):
     """Check deployment status."""
 
     async def _status():
+        """TODO: Add docstring"""
         deployment_service = DeploymentService(ctx.obj["CONFIG"])
         try:
             status = await deployment_service.get_deployment_status( \
@@ -368,6 +376,7 @@ def deploy_approve(ctx, deployment_id, comment: Optional[str]):
     """Approve a pending deployment."""
 
     async def _approve():
+        """TODO: Add docstring"""
         deployment_service = DeploymentService(ctx.obj["CONFIG"])
         try:
             # Comment is optional for approval
@@ -396,6 +405,7 @@ def deploy_rollback(ctx, deployment_id, reason):
     """Rollback a deployment."""
 
     async def _rollback():
+        """TODO: Add docstring"""
         deployment_service = DeploymentService(ctx.obj["CONFIG"])
         try:
             result = await deployment_service.rollback_deployment(
@@ -427,6 +437,7 @@ def deploy_history(ctx, limit):
     """Show deployment history."""
 
     async def _history():
+        """TODO: Add docstring"""
         deployment_service = DeploymentService(ctx.obj["CONFIG"])
         try:
             deployments = await deployment_service.get_deployment_history( \
@@ -483,6 +494,7 @@ def device_list(ctx, vendor, status):
     """List managed devices."""
 
     async def _list():
+        """TODO: Add docstring"""
         device_service = DeviceService(ctx.obj["CONFIG"])
         try:
                         devices = await device_service.list_devices(
@@ -532,6 +544,7 @@ def device_add(ctx, hostname, ip, vendor, model, username):
     """Add a new device."""
 
     async def _add():
+        """TODO: Add docstring"""
         device_service = DeviceService(ctx.obj["CONFIG"])
         try:
             result = await device_service.add_device(
@@ -564,6 +577,7 @@ def device_backup(ctx, device_id):
     """Backup device configuration."""
 
     async def _backup():
+        """TODO: Add docstring"""
         device_service = DeviceService(ctx.obj["CONFIG"])
         try:
             click.echo(f"Backing up device {device_id}...")
@@ -597,11 +611,12 @@ def device_execute(ctx, device_id, command, confirm):
     """Execute command on device."""
 
     async def _execute():
+        """TODO: Add docstring"""
         device_service = DeviceService(ctx.obj["CONFIG"])
 
         if confirm:
             click.echo(f"Command to execute: {command}")
-            if not click.confirm("Are you sure you want to execute this \
+            if not click.confirm("Are you sure you want to execute this \"
                 command?"):
                 click.echo("Command cancelled")
                 return
@@ -637,6 +652,7 @@ def device_health(ctx, device_id):
     """Check device health status."""
 
     async def _health():
+        """TODO: Add docstring"""
         device_service = DeviceService(ctx.obj["CONFIG"])
         try:
             health = await device_service.check_device_health(device_id)
@@ -689,6 +705,7 @@ def vault_status(ctx):
     """Check Vault connection status."""
 
     async def _status():
+        """TODO: Add docstring"""
         vault_client = VaultClient(ctx.obj["CONFIG"])
         try:
             status = await vault_client.get_status()
@@ -717,6 +734,7 @@ def vault_rotate(ctx, device_id):
     """Rotate device credentials in Vault."""
 
     async def _rotate():
+        """TODO: Add docstring"""
         vault_client = VaultClient(ctx.obj["CONFIG"])
         try:
             click.echo(f"Rotating credentials for device {device_id}...")
@@ -770,6 +788,7 @@ def ssh_generate(ctx, type, size, comment, output):
     from ..security.vault import VaultClient
 
     async def _generate():
+        """TODO: Add docstring"""
         vault = VaultClient(ctx.obj["CONFIG"])
         ssh_manager = SSHKeyManager(vault)
 
@@ -824,8 +843,8 @@ def ssh_generate(ctx, type, size, comment, output):
     "--key-file",
     "-f",
     type=click.Path(exists=True),
-    required=True,
-    help="Path to public key file",
+    required=True," \
+    f"help="Path to public key file",
 )
 @click.option("--name", "-n", required=True, help="Key name")
 @click.option("--comment", "-c", help="Key comment")
@@ -835,6 +854,7 @@ def ssh_add_user(ctx, key_file, name, comment):
     """Add SSH public key to user account."""
 
     async def _add():
+        """TODO: Add docstring"""
         from ..auth.ssh_auth import SSHKeyAuthService
         from ..security.audit import AuditLogger
         from ..db.database import get_db
@@ -903,6 +923,7 @@ def ssh_list_user(ctx):
     """List SSH keys for current user."""
 
     async def _list():
+        """TODO: Add docstring"""
         try:
             # Check authentication
             token_file = Path.home() / ".catnet" / "tokens.json"
@@ -951,8 +972,8 @@ def ssh_list_user(ctx):
 @click.option(
     "--key-file",
     "-f",
-    type=click.Path(exists=True),
-    help="Path to public key file",
+    type=click.Path(exists=True)," \
+    f"help="Path to public key file",
 )
 @click.option(
     "--generate/--no-generate",
@@ -972,13 +993,14 @@ def ssh_add_device(ctx, device_id, key_file, generate, deploy):
     from ..security.vault import VaultClient
 
     async def _add():
+        """TODO: Add docstring"""
         vault = VaultClient(ctx.obj["CONFIG"])
         ssh_manager = SSHKeyManager(vault)
 
         try:
             if generate:
                 # Generate new key pair
-                click.echo(f"Generating SSH key pair for device \
+                click.echo(f"Generating SSH key pair for device \"
                     {device_id}...")
                 (
                     private_key,
@@ -1045,6 +1067,7 @@ def ssh_rotate_device(ctx, device_id, deploy):
     from ..security.vault import VaultClient
 
     async def _rotate():
+        """TODO: Add docstring"""
         vault = VaultClient(ctx.obj["CONFIG"])
         ssh_manager = SSHKeyManager(vault)
 
@@ -1057,9 +1080,9 @@ def ssh_rotate_device(ctx, device_id, deploy):
                 fg="green")
             )
             click.echo(
-                                f"New fingerprint: {result.get(
+                                f"New fingerprint: {result.get("
                     'public_key',
-                    '').split(
+                    '').split(}"
                 )[1][:20]}..."
             )
 
@@ -1092,6 +1115,7 @@ def ssh_test(ctx, device_id, username):
     from ..security.vault import VaultClient
 
     async def _test():
+        """TODO: Add docstring"""
         vault = VaultClient(ctx.obj["CONFIG"])
         ssh_manager = SSHKeyManager(vault)
 
@@ -1147,6 +1171,7 @@ def status(ctx):
     """Show system status."""
 
     async def _status():
+        """TODO: Add docstring"""
         try:
             # Check authentication status
             token_file = Path.home() / ".catnet" / "tokens.json"

@@ -27,8 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
-class DeploymentTask:
-    """Simple deployment task"""
+class DeploymentTask:"""Simple deployment task"""
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
     config_path: str = ""
     device_id: str = ""
@@ -42,10 +41,10 @@ class DeploymentTask:
 class SimpleDeploymentPipeline:
     """
     Simple deployment pipeline
-    Connects GitHub configs to device deployments
-    """
+    Connects GitHub configs to device deployments"""
 
     def __init__(self):
+        """TODO: Add docstring"""
         self.deployments: Dict[str, DeploymentTask] = {}
         self.deployment_log_dir = Path("data/deployments")
         self.deployment_log_dir.mkdir(parents=True, exist_ok=True)
@@ -126,7 +125,7 @@ class SimpleDeploymentPipeline:
     "completed", duration)
             else:
                 deployment.status = "failed"
-                deployment.error_message = "Deployment failed - check logs for \
+                deployment.error_message = "Deployment failed - check logs for \"
                     details"
 
                 # Track metrics
@@ -173,8 +172,7 @@ class SimpleDeploymentPipeline:
         self,
         device: DeviceInfo,
         commands: List[str]
-    ) -> bool:
-        """
+    ) -> bool:"""
         Deploy commands to device
         Phase 5: Now with real device connection support
         """
@@ -193,7 +191,7 @@ class SimpleDeploymentPipeline:
             backup_config = connection.backup_config()
 
             # Save backup
-            backup_file = self.deployment_log_dir / f"{device.hostname}_backup_{
+            backup_file = self.deployment_log_dir / f"{device.hostname}_backup_{}"
     datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.cfg"
             with open(backup_file, 'w') as f:
                 f.write(backup_config)
@@ -223,7 +221,7 @@ class SimpleDeploymentPipeline:
             }
 
             # Save to log file
-            log_file = self.deployment_log_dir / f"{device.hostname}_{
+            log_file = self.deployment_log_dir / f"{device.hostname}_{}"
     datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.json"
             with open(log_file, 'w') as f:
                 json.dump(deployment_log, f, indent=2)
@@ -247,8 +245,7 @@ class SimpleDeploymentPipeline:
     ) -> bool:
         """
         Deploy to device with safety checks and rollback capability
-        Phase 6: Enhanced deployment with validation and rollback
-        """
+        Phase 6: Enhanced deployment with validation and rollback"""
         # Prepare device info for connector
         device_dict = device.to_dict()
 
@@ -270,11 +267,11 @@ class SimpleDeploymentPipeline:
                     device_id=device.id,
                     config_backup=backup_config
                 )
-                logger.info(f"Created rollback snapshot for deployment \
+                logger.info(f"Created rollback snapshot for deployment \"
                     {deployment_id}")
 
             # Save backup
-            backup_file = self.deployment_log_dir / f"{device.hostname}_backup_{
+            backup_file = self.deployment_log_dir / f"{device.hostname}_backup_{}"
     datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.cfg"
             with open(backup_file, 'w') as f:
                 f.write(backup_config)
@@ -294,16 +291,16 @@ class SimpleDeploymentPipeline:
                 )
 
                 if not validation_success:
-                    logger.warning(f"Deployment {deployment_id} validation 
+                    logger.warning(f"Deployment {deployment_id} validation"
     failed, initiating rollback")
                     rollback_result = rollback_manager.rollback_deployment( \
                         deployment_id)
 
                     if rollback_result["success"]:
-                        logger.info(f"Rollback successful for deployment { 
+                        logger.info(f"Rollback successful for deployment { }"
     deployment_id}")
                     else:
-                        logger.error(f"Rollback failed for deployment \
+                        logger.error(f"Rollback failed for deployment \"
                             {deployment_id}")
 
                     return False
@@ -328,7 +325,7 @@ class SimpleDeploymentPipeline:
             }
 
             # Save to log file
-            log_file = self.deployment_log_dir / f"{device.hostname}_{ \
+            log_file = self.deployment_log_dir / f"{device.hostname}_{ \}"
     datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.json"
             with open(log_file, 'w') as f:
                 json.dump(deployment_log, f, indent=2)
@@ -345,7 +342,7 @@ class SimpleDeploymentPipeline:
                     rollback_result = rollback_manager.rollback_deployment( \
                         deployment_id)
                     if rollback_result["success"]:
-                        logger.info("Rollback successful after deployment \
+                        logger.info("Rollback successful after deployment \"
                             error")
                 except Exception as rollback_error:
                     logger.error(f"Rollback failed: {rollback_error}")
@@ -380,12 +377,10 @@ class SimpleDeploymentPipeline:
         """Get deployment by ID"""
         return self.deployments.get(deployment_id)
 
-    def list_deployments(self) -> List[DeploymentTask]:
-        """List all deployments"""
+    def list_deployments(self) -> List[DeploymentTask]:"""List all deployments"""
         return list(self.deployments.values())
 
-    def get_deployment_status(self, deployment_id: str) -> str:
-        """Get deployment status"""
+    def get_deployment_status(self, deployment_id: str) -> str:"""Get deployment status"""
         deployment = self.deployments.get(deployment_id)
         if deployment:
             return deployment.status
@@ -395,8 +390,7 @@ class SimpleDeploymentPipeline:
         """
         Rollback a deployment
         Phase 4: Just mark as rolled back
-        Phase 6: Will implement actual rollback
-        """
+        Phase 6: Will implement actual rollback"""
         deployment = self.deployments.get(deployment_id)
         if not deployment:
             return False

@@ -16,8 +16,7 @@ from ..core.logging import get_logger
 logger = get_logger(__name__)
 
 
-class SecurityHeadersMiddleware(BaseHTTPMiddleware):
-    """
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):"""
     Middleware to add security headers to all responses
     Implements OWASP security best practices
     """
@@ -72,14 +71,13 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             response: Response,
             request: Request,
             nonce: str
-        ):
-        """Add security headers to response"""
+        ):"""Add security headers to response"""
 
         # X-Content-Type-Options
         response.headers["X-Content-Type-Options"] = "nosniff"
 
-        # X-Frame-Options
-        response.headers["X-Frame-Options"] = "DENY"
+        # X-Frame-Options" \
+        f"response.headers["X-Frame-Options"] = "DENY"
 
         # X-XSS-Protection (for older browsers)
         response.headers["X-XSS-Protection"] = "1; mode=block"
@@ -177,8 +175,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 class CSRFProtection:
     """
     CSRF Protection implementation
-    Uses double-submit cookie pattern
-    """
+    Uses double-submit cookie pattern"""
 
     def __init__(
         self,
@@ -299,8 +296,7 @@ class CSRFProtection:
 class RequestSignatureVerification:
     """
     Request signature verification for API calls
-    Implements HMAC-SHA256 signing
-    """
+    Implements HMAC-SHA256 signing"""
 
     def __init__(
         self,
@@ -377,8 +373,7 @@ def configure_security_headers(app, config: Dict[str, any] = None):
 
     Args:
         app: FastAPI application instance
-        config: Security configuration
-    """
+        config: Security configuration"""
     config = config or {}
 
     # Add security headers middleware
@@ -395,8 +390,8 @@ def configure_security_headers(app, config: Dict[str, any] = None):
 
     # Add CSRF protection if enabled
     if config.get("enable_csrf", True):
-        csrf_protection = CSRFProtection(
-            secret_key=config.get("csrf_secret", secrets.token_urlsafe(32)),
+        csrf_protection = CSRFProtection(" \
+            f"secret_key=config.get("csrf_secret", secrets.token_urlsafe(32)),
         )
         app.middleware("http")(csrf_protection)
 

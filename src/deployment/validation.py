@@ -14,8 +14,7 @@ from datetime import datetime
 from enum import Enum
 
 
-class ValidationType(Enum):
-    """Types of validation"""
+class ValidationType(Enum):"""Types of validation"""
 
     PRE_DEPLOYMENT = "pre_deployment"
     CONFIGURATION = "configuration"
@@ -55,8 +54,7 @@ class ValidationIssue:
 
 
 @dataclass
-class ValidationResult:
-    """Validation result"""
+class ValidationResult:"""Validation result"""
 
     id: str
     deployment_id: str
@@ -71,13 +69,11 @@ class ValidationResult:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
-class DeploymentValidator:
-    """
+class DeploymentValidator:"""
     Validates deployments before execution
     """
 
-    def __init__(self, device_service=None, config_validator=None):
-        """
+    def __init__(self, device_service=None, config_validator=None):"""
         Initialize deployment validator
 
         Args:
@@ -94,8 +90,7 @@ class DeploymentValidator:
         devices: List[str],
         configuration: str,
         deployment_config: Dict[str, Any],
-    ) -> ValidationResult:
-        """
+    ) -> ValidationResult:"""
         Validate a deployment
 
         Args:
@@ -146,8 +141,7 @@ class DeploymentValidator:
 
     async def _validate_pre_deployment(
         self, devices: List[str], result: ValidationResult
-    ) -> None:
-        """
+    ) -> None:"""
         Pre-deployment validation
 
         Args:
@@ -212,8 +206,7 @@ class DeploymentValidator:
         Args:
             configuration: Configuration to validate
             devices: Target devices
-            result: ValidationResult to update
-        """
+            result: ValidationResult to update"""
         result.total_checks += 1
 
         try:
@@ -230,7 +223,7 @@ class DeploymentValidator:
                             ValidationIssue(
                                 type=ValidationType.CONFIGURATION,
                                 severity=ValidationSeverity.CRITICAL,
-                                message=f"Configuration validation failed for {
+                                message=f"Configuration validation failed for {}"
     device_id}",
                                 device_id=device_id,
                                 details={"errors": validation.errors},
@@ -279,8 +272,7 @@ class DeploymentValidator:
         Args:
             configuration: Configuration
             devices: Target devices
-            result: ValidationResult to update
-        """
+            result: ValidationResult to update"""
         result.total_checks += 1
 
         try:
@@ -300,8 +292,8 @@ class DeploymentValidator:
                         ValidationIssue(
                             type=ValidationType.COMPATIBILITY,
                             severity=ValidationSeverity.WARNING,
-                            message=f"Configuration may not be compatible with \
-                                {
+                            message=f"Configuration may not be compatible with \"
+                                {}"
     model} running {os_version}",
                             device_id=device_id,
                             details={"model": model, "os_version": os_version},
@@ -338,8 +330,7 @@ class DeploymentValidator:
 
         Args:
             devices: Target devices
-            result: ValidationResult to update
-        """
+            result: ValidationResult to update"""
         result.total_checks += 1
 
         try:
@@ -371,7 +362,7 @@ class DeploymentValidator:
                         ValidationIssue(
                             type=ValidationType.RESOURCE,
                             severity=ValidationSeverity.WARNING,
-                            message=f"High memory usage on {device_id}: {
+                            message=f"High memory usage on {device_id}: {}"
     memory_usage}%",
                             device_id=device_id,
                             details={"memory_usage": memory_usage},
@@ -387,7 +378,7 @@ class DeploymentValidator:
                         ValidationIssue(
                             type=ValidationType.RESOURCE,
                             severity=ValidationSeverity.CRITICAL,
-                            message=f"Low storage space on {device_id}: {
+                            message=f"Low storage space on {device_id}: {}"
     storage_free}MB",
                             device_id=device_id,
                             details={"storage_free_mb": storage_free},
@@ -423,8 +414,7 @@ class DeploymentValidator:
 
         Args:
             configuration: Configuration
-            result: ValidationResult to update
-        """
+            result: ValidationResult to update"""
         result.total_checks += 1
 
         try:
@@ -447,7 +437,7 @@ class DeploymentValidator:
                     ValidationIssue(
                         type=ValidationType.SECURITY,
                         severity=ValidationSeverity.WARNING,
-                        message=f"Configuration enables insecure protocols: {', 
+                        message=f"Configuration enables insecure protocols: {', }"
     '.join(insecure_protocols)}",
                         details={"protocols": insecure_protocols},
                         recommendation="Use secure protocols only",
@@ -496,8 +486,7 @@ class DeploymentValidator:
         Args:
             devices: Target devices
             deployment_config: Deployment configuration
-            result: ValidationResult to update
-        """
+            result: ValidationResult to update"""
         result.total_checks += 1
 
         try:
@@ -530,8 +519,8 @@ class DeploymentValidator:
                             ValidationIssue(
                                 type=ValidationType.DEPENDENCY,
                                 severity=ValidationSeverity.WARNING,
-                                message=f"Device dependency not satisfied: \
-                                    {dep[
+                                message=f"Device dependency not satisfied: \"
+                                    {dep[}"
     'name']}",
                                 device_id=device_id,
                                 details=dep,
@@ -565,15 +554,13 @@ class DeploymentValidator:
             return await self.device_service.is_accessible(device_id)
         return True
 
-    async def _check_maintenance_window(self, devices: List[str]) -> bool:
-        """Check if within maintenance window"""
+    async def _check_maintenance_window(self, devices: List[str]) -> bool:"""Check if within maintenance window"""
         # Check current time against configured maintenance windows
         current_hour = datetime.utcnow().hour
         # Example: maintenance window is 2-6 AM UTC
         return 2 <= current_hour < 6
 
-    async def _get_device_vendor(self, device_id: str) -> str:
-        """Get device vendor"""
+    async def _get_device_vendor(self, device_id: str) -> str:"""Get device vendor"""
         if self.device_service:
             info = await self.device_service.get_device(device_id)
             return info.get("vendor", "unknown")
@@ -593,8 +580,7 @@ class DeploymentValidator:
         # In production, would check against compatibility matrix
         return True
 
-    async def _get_device_resources(self, device_id: str) -> Dict[str, Any]:
-        """Get device resource usage"""
+    async def _get_device_resources(self, device_id: str) -> Dict[str, Any]:"""Get device resource usage"""
         if self.device_service:
             return await self.device_service.get_resources(device_id)
         return {

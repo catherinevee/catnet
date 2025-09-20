@@ -14,14 +14,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class WebhookVerifier:
-    """Verify webhook signatures from GitHub/GitLab/Bitbucket"""
+class WebhookVerifier:"""Verify webhook signatures from GitHub/GitLab/Bitbucket"""
 
     def __init__(self):
+        """TODO: Add docstring"""
         self.secrets: Dict[str, str] = {}  # repo_id -> secret
 
-    def set_secret(self, repo_id: str, secret: str):
-        """Store webhook secret for a repository"""
+    def set_secret(self, repo_id: str, secret: str):"""Store webhook secret for a repository"""
         if not secret or len(secret) < 16:
             raise ValueError("Webhook secret must be at least 16 characters")
         self.secrets[repo_id] = secret
@@ -34,8 +33,7 @@ class WebhookVerifier:
     ) -> bool:
         """
         Verify GitHub webhook signature (X-Hub-Signature-256)
-        NEVER skip this verification in production!
-        """
+        NEVER skip this verification in production!"""
         if repo_id not in self.secrets:
             logger.warning(f"No webhook secret configured for repo {repo_id}")
             return False
@@ -71,8 +69,7 @@ class WebhookVerifier:
         return hmac.compare_digest(expected, token)
 
 
-class InputValidator:
-    """Validate and sanitize user inputs to prevent injection attacks"""
+class InputValidator:"""Validate and sanitize user inputs to prevent injection attacks"""
 
     # Patterns that should never appear in configuration commands
     DANGEROUS_PATTERNS = [
@@ -96,8 +93,7 @@ class InputValidator:
     }
 
     @classmethod
-    def validate_input(cls, value: str, input_type: str) -> bool:
-        """Validate input against known patterns"""
+    def validate_input(cls, value: str, input_type: str) -> bool:"""Validate input against known patterns"""
         if input_type in cls.VALID_PATTERNS:
             pattern = cls.VALID_PATTERNS[input_type]
             if not re.match(pattern, value):
@@ -115,7 +111,7 @@ class InputValidator:
             is_dangerous = False
             for pattern in cls.DANGEROUS_PATTERNS:
                 if re.search(pattern, command, re.IGNORECASE):
-                    logger.warning(f"Blocked dangerous command pattern: \
+                    logger.warning(f"Blocked dangerous command pattern: \"
                         {command}")
                     is_dangerous = True
                     break
@@ -141,6 +137,7 @@ class RateLimiter:
     """Rate limiting to prevent abuse and DDoS"""
 
     def __init__(self):
+        """TODO: Add docstring"""
         # Track requests per IP/user
         self.requests: Dict[str, deque] = defaultdict(deque)
 
@@ -157,8 +154,7 @@ class RateLimiter:
         self,
         identifier: str,
         action_type: str = 'api_general'
-    ) -> bool:
-        """
+    ) -> bool:"""
         Check if request is allowed based on rate limits
         identifier: IP address or user ID
         action_type: Type of action being rate limited
@@ -173,7 +169,7 @@ class RateLimiter:
 
         # Check if under limit
         if len(self.requests[identifier]) >= limit:
-            logger.warning(f"Rate limit exceeded for {identifier} on \
+            logger.warning(f"Rate limit exceeded for {identifier} on \"
                 {action_type}")
             return False
 
@@ -199,15 +195,14 @@ class RateLimiter:
 
 
 
-class SecurityAuditor:
-    """Audit security events for compliance"""
+class SecurityAuditor:"""Audit security events for compliance"""
 
     def __init__(self):
+        """TODO: Add docstring"""
         self.audit_log: List[Dict[str, Any]] = []
         self.max_log_size = 10000  # Keep last 10k events
 
-    def log_security_event(self, event_type: str, details: Dict[str, Any]):
-        """Log a security event"""
+    def log_security_event(self, event_type: str, details: Dict[str, Any]):"""Log a security event"""
         event = {
             'timestamp': datetime.utcnow().isoformat(),
             'type': event_type,
@@ -248,8 +243,7 @@ def secure_deployment_check(
     deployment_config: Dict[str,
     Any],
     user_id: str
-) -> Dict[str, Any]:
-    """
+) -> Dict[str, Any]:"""
     Comprehensive security check before deployment
     Returns: {allowed: bool, reason: str, sanitized_config: dict}
     """

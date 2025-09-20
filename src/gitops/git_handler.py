@@ -18,6 +18,7 @@ logger = get_logger(__name__)
 
 class GitHandler:
     def __init__(self, vault_client: Optional[VaultClient] = None):
+        """TODO: Add docstring"""
         self.vault = vault_client or VaultClient()
         self.encryption = EncryptionManager()
         self.temp_dirs = []
@@ -42,7 +43,7 @@ class GitHandler:
                 os.chmod(ssh_key_path, 0o600)
 
                 # Configure git to use SSH key
-                ssh_command = f"ssh -i {ssh_key_path} -o \
+                ssh_command = f"ssh -i {ssh_key_path} -o \"
                     StrictHostKeyChecking=no"
                 repo = Repo.clone_from(
                     repo_url,
@@ -301,6 +302,7 @@ class GitHandler:
         return manifest
 
     def cleanup(self):
+        """TODO: Add docstring"""
         for temp_dir in self.temp_dirs:
             shutil.rmtree(temp_dir, ignore_errors=True)
         self.temp_dirs.clear()
@@ -311,4 +313,5 @@ class GitHandler:
         self.cleanup()
 
     def __del__(self):
+        """TODO: Add docstring"""
         self.cleanup()

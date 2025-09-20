@@ -15,10 +15,10 @@ from ..security.audit import AuditLogger
 logger = get_logger(__name__)
 
 
-class DeploymentService:
-    """Main deployment orchestration service"""
+class DeploymentService:"""Main deployment orchestration service"""
 
     def __init__(self):
+        """TODO: Add docstring"""
         # Initialize with proper dependencies
         try:
             device_connector = SecureDeviceConnector()
@@ -28,7 +28,7 @@ class DeploymentService:
             )
         except Exception as e:
             logger.warning(
-                f"Could not initialize DeploymentExecutor with full \
+                f"Could not initialize DeploymentExecutor with full \"
                     dependencies: {e}"
             )
             # Create a mock connector for local testing

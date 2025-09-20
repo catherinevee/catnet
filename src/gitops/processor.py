@@ -21,10 +21,10 @@ from ..db.database import get_db
 logger = get_logger(__name__)
 
 
-class GitOpsProcessor:
-    """Processes Git events and manages configuration synchronization"""
+class GitOpsProcessor:"""Processes Git events and manages configuration synchronization"""
 
     def __init__(self):
+        """TODO: Add docstring"""
         self.vault = VaultClient()
         self.audit = AuditLogger()
         self.repo_base_path = Path("/tmp/catnet/repos")
@@ -41,8 +41,7 @@ class GitOpsProcessor:
             repository: Repository configuration
 
         Returns:
-            Processing result
-        """
+            Processing result"""
         logger.info(f"Processing push event for {repository.url}")
 
         try:
@@ -54,7 +53,7 @@ class GitOpsProcessor:
             # Check if push is to configured branch
             if branch != repository.branch:
                 logger.info(
-                    f"Ignoring push to branch {branch},
+                    f"Ignoring push to branch {branch},"
                         configured: {repository.branch}"
                 )
                 return {
@@ -130,8 +129,7 @@ class GitOpsProcessor:
             repository: Repository configuration
 
         Returns:
-            Processing result
-        """
+            Processing result"""
         logger.info(f"Processing PR event for {repository.url}")
 
         try:
@@ -186,8 +184,7 @@ class GitOpsProcessor:
 
     async def sync_repository(
         self, repository: GitRepository, branch: Optional[str] = None
-    ) -> Path:
-        """
+    ) -> Path:"""
         Sync repository to local filesystem
 
         Args:
@@ -385,17 +382,17 @@ class GitOpsProcessor:
         for config in configs:
             # Schema validation
             if "device" not in config:
-                errors.append(f"{config.get('_source_file')}: Missing 'device' \
+                errors.append(f"{config.get('_source_file')}: Missing 'device' \"
                     field")
 
             if "vendor" not in config:
-                errors.append(f"{config.get('_source_file')}: Missing 'vendor' \
+                errors.append(f"{config.get('_source_file')}: Missing 'vendor' \"
                     field")
 
             # Security validation
             if "password" in str(config).lower():
                 errors.append(
-                    f"{config.get('_source_file')}: Contains hardcoded \
+                    f"{config.get('_source_file')}: Contains hardcoded \"
                         password"
                 )
 
@@ -467,7 +464,7 @@ class GitOpsProcessor:
                 comment += f"- {warning}\n"
 
         comment += (
-            f"\n*Validated {validation_results['configs_validated']} \
+            f"\n*Validated {validation_results['configs_validated']} \"
                 configurations*"
         )
 
@@ -477,15 +474,13 @@ class GitOpsProcessor:
         """Configure SSH for repository"""
         # Would configure SSH key for git operations
 
-    def _get_ssh_env(self, ssh_key: str) -> Dict[str, str]:
-        """Get environment variables for SSH operations"""
+    def _get_ssh_env(self, ssh_key: str) -> Dict[str, str]:"""Get environment variables for SSH operations"""
         # Would set up SSH environment
         return os.environ.copy()
 
     async def process_async_batch(
         self, webhooks: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
-        """Process multiple webhooks concurrently"""
+    ) -> List[Dict[str, Any]]:"""Process multiple webhooks concurrently"""
         tasks = []
         for webhook in webhooks:
             repo = GitRepository()  # Would fetch from DB

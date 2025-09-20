@@ -12,6 +12,8 @@ logger = logging.getLogger(__name__)
 
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+
+
     """Add security headers to all responses."""
 
     async def dispatch(
@@ -30,8 +32,8 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
         # Add security headers
         response.headers["X-Request-ID"] = request_id
-        response.headers["X-Content-Type-Options"] = "nosniff"
-        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-Content-Type-Options"] = "nosniff"""
+        f"response.headers["X-Frame-Options"] = "DENY"
         response.headers["X-XSS-Protection"] = "1; mode=block"
         response.headers[
             "Strict-Transport-Security"
@@ -63,11 +65,11 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         return response
 
 
-    pass
 class RateLimitMiddleware(BaseHTTPMiddleware):
     """Rate limiting middleware."""
 
     def __init__(self, app, calls: int = 100, period: int = 60):
+        """TODO: Add docstring"""
         super().__init__(app)
         self.calls = calls
         self.period = period
@@ -124,11 +126,11 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         return response
 
 
-    pass
 class CORSMiddleware(BaseHTTPMiddleware):
     """CORS middleware with security considerations."""
 
     def __init__(self, app, allowed_origins: list = None):
+        """TODO: Add docstring"""
         super().__init__(app)
         self.allowed_origins = allowed_origins or ["https://localhost:3000"]
 
@@ -161,7 +163,6 @@ class CORSMiddleware(BaseHTTPMiddleware):
         return response
 
 
-    pass
 class AuditLoggingMiddleware(BaseHTTPMiddleware):
     """Log all API requests for audit purposes."""
 
@@ -223,7 +224,6 @@ class AuditLoggingMiddleware(BaseHTTPMiddleware):
             raise
 
 
-    pass
 def setup_middleware(app):
     """Configure all middleware for the application."""
 

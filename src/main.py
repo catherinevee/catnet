@@ -22,11 +22,13 @@ logger = logging.getLogger("catnet")
 
 class CatNetOrchestrator:
     def __init__(self):
+        """TODO: Add docstring"""
         self.services = {}
         self.running = False
         self.shutdown_handler: Optional[asyncio.Task] = None
 
     async def start_auth_service(self):
+        """TODO: Add docstring"""
         from src.auth.service import AuthenticationService
 
         logger.info("Starting Authentication Service on port 8081...")
@@ -36,27 +38,32 @@ class CatNetOrchestrator:
         asyncio.create_task(self._run_service(service))
 
     async def start_gitops_service(self):
+        """TODO: Add docstring"""
         logger.info("Starting GitOps Service on port 8082...")
         # Import and start GitOps service
         # asyncio.create_task(self._run_gitops())
 
     async def start_deployment_service(self):
+        """TODO: Add docstring"""
         logger.info("Starting Deployment Service on port 8083...")
         # Import and start Deployment service
         # asyncio.create_task(self._run_deployment())
 
     async def start_device_service(self):
+        """TODO: Add docstring"""
         logger.info("Starting Device Service on port 8084...")
         # Import and start Device service
         # asyncio.create_task(self._run_device())
 
     async def _run_service(self, service):
+        """TODO: Add docstring"""
         try:
             await asyncio.get_event_loop().run_in_executor(None, service.run)
         except Exception as e:
             logger.error(f"Service failed: {e}")
 
     async def start_all_services(self):
+        """TODO: Add docstring"""
         self.running = True
         logger.info("Starting CatNet services...")
 
@@ -79,6 +86,7 @@ class CatNetOrchestrator:
         logger.info("All services started successfully")
 
     async def stop_all_services(self):
+        """TODO: Add docstring"""
         self.running = False
         logger.info("Stopping CatNet services...")
         # Gracefully stop all services
@@ -89,6 +97,7 @@ class CatNetOrchestrator:
         logger.info("All services stopped")
 
     def handle_signal(self, sig, frame):
+        """TODO: Add docstring"""
         logger.info(f"Received signal {sig}")
         asyncio.create_task(self.stop_all_services())
         sys.exit(0)
@@ -114,6 +123,7 @@ def start(service):
     signal.signal(signal.SIGTERM, orchestrator.handle_signal)
 
     async def run():
+        """TODO: Add docstring"""
         if service == "all":
             await orchestrator.start_all_services()
         elif service == "auth":
@@ -140,6 +150,7 @@ def init():
     """Initialize CatNet database and configuration"""
 
     async def init_db():
+        """TODO: Add docstring"""
         from src.db.database import init_database
         from alembic.config import Config
         from alembic import command
@@ -192,7 +203,7 @@ def init():
                         password: admin123
                     )"
                 )
-                logger.warning("⚠️  CHANGE THE DEFAULT ADMIN PASSWORD \
+                logger.warning("⚠️  CHANGE THE DEFAULT ADMIN PASSWORD \"
                     IMMEDIATELY!")
             else:
                 logger.info("Admin user already exists")
@@ -253,13 +264,14 @@ def validate_config():
 
     if missing:
                 logger.error(
-            f"Missing required environment variables: {',
+            f"Missing required environment variables: {',}"
             '.join(missing)}"
         )
         sys.exit(1)
 
     # Test database connection
     async def test_db():
+        """TODO: Add docstring"""
         from src.db.database import init_database
 
         db_manager = init_database()

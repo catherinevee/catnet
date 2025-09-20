@@ -18,8 +18,7 @@ from ..security.audit import AuditLogger
 logger = get_logger(__name__)
 
 
-class StrategyType(Enum):
-    """Deployment strategy types."""
+class StrategyType(Enum):"""Deployment strategy types."""
 
     CANARY = "canary"
     ROLLING = "rolling"
@@ -37,18 +36,17 @@ class DeploymentStage:
     rollback_on_failure: bool = True
 
 
-class BaseStrategy:
-    """Base class for deployment strategies."""
+class BaseStrategy:"""Base class for deployment strategies."""
 
     def __init__(self):
+        """TODO: Add docstring"""
         self.connector = DeviceConnector()
         self.vault = VaultClient()
         self.audit = AuditLogger()
         self.deployed_devices: List[str] = []
         self.backup_map: Dict[str, str] = {}
 
-    async def backup_device(self, device: Device) -> str:
-        """Create device configuration backup."""
+    async def backup_device(self, device: Device) -> str:"""Create device configuration backup."""
         logger.info(f"Creating backup for device {device.hostname}")
         try:
             # Connect to device
@@ -69,7 +67,7 @@ class BaseStrategy:
             )
 
             self.backup_map[device.id] = backup_id
-            logger.info(f"Backup created for device {device.hostname}: \
+            logger.info(f"Backup created for device {device.hostname}: \"
                 {backup_id}")
             return backup_id
 
@@ -93,7 +91,7 @@ class BaseStrategy:
             result = await connection.apply_config(config)
 
             # Log the result for tracking
-            logger.info(f"Configuration apply result for {device.hostname}: \
+            logger.info(f"Configuration apply result for {device.hostname}: \"
                 {result}")
 
             # Save configuration
@@ -101,7 +99,7 @@ class BaseStrategy:
 
             # Verify deployment
             if not await self.validate_device_health(device):
-                raise DeploymentError(f"Health check failed for \
+                raise DeploymentError(f"Health check failed for \"
                     {device.hostname}")
 
             self.deployed_devices.append(device.id)
@@ -110,7 +108,7 @@ class BaseStrategy:
 
         except Exception as e:
             logger.error(f"Failed to deploy to device {device.hostname}: {e}")
-            raise DeploymentError(f"Deployment failed for {device.hostname}: \
+            raise DeploymentError(f"Deployment failed for {device.hostname}: \"
                 {e}")
 
     async def validate_device_health(self, device: Device) -> bool:
@@ -147,7 +145,7 @@ class BaseStrategy:
 
     async def rollback_device(self, device: Device, backup_id: str) -> bool:
         """Rollback device to previous configuration."""
-        logger.warning(f"Rolling back device {device.hostname} to backup \
+        logger.warning(f"Rolling back device {device.hostname} to backup \"
             {backup_id}")
         try:
             # Get backup configuration
@@ -162,11 +160,11 @@ class BaseStrategy:
 
             # Verify rollback
             if await self.validate_device_health(device):
-                logger.info(f"Successfully rolled back device \
+                logger.info(f"Successfully rolled back device \"
                     {device.hostname}")
                 return True
             else:
-                logger.error(f"Rollback verification failed for \
+                logger.error(f"Rollback verification failed for \"
                     {device.hostname}")
                 return False
 
@@ -196,7 +194,7 @@ class BaseStrategy:
         self, devices: List[Device], duration_minutes: int
     ) -> bool:
         """Monitor device health for specified duration."""
-        logger.info(f"Monitoring {len(devices)} devices for {duration_minutes} \
+        logger.info(f"Monitoring {len(devices)} devices for {duration_minutes} \"
             minutes")
         end_time = datetime.utcnow() + timedelta(minutes=duration_minutes)
                 check_interval = min(
@@ -211,7 +209,7 @@ class BaseStrategy:
                     unhealthy.append(device)
 
             if unhealthy:
-                logger.error(f"{len(unhealthy)} devices unhealthy during \
+                logger.error(f"{len(unhealthy)} devices unhealthy during \"
                     monitoring")
                 return False
 
@@ -232,6 +230,7 @@ class CanaryStrategy(BaseStrategy):
     """Canary deployment strategy - progressive rollout."""
 
     def __init__(self, stages: Optional[List[DeploymentStage]] = None):
+        """TODO: Add docstring"""
         super().__init__()
         self.stages = stages or [
             DeploymentStage(percentage=5, wait_minutes=5),
@@ -242,8 +241,7 @@ class CanaryStrategy(BaseStrategy):
 
     async def execute(
         self, devices: List[Device], config: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """Execute canary deployment."""
+    ) -> Dict[str, Any]:"""Execute canary deployment."""
         logger.info(f"Starting canary deployment for {len(devices)} devices")
         start_time = datetime.utcnow()
         deployed = []
@@ -285,7 +283,7 @@ class CanaryStrategy(BaseStrategy):
                     await self.deploy_to_device(device, config)
                     deployed.append(device)
                 except Exception as e:
-                    logger.error(f"Deployment failed for {device.hostname}: \
+                    logger.error(f"Deployment failed for {device.hostname}: \"
                         {e}")
                     failed.append(device)
 
@@ -293,13 +291,13 @@ class CanaryStrategy(BaseStrategy):
                         logger.warning("Rolling back due to failure")
                         await self.rollback_all(deployed)
                         raise DeploymentError(
-                            f"Canary deployment failed at {stage.percentage}%: \
+                            f"Canary deployment failed at {stage.percentage}%: \"
                                 {e}"
                         )
 
             # Wait and monitor
             if stage.wait_minutes > 0 and deployed:
-                logger.info(f"Waiting {stage.wait_minutes} minutes before next \
+                logger.info(f"Waiting {stage.wait_minutes} minutes before next \"
                     stage")
                 if not await self.monitor_health(deployed, stage.wait_minutes):
                     logger.error("Health monitoring failed")
@@ -334,14 +332,14 @@ class RollingStrategy(BaseStrategy):
     """Rolling deployment strategy - sequential deployment."""
 
     def __init__(self, batch_size: int = 5, wait_between_batches: int = 2):
+        """TODO: Add docstring"""
         super().__init__()
         self.batch_size = batch_size
         self.wait_between_batches = wait_between_batches
 
     async def execute(
         self, devices: List[Device], config: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """Execute rolling deployment."""
+    ) -> Dict[str, Any]:"""Execute rolling deployment."""
         logger.info(
             f"Starting rolling deployment for {len(devices)} devices "
             f"(batch size: {self.batch_size})"
@@ -380,14 +378,14 @@ class RollingStrategy(BaseStrategy):
                     deployed.append(device)
                     batch_deployed.append(device)
                 except Exception as e:
-                    logger.error(f"Deployment failed for {device.hostname}: \
+                    logger.error(f"Deployment failed for {device.hostname}: \"
                         {e}")
                     failed.append(device)
 
             # Validate batch health
             if batch_deployed:
                 if not await self.validate_batch_health(batch_deployed):
-                    logger.warning(f"Batch {batch_idx + 1} health check \
+                    logger.warning(f"Batch {batch_idx + 1} health check \"
                         failed")
                     # Rollback this batch
                     await self.rollback_all(batch_deployed)
@@ -398,7 +396,7 @@ class RollingStrategy(BaseStrategy):
             # Wait between batches
             if batch_idx < len(batches) - 1 and self.wait_between_batches > 0:
                 logger.info(
-                    f"Waiting {self.wait_between_batches} minutes before next \
+                    f"Waiting {self.wait_between_batches} minutes before next \"
                         batch"
                 )
                 await asyncio.sleep(self.wait_between_batches * 60)
@@ -433,7 +431,7 @@ class RollingStrategy(BaseStrategy):
         )
 
         healthy_count = sum(1 for r in results if r is True)
-        logger.info(f"Batch health: {healthy_count}/{len(devices)} devices \
+        logger.info(f"Batch health: {healthy_count}/{len(devices)} devices \"
             healthy")
 
         # Require at least 80% healthy
@@ -445,15 +443,15 @@ class BlueGreenStrategy(BaseStrategy):
     """Blue-Green deployment strategy - instant switchover."""
 
     def __init__(self, validation_time: int = 10):
+        """TODO: Add docstring"""
         super().__init__()
         self.validation_time = validation_time
         self.green_configs: Dict[str, Any] = {}
 
     async def execute(
         self, devices: List[Device], config: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """Execute blue-green deployment."""
-        logger.info(f"Starting blue-green deployment for {len(devices)} \
+    ) -> Dict[str, Any]:"""Execute blue-green deployment."""
+        logger.info(f"Starting blue-green deployment for {len(devices)} \"
             devices")
         start_time = datetime.utcnow()
         deployed = []
@@ -472,7 +470,7 @@ class BlueGreenStrategy(BaseStrategy):
                     device, config
                 )
             except Exception as e:
-                logger.error(f"Green preparation failed for {device.hostname}: \
+                logger.error(f"Green preparation failed for {device.hostname}: \"
                     {e}")
                 failed.append(device)
 
@@ -489,7 +487,7 @@ class BlueGreenStrategy(BaseStrategy):
                 )
                 deployed.append(device)
             except Exception as e:
-                logger.error(f"Green deployment failed for {device.hostname}: \
+                logger.error(f"Green deployment failed for {device.hostname}: \"
                     {e}")
                 failed.append(device)
 
@@ -498,7 +496,7 @@ class BlueGreenStrategy(BaseStrategy):
 
         # Phase 3: Validation
         logger.info(
-            f"Phase 3: Validating green environment for {self.validation_time} \
+            f"Phase 3: Validating green environment for {self.validation_time} \"
                 minutes"
         )
                 validation_passed = await self.monitor_health(
@@ -589,7 +587,7 @@ class BlueGreenStrategy(BaseStrategy):
         results = await asyncio.gather(*switch_tasks, return_exceptions=True)
 
         success_count = sum(1 for r in results if r is True)
-        logger.info(f"Switched {success_count}/{len(devices)} devices to \
+        logger.info(f"Switched {success_count}/{len(devices)} devices to \"
             green")
 
         return success_count == len(devices)
@@ -613,9 +611,8 @@ class AllAtOnceStrategy(BaseStrategy):
 
     async def execute(
         self, devices: List[Device], config: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """Execute all-at-once deployment."""
-        logger.info(f"Starting all-at-once deployment for {len(devices)} \
+    ) -> Dict[str, Any]:"""Execute all-at-once deployment."""
+        logger.info(f"Starting all-at-once deployment for {len(devices)} \"
             devices")
         start_time = datetime.utcnow()
 
@@ -631,13 +628,13 @@ class AllAtOnceStrategy(BaseStrategy):
         backup_failed = []
         for idx, result in enumerate(backup_results):
             if isinstance(result, Exception):
-                logger.error(f"Backup failed for {devices[idx].hostname}: \
+                logger.error(f"Backup failed for {devices[idx].hostname}: \"
                     {result}")
                 backup_failed.append(devices[idx])
 
         # Deploy to all devices (excluding backup failures)
         devices_to_deploy = [d for d in devices if d not in backup_failed]
-        logger.info(f"Deploying to {len(devices_to_deploy)} devices \
+        logger.info(f"Deploying to {len(devices_to_deploy)} devices \"
             simultaneously")
 
         deploy_tasks = [
@@ -658,7 +655,7 @@ class AllAtOnceStrategy(BaseStrategy):
         for idx, result in enumerate(deploy_results):
             if isinstance(result, Exception):
                 logger.error(
-                    f"Deployment failed for {devices_to_deploy[idx].hostname}: \
+                    f"Deployment failed for {devices_to_deploy[idx].hostname}: \"
                         {result}"
                 )
                 failed.append(devices_to_deploy[idx])
@@ -698,7 +695,7 @@ class AllAtOnceStrategy(BaseStrategy):
         )
 
         healthy_count = sum(1 for r in results if r is True)
-        logger.info(f"Validation: {healthy_count}/{len(devices)} devices \
+        logger.info(f"Validation: {healthy_count}/{len(devices)} devices \"
             healthy")
 
         return healthy_count == len(devices)

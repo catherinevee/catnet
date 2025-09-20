@@ -67,7 +67,10 @@ async def require_auth(
 
 
 def require_roles(roles: list):
+    """TODO: Add docstring"""
+
     async def role_checker(current_user: User = Depends(get_current_user)):
+        """TODO: Add docstring"""
         if not any(role in current_user.roles for role in roles):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,

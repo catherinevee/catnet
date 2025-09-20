@@ -11,8 +11,7 @@ from ..core.exceptions import DeviceConnectionError
 from ..security.audit import AuditLogger
 
 
-class JuniperHandler:
-    """
+class JuniperHandler:"""
     Handler for Juniper Junos devices
     Following CLAUDE.md vendor commands exactly
     """
@@ -28,6 +27,7 @@ class JuniperHandler:
     }
 
     def __init__(self, connection: Any, audit_logger: Optional[AuditLogger] = None):
+        """TODO: Add docstring"""
         self.connection = connection
         self.audit = audit_logger or AuditLogger()
         self.in_config_mode = False
@@ -156,8 +156,7 @@ class JuniperHandler:
     ) -> str:
         """
         Commit configuration with optional confirmation
-        Junos-specific feature for safe commits
-        """
+        Junos-specific feature for safe commits"""
         if confirmed:
             # Commit with automatic rollback if not confirmed
             command = f"commit confirmed {confirm_timeout}"
@@ -257,7 +256,7 @@ class JuniperHandler:
 
         if ip_address:
             commands.append(
-                f"set interfaces {interface} unit 0 family inet address \
+                f"set interfaces {interface} unit 0 family inet address \"
                     {ip_address}"
             )
 
@@ -318,12 +317,12 @@ class JuniperHandler:
             term_name = f"term{i}"
             from_clause = rule.get("from", "")
             commands.append(
-                f"set firewall filter {filter_name} term {term_name} from \
+                f"set firewall filter {filter_name} term {term_name} from \"
                     {from_clause}"
             )
             then_action = rule.get("then", "accept")
             commands.append(
-                f"set firewall filter {filter_name} term {term_name} then \
+                f"set firewall filter {filter_name} term {term_name} then \"
                     {then_action}"
             )
 

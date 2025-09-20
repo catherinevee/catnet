@@ -1,9 +1,6 @@
 """
 Simple Deployment API Endpoints
 Phase 4 Implementation - Connect GitHub → Device deployment
-    """
-    Documentation placeholder
-    """
 from fastapi import APIRouter, HTTPException, status
 from typing import List, Optional
 from pydantic import BaseModel
@@ -22,8 +19,9 @@ class CreateDeploymentRequest(BaseModel):
     device_id: str
 
 
-    pass
 class DeploymentResponse(BaseModel):
+
+
     """Deployment response model"""
     id: str
     config_path: str
@@ -36,21 +34,18 @@ class DeploymentResponse(BaseModel):
 
 
 class ExecuteDeploymentRequest(BaseModel):
+
+
     """Request to execute a deployment"""
     deployment_id: str
 
 
 @router.post("/create", response_model=DeploymentResponse)
 async def create_deployment(request: CreateDeploymentRequest):
-    """
-    Documentation placeholder
-    """
+    """TODO: Add docstring"""
     Create a new deployment task
 
     Links a GitHub config to a device for deployment
-    """
-    Documentation placeholder
-    """
     try:
         # Validate device exists
         device = device_store.get_device(request.device_id)
@@ -96,15 +91,10 @@ async def create_deployment(request: CreateDeploymentRequest):
 
 @router.post("/execute")
 async def execute_deployment(request: ExecuteDeploymentRequest):
-    """
-    Documentation placeholder
-    """
+    """TODO: Add docstring"""
     Execute a pending deployment
 
     Fetches config from GitHub and deploys to device
-    """
-    Documentation placeholder
-    """
     try:
         deployment = deployment_pipeline.execute_deployment( \
             request.deployment_id)
@@ -219,9 +209,7 @@ async def rollback_deployment(deployment_id: str):
 
 @router.post("/deploy-flow")
 async def full_deployment_flow(config_path: str, device_id: str):
-    """
-    Documentation placeholder
-    """
+    """TODO: Add docstring"""
     Complete deployment flow in one call
 
     1. Create deployment
@@ -229,9 +217,6 @@ async def full_deployment_flow(config_path: str, device_id: str):
     3. Return result
 
     This is the main endpoint that wires everything together!
-    """
-    Documentation placeholder
-    """
     try:
         # Step 1: Create deployment
         deployment = deployment_pipeline.create_deployment(

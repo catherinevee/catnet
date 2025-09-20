@@ -32,10 +32,10 @@ from ..core.exceptions import SecurityError
 logger = get_logger(__name__)
 
 
-class DeviceCertificateManager:
-    """Manages device certificates for authentication"""
+class DeviceCertificateManager:"""Manages device certificates for authentication"""
 
     def __init__(self):
+        """TODO: Add docstring"""
         self.vault = VaultClient()
         self.audit = AuditLogger()
         self.ca_cert = None
@@ -78,8 +78,7 @@ class DeviceCertificateManager:
             validity_days: Certificate validity in days
 
         Returns:
-            Dictionary containing certificate details
-        """
+            Dictionary containing certificate details"""
         logger.info(f"Issuing certificate for device {device_id}")
 
         if not self.ca_cert or not self.ca_key:
@@ -260,8 +259,7 @@ class DeviceCertificateManager:
             reason: Revocation reason
 
         Returns:
-            True if revocation successful
-        """
+            True if revocation successful"""
         logger.info(f"Revoking certificate for device {device_id}")
 
         try:
@@ -309,7 +307,7 @@ class DeviceCertificateManager:
             )
 
             logger.info(
-                f"Certificate revoked for device {device_id} with ID \
+                f"Certificate revoked for device {device_id} with ID \"
                     {revocation_id}"
             )
             return True
@@ -329,8 +327,7 @@ class DeviceCertificateManager:
             device_ip: Optional IP address to verify
 
         Returns:
-            Device object if valid, None otherwise
-        """
+            Device object if valid, None otherwise"""
         try:
             # Parse certificate
             cert = x509.load_pem_x509_certificate(cert_data, default_backend())
@@ -355,7 +352,7 @@ class DeviceCertificateManager:
 
             # Check if certificate is revoked
             if await self._is_cert_revoked(device_id):
-                logger.warning(f"Certificate for device {device_id} is \
+                logger.warning(f"Certificate for device {device_id} is \"
                     revoked")
                 return None
 
@@ -387,11 +384,11 @@ class DeviceCertificateManager:
                         logger.warning(f"IP mismatch for device {device_id}")
                         return None
 
-                    logger.info(f"Certificate validated for device \
+                    logger.info(f"Certificate validated for device \"
                         {device_id}")
                     return device
 
-            logger.warning(f"Device {device_id} not found or certificate \
+            logger.warning(f"Device {device_id} not found or certificate \"
                 mismatch")
             return None
 
@@ -413,8 +410,7 @@ class DeviceCertificateManager:
             force: Force rotation regardless of expiry
 
         Returns:
-            Statistics of rotated certificates
-        """
+            Statistics of rotated certificates"""
         logger.info("Starting device certificate rotation")
 
         stats = {"checked": 0, "rotated": 0, "failed": 0}
@@ -466,8 +462,7 @@ class DeviceCertificateManager:
             return True
         return (expires_at - datetime.utcnow()).days <= days_before
 
-    async def _add_to_crl(self, device_id: str):
-        """Add certificate to CRL"""
+    async def _add_to_crl(self, device_id: str):"""Add certificate to CRL"""
         # In production, this would update the CRL file/service
         crl_path = self.certs_dir / "crl.json"
 
@@ -506,8 +501,7 @@ class DeviceCertificateManager:
             device_id: Device UUID
 
         Returns:
-            Certificate status information
-        """
+            Certificate status information"""
         async with get_db() as session:
             result = await session.execute(select(Device).where(Device.id ==
                                                                 device_id))

@@ -16,8 +16,7 @@ import json
 from collections import defaultdict
 
 
-class HistoryEventType(Enum):
-    """Types of history events"""
+class HistoryEventType(Enum):"""Types of history events"""
 
     DEPLOYMENT_CREATED = "deployment_created"
     DEPLOYMENT_STARTED = "deployment_started"
@@ -50,8 +49,7 @@ class HistoryEvent:
 
 
 @dataclass
-class DeploymentSummary:
-    """Deployment summary for history"""
+class DeploymentSummary:"""Deployment summary for history"""
 
     deployment_id: str
     name: str
@@ -69,8 +67,7 @@ class DeploymentSummary:
 
 
 @dataclass
-class DeviceHistory:
-    """Device deployment history"""
+class DeviceHistory:"""Device deployment history"""
 
     device_id: str
     device_hostname: str
@@ -84,13 +81,11 @@ class DeviceHistory:
     health_status: Optional[str] = None
 
 
-class DeploymentHistory:
-    """
+class DeploymentHistory:"""
     Tracks and manages deployment history
     """
 
-    def __init__(self):
-        """Initialize deployment history"""
+    def __init__(self):"""Initialize deployment history"""
         self.events: List[HistoryEvent] = []
         self.deployment_summaries: Dict[str, DeploymentSummary] = {}
         self.device_histories: Dict[str, DeviceHistory] = {}
@@ -104,8 +99,7 @@ class DeploymentHistory:
         device_id: Optional[str] = None,
         details: Optional[Dict[str, Any]] = None,
         metadata: Optional[Dict[str, Any]] = None,
-    ) -> str:
-        """
+    ) -> str:"""
         Record a history event
 
         Args:
@@ -166,8 +160,7 @@ class DeploymentHistory:
             devices: List of devices
             strategy: Deployment strategy
             created_by: User who created deployment
-            configuration_size: Size of configuration
-        """
+            configuration_size: Size of configuration"""
         # Create summary
         summary = DeploymentSummary(
             deployment_id=deployment_id,
@@ -223,8 +216,7 @@ class DeploymentHistory:
             deployment_id: Deployment ID
             status: Final status
             successful_devices: List of successful devices
-            failed_devices: List of failed devices
-        """
+            failed_devices: List of failed devices"""
         if deployment_id not in self.deployment_summaries:
             return
 
@@ -262,8 +254,7 @@ class DeploymentHistory:
             deployment_id: Deployment ID
             user: User who initiated rollback
             devices: Devices that were rolled back
-            reason: Rollback reason
-        """
+            reason: Rollback reason"""
         self.record_event(
             HistoryEventType.DEPLOYMENT_ROLLED_BACK,
             deployment_id,
@@ -299,8 +290,7 @@ class DeploymentHistory:
             limit: Maximum results
 
         Returns:
-            List of history events
-        """
+            List of history events"""
         events = self.events
 
         # Apply filters
@@ -332,8 +322,7 @@ class DeploymentHistory:
             deployment_id: Deployment ID
 
         Returns:
-            Deployment summary or None
-        """
+            Deployment summary or None"""
         if deployment_id not in self.deployment_summaries:
             return None
 
@@ -369,8 +358,7 @@ class DeploymentHistory:
             device_id: Device ID
 
         Returns:
-            Device history or None
-        """
+            Device history or None"""
         if device_id not in self.device_histories:
             return None
 
@@ -412,8 +400,7 @@ class DeploymentHistory:
             end_date: End date for statistics
 
         Returns:
-            Statistics dictionary
-        """
+            Statistics dictionary"""
         # Filter summaries by date
         summaries = list(self.deployment_summaries.values())
         if start_date:
@@ -477,8 +464,7 @@ class DeploymentHistory:
             end_date: Report end date
 
         Returns:
-            Compliance report
-        """
+            Compliance report"""
         events = [e for e in self.events if start_date <= e.timestamp <=
                   end_date]
 
@@ -541,8 +527,7 @@ class DeploymentHistory:
             end_date: End date filter
 
         Returns:
-            Exported data as string
-        """
+            Exported data as string"""
         events = self.get_deployment_history(
             start_date=start_date,
             end_date=end_date,
@@ -600,8 +585,7 @@ class DeploymentHistory:
         def _count_by_status(
             self,
             summaries: List[DeploymentSummary]
-        ) -> Dict[str, int]:
-        """Count deployments by status"""
+        ) -> Dict[str, int]:"""Count deployments by status"""
         counts = defaultdict(int)
         for summary in summaries:
             counts[summary.status] += 1
@@ -609,8 +593,7 @@ class DeploymentHistory:
 
     def _get_top_deployers(
         self, summaries: List[DeploymentSummary], limit: int = 5
-    ) -> List[Dict[str, Any]]:
-        """Get top deployers"""
+    ) -> List[Dict[str, Any]]:"""Get top deployers"""
         user_counts = defaultdict(int)
         for summary in summaries:
             user_counts[summary.created_by] += 1

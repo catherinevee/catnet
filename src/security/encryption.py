@@ -17,6 +17,7 @@ import secrets
 
 class EncryptionManager:
     def __init__(self, key: Optional[bytes] = None):
+        """TODO: Add docstring"""
         self.backend = default_backend()
         self.key = key or self._generate_key()
 

@@ -16,8 +16,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 
-class SecretType(Enum):
-    """Types of secrets"""
+class SecretType(Enum):"""Types of secrets"""
 
     PASSWORD = "password"
     API_KEY = "api_key"
@@ -47,8 +46,7 @@ class SecretMatch:
 
 
 @dataclass
-class SecretScanResult:
-    """Result of secret scanning"""
+class SecretScanResult:"""Result of secret scanning"""
 
     file_path: str
     has_secrets: bool
@@ -58,13 +56,11 @@ class SecretScanResult:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
-class SecretScanner:
-    """
+class SecretScanner:"""
     Scans for secrets and sensitive data in configurations
     """
 
-    def __init__(self):
-        """Initialize secret scanner"""
+    def __init__(self):"""Initialize secret scanner"""
         # Define secret detection patterns
         self.patterns = {
             # Passwords
@@ -76,7 +72,7 @@ class SecretScanner:
                 "confidence": 0.9,
             },
             "cisco_password": {
-                "pattern": r"(?i)(enable\s+password|username\s+\S+\s+password) \
+                "pattern": r"(?i)(enable\s+password|username\s+\S+\s+password) \" \
     \s+(?:0\s+)?(\S+)",
                 "type": SecretType.PASSWORD,
                 "confidence": 0.95,
@@ -91,13 +87,13 @@ class SecretScanner:
             },
             "aws_access_key": {
                                 "pattern": r"(
-                    ?i)(aws[_-]?access[_-]?key[_-]?id|AKIA[0-9A-Z]{16}
+                    ?i)(aws[_-]?access[_-]?key[_-]?id|AKIA[0-9A-Z]{16}" \
                 )",
                 "type": SecretType.AWS_CREDENTIALS,
                 "confidence": 0.95,
             },
             "aws_secret_key": {
-                "pattern": r"(?i)(aws[_-]?secret[_-]?access[_-]?key)\s*[:=]\s*[ 
+                "pattern": r"(?i)(aws[_-]?secret[_-]?access[_-]?key)\s*[:=]\s*[ " \
     '\"]?([a-zA-Z0-9/+=]{40})['\"]?",
                 "type": SecretType.AWS_CREDENTIALS,
                 "confidence": 0.95,
@@ -117,33 +113,33 @@ class SecretScanner:
             # Private Keys
             "private_key_header": {
                                 "pattern": r"-----BEGIN\s+(
-                    RSA|DSA|EC|OPENSSH
+                    RSA|DSA|EC|OPENSSH" \
                 )?\s*PRIVATE KEY-----",
                 "type": SecretType.PRIVATE_KEY,
                 "confidence": 1.0,
             },
             "ssh_private_key": {
-                "pattern": r"-----BEGIN OPENSSH PRIVATE KEY-----[\s\S]+?-----END \
+                "pattern": r"-----BEGIN OPENSSH PRIVATE KEY-----[\s\S]+?-----END \" \
     OPENSSH PRIVATE KEY-----",
                 "type": SecretType.SSH_KEY,
                 "confidence": 1.0,
             },
             # Certificates
             "certificate": {
-                "pattern": r"-----BEGIN CERTIFICATE-----[\s\S]+?-----END \
+                "pattern": r"-----BEGIN CERTIFICATE-----[\s\S]+?-----END \" \
     CERTIFICATE-----",
                 "type": SecretType.CERTIFICATE,
                 "confidence": 1.0,
             },
             # Connection Strings
             "connection_string": {
-                "pattern": r"(?i)( 
+                "pattern": r"(?i)( " \
     mongodb|postgres|postgresql|mysql|redis|amqp|jdbc):\/\/[^:]+:[^@]+@[^\s]+",
                 "type": SecretType.CONNECTION_STRING,
                 "confidence": 0.95,
             },
             "database_url": {
-                                "pattern": r"(
+                                "pattern": r"(" \
                     ?i)database[_-]?url\s*[:=]\s*['\"]?([^'\"}\s]+
                 )['\"]?",
                 "type": SecretType.DATABASE_URL,
@@ -157,7 +153,7 @@ class SecretScanner:
             },
             # Generic secrets
             "secret_literal": {
-                "pattern": r"(?i)(secret|private[_-]?key|auth[_-]?token)\s*[:=] \
+                "pattern": r"(?i)(secret|private[_-]?key|auth[_-]?token)\s*[:=] \" \
     \s*['\"]?([^'\"}\s]{8,})['\"]?",
                 "type": SecretType.GENERIC_SECRET,
                 "confidence": 0.7,
@@ -192,8 +188,7 @@ class SecretScanner:
             content: File content
 
         Returns:
-            SecretScanResult object
-        """
+            SecretScanResult object"""
         import time
 
         start_time = time.time()
@@ -311,8 +306,7 @@ class SecretScanner:
             extensions: File extensions to scan
 
         Returns:
-            List of SecretScanResult objects
-        """
+            List of SecretScanResult objects"""
         import os
 
         results = []
@@ -320,8 +314,8 @@ class SecretScanner:
             ".yml",
             ".yaml",
             ".json",
-            ".conf",
-            ".cfg",
+            ".conf"," \
+           f" ".cfg",
             ".ini",
             ".env",
         ]
@@ -357,8 +351,7 @@ class SecretScanner:
             text: Text to analyze
 
         Returns:
-            Entropy value
-        """
+            Entropy value"""
         if not text:
             return 0.0
 
@@ -388,8 +381,7 @@ class SecretScanner:
             entropy: Calculated entropy
 
         Returns:
-            True if high entropy
-        """
+            True if high entropy"""
         # Check if it looks like base64
         if re.match(r"^[A-Za-z0-9+/]+=*$", text):
             return entropy > self.entropy_thresholds["base64"]
@@ -409,8 +401,7 @@ class SecretScanner:
             text: Text to check
 
         Returns:
-            True if whitelisted
-        """
+            True if whitelisted"""
         for pattern in self.whitelist_patterns:
             if re.match(pattern, text, re.IGNORECASE):
                 return True
@@ -425,8 +416,7 @@ class SecretScanner:
             secret_value: Secret value to redact
 
         Returns:
-            Redacted text
-        """
+            Redacted text"""
         if len(secret_value) <= 4:
             redacted = "*" * len(secret_value)
         else:
@@ -451,8 +441,7 @@ class SecretScanner:
             scan_result: Scan result with secrets
 
         Returns:
-            Quarantine report
-        """
+            Quarantine report"""
         import tempfile
         import shutil
 

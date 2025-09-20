@@ -29,31 +29,33 @@ class ValidationResult:
     info: List[str] = field(default_factory=list)
 
     def add_error(self, message: str):
+        """TODO: Add docstring"""
         self.errors.append(message)
         self.is_valid = False
 
     def add_warning(self, message: str):
+        """TODO: Add docstring"""
         self.warnings.append(message)
 
     def add_info(self, message: str):
+        """TODO: Add docstring"""
         self.info.append(message)
 
 
-class ConfigValidator:
-    """
+class ConfigValidator:"""
     PATTERN: Multi-layer validation before deployment
     Following CLAUDE.md validation layers exactly
     """
 
     def __init__(self):
+        """TODO: Add docstring"""
         self.schema_validators = {}
         self.syntax_validators = {}
         self.security_rules = []
         self.business_rules = []
         self.load_validation_rules()
 
-    def load_validation_rules(self):
-        """Load all validation rules"""
+    def load_validation_rules(self):"""Load all validation rules"""
         # Security compliance rules
         self.security_rules = [
             self.no_plaintext_passwords,
@@ -77,8 +79,7 @@ class ConfigValidator:
             self,
             config: Dict[str,
                          Any]
-        ) -> ValidationResult:
-        """
+        ) -> ValidationResult:"""
         Main validation method following CLAUDE.md pattern
         """
         result = ValidationResult()
@@ -189,7 +190,7 @@ class ConfigValidator:
                 logger.debug(f"Validating interface: {interface_context}")
                 # Validate interface name
                 if not re.match(r"interface \S+", line):
-                    result.add_error(f"Line {line_num}: Invalid interface \
+                    result.add_error(f"Line {line_num}: Invalid interface \"
                         syntax")
 
             # Exit context
@@ -200,7 +201,7 @@ class ConfigValidator:
             elif "ip address" in line:
                 if "interface" not in current_context:
                     result.add_warning(
-                        f"Line {line_num}: IP address outside interface \
+                        f"Line {line_num}: IP address outside interface \"
                             context"
                     )
 
@@ -208,11 +209,11 @@ class ConfigValidator:
                 match = re.search(r"ip address (\S+) (\S+)", line)
                 if match:
                     try:
-                        ipaddress.IPv4Interface(f"{match.group(
+                        ipaddress.IPv4Interface(f"{match.group(}"
                             1)}/{match.group(2)}")
                     except ValueError:
                         result.add_error(
-                            f"Line {line_num}: Invalid IP address \
+                            f"Line {line_num}: Invalid IP address \"
                             or mask")
 
             # ACL validation
@@ -226,7 +227,7 @@ class ConfigValidator:
                 if match:
                     vlan_id = int(match.group(1))
                     if vlan_id < 1 or vlan_id > 4094:
-                        result.add_error(f"Line {line_num}: Invalid VLAN ID \
+                        result.add_error(f"Line {line_num}: Invalid VLAN ID \"
                             {vlan_id}")
 
         return result
@@ -248,7 +249,7 @@ class ConfigValidator:
             if line.startswith("set "):
                 # Basic syntax check
                 if not re.match(r"set \S+ \S+", line):
-                    result.add_error(f"Line {line_num}: Invalid set command \
+                    result.add_error(f"Line {line_num}: Invalid set command \"
                         syntax")
 
                 # Interface validation
@@ -266,14 +267,14 @@ class ConfigValidator:
                         try:
                             ipaddress.IPv4Interface(match.group(1))
                         except ValueError:
-                            result.add_error(f"Line {line_num}: Invalid IP \
+                            result.add_error(f"Line {line_num}: Invalid IP \"
                                 address")
 
             # Delete commands
             elif line.startswith("delete "):
                 if not re.match(r"delete \S+", line):
                     result.add_error(
-                        f"Line {line_num}: Invalid delete command \
+                        f"Line {line_num}: Invalid delete command \"
                         syntax")
 
         return result
@@ -488,7 +489,7 @@ class ConfigValidator:
         for acl_num, count in acl_counts.items():
             if count > 10:  # Arbitrary threshold
                 result.add_warning(
-                    f"ACL {acl_num} has {count} entries - consider \
+                    f"ACL {acl_num} has {count} entries - consider \"
                         optimization"
                 )
 

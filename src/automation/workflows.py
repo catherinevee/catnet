@@ -19,8 +19,7 @@ from collections import defaultdict
 import re
 
 
-class WorkflowState(Enum):
-    """Workflow execution states"""
+class WorkflowState(Enum):"""Workflow execution states"""
 
     PENDING = "pending"
     RUNNING = "running"
@@ -83,8 +82,7 @@ class WorkflowTrigger:
 
 
 @dataclass
-class WorkflowAction:
-    """Workflow action definition"""
+class WorkflowAction:"""Workflow action definition"""
 
     id: str
     name: str
@@ -99,8 +97,7 @@ class WorkflowAction:
 
 
 @dataclass
-class WorkflowStep:
-    """Workflow execution step"""
+class WorkflowStep:"""Workflow execution step"""
 
     action: WorkflowAction
     state: WorkflowState
@@ -112,8 +109,7 @@ class WorkflowStep:
 
 
 @dataclass
-class Workflow:
-    """Workflow definition"""
+class Workflow:"""Workflow definition"""
 
     id: str
     name: str
@@ -127,8 +123,7 @@ class Workflow:
 
 
 @dataclass
-class WorkflowExecution:
-    """Workflow execution instance"""
+class WorkflowExecution:"""Workflow execution instance"""
 
     id: str
     workflow_id: str
@@ -141,8 +136,7 @@ class WorkflowExecution:
     error: Optional[str] = None
 
 
-class WorkflowEngine:
-    """
+class WorkflowEngine:"""
     Workflow automation engine
     """
 
@@ -152,8 +146,7 @@ class WorkflowEngine:
         deployment_service=None,
         notification_service=None,
         monitoring_service=None,
-    ):
-        """
+    ):"""
         Initialize workflow engine
 
         Args:
@@ -189,8 +182,7 @@ class WorkflowEngine:
         # Initialize default workflows
         self._initialize_default_workflows()
 
-    def _register_action_handlers(self):
-        """Register action type handlers"""
+    def _register_action_handlers(self):"""Register action type handlers"""
         self.action_handlers[ActionType.DEVICE_COMMAND] = \
             self._execute_device_command
         self.action_handlers[ActionType.CONFIG_CHANGE] = \
@@ -203,8 +195,7 @@ class WorkflowEngine:
         self.action_handlers[ActionType.WAIT] = self._execute_wait
         self.action_handlers[ActionType.CONDITION] = self._execute_condition
 
-    def _initialize_default_workflows(self):
-        """Initialize default automation workflows"""
+    def _initialize_default_workflows(self):"""Initialize default automation workflows"""
         # Auto-remediation for high CPU
         self.add_workflow(
             Workflow(
@@ -370,8 +361,7 @@ class WorkflowEngine:
         Add a workflow
 
         Args:
-            workflow: Workflow to add
-        """
+            workflow: Workflow to add"""
         self.workflows[workflow.id] = workflow
 
         # Subscribe to events
@@ -389,8 +379,7 @@ class WorkflowEngine:
         Remove a workflow
 
         Args:
-            workflow_id: Workflow ID
-        """
+            workflow_id: Workflow ID"""
         if workflow_id in self.workflows:
             workflow = self.workflows[workflow_id]
 
@@ -423,8 +412,7 @@ class WorkflowEngine:
             trigger_event: Triggering event data
 
         Returns:
-            Execution ID
-        """
+            Execution ID"""
         if workflow_id not in self.workflows:
             raise ValueError(f"Workflow {workflow_id} not found")
 
@@ -529,8 +517,7 @@ class WorkflowEngine:
         self,
         step: WorkflowStep,
         execution: WorkflowExecution
-    ):
-        """Execute a workflow action"""
+    ):"""Execute a workflow action"""
         step.state = WorkflowState.RUNNING
         step.started_at = datetime.utcnow()
 
@@ -767,6 +754,7 @@ class WorkflowEngine:
         pattern = r"\{\{([^}]+)\}\}"
 
         def replace(match):
+            """TODO: Add docstring"""
             path = match.group(1).strip()
             parts = path.split(".")
 
@@ -791,8 +779,7 @@ class WorkflowEngine:
                 return False
         return True
 
-    def _parse_output(self, output: str) -> Dict[str, Any]:
-        """Parse command output"""
+    def _parse_output(self, output: str) -> Dict[str, Any]:"""Parse command output"""
         # Simple parsing - would be more sophisticated in production
         lines = output.strip().split("\n")
         return {"lines": lines, "line_count": len(lines)}
@@ -801,8 +788,7 @@ class WorkflowEngine:
         """Schedule a workflow"""
         # Implementation depends on scheduler
 
-    async def handle_event(self, event: Dict[str, Any]):
-        """Handle an event that might trigger workflows"""
+    async def handle_event(self, event: Dict[str, Any]):"""Handle an event that might trigger workflows"""
         event_type = event.get("type")
         if not event_type:
             return
@@ -886,8 +872,7 @@ class WorkflowEngine:
 
 class WorkflowBuilder:
     """
-    Builder pattern for creating workflows
-    """
+    Builder pattern for creating workflows"""
 
     def __init__(self, name: str, description: str = ""):
         """Initialize workflow builder"""
@@ -959,8 +944,7 @@ class WorkflowBuilder:
         self.workflow.retry_policy = policy
         return self
 
-    def build(self) -> Workflow:
-        """Build and return the workflow"""
+    def build(self) -> Workflow:"""Build and return the workflow"""
         # Validate workflow
         if not self.workflow.steps:
             raise ValueError("Workflow must have at least one step")
@@ -975,8 +959,7 @@ class WorkflowBuilder:
 
 class RemediationWorkflows:
     """
-    Pre-defined remediation workflows
-    """
+    Pre-defined remediation workflows"""
 
     @staticmethod
     def create_high_cpu_remediation() -> Workflow:

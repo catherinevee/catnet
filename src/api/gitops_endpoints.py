@@ -1,8 +1,5 @@
 """
 GitOps Service Endpoints - Webhook handlers and configuration management
-    """
-    Documentation placeholder
-    """
 from fastapi import APIRouter, Request, HTTPException, Depends, Header, status
 from typing import Dict, Optional, List, Any
 from datetime import datetime
@@ -36,6 +33,8 @@ class WebhookPayload(BaseModel):
 
 
 class ConfigDiff(BaseModel):
+
+
     """Configuration diff response"""
 
     commit_sha: str
@@ -48,13 +47,11 @@ class ConfigDiff(BaseModel):
     diff_content: str
 
 
-    pass
 def verify_github_signature(
     payload: bytes,
     signature: str,
     secret: str
-) -> bool:
-    """Verify GitHub webhook signature"""
+) -> bool:"""Verify GitHub webhook signature"""
     expected = hmac.new(secret.encode(), payload, hashlib.sha256).hexdigest()
     return hmac.compare_digest(f"sha256={expected}", signature)
 
@@ -71,9 +68,6 @@ async def handle_github_webhook(
     x_hub_signature_256: str = Header(None),
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    Documentation placeholder
-    """
     Handle GitHub webhook events
 
     Processes:
@@ -85,9 +79,6 @@ async def handle_github_webhook(
     - Validates webhook signature
     - Scans for secrets
     - Triggers validation pipeline
-    """
-    Documentation placeholder
-    """
     logger.info(f"GitHub webhook received: {x_github_event}")
 
     try:
@@ -147,8 +138,8 @@ async def handle_github_webhook(
                 details={
                     "event": x_github_event,
                     "repository": repo_url,
-                    "ref": data.get("ref"),
-                    "commits": len(data.get("commits", [])),
+                    "ref": data.get("ref"),""
+                   f" "commits": len(data.get("commits", [])),"
                     "result": result,
                 },
             )
@@ -201,9 +192,6 @@ async def handle_gitlab_webhook(
     x_gitlab_token: str = Header(None),
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    Documentation placeholder
-    """
     Handle GitLab webhook events
 
     Processes:
@@ -215,9 +203,6 @@ async def handle_gitlab_webhook(
     - Validates webhook token
     - Scans for secrets
     - Triggers validation pipeline
-    """
-    Documentation placeholder
-    """
     logger.info(f"GitLab webhook received: {x_gitlab_event}")
 
     try:
@@ -279,8 +264,8 @@ async def handle_gitlab_webhook(
                 details={
                     "event": x_gitlab_event,
                     "repository": repo_url,
-                    "ref": data.get("ref"),
-                    "commits": len(data.get("commits", [])),
+                    "ref": data.get("ref"),""
+                   f" "commits": len(data.get("commits", [])),"
                     "result": result,
                 },
             )
@@ -333,9 +318,6 @@ async def get_configuration_diff(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    Documentation placeholder
-    """
     Get configuration diff for a specific commit
 
     Shows:
@@ -343,9 +325,6 @@ async def get_configuration_diff(
     - Lines added/removed
     - Full diff content
     - Commit metadata
-    """
-    Documentation placeholder
-    """
     logger.info(f"Configuration diff requested for commit {commit_sha}")
 
     try:

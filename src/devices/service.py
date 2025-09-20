@@ -13,18 +13,17 @@ from ..security.vault import VaultClient
 logger = get_logger(__name__)
 
 
-class DeviceService:
-    """Main device management service"""
+class DeviceService:"""Main device management service"""
 
     def __init__(self):
+        """TODO: Add docstring"""
         self.connector = SecureDeviceConnector()
         self.vault = VaultClient()
         self.ssh_manager = SSHKeyManager(self.vault)
 
     async def connect_to_device(
         self, device_id: str, user_context: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """Connect to a network device"""
+    ) -> Dict[str, Any]:"""Connect to a network device"""
         logger.info(f"Connecting to device {device_id}")
 
         try:
@@ -112,7 +111,7 @@ class DeviceService:
                 await connection.disconnect()
 
                 # Store backup (would save to database)
-                backup_id = f"backup_{device_id}_{datetime.utcnow().isoformat( \
+                backup_id = f"backup_{device_id}_{datetime.utcnow().isoformat( \}"
                     )}"
 
                 return {

@@ -16,8 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
-class DeploymentSnapshot:
-    """Snapshot of device state before deployment"""
+class DeploymentSnapshot:"""Snapshot of device state before deployment"""
     deployment_id: str
     device_id: str
     timestamp: datetime
@@ -27,20 +26,19 @@ class DeploymentSnapshot:
 
 
 @dataclass
-class HealthCheck:
-    """Health check result"""
+class HealthCheck:"""Health check result"""
     check_name: str
     status: str  # healthy, degraded, failed
     message: str
     timestamp: datetime = field(default_factory=datetime.utcnow)
 
 
-class RollbackManager:
-    """
+class RollbackManager:"""
     Manages rollback operations and safety checks
     """
 
     def __init__(self):
+        """TODO: Add docstring"""
         self.snapshots_dir = Path("data/rollback_snapshots")
         self.snapshots_dir.mkdir(parents=True, exist_ok=True)
         self.health_checks_dir = Path("data/health_checks")
@@ -54,8 +52,7 @@ class RollbackManager:
         config_backup: str
     ) -> DeploymentSnapshot:
         """
-        Create a snapshot before deployment
-        """
+        Create a snapshot before deployment"""
         # Perform health check
         health_status = self.perform_health_check(device_id)
 
@@ -83,8 +80,7 @@ class RollbackManager:
 
     def perform_health_check(self, device_id: str) -> Dict[str, Any]:
         """
-        Perform device health check
-        """
+        Perform device health check"""
         device = device_store.get_device(device_id)
         if not device:
             return {"status": "unknown", "message": "Device not found"}
@@ -122,8 +118,8 @@ class RollbackManager:
             try:
                 output = connection.send_command("show ip interface brief")
                 # In simulation, assume interfaces are up
-                checks.append(HealthCheck(
-                    check_name="interfaces",
+                checks.append(HealthCheck(" \
+                    f"check_name="interfaces",
                     status="healthy",
                     message="Interfaces are operational"
                 ))
@@ -190,8 +186,7 @@ class RollbackManager:
         device_id: str
     ) -> bool:
         """
-        Validate deployment was successful
-        """
+        Validate deployment was successful"""
         # Perform post-deployment health check
         post_health = self.perform_health_check(device_id)
 
@@ -212,12 +207,12 @@ class RollbackManager:
         # 1. Post status is not failed
         # 2. Status didn't degrade (healthy -> degraded/failed)
         if post_status == "failed":
-            logger.error(f"Deployment {deployment_id} validation failed: device 
+            logger.error(f"Deployment {deployment_id} validation failed: device"
     unhealthy")
             return False
 
         if pre_status == "healthy" and post_status != "healthy":
-            logger.warning(f"Deployment {deployment_id} degraded device \
+            logger.warning(f"Deployment {deployment_id} degraded device \"
                 health")
             return False
 
@@ -229,8 +224,7 @@ class RollbackManager:
         deployment_id: str
     ) -> Dict[str, Any]:
         """
-        Rollback a deployment to previous configuration
-        """
+        Rollback a deployment to previous configuration"""
         # Get snapshot
         snapshot = self.snapshots.get(deployment_id)
         if not snapshot:
@@ -299,8 +293,7 @@ class RollbackManager:
 
     def _parse_config_to_commands(self, config: str) -> List[str]:
         """
-        Parse configuration into deployable commands
-        """
+        Parse configuration into deployable commands"""
         commands = []
         for line in config.split('\n'):
             line = line.strip()

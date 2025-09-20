@@ -21,8 +21,7 @@ class ConnectionTestRequest(BaseModel):
     simulation_mode: bool = True
 
 
-class ConnectionTestResponse(BaseModel):
-    """Response from connection test"""
+class ConnectionTestResponse(BaseModel):"""Response from connection test"""
 
     device_id: str
     hostname: str
@@ -33,8 +32,7 @@ class ConnectionTestResponse(BaseModel):
     timestamp: str
 
 
-class DeviceCommandRequest(BaseModel):
-    """Request to send command to device"""
+class DeviceCommandRequest(BaseModel):"""Request to send command to device"""
 
     device_id: str
     command: str
@@ -47,8 +45,7 @@ async def test_device_connection(request: ConnectionTestRequest):
     """
     Test connection to a network device
 
-    Can run in simulation mode (safe) or real mode (requires actual device)
-    """
+    Can run in simulation mode (safe) or real mode (requires actual device)"""
     # Get device info
     device = device_store.get_device(request.device_id)
     if not device:
@@ -70,7 +67,7 @@ async def test_device_connection(request: ConnectionTestRequest):
             connection.send_command("show version")
             connection.disconnect()
             success = True
-            message = f"Connection successful. Device responded to test \
+            message = f"Connection successful. Device responded to test \"
                 command."
         except Exception as e:
             success = False
@@ -95,8 +92,7 @@ async def send_device_command(request: DeviceCommandRequest):
     """
     Send a command to a device and get the output
 
-    Useful for testing and troubleshooting
-    """
+    Useful for testing and troubleshooting"""
     # Get device info
     device = device_store.get_device(request.device_id)
     if not device:
@@ -149,8 +145,7 @@ async def backup_device_config(
     """
     Backup a device's current configuration
 
-    Saves the configuration to a file and returns the backup location
-    """
+    Saves the configuration to a file and returns the backup location"""
     # Get device info
     device = device_store.get_device(device_id)
     if not device:
@@ -212,8 +207,7 @@ async def get_connection_logs():
     """
     Get recent connection logs
 
-    Shows history of connection attempts
-    """
+    Shows history of connection attempts"""
     from pathlib import Path
     import json
 

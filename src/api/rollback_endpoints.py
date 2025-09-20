@@ -20,6 +20,7 @@ class HealthCheckRequest(BaseModel):
 
 
 class HealthCheckResponse(BaseModel):
+
     """Response from health check"""
 
     device_id: str
@@ -30,12 +31,14 @@ class HealthCheckResponse(BaseModel):
 
 
 class RollbackRequest(BaseModel):
+
     """Request to rollback deployment"""
 
     deployment_id: str
 
 
 class RollbackResponse(BaseModel):
+
     """Response from rollback operation"""
 
     success: bool
@@ -51,8 +54,7 @@ async def perform_health_check(request: HealthCheckRequest):
     """
     Perform health check on a device
 
-    Checks device connectivity, interfaces, and configuration status
-    """
+    Checks device connectivity, interfaces, and configuration status"""
     # Get device info
     device = device_store.get_device(request.device_id)
     if not device:
@@ -78,8 +80,7 @@ async def rollback_deployment(request: RollbackRequest):
     """
     Rollback a deployment to previous configuration
 
-    Restores device to the configuration saved before deployment
-    """
+    Restores device to the configuration saved before deployment"""
     try:
         result = rollback_manager.rollback_deployment(request.deployment_id)
 
@@ -104,8 +105,7 @@ async def get_rollback_history():
     """
     Get history of rollback operations
 
-    Returns recent rollback operations with their status
-    """
+    Returns recent rollback operations with their status"""
     history = rollback_manager.get_rollback_history()
 
     return {
@@ -120,8 +120,7 @@ async def validate_deployment(deployment_id: str, device_id: str):
     """
     Validate a deployment
 
-    Checks if deployment was successful and device is healthy
-    """
+    Checks if deployment was successful and device is healthy"""
     # Get device info
     device = device_store.get_device(device_id)
     if not device:
@@ -157,8 +156,7 @@ async def safe_deployment_flow(
     4. Validate deployment
     5. Rollback if validation fails
 
-    This is the safest way to deploy configurations!
-    """
+    This is the safest way to deploy configurations!"""
     from ..deployment.simple_deploy import deployment_pipeline
 
     try:

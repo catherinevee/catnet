@@ -14,8 +14,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 
-class ValidationType(Enum):
-    """Types of validation"""
+class ValidationType(Enum):"""Types of validation"""
 
     SYNTAX = "syntax"
     SECURITY = "security"
@@ -47,8 +46,7 @@ class ValidationIssue:
 
 
 @dataclass
-class ValidationResult:
-    """Result of configuration validation"""
+class ValidationResult:"""Result of configuration validation"""
 
     is_valid: bool
     config_file: str
@@ -58,13 +56,11 @@ class ValidationResult:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
-class ConfigValidator:
-    """
+class ConfigValidator:"""
     Validates network device configurations
     """
 
-    def __init__(self):
-        """Initialize configuration validator"""
+    def __init__(self):"""Initialize configuration validator"""
         # Security patterns to check
         self.security_patterns = {
             "weak_encryption": [
@@ -81,7 +77,7 @@ class ConfigValidator:
             ],
             "missing_security": [
                                 r"^(
-                    ?!.*service password-encryption
+                    ?!.*service password-encryption" \
                 )",  # Missing password encryption
                 r"^(?!.*aaa new-model)",  # Missing AAA
                 r"^(?!.*login on-failure)",  # Missing login failure logging
@@ -111,7 +107,7 @@ class ConfigValidator:
         self.business_rules = {
             "vlan_range": (1, 4094),
                         "interface_naming": r"^(
-                GigabitEthernet|FastEthernet|Vlan|Loopback|Tunnel
+                GigabitEthernet|FastEthernet|Vlan|Loopback|Tunnel" \
             )",
             "ip_ranges": [
                 r"10\.\d{1,3}\.\d{1,3}\.\d{1,3}",  # RFC1918
@@ -137,8 +133,7 @@ class ConfigValidator:
             full_validation: Perform all validation types
 
         Returns:
-            ValidationResult object
-        """
+            ValidationResult object"""
         result = ValidationResult(
             is_valid=True, config_file=config_file, vendor=vendor.lower()
         )
@@ -200,8 +195,7 @@ class ConfigValidator:
 
         Args:
             config: Configuration content
-            result: ValidationResult to update
-        """
+            result: ValidationResult to update"""
         lines = config.splitlines()
 
         # Track configuration context
@@ -289,8 +283,7 @@ class ConfigValidator:
 
         Args:
             config: Configuration content
-            result: ValidationResult to update
-        """
+            result: ValidationResult to update"""
         lines = config.splitlines()
 
         # Check for hierarchy
@@ -341,8 +334,8 @@ class ConfigValidator:
                 ValidationIssue(
                     type=ValidationType.SYNTAX,
                     severity=Severity.CRITICAL,
-                    message=f"Unmatched braces in configuration ({brace_count} \
-                        {
+                    message=f"Unmatched braces in configuration ({brace_count} \"
+                        {}"
     'open' if brace_count > 0 else 'close'} braces)",
                 )
             )
@@ -356,8 +349,7 @@ class ConfigValidator:
         Args:
             config: Configuration content
             vendor: Device vendor
-            result: ValidationResult to update
-        """
+            result: ValidationResult to update"""
         lines = config.splitlines()
 
         # Check for weak encryption
@@ -368,18 +360,18 @@ class ConfigValidator:
                         if pattern_type == "weak_encryption":
                             severity = Severity.CRITICAL
                             message = "Weak or no encryption detected"
-                            recommendation = "Use type 7 or stronger \
+                            recommendation = "Use type 7 or stronger \"
                                 encryption"
                         elif pattern_type == "insecure_protocols":
                             severity = Severity.HIGH
-                            message = f"Insecure protocol enabled: \
+                            message = f"Insecure protocol enabled: \"
                                 {line.strip()}"
                             recommendation = "Disable insecure protocols"
                         else:
                             severity = Severity.HIGH
-                            message = f"Missing security feature: \
+                            message = f"Missing security feature: \"
                                 {line.strip()}"
-                            recommendation = "Enable recommended security \
+                            recommendation = "Enable recommended security \"
                                 features"
 
                         result.issues.append(
@@ -428,8 +420,7 @@ class ConfigValidator:
         Args:
             config: Configuration content
             vendor: Device vendor
-            result: ValidationResult to update
-        """
+            result: ValidationResult to update"""
         # Check for required features
         for feature in self.compliance_rules["required_features"]:
             if feature not in config.lower():
@@ -463,8 +454,7 @@ class ConfigValidator:
         Args:
             config: Configuration content
             vendor: Device vendor
-            result: ValidationResult to update
-        """
+            result: ValidationResult to update"""
         lines = config.splitlines()
 
         # Check VLAN ranges
@@ -479,7 +469,7 @@ class ConfigValidator:
                         ValidationIssue(
                             type=ValidationType.BUSINESS,
                             severity=Severity.MEDIUM,
-                            message=f"VLAN {vlan_id} outside allowed range ({ 
+                            message=f"VLAN {vlan_id} outside allowed range ({ }"
     min_vlan}-{max_vlan})",
                             line_number=line_num,
                         )
@@ -517,8 +507,7 @@ class ConfigValidator:
         Args:
             config: Configuration content
             vendor: Device vendor
-            result: ValidationResult to update
-        """
+            result: ValidationResult to update"""
         lines = config.splitlines()
 
         # Check for duplicate IP addresses
@@ -562,7 +551,7 @@ class ConfigValidator:
                     ValidationIssue(
                         type=ValidationType.CONFLICT,
                         severity=Severity.LOW,
-                                                message=f"ACL {acl_name} has many entries (
+                                                message=f"ACL {acl_name} has many entries ("
                             {len(line_nums)}
                         )",
                         recommendation="Consider consolidating ACL rules",
@@ -577,8 +566,7 @@ class ConfigValidator:
             interface: Interface name
 
         Returns:
-            Validation status
-        """
+            Validation status"""
         valid_prefixes = [
             "GigabitEthernet",
             "TenGigabitEthernet",
@@ -601,8 +589,7 @@ class ConfigValidator:
             ip: IP address string
 
         Returns:
-            Validation status
-        """
+            Validation status"""
         # Remove CIDR notation if present
         if "/" in ip:
             ip, cidr = ip.split("/")

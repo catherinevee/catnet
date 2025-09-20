@@ -10,10 +10,10 @@ from datetime import datetime
 from pathlib import Path
 
 
-class StructuredFormatter(logging.Formatter):
-    """JSON structured logging formatter"""
+class StructuredFormatter(logging.Formatter):"""JSON structured logging formatter"""
 
     def format(self, record):
+        """TODO: Add docstring"""
         log_obj = {
             "timestamp": datetime.utcnow().isoformat(),
             "level": record.levelname,
@@ -50,8 +50,7 @@ def setup_logging(
     Args:
         log_level: Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
         log_file: Optional log file path
-        structured: Use structured JSON logging
-    """
+        structured: Use structured JSON logging"""
     level = getattr(logging, log_level.upper(), logging.INFO)
 
     # Root logger configuration
@@ -130,17 +129,16 @@ def get_logger(name: str) -> logging.Logger:
         name: Logger name (usually __name__)
 
     Returns:
-        Logger instance
-    """
+        Logger instance"""
     return logging.getLogger(name)
 
 
 class AuditLogAdapter(logging.LoggerAdapter):
     """
-    Logger adapter for adding context to audit logs
-    """
+    Logger adapter for adding context to audit logs"""
 
     def process(self, msg, kwargs):
+        """TODO: Add docstring"""
         if "extra" not in kwargs:
             kwargs["extra"] = {}
 

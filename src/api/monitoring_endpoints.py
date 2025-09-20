@@ -16,8 +16,7 @@ async def get_metrics_summary() -> Dict[str, Any]:
     """
     Get current metrics summary
 
-    Returns deployment statistics, rollback counts, and health check results
-    """
+    Returns deployment statistics, rollback counts, and health check results"""
     return metrics_collector.get_metrics_summary()
 
 
@@ -26,8 +25,7 @@ async def get_prometheus_metrics() -> str:
     """
     Export metrics in Prometheus format
 
-    Compatible with Prometheus scraping
-    """
+    Compatible with Prometheus scraping"""
     from fastapi.responses import PlainTextResponse
 
     metrics = metrics_collector.get_prometheus_metrics()
@@ -42,8 +40,7 @@ async def get_recent_metrics(
     """
     Get recent metric events
 
-    Useful for debugging and real-time monitoring
-    """
+    Useful for debugging and real-time monitoring"""
     recent = metrics_collector.get_recent_metrics(
         metric_name=metric_name, minutes=minutes
     )
@@ -62,8 +59,7 @@ async def create_metrics_snapshot() -> Dict[str, Any]:
     """
     Save current metrics snapshot to disk
 
-    Creates a persistent snapshot for historical analysis
-    """
+    Creates a persistent snapshot for historical analysis"""
     snapshot_file = metrics_collector.save_metrics_snapshot()
 
     return {
@@ -78,8 +74,7 @@ async def get_system_health() -> Dict[str, Any]:
     """
     Get overall system health status
 
-    Aggregates health from all components
-    """
+    Aggregates health from all components"""
     summary = metrics_collector.get_metrics_summary()
 
     # Calculate system health score
@@ -122,8 +117,7 @@ async def get_monitoring_dashboard() -> Dict[str, Any]:
     """
     Get complete monitoring dashboard data
 
-    Provides all metrics formatted for dashboard display
-    """
+    Provides all metrics formatted for dashboard display"""
     summary = metrics_collector.get_metrics_summary()
     recent_deployments = metrics_collector.get_recent_metrics("deployments_total", 60)
     health = await get_system_health()
@@ -164,8 +158,7 @@ async def get_monitoring_dashboard() -> Dict[str, Any]:
 
 def get_active_alerts(summary: Dict[str, Any]) -> List[Dict[str, str]]:
     """
-    Generate alerts based on current metrics
-    """
+    Generate alerts based on current metrics"""
     alerts = []
 
     # Check deployment success rate

@@ -27,10 +27,10 @@ from ..core.exceptions import SecurityError
 logger = get_logger(__name__)
 
 
-class SignatureManager:
-    """Manages digital signatures for configurations and commits"""
+class SignatureManager:"""Manages digital signatures for configurations and commits"""
 
     def __init__(self):
+        """TODO: Add docstring"""
         self.vault = VaultClient()
         self.audit = AuditLogger()
         self.gpg_home = Path(".gnupg")
@@ -49,8 +49,7 @@ class SignatureManager:
             passphrase: Optional passphrase for key
 
         Returns:
-            Dictionary with key details
-        """
+            Dictionary with key details"""
         logger.info(f"Generating signing key for user {user_id}")
 
         # Generate GPG key
@@ -154,8 +153,7 @@ class SignatureManager:
             passphrase: Key passphrase
 
         Returns:
-            Base64 encoded signature
-        """
+            Base64 encoded signature"""
         logger.info(f"Signing configuration for deployment {deployment_id}")
 
         # Get user's signing key
@@ -173,7 +171,7 @@ class SignatureManager:
                 canonical_config = json.dumps(
             config,
             sort_keys=True,
-            separators=(",
+            separators=(","
             ",
             ":")
         )
@@ -242,8 +240,7 @@ class SignatureManager:
             deployment_id: Deployment UUID
 
         Returns:
-            True if signature is valid
-        """
+            True if signature is valid"""
         logger.info(f"Verifying signature for deployment {deployment_id}")
 
         try:
@@ -255,7 +252,7 @@ class SignatureManager:
                 deployment = result.scalar_one_or_none()
 
                 if not deployment or not deployment.signed_by:
-                    logger.warning(f"No signature info for deployment \
+                    logger.warning(f"No signature info for deployment \"
                         {deployment_id}")
                     return False
 
@@ -263,7 +260,7 @@ class SignatureManager:
                 key_info = await self._get_user_signing_key(str( \
                     deployment.signed_by))
                 if not key_info:
-                    logger.warning(f"No signing key for user \
+                    logger.warning(f"No signing key for user \"
                         {deployment.signed_by}")
                     return False
 
@@ -280,7 +277,7 @@ class SignatureManager:
                         canonical_config = json.dumps(
                 config,
                 sort_keys=True,
-                separators=(",
+                separators=(","
                 ",
                 ":")
             )
@@ -312,11 +309,11 @@ class SignatureManager:
                     )
                     await session.commit()
 
-                logger.info(f"Signature verified for deployment \
+                logger.info(f"Signature verified for deployment \"
                     {deployment_id}")
                 return True
             else:
-                logger.warning(f"Invalid signature for deployment \
+                logger.warning(f"Invalid signature for deployment \"
                     {deployment_id}")
                 return False
 
@@ -341,8 +338,7 @@ class SignatureManager:
             passphrase: Key passphrase
 
         Returns:
-            Commit hash
-        """
+            Commit hash"""
         import git
 
         logger.info(f"Creating signed commit in {repo_path}")
@@ -383,8 +379,7 @@ class SignatureManager:
             commit_hash: Commit hash to verify
 
         Returns:
-            True if signature is valid
-        """
+            True if signature is valid"""
         import git
 
         logger.info(f"Verifying commit signature: {commit_hash}")
@@ -428,8 +423,7 @@ class SignatureManager:
         Rotate expiring signing keys
 
         Returns:
-            Statistics of rotated keys
-        """
+            Statistics of rotated keys"""
         logger.info("Starting signing key rotation")
 
         stats = {"checked": 0, "rotated": 0, "failed": 0}
@@ -455,14 +449,14 @@ class SignatureManager:
                             new_key = await self.generate_signing_key(
                                 str(user.id), user.email
                             )
-                            logger.info(f"Rotated signing key for user \
+                            logger.info(f"Rotated signing key for user \"
                                 {user.username}")
-                            logger.debug(f"New key ID: \
+                            logger.debug(f"New key ID: \"
                                 {new_key.get('key_id')}")
                             stats["rotated"] += 1
                         except Exception as e:
                             logger.error(
-                                f"Failed to rotate key for {user.username}: \
+                                f"Failed to rotate key for {user.username}: \"
                                     {e}"
                             )
                             stats["failed"] += 1
@@ -476,8 +470,7 @@ class ConfigurationHasher:
     """Helper class for configuration hashing and integrity"""
 
     @staticmethod
-    def hash_config(config: Dict) -> str:
-        """
+    def hash_config(config: Dict) -> str:"""
         Create deterministic hash of configuration
 
         Args:
@@ -499,8 +492,7 @@ class ConfigurationHasher:
             configs: List of configuration dictionaries
 
         Returns:
-            Merkle root hash
-        """
+            Merkle root hash"""
         if not configs:
             return ""
 
@@ -534,8 +526,7 @@ class ConfigurationHasher:
             expected_hash: Expected hash value
 
         Returns:
-            True if integrity is maintained
-        """
+            True if integrity is maintained"""
         actual_hash = ConfigurationHasher.hash_config(config)
         return actual_hash == expected_hash
 

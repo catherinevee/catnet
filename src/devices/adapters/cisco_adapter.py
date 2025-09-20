@@ -26,8 +26,7 @@ from ..device_manager import (
 )
 
 
-class CiscoAdapter(DeviceAdapter):
-    """
+class CiscoAdapter(DeviceAdapter):"""
     Cisco device adapter implementation
     """
 
@@ -72,8 +71,7 @@ class CiscoAdapter(DeviceAdapter):
 
     async def connect(
         self, device: DeviceInfo, credentials: DeviceCredentials
-    ) -> DeviceConnection:
-        """
+    ) -> DeviceConnection:"""
         Connect to Cisco device
 
         Args:
@@ -133,8 +131,7 @@ class CiscoAdapter(DeviceAdapter):
             connection: Device connection
 
         Returns:
-            Success status
-        """
+            Success status"""
         try:
             if connection.session_data:
                 loop = asyncio.get_event_loop()
@@ -166,8 +163,7 @@ class CiscoAdapter(DeviceAdapter):
             command: Command to execute
 
         Returns:
-            Command output
-        """
+            Command output"""
         if not connection.is_active or not connection.session_data:
             raise Exception("Connection not active")
 
@@ -200,8 +196,7 @@ class CiscoAdapter(DeviceAdapter):
             config_type: Configuration type (running/startup)
 
         Returns:
-            Configuration
-        """
+            Configuration"""
         # Get vendor from connection
         connection.device_id
         vendor = self._get_vendor_from_connection(connection)
@@ -229,8 +224,7 @@ class CiscoAdapter(DeviceAdapter):
             configuration: Configuration to apply
 
         Returns:
-            Success status
-        """
+            Success status"""
         if not connection.is_active or not connection.session_data:
             raise Exception("Connection not active")
 
@@ -286,8 +280,7 @@ class CiscoAdapter(DeviceAdapter):
             connection: Device connection
 
         Returns:
-            Success status
-        """
+            Success status"""
         # Get vendor from connection
         vendor = self._get_vendor_from_connection(connection)
 
@@ -350,8 +343,7 @@ class CiscoAdapter(DeviceAdapter):
         # In real implementation, would look up from device info
         return DeviceVendor.CISCO_IOS
 
-    def _clean_configuration(self, config: str) -> str:
-        """Clean configuration output"""
+    def _clean_configuration(self, config: str) -> str:"""Clean configuration output"""
         lines = []
         skip_patterns = [
             "Building configuration",

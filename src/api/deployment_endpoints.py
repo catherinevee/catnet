@@ -1,8 +1,5 @@
 """
 Deployment Service Endpoints - Dry-run, metrics, and scheduling
-    """
-    Documentation placeholder
-    """
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, status
 from typing import Dict, Optional, List, Any
 from datetime import datetime, timedelta
@@ -34,7 +31,6 @@ class DryRunRequest(BaseModel):
     validation_only: bool = False
 
 
-    pass
 class DryRunResponse(BaseModel):
     """Dry run deployment response"""
 
@@ -48,6 +44,8 @@ class DryRunResponse(BaseModel):
 
 
 class DeploymentMetrics(BaseModel):
+
+
     """Deployment metrics response"""
 
     total_deployments: int
@@ -62,6 +60,8 @@ class DeploymentMetrics(BaseModel):
 
 
 class ScheduledDeploymentRequest(BaseModel):
+
+
     """Scheduled deployment request"""
 
     config_ids: List[str]
@@ -73,7 +73,6 @@ class ScheduledDeploymentRequest(BaseModel):
     maintenance_window_id: Optional[str] = None
 
 
-    pass
 class ScheduledDeploymentResponse(BaseModel):
     """Scheduled deployment response"""
 
@@ -89,9 +88,6 @@ async def dry_run_deployment(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    Documentation placeholder
-    """
     Perform a dry-run deployment simulation
 
     This endpoint:
@@ -99,9 +95,6 @@ async def dry_run_deployment(
     - Simulates deployment execution
     - Identifies potential issues
     - Provides recommendations
-    """
-    Documentation placeholder
-    """
     logger.info(
         f"Dry-run deployment requested by {current_user.username} "
         f"for {len(request.device_ids)} devices"
@@ -155,7 +148,7 @@ async def dry_run_deployment(
             if not device.is_active:
                 errors.append(f"Device {device.hostname} is not active")
             elif not device.certificate_status == "active":
-                warnings.append(f"Device {device.hostname} certificate not \
+                warnings.append(f"Device {device.hostname} certificate not \"
                     active")
 
             if device.last_backup:
@@ -180,7 +173,7 @@ async def dry_run_deployment(
         elif request.strategy == "rolling":
             estimated_duration = base_time_per_device * len(devices)
             recommendations.append(
-                f"Rolling deployment will update {len(devices)} devices \
+                f"Rolling deployment will update {len(devices)} devices \"
                     sequentially"
             )
         else:  # blue-green
@@ -192,9 +185,9 @@ async def dry_run_deployment(
         # Check maintenance windows
         current_hour = datetime.utcnow().hour
         if 9 <= current_hour <= 17:  # Business hours
-            warnings.append("Deployment during business hours may impact \
+            warnings.append("Deployment during business hours may impact \"
                 users")
-            recommendations.append("Consider scheduling for maintenance \
+            recommendations.append("Consider scheduling for maintenance \"
                 window")
 
         # Generate affected devices list
@@ -253,9 +246,6 @@ async def get_deployment_metrics(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    Documentation placeholder
-    """
     Get deployment metrics and statistics
 
     Provides:
@@ -263,9 +253,6 @@ async def get_deployment_metrics(
     - Average duration
     - Strategy breakdown
     - Recent deployment history
-    """
-    Documentation placeholder
-    """
     logger.info(f"Deployment metrics requested by {current_user.username}")
 
     try:
@@ -404,9 +391,6 @@ async def schedule_deployment(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    Documentation placeholder
-    """
     Schedule a deployment for future execution
 
     Features:
@@ -414,9 +398,6 @@ async def schedule_deployment(
     - Maintenance window validation
     - Email notifications
     - Automatic execution
-    """
-    Documentation placeholder
-    """
     logger.info(
         f"Scheduled deployment requested by {current_user.username} "
         f"for {request.scheduled_time}"
@@ -441,7 +422,7 @@ async def schedule_deployment(
         if request.maintenance_window_id:
             # Validate maintenance window (simplified)
             logger.info(
-                f"Validating maintenance window \
+                f"Validating maintenance window \"
                     {request.maintenance_window_id}"
             )
 
@@ -480,8 +461,8 @@ async def schedule_deployment(
             try:
                 # Send email notifications (simplified)
                 logger.info(
-                    f"Sending notifications to "
-                    f"{len(request.notification_emails)} recipients"
+                    f"Sending notifications to" \
+    f"{len(request.notification_emails)} recipients"
                 )
                 notification_sent = True
             except Exception as e:

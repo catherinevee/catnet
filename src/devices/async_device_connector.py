@@ -15,13 +15,13 @@ from .device_store import device_store
 logger = logging.getLogger(__name__)
 
 
-class AsyncDeviceConnector:
-    """
+class AsyncDeviceConnector:"""
     Async wrapper for device operations
     Prevents blocking operations from timing out
     """
 
     def __init__(self, max_workers: int = 5):
+        """TODO: Add docstring"""
         self.executor = concurrent.futures.ThreadPoolExecutor(
             max_workers=max_workers)
         self.active_connections: Dict[str, Any] = {}
@@ -30,8 +30,7 @@ class AsyncDeviceConnector:
             self,
             device_info: Dict[str,
                               Any]
-        ) -> Optional[Any]:
-        """
+        ) -> Optional[Any]:"""
         Connect to device asynchronously
         NEVER use synchronous blocking operations!
         """
@@ -47,7 +46,7 @@ class AsyncDeviceConnector:
 
             if connection:
                 self.active_connections[device_info['id']] = connection
-                logger.info(f"Async connection established to {device_info.get(
+                logger.info(f"Async connection established to {device_info.get(}"
                     'hostname')}")
 
             return connection
@@ -63,8 +62,7 @@ class AsyncDeviceConnector:
         ) -> Dict[str, Any]:
         """
         Execute commands on device asynchronously
-        Returns results without blocking
-        """
+        Returns results without blocking"""
         connection = self.active_connections.get(device_id)
 
         if not connection:
@@ -102,8 +100,7 @@ class AsyncDeviceConnector:
 
     async def backup_device_async(self, device_id: str) -> Dict[str, Any]:
         """
-        Backup device configuration asynchronously
-        """
+        Backup device configuration asynchronously"""
         connection = self.active_connections.get(device_id)
 
         if not connection:
@@ -155,8 +152,7 @@ class AsyncDeviceConnector:
         ) -> Dict[str, Any]:
         """
         Deploy to multiple devices in parallel
-        Much faster than sequential deployment!
-        """
+        Much faster than sequential deployment!"""
         tasks = []
 
         for device_id in devices:
@@ -194,8 +190,7 @@ class AsyncDeviceConnector:
             devices: List[str]
         ) -> Dict[str, Any]:
         """
-        Perform health checks on multiple devices in parallel
-        """
+        Perform health checks on multiple devices in parallel"""
         async def check_device(device_id: str) -> Dict[str, Any]:
             try:
                 # Simple connectivity check
@@ -258,8 +253,7 @@ class AsyncDeviceConnector:
 async_device_connector = AsyncDeviceConnector()
 
 
-async def example_usage():
-    """
+async def example_usage():"""
     Example of using async device operations
     """
     # Deploy to multiple devices in parallel
@@ -271,13 +265,13 @@ async def example_usage():
         devices,
         commands
     )
-    print(f"Deployment complete: {result['successful']}/{result['total']} \
+    print(f"Deployment complete: {result['successful']}/{result['total']} \"
         successful")
 
     # Health check all devices
     print("\nPerforming parallel health checks...")
     health = await async_device_connector.health_check_parallel(devices)
-    print(f"Health check: {health['healthy']}/{health['total']} devices \
+    print(f"Health check: {health['healthy']}/{health['total']} devices \"
         healthy")
 
 
