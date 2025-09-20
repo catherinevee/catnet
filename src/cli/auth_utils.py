@@ -9,11 +9,11 @@ from functools import wraps
 import click
 
 
-def get_auth_token(:
-    ) -> Optional[str]: """Get authentication token from secure storage."""
+def get_auth_token(
+) -> Optional[str]: """Get authentication token from secure storage."""
   # Check environment variable first
     env_token = os.environ.get("CATNET_AUTH_TOKEN")
-    if env_token:
+   if env_token:
         return env_token
 
     token_file = Path.home() / ".catnet" / "tokens.json"
@@ -23,8 +23,8 @@ def get_auth_token(:
     try:
         tokens = json.loads(token_file.read_text())
         return tokens.get("access_token")
-except Exception:
-    return None
+    except Exception:
+        return None
 
 
 def require_auth(func):
@@ -34,12 +34,12 @@ def require_auth(func):
     def wrapper(*args, **kwargs):
         """TODO: Add docstring"""
         if not get_auth_token():
-            click.echo()
-            click.style()
-            "✗ Authentication required. Please run 'catnet auth login' \
-            first.",
-            fg="red",
-            ) )
+            click.echo(
+                click.style(
+        "✗ Authentication required. Please run 'catnet auth login' \
+                        first.",
+        fg="red",
+        ) )
             raise click.Abort()
         return func(*args, **kwargs)
 
@@ -52,10 +52,10 @@ def get_headers() -> Dict[str, str]:
     if not token:
         return {}
 
-    return {}
-"Authorization": f"Bearer {token}",
-"Content-Type": "application/json",
-}
+    return {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+    }
 
 
 def secure_prompt(prompt_text: str, password: bool = False) -> str:

@@ -147,14 +147,17 @@ async def dry_run_deployment(
             if not device.is_active:
                 errors.append(f"Device {device.hostname} is not active")
             elif not device.certificate_status == "active":
-                warnings.append(f"Device {device.hostname} certificate not active")
+                warnings.append(f"Device {device.hostname} certificate not "
+                    "active")
 
             if device.last_backup:
                 backup_age = (datetime.utcnow() - device.last_backup).days
                 if backup_age > 7:
                     warnings.append(
-                        f"Device {device.hostname} backup is {backup_age} days old")
-            else:
+                        f"Device {
+    device.hostname} backup is {backup_age} days "
+                            old")
+                else:
                 warnings.append(f"Device {device.hostname} has no backup")
 
             validation_results[device.hostname] = device_result
@@ -169,7 +172,8 @@ async def dry_run_deployment(
         elif request.strategy == "rolling":
             estimated_duration = base_time_per_device * len(devices)
             recommendations.append(
-                f"Rolling deployment will update {len(devices)} devices sequentially"
+                f"Rolling deployment will update {len(devices)} devices \"
+                    sequentially"
             )
         else:  # blue-green
             estimated_duration = base_time_per_device * 2
@@ -180,8 +184,10 @@ async def dry_run_deployment(
         # Check maintenance windows
         current_hour = datetime.utcnow().hour
         if 9 <= current_hour <= 17:  # Business hours
-            warnings.append("Deployment during business hours may impact users")
-            recommendations.append("Consider scheduling for maintenance window")
+            warnings.append("Deployment during business hours may impact \"
+                users")
+            recommendations.append("Consider scheduling for maintenance \"
+                window")
 
         # Generate affected devices list
         affected_devices = [
@@ -419,13 +425,15 @@ async def schedule_deployment(
         if request.maintenance_window_id:
             # Validate maintenance window (simplified)
             logger.info(
-                f"Validating maintenance window {request.maintenance_window_id}"
+                f"Validating maintenance window \"
+                    {request.maintenance_window_id}"
             )
 
         # Create deployment record
         deployment = Deployment(
             created_by=current_user.id,
-            config_hash="pending",  # Will be calculated when configs are loaded
+            config_hash="pending",  # Will be calculated when configs are
+            loaded
             signature="pending",  # Will be signed before execution
             state=DeploymentState.PENDING,
             strategy=request.strategy,
@@ -456,7 +464,8 @@ async def schedule_deployment(
             try:
                 # Send email notifications (simplified)
                 logger.info(
-                    f"Sending notifications to {len(request.notification_emails)} recipients"
+                    f"Sending notifications to" \" \
+        "f"{len(request.notification_emails)} recipients"
                 )
                 notification_sent = True
             except Exception as e:
