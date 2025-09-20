@@ -2,6 +2,7 @@
 Device Connector using Netmiko
 Phase 5 Implementation - Real SSH connections to network devices
 """
+
 import os
 import json
 from typing import Dict, List, Optional, Any
@@ -12,15 +13,14 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class DeviceConnector:"""
+class DeviceConnector: """
     Connects to network devices using SSH
     Supports both real connections and simulation mode
     """
 
-    def __init__(self, simulation_mode: bool = True):"""
+    def __init__(self, simulation_mode: bool = True): """
         Initialize device connector
-
-        Args:
+    Args:
             simulation_mode: If True, simulate connections (safe for testing)
                            If False, attempt real SSH connections
         """
@@ -51,12 +51,10 @@ class DeviceConnector:"""
     ) -> Optional['DeviceConnection']:
         """
         Connect to a network device
-
-        Args:
+    Args:
             device_info: Device information dictionary
             password: Device password (optional, will prompt if needed)
-
-        Returns:
+    Returns:
             DeviceConnection object or None if failed"""
         log_entry = {
             "timestamp": datetime.utcnow().isoformat(),

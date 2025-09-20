@@ -20,7 +20,7 @@ from collections import defaultdict
 import hashlib
 
 
-class CredentialType(Enum):"""Types of credentials"""
+class CredentialType(Enum): """Types of credentials"""
 
     PASSWORD = "password"
     API_KEY = "api_key"
@@ -62,7 +62,7 @@ class Credential:
 
 
 @dataclass
-class SecretPolicy:"""Policy for secret management"""
+class SecretPolicy: """Policy for secret management"""
 
     name: str
     credential_types: List[CredentialType]
@@ -97,14 +97,13 @@ class AccessRequest:
     revoked: bool = False
 
 
-class SecretsManager:"""
+class SecretsManager: """
     Manages secrets and credentials
     """
 
-    def __init__(self, vault_service=None, audit_service=None):"""
+    def __init__(self, vault_service=None, audit_service=None): """
         Initialize secrets manager
-
-        Args:
+    Args:
             vault_service: Vault service for storage
             audit_service: Audit service for logging
         """
@@ -132,7 +131,8 @@ class SecretsManager:"""
         # Rotation scheduler
         self.rotation_tasks: Dict[str, asyncio.Task] = {}
 
-    def _initialize_default_policies(self):"""Initialize default security policies"""
+    def _initialize_default_policies(
+        self): """Initialize default security policies"""
         # Strong password policy
         self.policies["strong_password"] = SecretPolicy(
             name="strong_password",
@@ -205,8 +205,7 @@ class SecretsManager:"""
     ) -> Credential:
         """
         Create a new credential
-
-        Args:
+    Args:
             name: Credential name
             type: Credential type
             username: Associated username
@@ -215,8 +214,7 @@ class SecretsManager:"""
             metadata: Additional metadata
             tags: Credential tags
             auto_rotate: Enable automatic rotation
-
-        Returns:
+    Returns:
             Created credential"""
         import uuid
 
@@ -309,14 +307,12 @@ class SecretsManager:"""
     ) -> Optional[str]:
         """
         Get a credential value
-
-        Args:
+    Args:
             credential_id: Credential ID
             requester: Who is requesting
             purpose: Purpose of access
             decrypt: Whether to decrypt the value
-
-        Returns:
+    Returns:
             Credential value or None"""
         if credential_id not in self.credentials:
             return None
@@ -383,12 +379,10 @@ class SecretsManager:"""
     ) -> bool:
         """
         Rotate a credential
-
-        Args:
+    Args:
             credential_id: Credential ID
             new_value: New value (generated if not provided)
-
-        Returns:
+    Returns:
             Success status"""
         if credential_id not in self.credentials:
             return False
@@ -480,12 +474,10 @@ class SecretsManager:"""
     ) -> bool:
         """
         Delete a credential
-
-        Args:
+    Args:
             credential_id: Credential ID
             requester: Who is requesting deletion
-
-        Returns:
+    Returns:
             Success status"""
         if credential_id not in self.credentials:
             return False
@@ -532,8 +524,7 @@ class SecretsManager:"""
     ):
         """
         Grant access to a credential
-
-        Args:
+    Args:
             credential_id: Credential ID
             principal: User/service to grant access
             access_levels: Access levels to grant"""
@@ -547,8 +538,7 @@ class SecretsManager:"""
     ):
         """
         Revoke access to a credential
-
-        Args:
+    Args:
             credential_id: Credential ID
             principal: User/service to revoke access
             access_levels: Specific levels to revoke (all if None)"""

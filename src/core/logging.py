@@ -1,6 +1,5 @@
 """
 Logging configuration for CatNet
-"""
 import logging
 import sys
 from typing import Optional
@@ -10,7 +9,8 @@ from datetime import datetime
 from pathlib import Path
 
 
-class StructuredFormatter(logging.Formatter):"""JSON structured logging formatter"""
+class StructuredFormatter(logging.Formatter):
+    """JSON structured logging formatter"""
 
     def format(self, record):
         """TODO: Add docstring"""
@@ -40,17 +40,16 @@ class StructuredFormatter(logging.Formatter):"""JSON structured logging formatte
 
 
 def setup_logging(
-    log_level: str = "INFO",
-    log_file: Optional[str] = None,
-    structured: bool = True,
+        log_level: str = "INFO",
+        log_file: Optional[str] = None,
+        structured: bool = True,
 ) -> None:
     """
     Setup logging configuration
-
     Args:
-        log_level: Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-        log_file: Optional log file path
-        structured: Use structured JSON logging"""
+        log_level: Logging level(DEBUG, INFO, WARNING, ERROR, CRITICAL)
+            log_file: Optional log file path
+            structured: Use structured JSON logging"""
     level = getattr(logging, log_level.upper(), logging.INFO)
 
     # Root logger configuration
@@ -66,7 +65,7 @@ def setup_logging(
 
     if structured:
         console_handler.setFormatter(StructuredFormatter())
-    else:
+        else:
         console_formatter = logging.Formatter(
             "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
             datefmt="%Y-%m-%d %H:%M:%S",
@@ -105,7 +104,7 @@ def setup_logging(
 
         if structured:
             file_handler.setFormatter(StructuredFormatter())
-        else:
+            else:
             file_formatter = logging.Formatter(
                 "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
                 datefmt="%Y-%m-%d %H:%M:%S",
@@ -124,10 +123,8 @@ def setup_logging(
 def get_logger(name: str) -> logging.Logger:
     """
     Get a logger instance
-
     Args:
-        name: Logger name (usually __name__)
-
+        name: Logger name(usually __name__)
     Returns:
         Logger instance"""
     return logging.getLogger(name)

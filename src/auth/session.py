@@ -7,7 +7,6 @@ Provides secure session handling with:
 - Session expiration
 - Concurrent session limits
 - Session activity tracking
-"""
 
 import hashlib
 import secrets
@@ -19,23 +18,24 @@ import hmac
 
 
 @dataclass
-class Session:"""Represents a user session"""
+class Session:
+    """Represents a user session"""
 
     session_id: str
-    user_id: str
-    username: str
-    ip_address: str
-    user_agent: str
-    created_at: datetime
-    last_activity: datetime
-    expires_at: datetime
-    roles: List[str] = field(default_factory=list)
-    permissions: List[str] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
-    is_active: bool = True
-    refresh_token: Optional[str] = None
-    mfa_verified: bool = False
-    auth_method: str = "password"  # password, oauth, saml, ssh
+        user_id: str
+        username: str
+        ip_address: str
+        user_agent: str
+        created_at: datetime
+        last_activity: datetime
+        expires_at: datetime
+        roles: List[str] = field(default_factory=list)
+        permissions: List[str] = field(default_factory=list)
+        metadata: Dict[str, Any] = field(default_factory=dict)
+        is_active: bool = True
+        refresh_token: Optional[str] = None
+        mfa_verified: bool = False
+        auth_method: str = "password"  # password, oauth, saml, ssh
 
 
 class SessionManager:
@@ -44,19 +44,18 @@ class SessionManager:
 
     def __init__(
         self,
-        session_lifetime: int = 3600,  # 1 hour
-        max_sessions_per_user: int = 5,
-        require_mfa_for_sensitive: bool = True,
-        session_secret: Optional[str] = None,
+            session_lifetime: int = 3600,  # 1 hour
+            max_sessions_per_user: int = 5,
+            require_mfa_for_sensitive: bool = True,
+            session_secret: Optional[str] = None,
     ):
         """
         Initialize session manager
-
-        Args:
+    Args:
             session_lifetime: Session lifetime in seconds
-            max_sessions_per_user: Maximum concurrent sessions per user
-            require_mfa_for_sensitive: Require MFA for sensitive operations
-            session_secret: Secret for session ID generation"""
+                max_sessions_per_user: Maximum concurrent sessions per user
+                require_mfa_for_sensitive: Require MFA for sensitive operations
+                session_secret: Secret for session ID generation"""
         self.session_lifetime = session_lifetime
         self.max_sessions_per_user = max_sessions_per_user
         self.require_mfa_for_sensitive = require_mfa_for_sensitive
@@ -69,31 +68,29 @@ class SessionManager:
 
     def create_session(
         self,
-        user_id: str,
-        username: str,
-        ip_address: str,
-        user_agent: str,
-        roles: List[str] = None,
-        permissions: List[str] = None,
-        auth_method: str = "password",
-        mfa_verified: bool = False,
-        metadata: Dict[str, Any] = None,
+            user_id: str,
+            username: str,
+            ip_address: str,
+            user_agent: str,
+            roles: List[str] = None,
+            permissions: List[str] = None,
+            auth_method: str = "password",
+            mfa_verified: bool = False,
+            metadata: Dict[str, Any] = None,
     ) -> Session:
         """
         Create a new session
-
-        Args:
+    Args:
             user_id: User identifier
-            username: Username
-            ip_address: Client IP address
-            user_agent: Client user agent
-            roles: User roles
-            permissions: User permissions
-            auth_method: Authentication method used
-            mfa_verified: Whether MFA was verified
-            metadata: Additional session metadata
-
-        Returns:
+                username: Username
+                ip_address: Client IP address
+                user_agent: Client user agent
+                roles: User roles
+                permissions: User permissions
+                auth_method: Authentication method used
+                mfa_verified: Whether MFA was verified
+                metadata: Additional session metadata
+    Returns:
             Created session object"""
         # Clean up old sessions for user
         self._cleanup_user_sessions(user_id)
@@ -142,11 +139,9 @@ class SessionManager:
     def get_session(self, session_id: str) -> Optional[Session]:
         """
         Get session by ID
-
-        Args:
+    Args:
             session_id: Session identifier
-
-        Returns:
+    Returns:
             Session object or None"""
         # Check if revoked
         if session_id in self.revoked_sessions:
@@ -170,19 +165,17 @@ class SessionManager:
 
     def validate_session(
         self,
-        session_id: str,
-        ip_address: Optional[str] = None,
-        user_agent: Optional[str] = None,
+            session_id: str,
+            ip_address: Optional[str] = None,
+            user_agent: Optional[str] = None,
     ) -> Tuple[bool, Optional[str]]:
         """
         Validate a session
-
-        Args:
+    Args:
             session_id: Session identifier
-            ip_address: Client IP for validation
-            user_agent: Client user agent for validation
-
-        Returns:
+                ip_address: Client IP for validation
+                user_agent: Client user agent for validation
+    Returns:
             Tuple of (is_valid, error_message)"""
         session = self.get_session(session_id)
 
@@ -220,11 +213,9 @@ class SessionManager:
     def update_activity(self, session_id: str) -> bool:
         """
         Update session last activity time
-
-        Args:
+    Args:
             session_id: Session identifier
-
-        Returns:
+    Returns:
             Success status"""
         session = self.get_session(session_id)
 
@@ -245,13 +236,11 @@ class SessionManager:
     ) -> bool:
         """
         Extend session expiration
-
-        Args:
+    Args:
             session_id: Session identifier
-            additional_time: Additional seconds to add (default: \
+                additional_time: Additional seconds to add (default: \
                 session_lifetime)
-
-        Returns:
+    Returns:
             Success status"""
         session = self.get_session(session_id)
 
@@ -267,11 +256,9 @@ class SessionManager:
     def terminate_session(self, session_id: str) -> bool:
         """
         Terminate a session
-
-        Args:
+    Args:
             session_id: Session identifier
-
-        Returns:
+    Returns:
             Success status"""
         if session_id not in self.sessions:
             return False
@@ -296,11 +283,9 @@ class SessionManager:
     def terminate_user_sessions(self, user_id: str) -> int:
         """
         Terminate all sessions for a user
-
-        Args:
+    Args:
             user_id: User identifier
-
-        Returns:
+    Returns:
             Number of sessions terminated"""
         if user_id not in self.user_sessions:
             return 0
@@ -317,11 +302,9 @@ class SessionManager:
     def get_user_sessions(self, user_id: str) -> List[Session]:
         """
         Get all active sessions for a user
-
-        Args:
+    Args:
             user_id: User identifier
-
-        Returns:
+    Returns:
             List of active sessions"""
         if user_id not in self.user_sessions:
             return []
@@ -337,12 +320,10 @@ class SessionManager:
     def requires_mfa(self, session_id: str, operation: str) -> bool:
         """
         Check if operation requires MFA
-
-        Args:
+    Args:
             session_id: Session identifier
-            operation: Operation to perform
-
-        Returns:
+                operation: Operation to perform
+    Returns:
             Whether MFA is required"""
         if not self.require_mfa_for_sensitive:
             return False
@@ -367,8 +348,7 @@ class SessionManager:
     def cleanup_expired_sessions(self) -> int:
         """
         Clean up expired sessions
-
-        Returns:
+    Returns:
             Number of sessions cleaned"""
         now = datetime.utcnow()
         expired = []
@@ -385,8 +365,7 @@ class SessionManager:
     def get_session_statistics(self) -> Dict[str, Any]:
         """
         Get session statistics
-
-        Returns:
+    Returns:
             Statistics dictionary"""
         total_sessions = len(self.sessions)
         total_users = len(self.user_sessions)
@@ -412,13 +391,11 @@ class SessionManager:
     ) -> str:
         """
         Generate secure session ID
-
-        Args:
+    Args:
             user_id: User identifier
-            ip_address: Client IP
-            user_agent: Client user agent
-
-        Returns:
+                ip_address: Client IP
+                user_agent: Client user agent
+    Returns:
             Session ID"""
         # Combine entropy sources
         data = (
@@ -438,8 +415,7 @@ class SessionManager:
     def _cleanup_user_sessions(self, user_id: str) -> None:
         """
         Clean up expired sessions for a user
-
-        Args:
+    Args:
             user_id: User identifier"""
         if user_id not in self.user_sessions:
             return
@@ -455,16 +431,15 @@ class SessionManager:
 
         def _log_security_event(
             self,
-            event_type: str,
-            details: Dict[str,
+                event_type: str,
+                details: Dict[str,
                           Any]
         ) -> None:
         """
         Log security events
-
-        Args:
+    Args:
             event_type: Type of security event
-            details: Event details"""
+                details: Event details"""
         # In production, send to SIEM or security logging system
         event = {
             "timestamp": datetime.utcnow().isoformat(),

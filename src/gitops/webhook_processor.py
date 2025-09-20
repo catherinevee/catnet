@@ -18,7 +18,7 @@ from enum import Enum
 import re
 
 
-class WebhookProvider(Enum):"""Supported webhook providers"""
+class WebhookProvider(Enum): """Supported webhook providers"""
 
     GITHUB = "github"
     GITLAB = "gitlab"
@@ -57,11 +57,11 @@ class WebhookEvent:
     metadata: Dict[str, Any] = None
 
 
-class WebhookProcessor:"""
+class WebhookProcessor: """
     Processes webhooks from various Git providers
     """
 
-    def __init__(self):"""Initialize webhook processor"""
+    def __init__(self): """Initialize webhook processor"""
         self.webhook_secrets: Dict[str, str] = {}  # repo_url -> secret
         self.processed_events: List[str] = []  # Track processed event IDs
         self.event_handlers: Dict[EventType, List[callable]] = {}
@@ -70,10 +70,9 @@ class WebhookProcessor:"""
         self,
         repository_url: str,
         secret: str
-    ) -> None:"""
+    ) -> None: """
         Register webhook secret for repository
-
-        Args:
+    Args:
             repository_url: Repository URL
             secret: Webhook secret for verification
         """
@@ -86,15 +85,13 @@ class WebhookProcessor:"""
         headers: Dict[str, str],
         body: str,
         provider: Optional[WebhookProvider] = None,
-    ) -> Tuple[bool, Optional[WebhookEvent]]:"""
+    ) -> Tuple[bool, Optional[WebhookEvent]]: """
         Process incoming webhook
-
-        Args:
+    Args:
             headers: HTTP headers
             body: Request body (JSON string)
             provider: Webhook provider (auto-detect if None)
-
-        Returns:
+    Returns:
             Tuple of (success, WebhookEvent)
         """
         try:
@@ -183,8 +180,7 @@ class WebhookProcessor:"""
     ) -> None:
         """
         Register event handler
-
-        Args:
+    Args:
             event_type: Type of event to handle
             handler: Handler function"""
         if event_type not in self.event_handlers:
@@ -198,11 +194,9 @@ class WebhookProcessor:"""
     ) -> Optional[WebhookProvider]:
         """
         Detect webhook provider from headers
-
-        Args:
+    Args:
             headers: HTTP headers
-
-        Returns:
+    Returns:
             Detected provider or None"""
         # Convert headers to lowercase for case-insensitive comparison
         headers_lower = {k.lower(): v for k, v in headers.items()}
@@ -226,14 +220,12 @@ class WebhookProcessor:"""
     ) -> bool:
         """
         Verify webhook signature
-
-        Args:
+    Args:
             headers: HTTP headers
             body: Request body
             secret: Webhook secret
             provider: Webhook provider
-
-        Returns:
+    Returns:
             Verification status"""
         headers_lower = {k.lower(): v for k, v in headers.items()}
 
@@ -294,13 +286,11 @@ class WebhookProcessor:"""
     ) -> Optional[WebhookEvent]:
         """
         Process GitHub webhook
-
-        Args:
+    Args:
             headers: HTTP headers
             payload: Webhook payload
             verified: Signature verification status
-
-        Returns:
+    Returns:
             WebhookEvent or None"""
         headers_lower = {k.lower(): v for k, v in headers.items()}
         event_name = headers_lower.get("x-github-event", "")
@@ -390,13 +380,11 @@ class WebhookProcessor:"""
     ) -> Optional[WebhookEvent]:
         """
         Process GitLab webhook
-
-        Args:
+    Args:
             headers: HTTP headers
             payload: Webhook payload
             verified: Token verification status
-
-        Returns:
+    Returns:
             WebhookEvent or None"""
         headers_lower = {k.lower(): v for k, v in headers.items()}
         event_name = headers_lower.get("x-gitlab-event", "")
@@ -454,13 +442,11 @@ class WebhookProcessor:"""
     ) -> Optional[WebhookEvent]:
         """
         Process Bitbucket webhook
-
-        Args:
+    Args:
             headers: HTTP headers
             payload: Webhook payload
             verified: Signature verification status
-
-        Returns:
+    Returns:
             WebhookEvent or None"""
         headers_lower = {k.lower(): v for k, v in headers.items()}
         event_key = headers_lower.get("x-event-key", "")
@@ -522,13 +508,11 @@ class WebhookProcessor:"""
     ) -> Optional[WebhookEvent]:
         """
         Process generic Git webhook
-
-        Args:
+    Args:
             headers: HTTP headers
             payload: Webhook payload
             verified: Signature verification status
-
-        Returns:
+    Returns:
             WebhookEvent or None"""
         # Try to extract common fields
         repo_url = payload.get("repository", {}).get("url", "")
@@ -562,12 +546,10 @@ class WebhookProcessor:"""
     ) -> Optional[str]:
         """
         Extract repository URL from payload
-
-        Args:
+    Args:
             payload: Webhook payload
             provider: Webhook provider
-
-        Returns:
+    Returns:
             Repository URL or None"""
         if provider == WebhookProvider.GITHUB:
             return payload.get("repository", {}).get("clone_url")
@@ -586,11 +568,9 @@ class WebhookProcessor:"""
     def _normalize_repository_url(self, url: str) -> str:
         """
         Normalize repository URL for comparison
-
-        Args:
+    Args:
             url: Repository URL
-
-        Returns:
+    Returns:
             Normalized URL"""
         # Remove protocol
         url = re.sub(r"^https?://", "", url)
@@ -603,8 +583,7 @@ class WebhookProcessor:"""
     def _trigger_handlers(self, event: WebhookEvent) -> None:
         """
         Trigger registered event handlers
-
-        Args:
+    Args:
             event: Webhook event"""
         handlers = self.event_handlers.get(event.event_type, [])
         for handler in handlers:

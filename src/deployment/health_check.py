@@ -15,7 +15,7 @@ from enum import Enum
 import asyncio
 
 
-class HealthCheckType(Enum):"""Types of health checks"""
+class HealthCheckType(Enum): """Types of health checks"""
 
     CONNECTIVITY = "connectivity"
     PROTOCOL = "protocol"
@@ -60,7 +60,7 @@ class HealthMetric:
 
 
 @dataclass
-class HealthCheckResult:"""Health check result"""
+class HealthCheckResult: """Health check result"""
 
     check_type: HealthCheckType
     status: HealthStatus
@@ -73,7 +73,7 @@ class HealthCheckResult:"""Health check result"""
 
 
 @dataclass
-class HealthCheckConfig:"""Health check configuration"""
+class HealthCheckConfig: """Health check configuration"""
 
     enabled: bool = True
     interval_seconds: int = 60
@@ -104,8 +104,7 @@ class HealthCheckService:
     def __init__(self, device_service=None):
         """
         Initialize health check service
-
-        Args:
+    Args:
             device_service: Service for device operations"""
         self.device_service = device_service
         self.health_checks: Dict[str, List[HealthCheckResult]] = {}
@@ -119,12 +118,10 @@ class HealthCheckService:
     ) -> HealthCheckResult:
         """
         Check device health
-
-        Args:
+    Args:
             device_id: Device ID
             config: Health check configuration
-
-        Returns:
+    Returns:
             HealthCheckResult"""
         config = config or HealthCheckConfig()
         start_time = datetime.utcnow()
@@ -199,8 +196,7 @@ class HealthCheckService:
     ) -> None:
         """
         Start continuous health monitoring
-
-        Args:
+    Args:
             device_id: Device ID
             config: Health check configuration
             callback: Callback for health check results"""
@@ -239,8 +235,7 @@ class HealthCheckService:
     async def stop_monitoring(self, device_id: str) -> None:
         """
         Stop health monitoring
-
-        Args:
+    Args:
             device_id: Device ID"""
         if device_id in self.active_monitors:
             self.active_monitors[device_id].cancel()
@@ -253,11 +248,9 @@ class HealthCheckService:
     async def _check_connectivity(self, device_id: str) -> HealthCheckResult:
         """
         Check device connectivity
-
-        Args:
+    Args:
             device_id: Device ID
-
-        Returns:
+    Returns:
             HealthCheckResult"""
         start_time = datetime.utcnow()
 
@@ -303,11 +296,9 @@ class HealthCheckService:
     async def _check_protocols(self, device_id: str) -> HealthCheckResult:
         """
         Check protocol status
-
-        Args:
+    Args:
             device_id: Device ID
-
-        Returns:
+    Returns:
             HealthCheckResult"""
         start_time = datetime.utcnow()
 
@@ -363,11 +354,9 @@ class HealthCheckService:
     async def _check_services(self, device_id: str) -> HealthCheckResult:
         """
         Check critical services
-
-        Args:
+    Args:
             device_id: Device ID
-
-        Returns:
+    Returns:
             HealthCheckResult"""
         start_time = datetime.utcnow()
 
@@ -419,12 +408,10 @@ class HealthCheckService:
     ) -> HealthCheckResult:
         """
         Check performance metrics
-
-        Args:
+    Args:
             device_id: Device ID
             thresholds: Performance thresholds
-
-        Returns:
+    Returns:
             HealthCheckResult"""
         start_time = datetime.utcnow()
 
@@ -520,11 +507,9 @@ class HealthCheckService:
     async def _check_configuration(self, device_id: str) -> HealthCheckResult:
         """
         Check configuration consistency
-
-        Args:
+    Args:
             device_id: Device ID
-
-        Returns:
+    Returns:
             HealthCheckResult"""
         start_time = datetime.utcnow()
 
@@ -570,11 +555,9 @@ class HealthCheckService:
     async def _run_custom_checks(self, device_id: str) -> HealthCheckResult:
         """
         Run custom health checks
-
-        Args:
+    Args:
             device_id: Device ID
-
-        Returns:
+    Returns:
             HealthCheckResult"""
         start_time = datetime.utcnow()
 
@@ -625,8 +608,7 @@ class HealthCheckService:
     def register_custom_check(self, name: str, check_func: Callable) -> None:
         """
         Register a custom health check
-
-        Args:
+    Args:
             name: Check name
             check_func: Check function"""
         self.custom_checks[name] = check_func
@@ -638,12 +620,10 @@ class HealthCheckService:
     ) -> List[HealthCheckResult]:
         """
         Get health check history
-
-        Args:
+    Args:
             device_id: Device ID
             hours: Hours of history
-
-        Returns:
+    Returns:
             List of health check results"""
         if device_id not in self.health_checks:
             return []

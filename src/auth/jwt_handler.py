@@ -22,20 +22,19 @@ class JWTHandler:
 
     def __init__(
         self,
-        private_key_path: Optional[str] = None,
-        public_key_path: Optional[str] = None,
-        algorithm: str = "RS256",
-        token_lifetime: int = 3600,  # 1 hour
-        refresh_lifetime: int = 86400 * 7,  # 7 days
+            private_key_path: Optional[str] = None,
+            public_key_path: Optional[str] = None,
+            algorithm: str = "RS256",
+            token_lifetime: int = 3600,  # 1 hour
+            refresh_lifetime: int = 86400 * 7,  # 7 days
     ):
         Initialize JWT handler with RSA keys
-
-        Args:
+    Args:
             private_key_path: Path to RSA private key for signing
-            public_key_path: Path to RSA public key for verification
-            algorithm: JWT signing algorithm (default RS256)
-            token_lifetime: Access token lifetime in seconds
-            refresh_lifetime: Refresh token lifetime in seconds
+                public_key_path: Path to RSA public key for verification
+                algorithm: JWT signing algorithm (default RS256)
+                token_lifetime: Access token lifetime in seconds
+                refresh_lifetime: Refresh token lifetime in seconds
         self.algorithm = algorithm
         self.token_lifetime = token_lifetime
         self.refresh_lifetime = refresh_lifetime
@@ -58,35 +57,33 @@ class JWTHandler:
                 self.public_key = serialization.load_pem_public_key(
                     key_file.read(), backend=default_backend()
                 )
-        else:
+            else:
             self.public_key = self.private_key.public_key()
 
     def create_token(
         self,
-        user_id: str,
-        username: str,
-        roles: list = None,
-        permissions: list = None,
-        extra_claims: Dict[str, Any] = None,
-        token_type: str = "access",
+            user_id: str,
+            username: str,
+            roles: list = None,
+            permissions: list = None,
+            extra_claims: Dict[str, Any] = None,
+            token_type: str = "access",
     ) -> str:
         Create a JWT token with claims
-
-        Args:
+    Args:
             user_id: Unique user identifier
-            username: Username
-            roles: List of user roles
-            permissions: List of user permissions
-            extra_claims: Additional claims to include
-            token_type: Type of token (access or refresh)
-
-        Returns:
+                username: Username
+                roles: List of user roles
+                permissions: List of user permissions
+                extra_claims: Additional claims to include
+                token_type: Type of token (access or refresh)
+    Returns:
             Encoded JWT token string
         now = datetime.datetime.utcnow()
 
         if token_type == "refresh":
             exp = now + datetime.timedelta(seconds=self.refresh_lifetime)
-        else:
+            else:
             exp = now + datetime.timedelta(seconds=self.token_lifetime)
 
         # Build claims
@@ -120,13 +117,11 @@ class JWTHandler:
         self, token: str, token_type: str = "access", verify_exp: bool = True
     ) -> Tuple[bool, Optional[Dict[str, Any]]]:
         Verify and decode a JWT token
-
-        Args:
+    Args:
             token: JWT token string
-            token_type: Expected token type
-            verify_exp: Whether to verify expiration
-
-        Returns:
+                token_type: Expected token type
+                verify_exp: Whether to verify expiration
+    Returns:
             Tuple of (is_valid, claims_dict)
         try:
             # Check if token is revoked
@@ -163,14 +158,12 @@ class JWTHandler:
 
         def refresh_token(
             self,
-            refresh_token: str
+                refresh_token: str
         ) -> Tuple[Optional[str], Optional[str]]:
         Generate new access token from refresh token
-
-        Args:
+    Args:
             refresh_token: Valid refresh token
-
-        Returns:
+    Returns:
                         Tuple of (
                 new_access_token,
                 new_refresh_token) or (None,
@@ -208,13 +201,11 @@ class JWTHandler:
 
     def revoke_token(self, token: str) -> bool:
         Revoke a token by adding its JTI to revocation list
-
-        Args:
+    Args:
             token: Token to revoke
-
-        Returns:
+    Returns:
             Success status
-        try:
+            try:
             jti = self._extract_jti(token)
             if jti:
                 self.revoked_tokens.add(jti)
@@ -226,23 +217,19 @@ class JWTHandler:
 
     def _generate_jti(self, user_id: str, timestamp: datetime.datetime) -> str:
         Generate unique JWT ID
-
-        Args:
+    Args:
             user_id: User identifier
-            timestamp: Token creation timestamp
-
-        Returns:
+                timestamp: Token creation timestamp
+    Returns:
             Unique JTI string
         data = f"{user_id}:{timestamp.isoformat()}"
         return hashlib.sha256(data.encode()).hexdigest()[:16]
 
     def _extract_jti(self, token: str) -> Optional[str]:
         Extract JTI from token without full verification
-
-        Args:
+    Args:
             token: JWT token
-
-        Returns:
+    Returns:
             JTI string or None
         try:
             # Decode without verification to get JTI
@@ -255,8 +242,7 @@ class JWTHandler:
 
     def get_public_key(self) -> str:
         Get public key in PEM format for sharing
-
-        Returns:
+    Returns:
             PEM formatted public key
         return self.public_key.public_bytes(
             encoding=serialization.Encoding.PEM,
@@ -277,16 +263,14 @@ def get_jwt_handler() -> JWTHandler:
 
 
 def create_access_token(
-    user_id: str, username: str, roles: list = None, **kwargs
+        user_id: str, username: str, roles: list = None, **kwargs
 ) -> str:
     Create an access token
-
     Args:
         user_id: User identifier
-        username: Username
-        roles: User roles
+            username: Username
+            roles: User roles
         **kwargs: Additional claims
-
     Returns:
         JWT access token
     handler = get_jwt_handler()
@@ -300,15 +284,13 @@ def create_access_token(
 
 
 def verify_token(
-    token: str,
-    token_type: str = "access"
+        token: str,
+        token_type: str = "access"
 ) -> Tuple[bool, Optional[dict]]:
     Verify a token
-
     Args:
         token: JWT token
-        token_type: Expected token type
-
+            token_type: Expected token type
     Returns:
         Tuple of (is_valid, claims)
     handler = get_jwt_handler()

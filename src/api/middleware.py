@@ -12,14 +12,12 @@ logger = logging.getLogger(__name__)
 
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
-
-
     """Add security headers to all responses."""
 
     async def dispatch(
         self,
-        request: Request,
-        call_next: Callable
+            request: Request,
+            call_next: Callable
     ) -> Response:
         # Generate request ID for tracing
         request_id = str(uuid.uuid4())
@@ -33,7 +31,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         # Add security headers
         response.headers["X-Request-ID"] = request_id
         response.headers["X-Content-Type-Options"] = "nosniff"""
-        f"response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-Frame-Options"] = "DENY"
         response.headers["X-XSS-Protection"] = "1; mode=block"
         response.headers[
             "Strict-Transport-Security"
@@ -77,8 +75,8 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
         async def dispatch(
             self,
-            request: Request,
-            call_next: Callable
+                request: Request,
+                call_next: Callable
         ) -> Response:
             # Get client identifier (IP address)
         client_ip = request.client.host
@@ -136,13 +134,13 @@ class CORSMiddleware(BaseHTTPMiddleware):
 
         async def dispatch(
             self,
-            request: Request,
-            call_next: Callable
+                request: Request,
+                call_next: Callable
         ) -> Response:
             # Handle preflight requests
         if request.method == "OPTIONS":
             response = Response(status_code=200)
-        else:
+            else:
             response = await call_next(request)
 
         # Get origin
@@ -168,8 +166,8 @@ class AuditLoggingMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(
         self,
-        request: Request,
-        call_next: Callable
+            request: Request,
+            call_next: Callable
     ) -> Response:
         # Start timer
         start_time = time.time()

@@ -38,8 +38,6 @@ class LoginRequest(BaseModel):
 
 
 class LoginResponse(BaseModel):
-
-
     """Login response model"""
     access_token: str
     token_type: str = "bearer"
@@ -52,67 +50,59 @@ class MFAEnrollRequest(BaseModel):
     """MFA enrollment request"""
 
     method: str  # totp, sms, email
-    phone_number: Optional[str] = None
-    backup_email: Optional[EmailStr] = None
+        phone_number: Optional[str] = None
+        backup_email: Optional[EmailStr] = None
 
 
 class MFAEnrollResponse(BaseModel):
-
-
     """MFA enrollment response"""
 
     method: str
-    qr_code: Optional[str] = None  # Base64 encoded QR code for TOTP
-    backup_codes: List[str] = []
-    enrolled_at: datetime
+        qr_code: Optional[str] = None  # Base64 encoded QR code for TOTP
+        backup_codes: List[str] = []
+        enrolled_at: datetime
 
 
 class CertificateValidationRequest(BaseModel):
-
-
     """Certificate validation request"""
 
     certificate: str  # PEM encoded certificate
-    device_id: Optional[str] = None
+        device_id: Optional[str] = None
 
 
 class CertificateValidationResponse(BaseModel):
-
-
     """Certificate validation response"""
 
     valid: bool
-    subject: Dict[str, str]
-    issuer: Dict[str, str]
-    serial_number: str
-    not_valid_before: datetime
-    not_valid_after: datetime
-    device_id: Optional[str] = None
+        subject: Dict[str, str]
+        issuer: Dict[str, str]
+        serial_number: str
+        not_valid_before: datetime
+        not_valid_after: datetime
+        device_id: Optional[str] = None
 
 
 class SessionInfo(BaseModel):
-
-
     """Session information"""
 
     session_id: str
-    user_id: str
-    created_at: datetime
-    last_activity: datetime
-    ip_address: str
-    user_agent: str
-    expires_at: datetime
+        user_id: str
+        created_at: datetime
+        last_activity: datetime
+        ip_address: str
+        user_agent: str
+        expires_at: datetime
 
 
 @router.post("/login", response_model=LoginResponse)
 async def login(
-    request: Request,
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    db: AsyncSession = Depends(get_db),
+        request: Request,
+        form_data: OAuth2PasswordRequestForm = Depends(),
+        db: AsyncSession = Depends(get_db),
 ):
     """User login endpoint
 
-    Authenticates user with username/password.
+    Authenticates user with username / password.
     Returns JWT tokens on success.
     logger.info(f"Login attempt for user {form_data.username}")
 
@@ -194,8 +184,8 @@ async def login(
 
 @router.post("/logout")
 async def logout(
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+        current_user: User = Depends(get_current_user),
+        db: AsyncSession = Depends(get_db),
 ):
     """User logout endpoint
 
@@ -216,8 +206,8 @@ async def logout(
 
 @router.post("/refresh")
 async def refresh_token(
-    refresh_token: str,
-    db: AsyncSession = Depends(get_db),
+        refresh_token: str,
+        db: AsyncSession = Depends(get_db),
 ):
     """Refresh access token
 
@@ -266,16 +256,16 @@ async def refresh_token(
 
 @router.post("/mfa/enroll", response_model=MFAEnrollResponse)
 async def enroll_mfa(
-    request: MFAEnrollRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+        request: MFAEnrollRequest,
+        current_user: User = Depends(get_current_user),
+        db: AsyncSession = Depends(get_db),
 ):
-    Enroll user in Multi-Factor Authentication
+    Enroll user in Multi - Factor Authentication
 
     Methods supported:
-    - TOTP (Time-based One-Time Password)
-    - SMS (future implementation)
-    - Email (future implementation)
+    - TOTP(Time - based One - Time Password)
+    - SMS(future implementation)
+    - Email(future implementation)
     logger.info(f"MFA enrollment requested for user {current_user.username}")
 
     try:
@@ -360,8 +350,8 @@ async def enroll_mfa(
     response_model=CertificateValidationResponse
 )
 async def validate_certificate(
-    request: CertificateValidationRequest,
-    current_user: User = Depends(get_current_user),
+        request: CertificateValidationRequest,
+        current_user: User = Depends(get_current_user),
 ):
     Validate X.509 certificate for device or service authentication
 
@@ -384,7 +374,7 @@ async def validate_certificate(
         now = datetime.utcnow()
         if now < cert.not_valid_before or now > cert.not_valid_after:
             valid = False
-        else:
+            else:
             valid = True
 
         # Extract subject information
@@ -441,8 +431,8 @@ async def validate_certificate(
 
 @router.get("/sessions", response_model=List[SessionInfo])
 async def get_active_sessions(
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+        current_user: User = Depends(get_current_user),
+        db: AsyncSession = Depends(get_db),
 ):
     Get all active sessions for the current user
 
@@ -494,9 +484,9 @@ async def get_active_sessions(
 
 @router.delete("/sessions/{session_id}")
 async def terminate_session(
-    session_id: str,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+        session_id: str,
+        current_user: User = Depends(get_current_user),
+        db: AsyncSession = Depends(get_db),
 ):
     Terminate a specific session
 
@@ -505,7 +495,7 @@ async def terminate_session(
         f"Session termination requested by {current_user.username} for \"
             {session_id}"
     )
-
+    
     try:
         from ..db.models import Session
 

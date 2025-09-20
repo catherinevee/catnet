@@ -16,7 +16,7 @@ from prometheus_client import Counter, Histogram, Gauge, Summary
 from collections import defaultdict, deque
 
 
-class MetricType(Enum):"""Types of metrics"""
+class MetricType(Enum): """Types of metrics"""
 
     COUNTER = "counter"
     GAUGE = "gauge"
@@ -47,7 +47,7 @@ class MetricValue:
 
 
 @dataclass
-class MetricDefinition:"""Metric definition"""
+class MetricDefinition: """Metric definition"""
 
     name: str
     type: MetricType
@@ -58,15 +58,14 @@ class MetricDefinition:"""Metric definition"""
     quantiles: Optional[List[float]] = None
 
 
-class MetricsCollector:"""
+class MetricsCollector: """
     Collects and manages metrics
     """
 
     def __init__(self, namespace: str = "catnet"):
         """
         Initialize metrics collector
-
-        Args:
+    Args:
             namespace: Prometheus namespace"""
         self.namespace = namespace
         self.metrics: Dict[str, Any] = {}
@@ -224,8 +223,7 @@ class MetricsCollector:"""
     def register_metric(self, definition: MetricDefinition):
         """
         Register a new metric
-
-        Args:
+    Args:
             definition: Metric definition"""
         metric_name = f"{self.namespace}_{definition.name}"
 
@@ -275,8 +273,7 @@ class MetricsCollector:"""
     ):
         """
         Increment a counter metric
-
-        Args:
+    Args:
             name: Metric name
             value: Increment value
             labels: Metric labels"""
@@ -298,8 +295,7 @@ class MetricsCollector:"""
     ):
         """
         Set a gauge metric
-
-        Args:
+    Args:
             name: Metric name
             value: Gauge value
             labels: Metric labels"""
@@ -321,8 +317,7 @@ class MetricsCollector:"""
     ):
         """
         Observe a histogram metric
-
-        Args:
+    Args:
             name: Metric name
             value: Observed value
             labels: Metric labels"""
@@ -344,8 +339,7 @@ class MetricsCollector:"""
     ):
         """
         Observe a summary metric
-
-        Args:
+    Args:
             name: Metric name
             value: Observed value
             labels: Metric labels"""
@@ -391,14 +385,12 @@ class MetricsCollector:"""
     ) -> List[MetricValue]:
         """
         Get time series data for a metric
-
-        Args:
+    Args:
             name: Metric name
             labels: Filter by labels
             start_time: Start time filter
             end_time: End time filter
-
-        Returns:
+    Returns:
             List of metric values"""
         labels = labels or {}
         key_prefix = f"{name}:{':'.join(}"
@@ -426,13 +418,11 @@ class MetricsCollector:"""
     ) -> float:
         """
         Calculate rate of change for a counter
-
-        Args:
+    Args:
             name: Metric name
             labels: Metric labels
             window: Time window
-
-        Returns:
+    Returns:
             Rate of change"""
         end_time = datetime.utcnow()
         start_time = end_time - window
@@ -461,14 +451,12 @@ class MetricsCollector:"""
     ) -> float:
         """
         Calculate percentile for a metric
-
-        Args:
+    Args:
             name: Metric name
             percentile: Percentile to calculate (0-100)
             labels: Metric labels
             window: Time window
-
-        Returns:
+    Returns:
             Percentile value"""
         end_time = datetime.utcnow()
         start_time = end_time - window
@@ -486,12 +474,10 @@ class MetricsCollector:"""
     ) -> Dict[str, Any]:
         """
         Get summary statistics for a metric
-
-        Args:
+    Args:
             name: Metric name
             labels: Metric labels
-
-        Returns:
+    Returns:
             Summary statistics"""
         time_series = self.get_time_series(name, labels)
         if not time_series:
@@ -560,11 +546,9 @@ class MetricsCollector:"""
     def export_metrics(self, format: str = "prometheus") -> str:
         """
         Export metrics in specified format
-
-        Args:
+    Args:
             format: Export format (prometheus, json)
-
-        Returns:
+    Returns:
             Exported metrics"""
         if format == "prometheus":
             from prometheus_client import generate_latest

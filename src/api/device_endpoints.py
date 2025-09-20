@@ -1,7 +1,6 @@
 """
 Device Management API Endpoints
 Phase 2 Implementation - Simple device CRUD operations
-"""
 from fastapi import APIRouter, HTTPException, status, Query
 from typing import List, Optional
 from pydantic import BaseModel, Field
@@ -16,46 +15,50 @@ class DeviceCreateRequest(BaseModel):
     """Request model for creating a device"""
 
     hostname: str = Field(..., description="Device hostname")
-    ip_address: str = Field(..., description="Device IP address")
-    vendor: str = Field(default="cisco_ios", description="Device vendor")
-    username: str = Field(default="admin", description="SSH username")
-    ssh_port: int = Field(default=22, description="SSH port")
-    tags: List[str] = Field(default_factory=list, description="Device tags")
+        ip_address: str = Field(..., description="Device IP address")
+        vendor: str = Field(default="cisco_ios", description="Device vendor")
+        username: str = Field(default="admin", description="SSH username")
+        ssh_port: int = Field(default=22, description="SSH port")
+        tags: List[str] = Field(
+    default_factory=list,
+     description="Device tags")
 
 
 class DeviceUpdateRequest(BaseModel):
     """Request model for updating a device"""
 
     hostname: Optional[str] = None
-    ip_address: Optional[str] = None
-    vendor: Optional[str] = None
-    username: Optional[str] = None
-    ssh_port: Optional[int] = None
-    is_active: Optional[bool] = None
-    tags: Optional[List[str]] = None
+        ip_address: Optional[str] = None
+        vendor: Optional[str] = None
+        username: Optional[str] = None
+        ssh_port: Optional[int] = None
+        is_active: Optional[bool] = None
+        tags: Optional[List[str]] = None
 
 
-class DeviceResponse(BaseModel):"""Response model for device information"""
+class DeviceResponse(BaseModel):
+    """Response model for device information"""
 
     id: str
-    hostname: str
-    ip_address: str
-    vendor: str
-    username: str
-    ssh_port: int
-    added_at: str
-    last_seen: Optional[str] = None
-    is_active: bool
-    tags: List[str]
+        hostname: str
+        ip_address: str
+        vendor: str
+        username: str
+        ssh_port: int
+        added_at: str
+        last_seen: Optional[str] = None
+        is_active: bool
+        tags: List[str]
 
 
-@router.post("", response_model=DeviceResponse, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=DeviceResponse,
+             status_code=status.HTTP_201_CREATED)
 async def create_device(request: DeviceCreateRequest):
     """
     Add a new device to the inventory
 
     Simple implementation - no complex validation"""
-    try:
+        try:
         device = DeviceInfo(
             hostname=request.hostname,
             ip_address=request.ip_address,
@@ -70,7 +73,9 @@ async def create_device(request: DeviceCreateRequest):
         return DeviceResponse(**added_device.to_dict())
 
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
+        raise HTTPException(
+    status_code=status.HTTP_409_CONFLICT,
+     detail=str(e))
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -80,9 +85,10 @@ async def create_device(request: DeviceCreateRequest):
 
 @router.get("", response_model=List[DeviceResponse])
 async def list_devices(
-    active_only: bool = Query(False, description="Only return active devices"),
-    vendor: Optional[str] = Query(None, description="Filter by vendor"),
-    tag: Optional[str] = Query(None, description="Filter by tag"),
+        active_only: bool = Query(
+    False, description="Only return active devices"),
+        vendor: Optional[str] = Query(None, description="Filter by vendor"),
+        tag: Optional[str] = Query(None, description="Filter by tag"),
 ):
     """
     List all devices in the inventory
@@ -197,7 +203,7 @@ async def add_sample_devices():
     Add sample devices for testing
 
     Useful for quick testing without complex setup"""
-    try:
+        try:
         devices = device_store.add_sample_devices()
         return {
             "message": f"Added {len(devices)} sample devices",

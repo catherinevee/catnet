@@ -1,6 +1,7 @@
 """
 GitOps Processor - Handles Git events and configuration processing
 """
+
 import os
 import asyncio
 import json
@@ -21,7 +22,7 @@ from ..db.database import get_db
 logger = get_logger(__name__)
 
 
-class GitOpsProcessor:"""Processes Git events and manages configuration synchronization"""
+class GitOpsProcessor: """Processes Git events and manages configuration synchronization"""
 
     def __init__(self):
         """TODO: Add docstring"""
@@ -35,12 +36,10 @@ class GitOpsProcessor:"""Processes Git events and manages configuration synchron
     ) -> Dict[str, Any]:
         """
         Process push event from GitHub/GitLab
-
-        Args:
+    Args:
             webhook_data: Webhook payload
             repository: Repository configuration
-
-        Returns:
+    Returns:
             Processing result"""
         logger.info(f"Processing push event for {repository.url}")
 
@@ -123,12 +122,10 @@ class GitOpsProcessor:"""Processes Git events and manages configuration synchron
     ) -> Dict[str, Any]:
         """
         Process pull/merge request event
-
-        Args:
+    Args:
             webhook_data: Webhook payload
             repository: Repository configuration
-
-        Returns:
+    Returns:
             Processing result"""
         logger.info(f"Processing PR event for {repository.url}")
 
@@ -186,12 +183,10 @@ class GitOpsProcessor:"""Processes Git events and manages configuration synchron
         self, repository: GitRepository, branch: Optional[str] = None
     ) -> Path:"""
         Sync repository to local filesystem
-
-        Args:
+    Args:
             repository: Repository configuration
             branch: Optional specific branch to checkout
-
-        Returns:
+    Returns:
             Path to repository
         """
         logger.info(f"Syncing repository {repository.url}")

@@ -1,6 +1,7 @@
 """
 Device Certificate Manager for certificate-based authentication
 """
+
 import os
 
 # import asyncio  # Will be used for async certificate operations
@@ -32,7 +33,7 @@ from ..core.exceptions import SecurityError
 logger = get_logger(__name__)
 
 
-class DeviceCertificateManager:"""Manages device certificates for authentication"""
+class DeviceCertificateManager: """Manages device certificates for authentication"""
 
     def __init__(self):
         """TODO: Add docstring"""
@@ -70,14 +71,12 @@ class DeviceCertificateManager:"""Manages device certificates for authentication
     ) -> Dict[str, str]:
         """
         Issue certificate for network device
-
-        Args:
+    Args:
             device_id: Device UUID
             device_hostname: Device hostname
             device_ip: Device IP address
             validity_days: Certificate validity in days
-
-        Returns:
+    Returns:
             Dictionary containing certificate details"""
         logger.info(f"Issuing certificate for device {device_id}")
 
@@ -253,12 +252,10 @@ class DeviceCertificateManager:"""Manages device certificates for authentication
     ) -> bool:
         """
         Revoke device certificate
-
-        Args:
+    Args:
             device_id: Device UUID
             reason: Revocation reason
-
-        Returns:
+    Returns:
             True if revocation successful"""
         logger.info(f"Revoking certificate for device {device_id}")
 
@@ -321,12 +318,10 @@ class DeviceCertificateManager:"""Manages device certificates for authentication
     ) -> Optional[Device]:
         """
         Validate device certificate and return device info
-
-        Args:
+    Args:
             cert_data: Certificate data in PEM format
             device_ip: Optional IP address to verify
-
-        Returns:
+    Returns:
             Device object if valid, None otherwise"""
         try:
             # Parse certificate
@@ -405,11 +400,9 @@ class DeviceCertificateManager:"""Manages device certificates for authentication
     async def rotate_device_certs(self, force: bool = False) -> Dict[str, int]:
         """
         Rotate expiring device certificates
-
-        Args:
+    Args:
             force: Force rotation regardless of expiry
-
-        Returns:
+    Returns:
             Statistics of rotated certificates"""
         logger.info("Starting device certificate rotation")
 
@@ -496,11 +489,9 @@ class DeviceCertificateManager:"""Manages device certificates for authentication
     async def get_certificate_status(self, device_id: str) -> Dict[str, any]:
         """
         Get certificate status for a device
-
-        Args:
+    Args:
             device_id: Device UUID
-
-        Returns:
+    Returns:
             Certificate status information"""
         async with get_db() as session:
             result = await session.execute(select(Device).where(Device.id ==

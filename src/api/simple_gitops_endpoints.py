@@ -2,6 +2,7 @@
 Simple GitOps Endpoints
 Phase 3 Implementation - Basic GitHub integration without complexity
 """
+
 from fastapi import APIRouter, HTTPException, status, Query
 from typing import List, Optional
 from pydantic import BaseModel

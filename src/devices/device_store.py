@@ -2,6 +2,7 @@
 Simple In-Memory Device Store
 Phase 2 Implementation - Keeping it simple to avoid over-engineering
 """
+
 from typing import Dict, List, Optional
 from datetime import datetime
 import uuid
@@ -9,7 +10,7 @@ from dataclasses import dataclass, field, asdict
 
 
 @dataclass
-class DeviceInfo:"""Simple device information model"""
+class DeviceInfo: """Simple device information model"""
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
     hostname: str = ""
     ip_address: str = ""
@@ -32,7 +33,7 @@ class DeviceInfo:"""Simple device information model"""
         return data
 
 
-class DeviceStore:"""
+class DeviceStore: """
     Simple in-memory device store
     No complex database required initially
     """
@@ -42,7 +43,9 @@ class DeviceStore:"""
         self._devices: Dict[str, DeviceInfo] = {}
         self._hostname_index: Dict[str, str] = {}  # hostname -> id mapping
 
-    def add_device(self, device: DeviceInfo) -> DeviceInfo:"""Add a device to the store"""
+    def add_device(
+    self,
+     device: DeviceInfo) -> DeviceInfo: """Add a device to the store"""
         # Check for duplicate hostname
         if device.hostname in self._hostname_index:
             existing_id = self._hostname_index[device.hostname]

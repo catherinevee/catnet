@@ -7,7 +7,6 @@ Handles:
 - Workflow orchestration
 - Event-driven automation
 - Scheduled tasks
-"""
 
 from typing import Dict, Any, Optional, List, Callable
 from dataclasses import dataclass, field
@@ -19,51 +18,52 @@ from collections import defaultdict
 import re
 
 
-class WorkflowState(Enum):"""Workflow execution states"""
+class WorkflowState(Enum):
+    """Workflow execution states"""
 
     PENDING = "pending"
-    RUNNING = "running"
-    PAUSED = "paused"
-    COMPLETED = "completed"
-    FAILED = "failed"
-    CANCELLED = "cancelled"
+        RUNNING = "running"
+        PAUSED = "paused"
+        COMPLETED = "completed"
+        FAILED = "failed"
+        CANCELLED = "cancelled"
 
 
 class TriggerType(Enum):
     """Workflow trigger types"""
 
     EVENT = "event"
-    SCHEDULE = "schedule"
-    MANUAL = "manual"
-    CONDITION = "condition"
-    WEBHOOK = "webhook"
-    API = "api"
+        SCHEDULE = "schedule"
+        MANUAL = "manual"
+        CONDITION = "condition"
+        WEBHOOK = "webhook"
+        API = "api"
 
 
 class ActionType(Enum):
     """Workflow action types"""
 
     DEVICE_COMMAND = "device_command"
-    CONFIG_CHANGE = "config_change"
-    ROLLBACK = "rollback"
-    NOTIFICATION = "notification"
-    SCRIPT = "script"
-    API_CALL = "api_call"
-    APPROVAL = "approval"
-    WAIT = "wait"
-    CONDITION = "condition"
+        CONFIG_CHANGE = "config_change"
+        ROLLBACK = "rollback"
+        NOTIFICATION = "notification"
+        SCRIPT = "script"
+        API_CALL = "api_call"
+        APPROVAL = "approval"
+        WAIT = "wait"
+        CONDITION = "condition"
 
 
 class StepType(Enum):
     """Workflow step types"""
 
     ACTION = "action"
-    DECISION = "decision"
-    PARALLEL = "parallel"
-    LOOP = "loop"
-    WAIT = "wait"
-    APPROVAL = "approval"
-    NOTIFICATION = "notification"
+        DECISION = "decision"
+        PARALLEL = "parallel"
+        LOOP = "loop"
+        WAIT = "wait"
+        APPROVAL = "approval"
+        NOTIFICATION = "notification"
 
 
 # Alias for backward compatibility
@@ -75,70 +75,73 @@ class WorkflowTrigger:
     """Workflow trigger definition"""
 
     type: TriggerType
-    conditions: Dict[str, Any]
-    filters: Optional[Dict[str, Any]] = None
-    cooldown: timedelta = timedelta(minutes=5)
-    enabled: bool = True
+        conditions: Dict[str, Any]
+        filters: Optional[Dict[str, Any]] = None
+        cooldown: timedelta = timedelta(minutes=5)
+        enabled: bool = True
 
 
 @dataclass
-class WorkflowAction:"""Workflow action definition"""
+class WorkflowAction:
+    """Workflow action definition"""
 
     id: str
-    name: str
-    type: ActionType
-    parameters: Dict[str, Any]
-    timeout: timedelta = timedelta(minutes=5)
-    retry_count: int = 3
-    retry_delay: timedelta = timedelta(seconds=30)
-    on_success: Optional[List[str]] = None
-    on_failure: Optional[List[str]] = None
-    conditions: Optional[Dict[str, Any]] = None
+        name: str
+        type: ActionType
+        parameters: Dict[str, Any]
+        timeout: timedelta = timedelta(minutes=5)
+        retry_count: int = 3
+        retry_delay: timedelta = timedelta(seconds=30)
+        on_success: Optional[List[str]] = None
+        on_failure: Optional[List[str]] = None
+        conditions: Optional[Dict[str, Any]] = None
 
 
 @dataclass
-class WorkflowStep:"""Workflow execution step"""
+class WorkflowStep:
+    """Workflow execution step"""
 
     action: WorkflowAction
-    state: WorkflowState
-    started_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
-    result: Optional[Dict[str, Any]] = None
-    error: Optional[str] = None
-    attempts: int = 0
+        state: WorkflowState
+        started_at: Optional[datetime] = None
+        completed_at: Optional[datetime] = None
+        result: Optional[Dict[str, Any]] = None
+        error: Optional[str] = None
+        attempts: int = 0
 
 
 @dataclass
-class Workflow:"""Workflow definition"""
+class Workflow:
+    """Workflow definition"""
 
     id: str
-    name: str
-    description: str
-    triggers: List[WorkflowTrigger]
-    actions: List[WorkflowAction]
-    variables: Dict[str, Any] = field(default_factory=dict)
-    metadata: Dict[str, Any] = field(default_factory=dict)
-    created_at: datetime = field(default_factory=datetime.utcnow)
-    enabled: bool = True
+        name: str
+        description: str
+        triggers: List[WorkflowTrigger]
+        actions: List[WorkflowAction]
+        variables: Dict[str, Any] = field(default_factory=dict)
+        metadata: Dict[str, Any] = field(default_factory=dict)
+        created_at: datetime = field(default_factory=datetime.utcnow)
+        enabled: bool = True
 
 
 @dataclass
-class WorkflowExecution:"""Workflow execution instance"""
+class WorkflowExecution:
+    """Workflow execution instance"""
 
     id: str
-    workflow_id: str
-    state: WorkflowState
-    trigger_event: Dict[str, Any]
-    started_at: datetime
-    completed_at: Optional[datetime] = None
-    steps: List[WorkflowStep] = field(default_factory=list)
-    context: Dict[str, Any] = field(default_factory=dict)
-    error: Optional[str] = None
+        workflow_id: str
+        state: WorkflowState
+        trigger_event: Dict[str, Any]
+        started_at: datetime
+        completed_at: Optional[datetime] = None
+        steps: List[WorkflowStep] = field(default_factory=list)
+        context: Dict[str, Any] = field(default_factory=dict)
+        error: Optional[str] = None
 
 
 class WorkflowEngine:"""
     Workflow automation engine
-    """
 
     def __init__(
         self,
@@ -146,15 +149,13 @@ class WorkflowEngine:"""
         deployment_service=None,
         notification_service=None,
         monitoring_service=None,
-    ):"""
+    ): """
         Initialize workflow engine
-
-        Args:
+    Args:
             device_service: Device management service
-            deployment_service: Deployment service
-            notification_service: Notification service
-            monitoring_service: Monitoring service
-        """
+                deployment_service: Deployment service
+                notification_service: Notification service
+                monitoring_service: Monitoring service
         self.device_service = device_service
         self.deployment_service = deployment_service
         self.notification_service = notification_service
@@ -195,7 +196,8 @@ class WorkflowEngine:"""
         self.action_handlers[ActionType.WAIT] = self._execute_wait
         self.action_handlers[ActionType.CONDITION] = self._execute_condition
 
-    def _initialize_default_workflows(self):"""Initialize default automation workflows"""
+    def _initialize_default_workflows(
+        self):"""Initialize default automation workflows"""
         # Auto-remediation for high CPU
         self.add_workflow(
             Workflow(
@@ -359,8 +361,7 @@ class WorkflowEngine:"""
     def add_workflow(self, workflow: Workflow):
         """
         Add a workflow
-
-        Args:
+    Args:
             workflow: Workflow to add"""
         self.workflows[workflow.id] = workflow
 
@@ -377,8 +378,7 @@ class WorkflowEngine:"""
     def remove_workflow(self, workflow_id: str):
         """
         Remove a workflow
-
-        Args:
+    Args:
             workflow_id: Workflow ID"""
         if workflow_id in self.workflows:
             workflow = self.workflows[workflow_id]
@@ -406,12 +406,10 @@ class WorkflowEngine:"""
     ) -> str:
         """
         Trigger a workflow execution
-
-        Args:
+    Args:
             workflow_id: Workflow ID
-            trigger_event: Triggering event data
-
-        Returns:
+                trigger_event: Triggering event data
+    Returns:
             Execution ID"""
         if workflow_id not in self.workflows:
             raise ValueError(f"Workflow {workflow_id} not found")
@@ -454,7 +452,7 @@ class WorkflowEngine:"""
         """Execute a workflow"""
         execution = self.executions[execution_id]
         workflow = self.workflows[execution.workflow_id]
-
+    
         try:
             execution.state = WorkflowState.RUNNING
 
@@ -502,7 +500,7 @@ class WorkflowEngine:"""
         except Exception as e:
             execution.state = WorkflowState.FAILED
             execution.error = str(e)
-
+    
         finally:
             execution.completed_at = datetime.utcnow()
 
@@ -515,8 +513,8 @@ class WorkflowEngine:"""
 
         async def _execute_action(
         self,
-        step: WorkflowStep,
-        execution: WorkflowExecution
+            step: WorkflowStep,
+            execution: WorkflowExecution
     ):"""Execute a workflow action"""
         step.state = WorkflowState.RUNNING
         step.started_at = datetime.utcnow()
@@ -547,7 +545,7 @@ class WorkflowEngine:"""
                 if attempt < step.action.retry_count - 1:
                     await asyncio.sleep(step.action.retry_delay.total_seconds(
                         ))
-                else:
+                    else:
                     step.state = WorkflowState.FAILED
 
             except Exception as e:
@@ -555,7 +553,7 @@ class WorkflowEngine:"""
                 if attempt < step.action.retry_count - 1:
                     await asyncio.sleep(step.action.retry_delay.total_seconds(
                         ))
-                else:
+                    else:
                     step.state = WorkflowState.FAILED
 
         step.completed_at = datetime.utcnow()
@@ -734,14 +732,14 @@ class WorkflowEngine:"""
         )
 
         # Evaluate condition
-        try:
+            try:
             result = eval(condition, {"__builtins__": {}}, context)
         except Exception:
             result = False
 
         if result:
             action = parameters.get("true_action", "continue")
-        else:
+            else:
             action = parameters.get("false_action", "continue")
 
         return {"condition_result": result, "action": action}
@@ -762,7 +760,7 @@ class WorkflowEngine:"""
             for part in parts:
                 if isinstance(value, dict):
                     value = value.get(part, "")
-                else:
+                    else:
                     return ""
 
             return str(value)
@@ -802,7 +800,7 @@ class WorkflowEngine:"""
 
         def get_execution_status(
         self,
-        execution_id: str
+            execution_id: str
     ) -> Optional[Dict[str, Any]]:
         """Get workflow execution status"""
         if execution_id not in self.executions:
@@ -887,8 +885,8 @@ class WorkflowBuilder:
 
     def add_trigger(
         self,
-        trigger_type: TriggerType,
-        config: Optional[Dict[str, Any]] = None,
+            trigger_type: TriggerType,
+            config: Optional[Dict[str, Any]] = None,
     ) -> "WorkflowBuilder":
         """Add trigger to workflow"""
         trigger = WorkflowTrigger(
@@ -901,10 +899,10 @@ class WorkflowBuilder:
 
     def add_step(
         self,
-        name: str,
-        step_type: StepType,
-        action: Optional[WorkflowAction] = None,
-        timeout: Optional[int] = None,
+            name: str,
+            step_type: StepType,
+            action: Optional[WorkflowAction] = None,
+            timeout: Optional[int] = None,
     ) -> "WorkflowBuilder":
         """Add step to workflow"""
         step = WorkflowStep(

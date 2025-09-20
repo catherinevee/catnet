@@ -14,7 +14,7 @@ from datetime import datetime
 from enum import Enum
 
 
-class ValidationType(Enum):"""Types of validation"""
+class ValidationType(Enum): """Types of validation"""
 
     PRE_DEPLOYMENT = "pre_deployment"
     CONFIGURATION = "configuration"
@@ -54,7 +54,7 @@ class ValidationIssue:
 
 
 @dataclass
-class ValidationResult:"""Validation result"""
+class ValidationResult: """Validation result"""
 
     id: str
     deployment_id: str
@@ -69,14 +69,13 @@ class ValidationResult:"""Validation result"""
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
-class DeploymentValidator:"""
+class DeploymentValidator: """
     Validates deployments before execution
     """
 
-    def __init__(self, device_service=None, config_validator=None):"""
+    def __init__(self, device_service=None, config_validator=None): """
         Initialize deployment validator
-
-        Args:
+    Args:
             device_service: Service for device operations
             config_validator: Configuration validator
         """
@@ -90,16 +89,14 @@ class DeploymentValidator:"""
         devices: List[str],
         configuration: str,
         deployment_config: Dict[str, Any],
-    ) -> ValidationResult:"""
+    ) -> ValidationResult: """
         Validate a deployment
-
-        Args:
+    Args:
             deployment_id: Deployment ID
             devices: List of device IDs
             configuration: Configuration to deploy
             deployment_config: Deployment configuration
-
-        Returns:
+    Returns:
             ValidationResult
         """
         import uuid
@@ -141,10 +138,9 @@ class DeploymentValidator:"""
 
     async def _validate_pre_deployment(
         self, devices: List[str], result: ValidationResult
-    ) -> None:"""
+    ) -> None: """
         Pre-deployment validation
-
-        Args:
+    Args:
             devices: List of device IDs
             result: ValidationResult to update
         """
@@ -202,8 +198,7 @@ class DeploymentValidator:"""
     ) -> None:
         """
         Validate configuration
-
-        Args:
+    Args:
             configuration: Configuration to validate
             devices: Target devices
             result: ValidationResult to update"""
@@ -268,8 +263,7 @@ class DeploymentValidator:"""
     ) -> None:
         """
         Validate device compatibility
-
-        Args:
+    Args:
             configuration: Configuration
             devices: Target devices
             result: ValidationResult to update"""
@@ -327,8 +321,7 @@ class DeploymentValidator:"""
     ) -> None:
         """
         Validate resource availability
-
-        Args:
+    Args:
             devices: Target devices
             result: ValidationResult to update"""
         result.total_checks += 1
@@ -411,8 +404,7 @@ class DeploymentValidator:"""
     ) -> None:
         """
         Validate security aspects
-
-        Args:
+    Args:
             configuration: Configuration
             result: ValidationResult to update"""
         result.total_checks += 1
@@ -482,8 +474,7 @@ class DeploymentValidator:"""
     ) -> None:
         """
         Validate deployment dependencies
-
-        Args:
+    Args:
             devices: Target devices
             deployment_config: Deployment configuration
             result: ValidationResult to update"""

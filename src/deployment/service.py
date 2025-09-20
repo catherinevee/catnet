@@ -1,6 +1,7 @@
 """
 Deployment Service - Main deployment orchestration service
 """
+
 from typing import Dict, List, Optional, Any
 from datetime import datetime
 from uuid import UUID
@@ -15,7 +16,7 @@ from ..security.audit import AuditLogger
 logger = get_logger(__name__)
 
 
-class DeploymentService:"""Main deployment orchestration service"""
+class DeploymentService: """Main deployment orchestration service"""
 
     def __init__(self):
         """TODO: Add docstring"""

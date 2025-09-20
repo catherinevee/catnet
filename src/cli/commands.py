@@ -33,7 +33,7 @@ def cli(ctx, config, debug):
 
     if config:
         ctx.obj["CONFIG"] = Config.from_file(config)
-    else:
+        else:
         ctx.obj["CONFIG"] = Config.from_env()
 
     if debug:
@@ -63,7 +63,7 @@ def login(ctx, username, password, mfa_token):
     async def _login():
         """TODO: Add docstring"""
         auth_service = AuthenticationService(ctx.obj["CONFIG"])
-        try:
+            try:
             result = await auth_service.login(username, password, mfa_token)
 
             # Save tokens to secure storage
@@ -129,7 +129,7 @@ def refresh(ctx):
     async def _refresh():
         """TODO: Add docstring"""
         auth_service = AuthenticationService(ctx.obj["CONFIG"])
-        try:
+            try:
             token_file = Path.home() / ".catnet" / "tokens.json"
             if not token_file.exists():
                 click.echo("Not logged in")
@@ -181,7 +181,7 @@ def git_connect(ctx, url, branch, webhook_secret):
     async def _connect():
         """TODO: Add docstring"""
         gitops_service = GitOpsService(ctx.obj["CONFIG"])
-        try:
+            try:
             result = await gitops_service.connect_repository(
                 url=url, branch=branch, webhook_secret=webhook_secret
             )
@@ -214,7 +214,7 @@ def git_sync(ctx, repo_id, force):
     async def _sync():
         """TODO: Add docstring"""
         gitops_service = GitOpsService(ctx.obj["CONFIG"])
-        try:
+            try:
             result = await gitops_service.sync_repository(repo_id, force=force)
                         click.echo(
                 click.style("✓ Repository synced successfully",
@@ -238,7 +238,7 @@ def git_list(ctx):
     async def _list():
         """TODO: Add docstring"""
         gitops_service = GitOpsService(ctx.obj["CONFIG"])
-        try:
+            try:
             repos = await gitops_service.list_repositories()
             if not repos:
                 click.echo("No repositories connected")
@@ -273,7 +273,7 @@ def deploy(ctx):
     "--config-file",
     "-f",
     type=click.Path(exists=True)," \
-    f"help="Configuration file to deploy",
+    f"help="Configuration file to deploy","
 )
 @click.option("--target", "-t", multiple=True, help="Target devices")
 @click.option(
@@ -336,7 +336,7 @@ def deploy_status(ctx, deployment_id):
     async def _status():
         """TODO: Add docstring"""
         deployment_service = DeploymentService(ctx.obj["CONFIG"])
-        try:
+            try:
             status = await deployment_service.get_deployment_status( \
                 deployment_id)
 
@@ -407,7 +407,7 @@ def deploy_rollback(ctx, deployment_id, reason):
     async def _rollback():
         """TODO: Add docstring"""
         deployment_service = DeploymentService(ctx.obj["CONFIG"])
-        try:
+            try:
             result = await deployment_service.rollback_deployment(
                 deployment_id, reason=reason
             )
@@ -439,7 +439,7 @@ def deploy_history(ctx, limit):
     async def _history():
         """TODO: Add docstring"""
         deployment_service = DeploymentService(ctx.obj["CONFIG"])
-        try:
+            try:
             deployments = await deployment_service.get_deployment_history( \
                 limit=limit)
 
@@ -496,7 +496,7 @@ def device_list(ctx, vendor, status):
     async def _list():
         """TODO: Add docstring"""
         device_service = DeviceService(ctx.obj["CONFIG"])
-        try:
+            try:
                         devices = await device_service.list_devices(
                 vendor=vendor,
                 status=status
@@ -546,7 +546,7 @@ def device_add(ctx, hostname, ip, vendor, model, username):
     async def _add():
         """TODO: Add docstring"""
         device_service = DeviceService(ctx.obj["CONFIG"])
-        try:
+            try:
             result = await device_service.add_device(
                 hostname=hostname,
                 ip_address=ip,
@@ -579,7 +579,7 @@ def device_backup(ctx, device_id):
     async def _backup():
         """TODO: Add docstring"""
         device_service = DeviceService(ctx.obj["CONFIG"])
-        try:
+            try:
             click.echo(f"Backing up device {device_id}...")
             result = await device_service.backup_device(device_id)
 
@@ -620,7 +620,7 @@ def device_execute(ctx, device_id, command, confirm):
                 command?"):
                 click.echo("Command cancelled")
                 return
-
+    
         try:
             click.echo(f"Executing command on device {device_id}...")
             result = await device_service.execute_command(device_id, command)
@@ -654,7 +654,7 @@ def device_health(ctx, device_id):
     async def _health():
         """TODO: Add docstring"""
         device_service = DeviceService(ctx.obj["CONFIG"])
-        try:
+            try:
             health = await device_service.check_device_health(device_id)
 
             overall_status = "healthy" if health["healthy"] else "unhealthy"
@@ -707,7 +707,7 @@ def vault_status(ctx):
     async def _status():
         """TODO: Add docstring"""
         vault_client = VaultClient(ctx.obj["CONFIG"])
-        try:
+            try:
             status = await vault_client.get_status()
 
             click.echo(f"Vault Status: {status['status']}")
@@ -736,7 +736,7 @@ def vault_rotate(ctx, device_id):
     async def _rotate():
         """TODO: Add docstring"""
         vault_client = VaultClient(ctx.obj["CONFIG"])
-        try:
+            try:
             click.echo(f"Rotating credentials for device {device_id}...")
             result = await vault_client.rotate_credentials(device_id)
 
@@ -791,7 +791,7 @@ def ssh_generate(ctx, type, size, comment, output):
         """TODO: Add docstring"""
         vault = VaultClient(ctx.obj["CONFIG"])
         ssh_manager = SSHKeyManager(vault)
-
+    
         try:
             click.echo(f"Generating {type} SSH key pair...")
             private_key, public_key = await ssh_manager.generate_ssh_keypair(
@@ -844,7 +844,7 @@ def ssh_generate(ctx, type, size, comment, output):
     "-f",
     type=click.Path(exists=True),
     required=True," \
-    f"help="Path to public key file",
+    f"help="Path to public key file","
 )
 @click.option("--name", "-n", required=True, help="Key name")
 @click.option("--comment", "-c", help="Key comment")
@@ -973,7 +973,7 @@ def ssh_list_user(ctx):
     "--key-file",
     "-f",
     type=click.Path(exists=True)," \
-    f"help="Path to public key file",
+    f"help="Path to public key file","
 )
 @click.option(
     "--generate/--no-generate",
@@ -996,7 +996,7 @@ def ssh_add_device(ctx, device_id, key_file, generate, deploy):
         """TODO: Add docstring"""
         vault = VaultClient(ctx.obj["CONFIG"])
         ssh_manager = SSHKeyManager(vault)
-
+    
         try:
             if generate:
                 # Generate new key pair
@@ -1027,7 +1027,7 @@ def ssh_add_device(ctx, device_id, key_file, generate, deploy):
                     device_id, private_key or "", public_key
                 )
                 click.echo(click.style("✓ SSH key stored", fg="green"))
-
+    
             else:
                 click.echo("Either --generate or --key-file must be specified")
                 sys.exit(1)
@@ -1070,7 +1070,7 @@ def ssh_rotate_device(ctx, device_id, deploy):
         """TODO: Add docstring"""
         vault = VaultClient(ctx.obj["CONFIG"])
         ssh_manager = SSHKeyManager(vault)
-
+    
         try:
             click.echo(f"Rotating SSH key for device {device_id}...")
             result = await ssh_manager.rotate_ssh_key(device_id)
@@ -1118,7 +1118,7 @@ def ssh_test(ctx, device_id, username):
         """TODO: Add docstring"""
         vault = VaultClient(ctx.obj["CONFIG"])
         ssh_manager = SSHKeyManager(vault)
-
+    
         try:
             click.echo(f"Testing SSH connection to device {device_id}...")
 
@@ -1141,7 +1141,7 @@ def ssh_test(ctx, device_id, username):
                     click.style("✓ SSH connection successful",
                     fg="green")
                 )
-            else:
+                else:
                 click.echo(click.style("✗ SSH connection failed", fg="red"))
 
         except Exception as e:
@@ -1177,7 +1177,7 @@ def status(ctx):
             token_file = Path.home() / ".catnet" / "tokens.json"
             if token_file.exists():
                 click.echo(click.style("✓ Authenticated", fg="green"))
-            else:
+                else:
                 click.echo(click.style("✗ Not authenticated", fg="yellow"))
 
             # Check service connectivity
@@ -1193,7 +1193,7 @@ def status(ctx):
 
             async with aiohttp.ClientSession() as session:
                 for service_name, url in services:
-                    try:
+                        try:
                         async with session.get(url, timeout=2) as response:
                             if response.status == 200:
                                 click.echo(
@@ -1202,7 +1202,7 @@ def status(ctx):
                                         fg="green"
                                     )
                                 )
-                            else:
+                                else:
                                                                 click.echo(
                                     click.style(f"  ✗ {service_name}",
                                     fg="red")

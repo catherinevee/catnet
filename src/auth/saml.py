@@ -24,19 +24,19 @@ class SAMLConfig:
     """SAML configuration for Service Provider"""
 
     entity_id: str
-    acs_url: str  # Assertion Consumer Service URL
-    sls_url: str  # Single Logout Service URL
-    idp_entity_id: str
-    idp_sso_url: str
-    idp_sls_url: str
-    idp_cert: str  # IdP's public certificate
-    sp_cert: Optional[str] = None  # SP's certificate
-    sp_key: Optional[str] = None  # SP's private key
-    want_assertions_signed: bool = True
-    want_assertions_encrypted: bool = False
-    name_id_format: str = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddre \"
+        acs_url: str  # Assertion Consumer Service URL
+        sls_url: str  # Single Logout Service URL
+        idp_entity_id: str
+        idp_sso_url: str
+        idp_sls_url: str
+        idp_cert: str  # IdP's public certificate
+        sp_cert: Optional[str] = None  # SP's certificate
+        sp_key: Optional[str] = None  # SP's private key
+        want_assertions_signed: bool = True
+        want_assertions_encrypted: bool = False
+        name_id_format: str = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddre \"
         ss"
-    authn_context: str = (
+        authn_context: str = (
         "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport"
     )
 
@@ -62,28 +62,25 @@ class SAMLProvider:
 
     def register_config(self, name: str, config: SAMLConfig) -> None:
         Register a SAML configuration
-
-        Args:
+    Args:
             name: Configuration name
-            config: SAML configuration
+                config: SAML configuration
         self.configs[name] = config
 
     def create_authn_request(
         self,
-        config_name: str,
-        relay_state: Optional[str] = None,
-        force_authn: bool = False,
-        is_passive: bool = False,
+            config_name: str,
+            relay_state: Optional[str] = None,
+            force_authn: bool = False,
+            is_passive: bool = False,
     ) -> Dict[str, str]:
         Create SAML Authentication Request
-
-        Args:
+    Args:
             config_name: Name of the SAML configuration
-            relay_state: State to maintain through the flow
-            force_authn: Force re-authentication
-            is_passive: Don't interact with user
-
-        Returns:
+                relay_state: State to maintain through the flow
+                force_authn: Force re-authentication
+                is_passive: Don't interact with user
+    Returns:
             Dict with request_url and saml_request
         if config_name not in self.configs:
             raise ValueError(f"Configuration {config_name} not found")
@@ -94,9 +91,9 @@ class SAMLProvider:
 
         # Create AuthnRequest XML
         authn_request = f"""
-        <samlp:AuthnRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
-                           xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
-                           ID="{request_id}"
+        <samlp: AuthnRequest xmlns: samlp = "urn:oasis:names:tc:SAML:2.0:protocol"
+                               xmlns: saml = "urn:oasis:names:tc:SAML:2.0:assertion"
+                               ID = "{request_id}"
                            Version="2.0"
                            IssueInstant="{issue_instant}"
                            Destination="{config.idp_sso_url}"
@@ -145,18 +142,16 @@ class SAMLProvider:
 
     def validate_response(
         self,
-        config_name: str,
-        saml_response: str,
-        relay_state: Optional[str] = None,
+            config_name: str,
+            saml_response: str,
+            relay_state: Optional[str] = None,
     ) -> Tuple[bool, Dict[str, Any]]:
         Validate SAML Response
-
-        Args:
+    Args:
             config_name: Name of the SAML configuration
-            saml_response: Base64 encoded SAML response
-            relay_state: Relay state for validation
-
-        Returns:
+                saml_response: Base64 encoded SAML response
+                relay_state: Relay state for validation
+    Returns:
             Tuple of (is_valid, user_attributes)
         if config_name not in self.configs:
             raise ValueError(f"Configuration {config_name} not found")
@@ -204,18 +199,16 @@ class SAMLProvider:
 
     def create_logout_request(
         self,
-        config_name: str,
-        name_id: str,
-        session_index: Optional[str] = None,
+            config_name: str,
+            name_id: str,
+            session_index: Optional[str] = None,
     ) -> Dict[str, str]:
         Create SAML Logout Request
-
-        Args:
+    Args:
             config_name: Name of the SAML configuration
-            name_id: User's NameID
-            session_index: Session index from authentication
-
-        Returns:
+                name_id: User's NameID
+                session_index: Session index from authentication
+    Returns:
             Dict with logout_url and saml_request
         if config_name not in self.configs:
             raise ValueError(f"Configuration {config_name} not found")
@@ -231,8 +224,8 @@ class SAMLProvider:
         # Create LogoutRequest XML
         logout_request = f"""
         <samlp:LogoutRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
-                            xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
-                            ID="{request_id}"
+                                xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+                                ID="{request_id}"
                             Version="2.0"
                             IssueInstant="{issue_instant}"
                             Destination="{config.idp_sls_url}">
@@ -264,11 +257,9 @@ class SAMLProvider:
 
     def generate_metadata(self, config_name: str) -> str:
         Generate SAML Service Provider metadata
-
-        Args:
+    Args:
             config_name: Name of the SAML configuration
-
-        Returns:
+    Returns:
             XML metadata string
         if config_name not in self.configs:
             raise ValueError(f"Configuration {config_name} not found")
@@ -306,11 +297,11 @@ class SAMLProvider:
 
         metadata += f"""
                 <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0: \
-    bindings:HTTP-Redirect"
+        bindings:HTTP-Redirect"
                                     Location="{config.sls_url}"/>
                 <NameIDFormat>{config.name_id_format}</NameIDFormat>
                 <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0: \
-    bindings:HTTP-POST"
+        bindings:HTTP-POST"
                                          Location="{config.acs_url}"
                                          index="0"/>
             </SPSSODescriptor>
@@ -343,7 +334,7 @@ class SAMLProvider:
         """Validate XML signature"""
         # This is a simplified signature validation
         # In production, use python-xmlsec or similar library
-        try:
+            try:
             load_pem_x509_certificate(cert_pem.encode(), default_backend())
             # Signature validation logic here
             return True
@@ -352,8 +343,8 @@ class SAMLProvider:
 
         def _validate_conditions(
         self,
-        root: etree.Element,
-        config: SAMLConfig
+            root: etree.Element,
+            config: SAMLConfig
     ) -> bool:"""Validate SAML conditions"""
                 conditions = root.xpath(
             "//saml:Conditions",
@@ -405,14 +396,14 @@ class SAMLProvider:
             if values:
                 if len(values) == 1:
                     attributes[name] = values[0].text
-                else:
+                    else:
                     attributes[name] = [v.text for v in values]
 
         return attributes
 
         def _extract_session_index(
         self,
-        assertion: etree.Element
+            assertion: etree.Element
     ) -> Optional[str]:
         """Extract session index from assertion"""
         authn_statements = assertion.xpath(

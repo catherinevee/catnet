@@ -2,6 +2,7 @@
 Multi-layer Configuration Validation
 Following CLAUDE.md validation patterns exactly
 """
+
 import re
 import ipaddress
 from typing import Dict, Any, List, Optional
@@ -42,7 +43,7 @@ class ValidationResult:
         self.info.append(message)
 
 
-class ConfigValidator:"""
+class ConfigValidator: """
     PATTERN: Multi-layer validation before deployment
     Following CLAUDE.md validation layers exactly
     """
@@ -55,7 +56,7 @@ class ConfigValidator:"""
         self.business_rules = []
         self.load_validation_rules()
 
-    def load_validation_rules(self):"""Load all validation rules"""
+    def load_validation_rules(self): """Load all validation rules"""
         # Security compliance rules
         self.security_rules = [
             self.no_plaintext_passwords,
@@ -79,7 +80,7 @@ class ConfigValidator:"""
             self,
             config: Dict[str,
                          Any]
-        ) -> ValidationResult:"""
+        ) -> ValidationResult: """
         Main validation method following CLAUDE.md pattern
         """
         result = ValidationResult()

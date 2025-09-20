@@ -2,6 +2,7 @@
 Simple Metrics Collection
 Phase 7 Implementation - Monitoring and observability
 """
+
 from typing import Dict, List, Any
 from datetime import datetime, timedelta
 from dataclasses import dataclass, field
@@ -11,7 +12,7 @@ import threading
 
 
 @dataclass
-class Metric:"""Simple metric data point"""
+class Metric: """Simple metric data point"""
     name: str
     value: float
     timestamp: datetime = field(default_factory=datetime.utcnow)

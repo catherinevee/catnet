@@ -3,6 +3,7 @@ Simple Deployment Pipeline
 Phase 4 Implementation - Wire GitHub → Deploy → Device
 Phase 5 Update - Added real device connections
 """
+
 from typing import Dict, List, Optional
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -27,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
-class DeploymentTask:"""Simple deployment task"""
+class DeploymentTask: """Simple deployment task"""
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
     config_path: str = ""
     device_id: str = ""

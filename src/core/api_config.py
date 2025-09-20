@@ -1,6 +1,5 @@
 """
 API Configuration - CORS, Versioning, and Request Validation
-"""
 from typing import List, Optional, Dict, Any
 from fastapi import APIRouter, Request, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,28 +14,28 @@ logger = get_logger(__name__)
 
 
 class CORSConfig:"""
-    CORS configuration for production environment
-    """
+
+
+class CORSConfig: """
+CORS configuration for production environment
 
     def __init__(
         self,
-        allowed_origins: List[str] = None,
-        allowed_methods: List[str] = None,
-        allowed_headers: List[str] = None,
-        exposed_headers: List[str] = None,
-        allow_credentials: bool = True,
-        max_age: int = 86400,
+            allowed_origins: List[str] = None,
+            allowed_methods: List[str] = None,
+            allowed_headers: List[str] = None,
+            exposed_headers: List[str] = None,
+            allow_credentials: bool = True,
+            max_age: int = 86400,
     ):"""
         Initialize CORS configuration
-
-        Args:
+    Args:
             allowed_origins: List of allowed origins
-            allowed_methods: List of allowed HTTP methods
-            allowed_headers: List of allowed headers
-            exposed_headers: List of headers to expose
-            allow_credentials: Allow credentials in requests
-            max_age: Max age for preflight cache
-        """
+                allowed_methods: List of allowed HTTP methods
+                allowed_headers: List of allowed headers
+                exposed_headers: List of headers to expose
+                allow_credentials: Allow credentials in requests
+                max_age: Max age for preflight cache
         self.allowed_origins = allowed_origins or [
             "https://catnet.local",
             "https://api.catnet.local",
@@ -138,19 +137,18 @@ class APIVersioning:
 
     def __init__(
         self,
-        default_version: str = "v1",
-        supported_versions: List[str] = None,
-        deprecated_versions: List[str] = None,
-        version_header: str = "X-API-Version",
+            default_version: str = "v1",
+            supported_versions: List[str] = None,
+            deprecated_versions: List[str] = None,
+            version_header: str = "X-API-Version",
     ):
         """
         Initialize API versioning
-
-        Args:
+    Args:
             default_version: Default API version
-            supported_versions: List of supported versions
-            deprecated_versions: List of deprecated versions
-            version_header: Header name for version"""
+                supported_versions: List of supported versions
+                deprecated_versions: List of deprecated versions
+                version_header: Header name for version"""
         self.default_version = default_version
         self.supported_versions = supported_versions or ["v1", "v2"]
         self.deprecated_versions = deprecated_versions or []
@@ -249,8 +247,7 @@ class APIVersioning:
 
 
 class RequestValidation:"""
-    Request validation and sanitization
-    """
+class RequestValidation:"""
 
     # Common patterns for validation
     PATTERNS = {
@@ -298,12 +295,10 @@ class RequestValidation:"""
     def sanitize_input(cls, value: str, max_length: int = 1000) -> str:
         """
         Sanitize user input
-
-        Args:
+    Args:
             value: Input value
-            max_length: Maximum allowed length
-
-        Returns:
+                max_length: Maximum allowed length
+    Returns:
             Sanitized value"""
         if not value:
             return ""
@@ -332,8 +327,8 @@ class RequestValidation:"""
     @classmethod
         def validate_request_size(
         cls,
-        request: Request,
-        max_size: int = 10485760
+            request: Request,
+            max_size: int = 10485760
     ):  # 10MB
         """Validate request body size"""
         content_length = request.headers.get("content-length")
@@ -350,11 +345,11 @@ class RequestValidation:"""
 
 class PaginationParams(BaseModel):
     """Standard pagination parameters"""
-
+    
     page: int = Field(1, ge=1, le=10000, description="Page number")
-    per_page: int = Field(20, ge=1, le=100, description="Items per page")
-    sort_by: Optional[str] = Field(None, description="Sort field")
-    sort_order: Optional[str] = Field(
+        per_page: int = Field(20, ge=1, le=100, description="Items per page")
+        sort_by: Optional[str] = Field(None, description="Sort field")
+        sort_order: Optional[str] = Field(
         "asc", regex="^(asc|desc)$", description="Sort order"
     )
 
@@ -367,20 +362,21 @@ class PaginationParams(BaseModel):
 
 
 
-class APIResponse(BaseModel):"""Standard API response format"""
-
+class APIResponse(BaseModel):
+    """Standard API response format"""
+    
     success: bool = Field(True, description="Request success status")
-    data: Optional[Any] = Field(None, description="Response data")
-    error: Optional[str] = Field(None, description="Error message")
-    message: Optional[str] = Field(None, description="Status message")
-    timestamp: datetime = Field(
+        data: Optional[Any] = Field(None, description="Response data")
+        error: Optional[str] = Field(None, description="Error message")
+        message: Optional[str] = Field(None, description="Status message")
+        timestamp: datetime = Field(
         default_factory=datetime.utcnow, description="Response timestamp"
     )
-    request_id: Optional[str] = Field(None, description="Request tracking ID")
+        request_id: Optional[str] = Field(None, description="Request tracking ID")
 
     class Config:
         json_encoders = {
-            datetime: lambda v: v.isoformat(),
+                datetime: lambda v: v.isoformat(),
         }
 
 
@@ -388,10 +384,9 @@ class APIResponse(BaseModel):"""Standard API response format"""
 def configure_api(app, config: Dict[str, Any] = None):
     """
     Configure all API settings
-
     Args:
         app: FastAPI application
-        config: API configuration"""
+            config: API configuration"""
     config = config or {}
 
     # Configure CORS

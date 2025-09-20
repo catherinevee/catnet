@@ -16,7 +16,7 @@ import asyncio
 from abc import ABC, abstractmethod
 
 
-class DeviceVendor(Enum):"""Supported device vendors"""
+class DeviceVendor(Enum): """Supported device vendors"""
 
     CISCO_IOS = "cisco_ios"
     CISCO_IOSXE = "cisco_iosxe"
@@ -69,7 +69,7 @@ class DeviceCredentials:
 
 
 @dataclass
-class DeviceInfo:"""Device information"""
+class DeviceInfo: """Device information"""
 
     id: str
     hostname: str
@@ -91,7 +91,7 @@ class DeviceInfo:"""Device information"""
 
 
 @dataclass
-class DeviceConnection:"""Active device connection"""
+class DeviceConnection: """Active device connection"""
 
     device_id: str
     connection_id: str
@@ -103,22 +103,23 @@ class DeviceConnection:"""Active device connection"""
     bytes_transferred: int = 0
 
 
-class DeviceAdapter(ABC):"""Abstract base class for device adapters"""
+class DeviceAdapter(ABC): """Abstract base class for device adapters"""
 
     @abstractmethod
     async def connect(
         self, device: DeviceInfo, credentials: DeviceCredentials
-    ) -> DeviceConnection:"""Establish connection to device"""
+    ) -> DeviceConnection: """Establish connection to device"""
 
     @abstractmethod
-    async def disconnect(self, connection: DeviceConnection) -> bool:"""Disconnect from device"""
+    async def disconnect(
+    self, connection: DeviceConnection) -> bool: """Disconnect from device"""
 
     @abstractmethod
         async def execute_command(
         self,
         connection: DeviceConnection,
         command: str
-    ) -> str:"""Execute command on device"""
+    ) -> str: """Execute command on device"""
 
     @abstractmethod
     async def get_configuration(
@@ -129,13 +130,14 @@ class DeviceAdapter(ABC):"""Abstract base class for device adapters"""
     @abstractmethod
     async def apply_configuration(
         self, connection: DeviceConnection, configuration: str
-    ) -> bool:"""Apply configuration to device"""
+    ) -> bool: """Apply configuration to device"""
 
     @abstractmethod
-    async def save_configuration(self, connection: DeviceConnection) -> bool:"""Save device configuration"""
+    async def save_configuration(
+    self, connection: DeviceConnection) -> bool: """Save device configuration"""
 
 
-class DeviceManager:"""
+class DeviceManager: """
     Manages network devices
     """
 
@@ -144,10 +146,9 @@ class DeviceManager:"""
         vault_service=None,
         audit_service=None,
         telemetry_service=None,
-    ):"""
+    ): """
         Initialize device manager
-
-        Args:
+    Args:
             vault_service: Vault service for credentials
             audit_service: Audit service for logging
             telemetry_service: Telemetry service for metrics
@@ -171,10 +172,9 @@ class DeviceManager:"""
         self,
         vendor: DeviceVendor,
         adapter: DeviceAdapter
-    ) -> None:"""
+    ) -> None: """
         Register a device adapter
-
-        Args:
+    Args:
             vendor: Device vendor
             adapter: Adapter instance
         """
@@ -191,10 +191,9 @@ class DeviceManager:"""
         os_version: str,
         location: str,
         **kwargs,
-    ) -> str:"""
+    ) -> str: """
         Add a device to inventory
-
-        Args:
+    Args:
             hostname: Device hostname
             ip_address: Device IP address
             vendor: Device vendor
@@ -204,8 +203,7 @@ class DeviceManager:"""
             os_version: OS version
             location: Physical location
             **kwargs: Additional parameters
-
-        Returns:
+    Returns:
             Device ID
         """
         import uuid
@@ -249,12 +247,10 @@ class DeviceManager:"""
     ) -> Optional[DeviceConnection]:
         """
         Connect to a device
-
-        Args:
+    Args:
             device_id: Device ID
             credentials: Optional credentials (will use vault if not provided)
-
-        Returns:
+    Returns:
             DeviceConnection or None"""
         if device_id not in self.devices:
             return None
@@ -317,13 +313,11 @@ class DeviceManager:"""
     ) -> Optional[str]:
         """
         Execute command on device
-
-        Args:
+    Args:
             device_id: Device ID
             command: Command to execute
             connection_id: Optional existing connection ID
-
-        Returns:
+    Returns:
             Command output or None"""
         # Get or create connection
                 connection = await self._get_or_create_connection(
@@ -375,13 +369,11 @@ class DeviceManager:"""
     ) -> Optional[str]:
         """
         Get device configuration
-
-        Args:
+    Args:
             device_id: Device ID
             config_type: Configuration type (running/startup)
             connection_id: Optional existing connection ID
-
-        Returns:
+    Returns:
             Configuration or None"""
         # Get or create connection
                 connection = await self._get_or_create_connection(
@@ -420,14 +412,12 @@ class DeviceManager:"""
     ) -> bool:
         """
         Apply configuration to device
-
-        Args:
+    Args:
             device_id: Device ID
             configuration: Configuration to apply
             save: Whether to save configuration
             connection_id: Optional existing connection ID
-
-        Returns:
+    Returns:
             Success status"""
         # Get or create connection
                 connection = await self._get_or_create_connection(
@@ -474,11 +464,9 @@ class DeviceManager:"""
     async def disconnect_device(self, connection_id: str) -> bool:
         """
         Disconnect from device
-
-        Args:
+    Args:
             connection_id: Connection ID
-
-        Returns:
+    Returns:
             Success status"""
         if connection_id not in self.connections:
             return False
@@ -515,11 +503,9 @@ class DeviceManager:"""
     def get_device_info(self, device_id: str) -> Optional[Dict[str, Any]]:
         """
         Get device information
-
-        Args:
+    Args:
             device_id: Device ID
-
-        Returns:
+    Returns:
             Device information or None"""
         if device_id not in self.devices:
             return None
@@ -557,14 +543,12 @@ class DeviceManager:"""
     ) -> List[Dict[str, Any]]:
         """
         Search devices
-
-        Args:
+    Args:
             vendor: Filter by vendor
             device_type: Filter by type
             state: Filter by state
             tags: Filter by tags
-
-        Returns:
+    Returns:
             List of matching devices"""
         results = []
 
@@ -591,13 +575,11 @@ class DeviceManager:"""
     ) -> Dict[str, Union[str, Exception]]:
         """
         Execute command on multiple devices
-
-        Args:
+    Args:
             device_ids: List of device IDs
             command: Command to execute
             parallel: Execute in parallel
-
-        Returns:
+    Returns:
             Results dictionary"""
         results = {}
 
@@ -629,11 +611,9 @@ class DeviceManager:"""
     async def health_check(self, device_id: str) -> Dict[str, Any]:
         """
         Perform device health check
-
-        Args:
+    Args:
             device_id: Device ID
-
-        Returns:
+    Returns:
             Health status"""
         health = {
             "device_id": device_id,

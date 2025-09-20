@@ -2,6 +2,7 @@
 Simple GitHub Client for Configuration Management
 Phase 3 Implementation - Keep it simple, avoid over-engineering
 """
+
 import os
 import requests
 from typing import List, Dict, Optional
@@ -11,7 +12,7 @@ from pathlib import Path
 
 
 @dataclass
-class RepositoryInfo:"""Simple repository information"""
+class RepositoryInfo: """Simple repository information"""
     url: str
     owner: str = ""
     repo: str = ""
@@ -84,7 +85,7 @@ class SimpleGitHubClient:
             # Try raw URL as fallback (public repos)
             try:
                 raw_url = f"https://raw.githubusercontent.com/{repo.owner}/{}"
-    repo.repo}/{repo.branch}/README.md"
+    repo.repo} / {repo.branch} / README.md"
                 response = requests.get(raw_url, timeout=10)
                                 return response.status_code in [
                                     200, 404]  # 404 is OK (

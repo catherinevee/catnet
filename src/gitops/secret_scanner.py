@@ -16,7 +16,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 
-class SecretType(Enum):"""Types of secrets"""
+class SecretType(Enum): """Types of secrets"""
 
     PASSWORD = "password"
     API_KEY = "api_key"
@@ -46,7 +46,7 @@ class SecretMatch:
 
 
 @dataclass
-class SecretScanResult:"""Result of secret scanning"""
+class SecretScanResult: """Result of secret scanning"""
 
     file_path: str
     has_secrets: bool
@@ -56,11 +56,11 @@ class SecretScanResult:"""Result of secret scanning"""
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
-class SecretScanner:"""
+class SecretScanner: """
     Scans for secrets and sensitive data in configurations
     """
 
-    def __init__(self):"""Initialize secret scanner"""
+    def __init__(self): """Initialize secret scanner"""
         # Define secret detection patterns
         self.patterns = {
             # Passwords
@@ -182,12 +182,10 @@ class SecretScanner:"""
     def scan_file(self, file_path: str, content: str) -> SecretScanResult:
         """
         Scan a file for secrets
-
-        Args:
+    Args:
             file_path: Path to file being scanned
             content: File content
-
-        Returns:
+    Returns:
             SecretScanResult object"""
         import time
 
@@ -300,12 +298,10 @@ class SecretScanner:"""
     ) -> List[SecretScanResult]:
         """
         Scan directory for secrets
-
-        Args:
+    Args:
             directory_path: Path to directory
             extensions: File extensions to scan
-
-        Returns:
+    Returns:
             List of SecretScanResult objects"""
         import os
 
@@ -346,11 +342,9 @@ class SecretScanner:"""
     def _calculate_entropy(self, text: str) -> float:
         """
         Calculate Shannon entropy of text
-
-        Args:
+    Args:
             text: Text to analyze
-
-        Returns:
+    Returns:
             Entropy value"""
         if not text:
             return 0.0
@@ -375,12 +369,10 @@ class SecretScanner:"""
     def _is_high_entropy(self, text: str, entropy: float) -> bool:
         """
         Check if text has high entropy
-
-        Args:
+    Args:
             text: Text to check
             entropy: Calculated entropy
-
-        Returns:
+    Returns:
             True if high entropy"""
         # Check if it looks like base64
         if re.match(r"^[A-Za-z0-9+/]+=*$", text):
@@ -396,11 +388,9 @@ class SecretScanner:"""
     def _is_whitelisted(self, text: str) -> bool:
         """
         Check if text matches whitelist patterns
-
-        Args:
+    Args:
             text: Text to check
-
-        Returns:
+    Returns:
             True if whitelisted"""
         for pattern in self.whitelist_patterns:
             if re.match(pattern, text, re.IGNORECASE):
@@ -410,12 +400,10 @@ class SecretScanner:"""
     def _redact_secret(self, full_text: str, secret_value: str) -> str:
         """
         Redact secret value in text
-
-        Args:
+    Args:
             full_text: Full matched text
             secret_value: Secret value to redact
-
-        Returns:
+    Returns:
             Redacted text"""
         if len(secret_value) <= 4:
             redacted = "*" * len(secret_value)
@@ -435,12 +423,10 @@ class SecretScanner:"""
     ) -> str:
         """
         Quarantine file with detected secrets
-
-        Args:
+    Args:
             file_path: Original file path
             scan_result: Scan result with secrets
-
-        Returns:
+    Returns:
             Quarantine report"""
         import tempfile
         import shutil

@@ -3,7 +3,6 @@ Core Metrics Module for CatNet
 
 Provides metrics collection and tracking for deployments, operations, and \
     system health.
-"""
 
 from typing import Dict, Any, Optional, List
 from datetime import datetime
@@ -14,13 +13,14 @@ from collections import defaultdict, deque
 import statistics
 
 
-class MetricType(Enum):"""Types of metrics we collect"""
+class MetricType(Enum):
+    """Types of metrics we collect"""
 
     COUNTER = "counter"
-    GAUGE = "gauge"
-    HISTOGRAM = "histogram"
-    SUMMARY = "summary"
-    TIMER = "timer"
+        GAUGE = "gauge"
+        HISTOGRAM = "histogram"
+        SUMMARY = "summary"
+        TIMER = "timer"
 
 
 @dataclass
@@ -28,12 +28,12 @@ class Metric:
     """Represents a single metric"""
 
     name: str
-    type: MetricType
-    value: float
-    labels: Dict[str, str] = field(default_factory=dict)
-    timestamp: datetime = field(default_factory=datetime.utcnow)
-    description: str = ""
-    unit: str = ""
+        type: MetricType
+        value: float
+        labels: Dict[str, str] = field(default_factory=dict)
+        timestamp: datetime = field(default_factory=datetime.utcnow)
+        description: str = ""
+        unit: str = ""
 
 
 class MetricsCollector:
@@ -46,7 +46,7 @@ class MetricsCollector:
         self.counters: Dict[str, float] = defaultdict(float)
         self.gauges: Dict[str, float] = {}
         self.histograms: Dict[str, deque] = defaultdict(
-            lambda: deque(maxlen=1000)
+                lambda: deque(maxlen=1000)
         )
         self.timers: Dict[str, float] = {}
 
@@ -68,9 +68,9 @@ class MetricsCollector:
 
         def set_gauge(
             self,
-            name: str,
-            value: float,
-            labels: Dict[str,
+                name: str,
+                value: float,
+                labels: Dict[str,
                          str] = None
         ):"""Set a gauge metric value"""
         key = self._make_key(name, labels)
@@ -87,9 +87,9 @@ class MetricsCollector:
 
         def observe_histogram(
             self,
-            name: str,
-            value: float,
-            labels: Dict[str,
+                name: str,
+                value: float,
+                labels: Dict[str,
                          str] = None
         ):"""Add an observation to a histogram"""
         key = self._make_key(name, labels)
@@ -104,7 +104,9 @@ class MetricsCollector:
             )
         )
 
-    def start_timer(self, name: str) -> str:"""Start a timer and return its ID"""
+    def start_timer(
+    self,
+     name: str) -> str:"""Start a timer and return its ID"""
         timer_id = f"{name}_{time.time()}"
         self.timers[timer_id] = time.time()
         return timer_id
@@ -124,7 +126,8 @@ class MetricsCollector:
         """Get all collected metrics"""
         return dict(self.metrics)
 
-    def get_summary(self, name: str) -> Dict[str, Any]:"""Get summary statistics for a metric"""
+    def get_summary(
+        self, name: str) -> Dict[str, Any]:"""Get summary statistics for a metric"""
         if name not in self.metrics:
             return {}
 
@@ -233,7 +236,8 @@ class MetricsCollector:
         self.timers.clear()
 
 
-class DeploymentMetrics:"""Specialized metrics for deployment tracking"""
+class DeploymentMetrics:
+    """Specialized metrics for deployment tracking"""
 
     def __init__(self, collector: Optional[MetricsCollector] = None):
         """TODO: Add docstring"""
@@ -255,9 +259,9 @@ class DeploymentMetrics:"""Specialized metrics for deployment tracking"""
 
         def record_deployment_end(
             self,
-            deployment_id: str,
-            timer_id: str,
-            success: bool
+                deployment_id: str,
+                timer_id: str,
+                success: bool
         ):
         """Record the end of a deployment"""
         status = "success" if success else "failure"
@@ -268,9 +272,9 @@ class DeploymentMetrics:"""Specialized metrics for deployment tracking"""
 
         def record_device_deployment(
             self,
-            device_id: str,
-            success: bool,
-            duration: float
+                device_id: str,
+                success: bool,
+                duration: float
         ):
         """Record a single device deployment"""
         status = "success" if success else "failure"
@@ -338,7 +342,7 @@ class DeploymentMetrics:"""Specialized metrics for deployment tracking"""
 
 
 class SystemMetrics:
-    """System-wide metrics collection"""
+    """System - wide metrics collection"""
 
     def __init__(self):
         """TODO: Add docstring"""
@@ -370,9 +374,9 @@ class SystemMetrics:
 
         def record_database_query(
             self,
-            operation: str,
-            table: str,
-            duration: float
+                operation: str,
+                table: str,
+                duration: float
         ):
         """Record database query metrics"""
         self.collector.observe_histogram(

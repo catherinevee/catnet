@@ -22,7 +22,7 @@ from cryptography.hazmat.backends import default_backend
 import os
 
 
-class SecretType(Enum):"""Types of secrets"""
+class SecretType(Enum): """Types of secrets"""
 
     STATIC = "static"
     DYNAMIC = "dynamic"
@@ -60,7 +60,7 @@ class Secret:
 
 
 @dataclass
-class EncryptionKey:"""Encryption key object"""
+class EncryptionKey: """Encryption key object"""
 
     key_id: str
     key_material: bytes
@@ -72,7 +72,7 @@ class EncryptionKey:"""Encryption key object"""
 
 
 @dataclass
-class Certificate:"""Certificate object"""
+class Certificate: """Certificate object"""
 
     cert_id: str
     common_name: str
@@ -98,8 +98,7 @@ class VaultService:
     ):
         """
         Initialize Vault service
-
-        Args:
+    Args:
             vault_url: Vault server URL
             vault_token: Vault token
             vault_namespace: Vault namespace
@@ -130,8 +129,7 @@ class VaultService:
     async def initialize(self) -> bool:
         """
         Initialize Vault connection and setup
-
-        Returns:
+    Returns:
             Success status"""
         try:
             # Check if Vault is initialized and unsealed
@@ -224,8 +222,7 @@ class VaultService:
     ) -> bool:
         """
         Store a secret in Vault
-
-        Args:
+    Args:
             path: Secret path
             key: Secret key
             value: Secret value
@@ -233,8 +230,7 @@ class VaultService:
             engine: Secret engine to use
             metadata: Additional metadata
             ttl: Time to live
-
-        Returns:
+    Returns:
             Success status"""
         try:
             # Prepare secret data
@@ -291,14 +287,12 @@ class VaultService:
     ) -> Optional[Secret]:
         """
         Retrieve a secret from Vault
-
-        Args:
+    Args:
             path: Secret path
             key: Secret key (optional, returns all if not specified)
             version: Secret version
             use_cache: Use cached value if available
-
-        Returns:
+    Returns:
             Secret object or None"""
         try:
             cache_key = f"{path}:{key or '*'}"
@@ -367,12 +361,10 @@ class VaultService:
     ) -> bool:
         """
         Delete a secret from Vault
-
-        Args:
+    Args:
             path: Secret path
             versions: Specific versions to delete
-
-        Returns:
+    Returns:
             Success status"""
         try:
             if versions:
@@ -419,13 +411,11 @@ class VaultService:
     ) -> Optional[Dict[str, str]]:
         """
         Generate dynamic database credentials
-
-        Args:
+    Args:
             database: Database name
             role: Database role
             ttl: Credential lifetime
-
-        Returns:
+    Returns:
             Credentials dictionary"""
         try:
             response = self.client.read(
@@ -469,14 +459,12 @@ class VaultService:
     ) -> Optional[Dict[str, str]]:
         """
         Generate SSH credentials
-
-        Args:
+    Args:
             role: SSH role
             username: SSH username
             ip: Target IP address
             ttl: Credential lifetime
-
-        Returns:
+    Returns:
             SSH credentials"""
         try:
             response = self.client.write(
@@ -514,12 +502,10 @@ class VaultService:
     ) -> Tuple[bytes, str]:
         """
         Encrypt data using Vault's transit engine
-
-        Args:
+    Args:
             data: Data to encrypt
             key_id: Encryption key ID
-
-        Returns:
+    Returns:
             Tuple of (encrypted data, key ID used)"""
         try:
             # Use current key if not specified
@@ -550,12 +536,10 @@ class VaultService:
     ) -> bytes:
         """
         Decrypt data
-
-        Args:
+    Args:
             encrypted_data: Encrypted data
             key_id: Encryption key ID
-
-        Returns:
+    Returns:
             Decrypted data"""
         try:
             if self.use_tls and self.client.is_authenticated():
@@ -625,13 +609,11 @@ class VaultService:
     ) -> Optional[Certificate]:
         """
         Issue a certificate
-
-        Args:
+    Args:
             common_name: Certificate common name
             alt_names: Alternative names
             ttl: Certificate lifetime
-
-        Returns:
+    Returns:
             Certificate object"""
         try:
             response = self.client.write(
@@ -664,11 +646,9 @@ class VaultService:
     async def revoke_certificate(self, serial_number: str) -> bool:
         """
         Revoke a certificate
-
-        Args:
+    Args:
             serial_number: Certificate serial number
-
-        Returns:
+    Returns:
             Success status"""
         try:
             self.client.write(
@@ -692,8 +672,7 @@ class VaultService:
     async def rotate_encryption_key(self) -> str:
         """
         Rotate encryption key
-
-        Returns:
+    Returns:
             New key ID"""
         try:
             # Generate new key
@@ -735,13 +714,11 @@ class VaultService:
     ) -> bool:
         """
         Rotate a secret
-
-        Args:
+    Args:
             path: Secret path
             key: Secret key
             new_value: New secret value
-
-        Returns:
+    Returns:
             Success status"""
         try:
             # Get current secret
@@ -799,12 +776,10 @@ class VaultService:
         rules: Dict[str, Any],
     ) -> bool:"""
         Create Vault policy
-
-        Args:
+    Args:
             name: Policy name
             rules: Policy rules
-
-        Returns:
+    Returns:
             Success status
         """
         try:
@@ -824,12 +799,10 @@ class VaultService:
         policies: List[str],
     ) -> bool:"""
         Assign policies to entity
-
-        Args:
+    Args:
             entity: Entity (user/service)
             policies: List of policies
-
-        Returns:
+    Returns:
             Success status
         """
         try:
@@ -862,13 +835,11 @@ class VaultService:
     ) -> List[Dict[str, Any]]:
         """
         Get audit log entries
-
-        Args:
+    Args:
             start_time: Filter start time
             end_time: Filter end time
             action: Filter by action
-
-        Returns:
+    Returns:
             Filtered audit log entries"""
         logs = self.audit_log
 

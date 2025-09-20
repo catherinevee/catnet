@@ -2,6 +2,7 @@
 Monitoring and Metrics API Endpoints
 Phase 7 Implementation - Observability endpoints
 """
+
 from fastapi import APIRouter, Query
 from typing import Optional, Dict, Any, List
 from datetime import datetime

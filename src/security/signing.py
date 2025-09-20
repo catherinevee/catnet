@@ -1,6 +1,7 @@
 """
 Configuration and Commit Signing Manager
 """
+
 import os
 import json
 import hashlib
@@ -27,7 +28,7 @@ from ..core.exceptions import SecurityError
 logger = get_logger(__name__)
 
 
-class SignatureManager:"""Manages digital signatures for configurations and commits"""
+class SignatureManager: """Manages digital signatures for configurations and commits"""
 
     def __init__(self):
         """TODO: Add docstring"""
@@ -42,13 +43,11 @@ class SignatureManager:"""Manages digital signatures for configurations and comm
     ) -> Dict[str, str]:
         """
         Generate GPG signing key for a user
-
-        Args:
+    Args:
             user_id: User UUID
             user_email: User email
             passphrase: Optional passphrase for key
-
-        Returns:
+    Returns:
             Dictionary with key details"""
         logger.info(f"Generating signing key for user {user_id}")
 
@@ -145,14 +144,12 @@ class SignatureManager:"""Manages digital signatures for configurations and comm
     ) -> str:
         """
         Generate cryptographic signature for configuration
-
-        Args:
+    Args:
             config: Configuration dictionary
             user_id: User UUID
             deployment_id: Deployment UUID
             passphrase: Key passphrase
-
-        Returns:
+    Returns:
             Base64 encoded signature"""
         logger.info(f"Signing configuration for deployment {deployment_id}")
 
@@ -233,13 +230,11 @@ class SignatureManager:"""Manages digital signatures for configurations and comm
     ) -> bool:
         """
         Verify configuration hasn't been tampered with
-
-        Args:
+    Args:
             config: Configuration dictionary
             signature: Base64 encoded signature
             deployment_id: Deployment UUID
-
-        Returns:
+    Returns:
             True if signature is valid"""
         logger.info(f"Verifying signature for deployment {deployment_id}")
 
@@ -330,14 +325,12 @@ class SignatureManager:"""Manages digital signatures for configurations and comm
     ) -> str:
         """
         Create signed Git commit
-
-        Args:
+    Args:
             repo_path: Path to Git repository
             commit_message: Commit message
             user_id: User UUID
             passphrase: Key passphrase
-
-        Returns:
+    Returns:
             Commit hash"""
         import git
 
@@ -373,12 +366,10 @@ class SignatureManager:"""Manages digital signatures for configurations and comm
     ) -> bool:
         """
         Verify Git commit signature
-
-        Args:
+    Args:
             repo_path: Path to Git repository
             commit_hash: Commit hash to verify
-
-        Returns:
+    Returns:
             True if signature is valid"""
         import git
 
@@ -421,8 +412,7 @@ class SignatureManager:"""Manages digital signatures for configurations and comm
     async def rotate_signing_keys(self) -> Dict[str, int]:
         """
         Rotate expiring signing keys
-
-        Returns:
+    Returns:
             Statistics of rotated keys"""
         logger.info("Starting signing key rotation")
 
@@ -472,11 +462,9 @@ class ConfigurationHasher:
     @staticmethod
     def hash_config(config: Dict) -> str:"""
         Create deterministic hash of configuration
-
-        Args:
+    Args:
             config: Configuration dictionary
-
-        Returns:
+    Returns:
             SHA-256 hash hex string
         """
         # Canonicalize by sorting keys
@@ -487,11 +475,9 @@ class ConfigurationHasher:
     def create_merkle_tree(configs: list) -> str:
         """
         Create Merkle tree root hash for multiple configurations
-
-        Args:
+    Args:
             configs: List of configuration dictionaries
-
-        Returns:
+    Returns:
             Merkle root hash"""
         if not configs:
             return ""
@@ -520,12 +506,10 @@ class ConfigurationHasher:
     def verify_integrity(config: Dict, expected_hash: str) -> bool:
         """
         Verify configuration integrity
-
-        Args:
+    Args:
             config: Configuration dictionary
             expected_hash: Expected hash value
-
-        Returns:
+    Returns:
             True if integrity is maintained"""
         actual_hash = ConfigurationHasher.hash_config(config)
         return actual_hash == expected_hash

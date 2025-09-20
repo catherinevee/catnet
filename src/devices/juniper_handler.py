@@ -2,6 +2,7 @@
 Juniper Device Handler
 Following CLAUDE.md vendor-specific patterns
 """
+
 import asyncio
 from typing import List, Dict, Any, Optional
 import re
@@ -11,7 +12,7 @@ from ..core.exceptions import DeviceConnectionError
 from ..security.audit import AuditLogger
 
 
-class JuniperHandler:"""
+class JuniperHandler: """
     Handler for Juniper Junos devices
     Following CLAUDE.md vendor commands exactly
     """
@@ -26,7 +27,10 @@ class JuniperHandler:"""
         "show_config_json": "show configuration | display json",
     }
 
-    def __init__(self, connection: Any, audit_logger: Optional[AuditLogger] = None):
+    def __init__(
+    self,
+    connection: Any,
+     audit_logger: Optional[AuditLogger] = None):
         """TODO: Add docstring"""
         self.connection = connection
         self.audit = audit_logger or AuditLogger()

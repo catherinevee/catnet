@@ -26,12 +26,13 @@ from ..device_manager import (
 )
 
 
-class CiscoAdapter(DeviceAdapter):"""
+class CiscoAdapter(DeviceAdapter):
+    """
     Cisco device adapter implementation
     """
 
-    # Device type mappings for Netmiko
-    DEVICE_TYPE_MAP = {
+   # Device type mappings for Netmiko
+   DEVICE_TYPE_MAP = {
         DeviceVendor.CISCO_IOS: "cisco_ios",
         DeviceVendor.CISCO_IOSXE: "cisco_xe",
         DeviceVendor.CISCO_NXOS: "cisco_nxos",
@@ -71,17 +72,15 @@ class CiscoAdapter(DeviceAdapter):"""
 
     async def connect(
         self, device: DeviceInfo, credentials: DeviceCredentials
-    ) -> DeviceConnection:"""
+    ) -> DeviceConnection: """
         Connect to Cisco device
-
-        Args:
+    Args:
             device: Device information
             credentials: Device credentials
-
-        Returns:
+    Returns:
             DeviceConnection
         """
-        import uuid
+       import uuid
 
         connection_id = str(uuid.uuid4())[:12]
 
@@ -126,11 +125,9 @@ class CiscoAdapter(DeviceAdapter):"""
     async def disconnect(self, connection: DeviceConnection) -> bool:
         """
         Disconnect from Cisco device
-
-        Args:
+    Args:
             connection: Device connection
-
-        Returns:
+    Returns:
             Success status"""
         try:
             if connection.session_data:
@@ -157,12 +154,10 @@ class CiscoAdapter(DeviceAdapter):"""
         ) -> str:
         """
         Execute command on Cisco device
-
-        Args:
+    Args:
             connection: Device connection
             command: Command to execute
-
-        Returns:
+    Returns:
             Command output"""
         if not connection.is_active or not connection.session_data:
             raise Exception("Connection not active")
@@ -190,12 +185,10 @@ class CiscoAdapter(DeviceAdapter):"""
     ) -> str:
         """
         Get Cisco device configuration
-
-        Args:
+    Args:
             connection: Device connection
             config_type: Configuration type (running/startup)
-
-        Returns:
+    Returns:
             Configuration"""
         # Get vendor from connection
         connection.device_id
@@ -218,12 +211,10 @@ class CiscoAdapter(DeviceAdapter):"""
     ) -> bool:
         """
         Apply configuration to Cisco device
-
-        Args:
+    Args:
             connection: Device connection
             configuration: Configuration to apply
-
-        Returns:
+    Returns:
             Success status"""
         if not connection.is_active or not connection.session_data:
             raise Exception("Connection not active")
@@ -275,11 +266,9 @@ class CiscoAdapter(DeviceAdapter):"""
     async def save_configuration(self, connection: DeviceConnection) -> bool:
         """
         Save Cisco device configuration
-
-        Args:
+    Args:
             connection: Device connection
-
-        Returns:
+    Returns:
             Success status"""
         # Get vendor from connection
         vendor = self._get_vendor_from_connection(connection)
@@ -343,8 +332,8 @@ class CiscoAdapter(DeviceAdapter):"""
         # In real implementation, would look up from device info
         return DeviceVendor.CISCO_IOS
 
-    def _clean_configuration(self, config: str) -> str:"""Clean configuration output"""
-        lines = []
+    def _clean_configuration(self, config: str) -> str: """Clean configuration output"""
+       lines = []
         skip_patterns = [
             "Building configuration",
             "Current configuration",

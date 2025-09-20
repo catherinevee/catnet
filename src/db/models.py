@@ -107,7 +107,8 @@ class User(Base):
     # SSH key fields
     ssh_public_keys = Column(JSON, default=[])  # List of SSH public keys
     ssh_key_added_at = Column(DateTime(timezone=True))
-    ssh_key_fingerprints = Column(JSON, default=[])  # List of SSH key fingerprints
+    # List of SSH key fingerprints
+    ssh_key_fingerprints = Column(JSON, default=[])
 
     # Relationships - Specify foreign keys to avoid ambiguity
     deployments = relationship(
@@ -174,10 +175,12 @@ class Deployment(Base):
         nullable=False,
         default=DeploymentState.PENDING,
     )
-    approved_by = Column(JSON, default=list)  # Stores list of user IDs as strings
+    # Stores list of user IDs as strings
+    approved_by = Column(JSON, default=list)
     approval_required = Column(Boolean, default=True)
     approval_count = Column(Integer, default=2)  # Number of approvals needed
-    strategy = Column(String(50), default="rolling")  # canary, rolling, blue-green
+    # canary, rolling, blue-green
+    strategy = Column(String(50), default="rolling")
     rollback_config = Column(JSON)
     scheduled_at = Column(DateTime(timezone=True))
     started_at = Column(DateTime(timezone=True))
@@ -313,7 +316,8 @@ class SecretRotation(Base):
 
     id = Column(UUID(), primary_key=True, default=uuid.uuid4)
     secret_path = Column(String(500), nullable=False)
-    secret_type = Column(String(50), nullable=False)  # device_credential, api_key, etc.
+    # device_credential, api_key, etc.
+    secret_type = Column(String(50), nullable=False)
     last_rotation = Column(DateTime(timezone=True), nullable=False)
     next_rotation = Column(DateTime(timezone=True), nullable=False)
     rotation_interval_days = Column(Integer, default=90)

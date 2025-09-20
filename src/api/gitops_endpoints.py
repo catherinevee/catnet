@@ -26,31 +26,29 @@ class WebhookPayload(BaseModel):
     """Generic webhook payload"""
 
     ref: str
-    repository: Dict[str, Any]
-    commits: List[Dict[str, Any]]
-    pusher: Dict[str, str]
-    sender: Dict[str, Any]
+        repository: Dict[str, Any]
+        commits: List[Dict[str, Any]]
+        pusher: Dict[str, str]
+        sender: Dict[str, Any]
 
 
 class ConfigDiff(BaseModel):
-
-
     """Configuration diff response"""
 
     commit_sha: str
-    timestamp: datetime
-    author: str
-    message: str
-    files_changed: List[str]
-    additions: int
-    deletions: int
-    diff_content: str
+        timestamp: datetime
+        author: str
+        message: str
+        files_changed: List[str]
+        additions: int
+        deletions: int
+        diff_content: str
 
 
 def verify_github_signature(
-    payload: bytes,
-    signature: str,
-    secret: str
+        payload: bytes,
+        signature: str,
+        secret: str
 ) -> bool:"""Verify GitHub webhook signature"""
     expected = hmac.new(secret.encode(), payload, hashlib.sha256).hexdigest()
     return hmac.compare_digest(f"sha256={expected}", signature)
@@ -63,10 +61,10 @@ def verify_gitlab_signature(payload: bytes, token: str, secret: str) -> bool:
 
 @router.post("/webhook/github")
 async def handle_github_webhook(
-    request: Request,
-    x_github_event: str = Header(None),
-    x_hub_signature_256: str = Header(None),
-    db: AsyncSession = Depends(get_db),
+        request: Request,
+        x_github_event: str = Header(None),
+        x_hub_signature_256: str = Header(None),
+        db: AsyncSession = Depends(get_db),
 ):
     Handle GitHub webhook events
 
@@ -107,7 +105,7 @@ async def handle_github_webhook(
         if repo.webhook_secret_ref:
             secret_data = await vault.get_secret(repo.webhook_secret_ref)
             webhook_secret = secret_data.get("webhook_secret", "")
-        else:
+            else:
             logger.warning(f"No webhook secret configured for {repo_url}")
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -162,7 +160,7 @@ async def handle_github_webhook(
                 "repository": repo_url,
                 "result": result,
             }
-
+    
         else:
             return {
                 "status": "ignored",
@@ -187,10 +185,10 @@ async def handle_github_webhook(
 
 @router.post("/webhook/gitlab")
 async def handle_gitlab_webhook(
-    request: Request,
-    x_gitlab_event: str = Header(None),
-    x_gitlab_token: str = Header(None),
-    db: AsyncSession = Depends(get_db),
+        request: Request,
+        x_gitlab_event: str = Header(None),
+        x_gitlab_token: str = Header(None),
+        db: AsyncSession = Depends(get_db),
 ):
     Handle GitLab webhook events
 
@@ -231,7 +229,7 @@ async def handle_gitlab_webhook(
         if repo.webhook_secret_ref:
             secret_data = await vault.get_secret(repo.webhook_secret_ref)
             webhook_secret = secret_data.get("webhook_secret", "")
-        else:
+            else:
             logger.warning(f"No webhook secret configured for {repo_url}")
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -288,7 +286,7 @@ async def handle_gitlab_webhook(
                 "repository": repo_url,
                 "result": result,
             }
-
+    
         else:
             return {
                 "status": "ignored",
@@ -313,10 +311,10 @@ async def handle_gitlab_webhook(
 
 @router.get("/diff/{commit_sha}", response_model=ConfigDiff)
 async def get_configuration_diff(
-    commit_sha: str,
-    repository_id: Optional[str] = None,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+        commit_sha: str,
+        repository_id: Optional[str] = None,
+        current_user: User = Depends(get_current_user),
+        db: AsyncSession = Depends(get_db),
 ):
     Get configuration diff for a specific commit
 
@@ -326,7 +324,7 @@ async def get_configuration_diff(
     - Full diff content
     - Commit metadata
     logger.info(f"Configuration diff requested for commit {commit_sha}")
-
+    
     try:
         import git
 
@@ -349,7 +347,7 @@ async def get_configuration_diff(
                     )
                 )
                 repo_config = result.scalar_one_or_none()
-            else:
+                else:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail="Repository not found for commit",

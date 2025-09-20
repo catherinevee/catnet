@@ -2,6 +2,7 @@
 Async Device Connector
 Provides non-blocking device operations using asyncio
 """
+
 import asyncio
 import concurrent.futures
 from typing import Dict, List, Any, Optional
@@ -15,7 +16,7 @@ from .device_store import device_store
 logger = logging.getLogger(__name__)
 
 
-class AsyncDeviceConnector:"""
+class AsyncDeviceConnector: """
     Async wrapper for device operations
     Prevents blocking operations from timing out
     """
@@ -30,7 +31,7 @@ class AsyncDeviceConnector:"""
             self,
             device_info: Dict[str,
                               Any]
-        ) -> Optional[Any]:"""
+        ) -> Optional[Any]: """
         Connect to device asynchronously
         NEVER use synchronous blocking operations!
         """

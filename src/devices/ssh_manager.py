@@ -22,7 +22,7 @@ from ..core.exceptions import SecurityError, DeviceConnectionError
 logger = logging.getLogger(__name__)
 
 
-class SSHKeyManager:"""Manage SSH keys for device authentication."""
+class SSHKeyManager: """Manage SSH keys for device authentication."""
 
     def __init__(self, vault_client: VaultClient):
         """TODO: Add docstring"""
@@ -38,13 +38,11 @@ class SSHKeyManager:"""Manage SSH keys for device authentication."""
     ) -> Tuple[str, str]:
         """
         Generate SSH key pair.
-
-        Args:
+    Args:
             key_type: Type of key ('rsa' or 'ed25519')
             key_size: Key size for RSA (ignored for ed25519)
             comment: Optional comment for the key
-
-        Returns:
+    Returns:
             Tuple of (private_key, public_key) in PEM format"""
         if key_type == "ed25519":
             # Generate Ed25519 key (more secure, smaller)
@@ -106,14 +104,12 @@ class SSHKeyManager:"""Manage SSH keys for device authentication."""
     ) -> Dict[str, str]:
         """
         Store SSH key pair in Vault.
-
-        Args:
+    Args:
             device_id: Device identifier
             private_key: Private key in PEM format
             public_key: Public key in OpenSSH format
             key_name: Optional key name
-
-        Returns:
+    Returns:
             Dictionary with Vault paths"""
         key_name = key_name or f"{device_id}_key"
 
@@ -141,12 +137,10 @@ class SSHKeyManager:"""Manage SSH keys for device authentication."""
     ) -> Dict[str, str]:
         """
         Retrieve SSH key from Vault.
-
-        Args:
+    Args:
             device_id: Device identifier
             key_name: Optional key name
-
-        Returns:
+    Returns:
             Dictionary with private and public keys"""
         key_name = key_name or f"{device_id}_key"
         vault_path = f"ssh-keys/{device_id}/{key_name}"
@@ -165,11 +159,9 @@ class SSHKeyManager:"""Manage SSH keys for device authentication."""
     async def rotate_ssh_key(self, device_id: str) -> Dict[str, Any]:
         """
         Rotate SSH key for a device.
-
-        Args:
+    Args:
             device_id: Device identifier
-
-        Returns:
+    Returns:
             New key information"""
         # Generate new key pair
         private_key, public_key = await self.generate_ssh_keypair()
@@ -214,13 +206,11 @@ class SSHKeyManager:"""Manage SSH keys for device authentication."""
     ) -> bool:
         """
         Deploy public key to network device.
-
-        Args:
+    Args:
             device: Device object
             public_key: Public key in OpenSSH format
             username: Username for the key
-
-        Returns:
+    Returns:
             True if successful"""
         # Commands vary by vendor
         if device.vendor.lower() == "cisco":
@@ -259,14 +249,12 @@ class SSHKeyManager:"""Manage SSH keys for device authentication."""
     ) -> bool:
         """
         Test SSH connection using key authentication.
-
-        Args:
+    Args:
             hostname: Device hostname or IP
             username: SSH username
             private_key: Private key in PEM format
             port: SSH port
-
-        Returns:
+    Returns:
             True if connection successful"""
         try:
             # Create SSH client
@@ -313,11 +301,9 @@ class SSHKeyManager:"""Manage SSH keys for device authentication."""
     async def list_keys(self, device_id: Optional[str] = None) -> list:
         """
         List all SSH keys for a device or all devices.
-
-        Args:
+    Args:
             device_id: Optional device ID to filter
-
-        Returns:
+    Returns:
             List of key information"""
         if device_id:
             path = f"ssh-keys/{device_id}"
@@ -348,12 +334,10 @@ class SSHKeyManager:"""Manage SSH keys for device authentication."""
     ) -> bool:
         """
         Remove SSH key from Vault.
-
-        Args:
+    Args:
             device_id: Device identifier
             key_name: Optional key name
-
-        Returns:
+    Returns:
             True if removed successfully"""
         key_name = key_name or f"{device_id}_key"
         vault_path = f"ssh-keys/{device_id}/{key_name}"
@@ -377,12 +361,10 @@ class SSHDeviceConnector:
         self, device: Device, username: Optional[str] = None
     ) -> SSHClient:"""
         Connect to device using SSH key authentication.
-
-        Args:
+    Args:
             device: Device object
             username: Optional username override
-
-        Returns:
+    Returns:
             Connected SSH client
         """
         # Get SSH key from Vault
@@ -435,13 +417,11 @@ class SSHDeviceConnector:
     ) -> str:
         """
         Execute command on device using SSH key authentication.
-
-        Args:
+    Args:
             device: Device object
             command: Command to execute
             username: Optional username override
-
-        Returns:
+    Returns:
             Command output"""
         client = await self.connect_with_key(device, username)
 

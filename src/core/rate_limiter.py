@@ -1,6 +1,7 @@
 """
 Rate Limiting for API Endpoints
 """
+
 import time
 
 import asyncio
@@ -17,7 +18,7 @@ from ..security.audit import AuditLogger
 logger = get_logger(__name__)
 
 
-class RateLimiter:"""
+class RateLimiter: """
     Rate limiter implementation using Token Bucket algorithm
     Supports per-user and per-IP rate limiting with Redis backend
     """
@@ -30,8 +31,7 @@ class RateLimiter:"""
     ):
         """
         Initialize rate limiter
-
-        Args:
+    Args:
             redis_url: Redis connection URL
             default_rate: Default requests per period
             default_period: Default period in seconds"""
@@ -54,7 +54,7 @@ class RateLimiter:"""
         except Exception as e:
                         logger.warning(
                 f"Redis not available,"
-                using in-memory rate limiting: {e}"
+                using in -memory rate limiting: {e}"
             )
             self.redis_client = None
             self._local_buckets = {}
@@ -71,13 +71,11 @@ class RateLimiter:"""
         period: Optional[int] = None,
     ) -> Dict[str, any]:"""
         Check if request is within rate limit
-
-        Args:
+    Args:
             key: Unique identifier (user_id, IP, etc.)
             rate: Max requests per period (overrides default)
             period: Period in seconds (overrides default)
-
-        Returns:
+    Returns:
             Dictionary with rate limit info
         """
         rate = rate or self.default_rate
@@ -186,8 +184,7 @@ class RateLimiter:"""
     ):
         """
         Decorator for rate limiting endpoints
-
-        Args:
+    Args:
             rate: Max requests per period
             period: Period in seconds
             key_func: Function to generate rate limit key from request

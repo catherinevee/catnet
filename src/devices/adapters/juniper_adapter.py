@@ -26,7 +26,7 @@ from ..device_manager import (
 )
 
 
-class JuniperAdapter(DeviceAdapter):"""
+class JuniperAdapter(DeviceAdapter): """
     Juniper device adapter implementation
     """
 
@@ -49,14 +49,12 @@ class JuniperAdapter(DeviceAdapter):"""
 
     async def connect(
         self, device: DeviceInfo, credentials: DeviceCredentials
-    ) -> DeviceConnection:"""
+    ) -> DeviceConnection: """
         Connect to Juniper device
-
-        Args:
+    Args:
             device: Device information
             credentials: Device credentials
-
-        Returns:
+    Returns:
             DeviceConnection
         """
         import uuid
@@ -102,11 +100,9 @@ class JuniperAdapter(DeviceAdapter):"""
     async def disconnect(self, connection: DeviceConnection) -> bool:
         """
         Disconnect from Juniper device
-
-        Args:
+    Args:
             connection: Device connection
-
-        Returns:
+    Returns:
             Success status"""
         try:
             if connection.session_data:
@@ -130,12 +126,10 @@ class JuniperAdapter(DeviceAdapter):"""
     ) -> str:
         """
         Execute command on Juniper device
-
-        Args:
+    Args:
             connection: Device connection
             command: Command to execute
-
-        Returns:
+    Returns:
             Command output"""
         if not connection.is_active or not connection.session_data:
             raise Exception("Connection not active")
@@ -176,12 +170,10 @@ class JuniperAdapter(DeviceAdapter):"""
     ) -> str:
         """
         Get Juniper device configuration
-
-        Args:
+    Args:
             connection: Device connection
             config_type: Configuration type (running/candidate)
-
-        Returns:
+    Returns:
             Configuration"""
         # Get command for config type
         command = self.CONFIG_COMMANDS.get(config_type, "show configuration")
@@ -199,12 +191,10 @@ class JuniperAdapter(DeviceAdapter):"""
     ) -> bool:
         """
         Apply configuration to Juniper device
-
-        Args:
+    Args:
             connection: Device connection
             configuration: Configuration to apply
-
-        Returns:
+    Returns:
             Success status"""
         if not connection.is_active or not connection.session_data:
             raise Exception("Connection not active")
@@ -266,11 +256,9 @@ class JuniperAdapter(DeviceAdapter):"""
     async def save_configuration(self, connection: DeviceConnection) -> bool:
         """
         Save Juniper device configuration
-
-        Args:
+    Args:
             connection: Device connection
-
-        Returns:
+    Returns:
             Success status"""
         # Junos automatically saves committed configuration
         # This method ensures the configuration is synced
@@ -292,12 +280,10 @@ class JuniperAdapter(DeviceAdapter):"""
     ) -> bool:
         """
         Check if configuration can be committed without errors
-
-        Args:
+    Args:
             connection: Device connection
             configuration: Configuration to check
-
-        Returns:
+    Returns:
             True if configuration is valid"""
         if not connection.is_active or not connection.session_data:
             raise Exception("Connection not active")
@@ -336,12 +322,10 @@ class JuniperAdapter(DeviceAdapter):"""
     ) -> bool:
         """
         Rollback to previous configuration
-
-        Args:
+    Args:
             connection: Device connection
             rollback_id: Rollback ID (0-49)
-
-        Returns:
+    Returns:
             Success status"""
         if not connection.is_active or not connection.session_data:
             raise Exception("Connection not active")

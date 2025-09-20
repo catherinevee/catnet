@@ -1,6 +1,7 @@
 """
 Security Headers Middleware for Production Hardening
 """
+
 from typing import Dict, Optional, List
 from fastapi import Request
 from fastapi.responses import Response
@@ -16,7 +17,7 @@ from ..core.logging import get_logger
 logger = get_logger(__name__)
 
 
-class SecurityHeadersMiddleware(BaseHTTPMiddleware):"""
+class SecurityHeadersMiddleware(BaseHTTPMiddleware): """
     Middleware to add security headers to all responses
     Implements OWASP security best practices
     """
@@ -71,13 +72,13 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):"""
             response: Response,
             request: Request,
             nonce: str
-        ):"""Add security headers to response"""
+        ): """Add security headers to response"""
 
         # X-Content-Type-Options
         response.headers["X-Content-Type-Options"] = "nosniff"
 
         # X-Frame-Options" \
-        f"response.headers["X-Frame-Options"] = "DENY"
+        f"response.headers["X - Frame - Options"] = "DENY"
 
         # X-XSS-Protection (for older browsers)
         response.headers["X-XSS-Protection"] = "1; mode=block"

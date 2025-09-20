@@ -75,7 +75,7 @@ class AnomalyScore:
 
 
 @dataclass
-class ModelMetrics:"""Model performance metrics"""
+class ModelMetrics: """Model performance metrics"""
 
     accuracy: float
     precision: float
@@ -88,7 +88,7 @@ class ModelMetrics:"""Model performance metrics"""
 
 
 @dataclass
-class TrainingData:"""Training data container"""
+class TrainingData: """Training data container"""
 
     features: np.ndarray
     labels: Optional[np.ndarray] = None
@@ -96,14 +96,13 @@ class TrainingData:"""Training data container"""
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
-class AnomalyDetector:"""
+class AnomalyDetector: """
     Machine learning-based anomaly detection
     """
 
-    def __init__(self, model_type: ModelType = ModelType.ISOLATION_FOREST):"""
+    def __init__(self, model_type: ModelType = ModelType.ISOLATION_FOREST): """
         Initialize anomaly detector
-
-        Args:
+    Args:
             model_type: Type of ML model to use
         """
         self.model_type = model_type
@@ -129,7 +128,7 @@ class AnomalyDetector:"""
         # Initialize feature extractors
         self._initialize_feature_extractors()
 
-    def _initialize_model(self):"""Initialize ML model based on type"""
+    def _initialize_model(self): """Initialize ML model based on type"""
         if self.model_type == ModelType.ISOLATION_FOREST:
             return IsolationForest(
                 n_estimators=100,
@@ -148,7 +147,8 @@ class AnomalyDetector:"""
                 random_state=42
             )
 
-    def _initialize_feature_extractors(self):"""Initialize feature extraction functions"""
+    def _initialize_feature_extractors(
+        self): """Initialize feature extraction functions"""
         # Traffic features
         self.feature_extractors["traffic"] = self._extract_traffic_features
 
@@ -166,11 +166,9 @@ class AnomalyDetector:"""
     def train(self, training_data: TrainingData) -> ModelMetrics:
         """
         Train the anomaly detection model
-
-        Args:
+    Args:
             training_data: Training data
-
-        Returns:
+    Returns:
             Model performance metrics"""
         if len(training_data.features) < self.min_training_samples:
             raise ValueError(
@@ -200,11 +198,9 @@ class AnomalyDetector:"""
     def detect(self, data: Dict[str, Any]) -> AnomalyScore:
         """
         Detect anomalies in data
-
-        Args:
+    Args:
             data: Input data
-
-        Returns:
+    Returns:
             Anomaly score"""
         if not self.is_trained:
             raise ValueError("Model not trained. Call train() first.")
@@ -269,11 +265,9 @@ class AnomalyDetector:"""
         ) -> List[AnomalyScore]:
         """
         Detect anomalies in batch
-
-        Args:
+    Args:
             data_list: List of input data
-
-        Returns:
+    Returns:
             List of anomaly scores"""
         return [self.detect(data) for data in data_list]
 
@@ -812,11 +806,9 @@ class FeatureExtractor:
         ) -> np.ndarray:
         """
         Extract features from network traffic data
-
-        Args:
+    Args:
             traffic_data: Traffic data dictionary
-
-        Returns:
+    Returns:
             Feature vector"""
         features = []
 
@@ -847,11 +839,9 @@ class FeatureExtractor:
         ) -> np.ndarray:
         """
         Extract features from configuration data
-
-        Args:
+    Args:
             config_data: Configuration data dictionary
-
-        Returns:
+    Returns:
             Feature vector"""
         features = []
 
@@ -880,11 +870,9 @@ class FeatureExtractor:
         ) -> np.ndarray:
         """
         Extract features from performance data
-
-        Args:
+    Args:
             perf_data: Performance data dictionary
-
-        Returns:
+    Returns:
             Feature vector"""
         features = []
 
@@ -911,12 +899,10 @@ class FeatureExtractor:
     ) -> np.ndarray:
         """
         Extract features based on data type
-
-        Args:
+    Args:
             data: Input data
             feature_type: Type of features to extract
-
-        Returns:
+    Returns:
             Feature vector"""
         if feature_type == "traffic":
             return self.extract_traffic_features(data)
@@ -932,12 +918,10 @@ class FeatureExtractor:
     ) -> np.ndarray:
         """
         Normalize features using StandardScaler
-
-        Args:
+    Args:
             features: Feature vector
             feature_type: Type of features
-
-        Returns:
+    Returns:
             Normalized features"""
         if feature_type not in self.scalers:
             self.scalers[feature_type] = StandardScaler()
@@ -968,13 +952,11 @@ class ModelManager:
         config: Optional[Dict[str, Any]] = None,
     ) -> str:"""
         Create a new ML model
-
-        Args:
+    Args:
             name: Model name
             model_type: Type of model
             config: Model configuration
-
-        Returns:
+    Returns:
             Model ID
         """
         model_id = f"{name}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
@@ -1018,13 +1000,11 @@ class ModelManager:
     ) -> ModelMetrics:
         """
         Train a model
-
-        Args:
+    Args:
             model_id: Model ID
             training_data: Training data
             validation_split: Validation split ratio
-
-        Returns:
+    Returns:
             Model metrics"""
         if model_id not in self.models:
             raise ValueError(f"Model {model_id} not found")
@@ -1077,12 +1057,10 @@ class ModelManager:
     ) -> Tuple[bool, float]:
         """
         Make prediction using model
-
-        Args:
+    Args:
             model_id: Model ID
             features: Feature vector
-
-        Returns:
+    Returns:
             Tuple of (is_anomaly, confidence_score)"""
         if model_id not in self.models:
             raise ValueError(f"Model {model_id} not found")
@@ -1119,23 +1097,19 @@ class ModelManager:
     async def get_model_metrics(self, model_id: str) -> Optional[ModelMetrics]:
         """
         Get model metrics
-
-        Args:
+    Args:
             model_id: Model ID
-
-        Returns:
+    Returns:
             Model metrics or None"""
         return self.model_metrics.get(model_id)
 
     async def save_model(self, model_id: str, path: str) -> bool:
         """
         Save model to disk
-
-        Args:
+    Args:
             model_id: Model ID
             path: Save path
-
-        Returns:
+    Returns:
             Success status"""
         if model_id not in self.models:
             return False
@@ -1160,13 +1134,11 @@ class ModelManager:
     ) -> Optional[str]:
         """
         Load model from disk
-
-        Args:
+    Args:
             path: Model path
             name: Model name
             model_type: Model type
-
-        Returns:
+    Returns:
             Model ID or None"""
         try:
             with open(path, "rb") as f:
@@ -1188,12 +1160,10 @@ class ModelManager:
     ) -> Tuple[bool, float]:
         """
         Make ensemble prediction using multiple models
-
-        Args:
+    Args:
             model_ids: List of model IDs
             features: Feature vector
-
-        Returns:
+    Returns:
             Tuple of (is_anomaly, confidence_score)"""
         predictions = []
         confidences = []

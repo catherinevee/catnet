@@ -9,10 +9,11 @@ from functools import wraps
 import click
 
 
-def get_auth_token() -> Optional[str]:"""Get authentication token from secure storage."""
-    # Check environment variable first
-    env_token = os.environ.get("CATNET_AUTH_TOKEN")
-    if env_token:
+def get_auth_token(
+) -> Optional[str]: """Get authentication token from secure storage."""
+  # Check environment variable first
+  env_token = os.environ.get("CATNET_AUTH_TOKEN")
+   if env_token:
         return env_token
 
     token_file = Path.home() / ".catnet" / "tokens.json"
@@ -35,11 +36,10 @@ def require_auth(func):
         if not get_auth_token():
             click.echo(
                 click.style(
-                    "✗ Authentication required. Please run 'catnet auth login' \
+        "✗ Authentication required. Please run 'catnet auth login' \
                         first.",
-                    fg="red",
-                )
-            )
+        fg="red",
+        ) )
             raise click.Abort()
         return func(*args, **kwargs)
 

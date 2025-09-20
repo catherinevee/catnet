@@ -2,6 +2,7 @@
 Enhanced Security Module for CatNet
 Implements webhook verification, input validation, and rate limiting
 """
+
 import hmac
 import hashlib
 import re
@@ -14,13 +15,16 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class WebhookVerifier:"""Verify webhook signatures from GitHub/GitLab/Bitbucket"""
+class WebhookVerifier: """Verify webhook signatures from GitHub/GitLab/Bitbucket"""
 
     def __init__(self):
         """TODO: Add docstring"""
         self.secrets: Dict[str, str] = {}  # repo_id -> secret
 
-    def set_secret(self, repo_id: str, secret: str):"""Store webhook secret for a repository"""
+    def set_secret(
+    self,
+    repo_id: str,
+     secret: str): """Store webhook secret for a repository"""
         if not secret or len(secret) < 16:
             raise ValueError("Webhook secret must be at least 16 characters")
         self.secrets[repo_id] = secret
@@ -69,7 +73,7 @@ class WebhookVerifier:"""Verify webhook signatures from GitHub/GitLab/Bitbucket"
         return hmac.compare_digest(expected, token)
 
 
-class InputValidator:"""Validate and sanitize user inputs to prevent injection attacks"""
+class InputValidator: """Validate and sanitize user inputs to prevent injection attacks"""
 
     # Patterns that should never appear in configuration commands
     DANGEROUS_PATTERNS = [

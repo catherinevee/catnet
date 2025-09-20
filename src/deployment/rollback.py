@@ -14,7 +14,7 @@ from datetime import datetime
 from enum import Enum
 
 
-class RollbackReason(Enum):"""Reasons for rollback"""
+class RollbackReason(Enum): """Reasons for rollback"""
 
     HEALTH_CHECK_FAILED = "health_check_failed"
     VALIDATION_FAILED = "validation_failed"
@@ -49,7 +49,7 @@ class RollbackPoint:
 
 
 @dataclass
-class RollbackOperation:"""Rollback operation"""
+class RollbackOperation: """Rollback operation"""
 
     id: str
     deployment_id: str
@@ -65,14 +65,13 @@ class RollbackOperation:"""Rollback operation"""
     errors: List[str] = field(default_factory=list)
 
 
-class RollbackManager:"""
+class RollbackManager: """
     Manages deployment rollbacks
     """
 
-    def __init__(self, device_service=None, backup_service=None):"""
+    def __init__(self, device_service=None, backup_service=None): """
         Initialize rollback manager
-
-        Args:
+    Args:
             device_service: Service for device operations
             backup_service: Service for backup operations
         """
@@ -91,16 +90,14 @@ class RollbackManager:"""
         configuration: str,
         backup_location: str,
         metadata: Optional[Dict[str, Any]] = None,
-    ) -> RollbackPoint:"""
+    ) -> RollbackPoint: """
         Create a rollback point
-
-        Args:
+    Args:
             device_id: Device ID
             configuration: Current configuration
             backup_location: Backup location
             metadata: Additional metadata
-
-        Returns:
+    Returns:
             RollbackPoint instance
         """
         import uuid
@@ -136,14 +133,12 @@ class RollbackManager:"""
     ) -> str:
         """
         Initiate a rollback operation
-
-        Args:
+    Args:
             deployment_id: Deployment to rollback
             devices: Devices to rollback
             reason: Rollback reason
             initiated_by: User or system initiating rollback
-
-        Returns:
+    Returns:
             Rollback operation ID"""
         import uuid
 
@@ -171,11 +166,9 @@ class RollbackManager:"""
     async def execute_rollback(self, rollback_id: str) -> bool:
         """
         Execute a rollback operation
-
-        Args:
+    Args:
             rollback_id: Rollback operation ID
-
-        Returns:
+    Returns:
             Success status"""
         if rollback_id not in self.rollback_operations:
             return False
@@ -230,12 +223,10 @@ class RollbackManager:"""
     ) -> bool:
         """
         Rollback a single device
-
-        Args:
+    Args:
             device_id: Device ID
             rollback_point: Rollback point
-
-        Returns:
+    Returns:
             Success status"""
         try:
             # Step 1: Create new backup of current state
@@ -272,11 +263,9 @@ class RollbackManager:"""
         ) -> Dict[str, bool]:
         """
         Validate if devices can be rolled back
-
-        Args:
+    Args:
             devices: List of device IDs
-
-        Returns:
+    Returns:
             Dictionary of device ID to rollback capability"""
         capability = {}
 
@@ -309,13 +298,11 @@ class RollbackManager:"""
     ) -> List[Dict[str, Any]]:
         """
         Get rollback history
-
-        Args:
+    Args:
             deployment_id: Filter by deployment
             device_id: Filter by device
             limit: Maximum results
-
-        Returns:
+    Returns:
             List of rollback operations"""
         operations = []
 
@@ -355,12 +342,10 @@ class RollbackManager:"""
     ) -> List[Dict[str, Any]]:
         """
         Get rollback points for a device
-
-        Args:
+    Args:
             device_id: Device ID
             limit: Maximum results
-
-        Returns:
+    Returns:
             List of rollback points"""
         if device_id not in self.rollback_points:
             return []

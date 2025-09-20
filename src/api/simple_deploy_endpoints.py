@@ -20,8 +20,6 @@ class CreateDeploymentRequest(BaseModel):
 
 
 class DeploymentResponse(BaseModel):
-
-
     """Deployment response model"""
     id: str
     config_path: str
@@ -34,8 +32,6 @@ class DeploymentResponse(BaseModel):
 
 
 class ExecuteDeploymentRequest(BaseModel):
-
-
     """Request to execute a deployment"""
     deployment_id: str
 
@@ -95,7 +91,7 @@ async def execute_deployment(request: ExecuteDeploymentRequest):
     Execute a pending deployment
 
     Fetches config from GitHub and deploys to device
-    try:
+        try:
         deployment = deployment_pipeline.execute_deployment( \
             request.deployment_id)
 
@@ -106,7 +102,7 @@ async def execute_deployment(request: ExecuteDeploymentRequest):
             status=deployment.status,
             created_at=deployment.created_at.isoformat(),
                         completed_at=deployment.completed_at.isoformat(
-                
+
             ) if deployment.completed_at else None,
             error_message=deployment.error_message,
             deployed_commands=deployment.deployed_commands
@@ -137,7 +133,7 @@ async def list_deployments():
             status=d.status,
             created_at=d.created_at.isoformat(),
                         completed_at=d.completed_at.isoformat(
-                
+
             ) if d.completed_at else None,
             error_message=d.error_message,
             deployed_commands=d.deployed_commands
@@ -164,7 +160,7 @@ async def get_deployment(deployment_id: str):
         status=deployment.status,
         created_at=deployment.created_at.isoformat(),
                 completed_at=deployment.completed_at.isoformat(
-            
+
         ) if deployment.completed_at else None,
         error_message=deployment.error_message,
         deployed_commands=deployment.deployed_commands

@@ -2,6 +2,7 @@
 Cisco Device Handler
 Following CLAUDE.md vendor-specific patterns
 """
+
 import asyncio
 from typing import List, Dict, Any, Optional
 
@@ -17,13 +18,14 @@ from ..core.logging import get_logger
 logger = get_logger(__name__)
 
 
-class CiscoHandler:"""
+class CiscoHandler:
+    """
     Handler for Cisco IOS, IOS-XE, and NX-OS devices
     Following CLAUDE.md vendor commands exactly
     """
 
-    # Vendor-specific commands from CLAUDE.md
-    COMMANDS = {
+   # Vendor-specific commands from CLAUDE.md
+   COMMANDS = {
         "backup": "show running-config",
         "save": "write memory",
         "rollback": "configure replace flash:backup.cfg force",
@@ -202,7 +204,8 @@ class CiscoHandler:"""
         """Get VLAN information"""
         if self.device_type == "cisco_nxos":
             output = await self.execute_command("show vlan brief")
-        else:" \
+        else:
+            " \
             f"output = await self.execute_command("show vlan")
 
         vlans = []
@@ -385,8 +388,8 @@ class CiscoHandler:"""
         """Enable session command recording"""
         # Would implement session recording
 
-    async def verify_configuration(self, expected_config: str) -> bool:"""Verify configuration matches expected"""
-        current_config = await self.backup_configuration()
+    async def verify_configuration(self, expected_config: str) -> bool: """Verify configuration matches expected"""
+       current_config = await self.backup_configuration()
 
         # Normalize configs for comparison
         current_lines = set(current_config.strip().split("\n"))

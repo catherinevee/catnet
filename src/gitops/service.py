@@ -2,6 +2,7 @@
 GitOps Service Implementation
 Following CLAUDE.md GitOps patterns exactly
 """
+
 from fastapi import (
     FastAPI,
     Depends,

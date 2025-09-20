@@ -1,6 +1,7 @@
 """
 Performance Optimization - Database pooling, caching, and async tasks
 """
+
 import asyncio
 import json
 import pickle
@@ -24,7 +25,7 @@ from ..core.config import settings
 logger = get_logger(__name__)
 
 
-class DatabasePoolManager:"""
+class DatabasePoolManager: """
     Manages database connection pooling for optimal performance
     """
 
@@ -36,10 +37,9 @@ class DatabasePoolManager:"""
         pool_timeout: int = 30,
         pool_recycle: int = 3600,
         use_null_pool: bool = False,
-    ):"""
+    ): """
         Initialize database pool manager
-
-        Args:
+    Args:
             database_url: Database connection URL
             pool_size: Number of connections to maintain in pool
             max_overflow: Maximum overflow connections
@@ -56,7 +56,7 @@ class DatabasePoolManager:"""
         self.engine = None
         self.session_factory = None
 
-    async def initialize(self):"""Initialize connection pool"""
+    async def initialize(self): """Initialize connection pool"""
         try:
             # Choose pool class based on configuration
             pool_class = NullPool if self.use_null_pool else QueuePool
@@ -138,8 +138,7 @@ class RedisCacheManager:
     ):
         """
         Initialize Redis cache manager
-
-        Args:
+    Args:
             redis_url: Redis connection URL
             default_ttl: Default TTL in seconds
             key_prefix: Prefix for all cache keys
@@ -285,8 +284,7 @@ class RedisCacheManager:
     ):
         """
         Decorator for caching function results
-
-        Args:
+    Args:
             ttl: Cache TTL in seconds
             key_func: Function to generate cache key
             invalidate_on: List of events that invalidate cache
@@ -344,8 +342,7 @@ class AsyncTaskQueue:
     ):
         """
         Initialize async task queue
-
-        Args:
+    Args:
             broker_url: Message broker URL (Redis/RabbitMQ)
             backend_url: Result backend URL
             task_default_queue: Default queue name"""
@@ -389,8 +386,7 @@ class AsyncTaskQueue:
         eta: datetime = None,
     ) -> str:"""
         Send task to queue
-
-        Args:
+    Args:
             name: Task name
             args: Task arguments
             kwargs: Task keyword arguments
@@ -398,8 +394,7 @@ class AsyncTaskQueue:
             priority: Task priority (0-9, 0 highest)
             countdown: Delay in seconds or timedelta
             eta: Exact time to execute
-
-        Returns:
+    Returns:
             Task ID
         """
         # Convert timedelta to seconds if provided
@@ -444,8 +439,7 @@ class HTTPConnectionPool:"""
         timeout: int = 30,
     ):"""
         Initialize HTTP connection pool
-
-        Args:
+    Args:
             connector_limit: Total connection limit
             connector_limit_per_host: Per-host connection limit
             timeout: Request timeout

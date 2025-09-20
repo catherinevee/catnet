@@ -7,7 +7,6 @@ Handles:
 - Security audits
 - Configuration compliance
 - Report generation
-"""
 
 from typing import Dict, Any, Optional, List
 from dataclasses import dataclass, field
@@ -19,39 +18,40 @@ import html
 from collections import defaultdict
 
 
-class ComplianceFramework(Enum):"""Supported compliance frameworks"""
+class ComplianceFramework(Enum):
+    """Supported compliance frameworks"""
 
     PCI_DSS = "pci_dss"
-    HIPAA = "hipaa"
+        HIPAA = "hipaa"
     SOC2 = "soc2"
     ISO_27001 = "iso_27001"
-    NIST = "nist"
-    CIS = "cis"
-    GDPR = "gdpr"
-    CUSTOM = "custom"
+        NIST = "nist"
+        CIS = "cis"
+        GDPR = "gdpr"
+        CUSTOM = "custom"
 
 
 class ComplianceStatus(Enum):
     """Compliance check status"""
 
     COMPLIANT = "compliant"
-    NON_COMPLIANT = "non_compliant"
-    PARTIALLY_COMPLIANT = "partially_compliant"
-    NOT_APPLICABLE = "not_applicable"
-    NOT_CHECKED = "not_checked"
+        NON_COMPLIANT = "non_compliant"
+        PARTIALLY_COMPLIANT = "partially_compliant"
+        NOT_APPLICABLE = "not_applicable"
+        NOT_CHECKED = "not_checked"
 
 
 class ControlCategory(Enum):
     """Control categories"""
 
     ACCESS_CONTROL = "access_control"
-    NETWORK_SECURITY = "network_security"
-    DATA_PROTECTION = "data_protection"
-    CONFIGURATION_MANAGEMENT = "configuration_management"
-    INCIDENT_RESPONSE = "incident_response"
-    AUDIT_LOGGING = "audit_logging"
-    PHYSICAL_SECURITY = "physical_security"
-    RISK_ASSESSMENT = "risk_assessment"
+        NETWORK_SECURITY = "network_security"
+        DATA_PROTECTION = "data_protection"
+        CONFIGURATION_MANAGEMENT = "configuration_management"
+        INCIDENT_RESPONSE = "incident_response"
+        AUDIT_LOGGING = "audit_logging"
+        PHYSICAL_SECURITY = "physical_security"
+        RISK_ASSESSMENT = "risk_assessment"
 
 
 @dataclass
@@ -59,15 +59,15 @@ class ComplianceControl:
     """Compliance control definition"""
 
     id: str
-    name: str
-    description: str
-    category: ControlCategory
-    framework: ComplianceFramework
-    requirements: List[str]
-    validation_script: Optional[str] = None
-    remediation_steps: List[str] = field(default_factory=list)
-    severity: str = "medium"  # low, medium, high, critical
-    automated: bool = False
+        name: str
+        description: str
+        category: ControlCategory
+        framework: ComplianceFramework
+        requirements: List[str]
+        validation_script: Optional[str] = None
+        remediation_steps: List[str] = field(default_factory=list)
+        severity: str = "medium"  # low, medium, high, critical
+        automated: bool = False
 
 
 @dataclass
@@ -75,50 +75,48 @@ class ComplianceCheck:
     """Compliance check result"""
 
     control_id: str
-    device_id: str
-    status: ComplianceStatus
-    checked_at: datetime
-    details: Dict[str, Any] = field(default_factory=dict)
-    evidence: List[str] = field(default_factory=list)
-    violations: List[str] = field(default_factory=list)
-    remediation_applied: bool = False
+        device_id: str
+        status: ComplianceStatus
+        checked_at: datetime
+        details: Dict[str, Any] = field(default_factory=dict)
+        evidence: List[str] = field(default_factory=list)
+        violations: List[str] = field(default_factory=list)
+        remediation_applied: bool = False
 
 
 @dataclass
-class ComplianceReport:"""Compliance report"""
+class ComplianceReport:
+    """Compliance report"""
 
     id: str
-    framework: ComplianceFramework
-    generated_at: datetime
-    period_start: datetime
-    period_end: datetime
-    overall_status: ComplianceStatus
-    compliance_score: float  # 0-100
-    total_controls: int
-    compliant_controls: int
-    non_compliant_controls: int
-    checks: List[ComplianceCheck]
-    summary: Dict[str, Any] = field(default_factory=dict)
-    recommendations: List[str] = field(default_factory=list)
+        framework: ComplianceFramework
+        generated_at: datetime
+        period_start: datetime
+        period_end: datetime
+        overall_status: ComplianceStatus
+        compliance_score: float  # 0-100
+        total_controls: int
+        compliant_controls: int
+        non_compliant_controls: int
+        checks: List[ComplianceCheck]
+        summary: Dict[str, Any] = field(default_factory=dict)
+        recommendations: List[str] = field(default_factory=list)
 
 
 class ComplianceManager:"""
     Manages compliance checking and reporting
-    """
 
         def __init__(
         self,
         device_service=None,
         config_service=None,
         audit_service=None
-    ):"""
+    ): """
         Initialize compliance manager
-
-        Args:
+    Args:
             device_service: Device management service
-            config_service: Configuration service
-            audit_service: Audit logging service
-        """
+                config_service: Configuration service
+                audit_service: Audit logging service
         self.device_service = device_service
         self.config_service = config_service
         self.audit_service = audit_service
@@ -250,25 +248,22 @@ class ComplianceManager:"""
     def add_control(self, control: ComplianceControl):
         """
         Add a compliance control
-
-        Args:
+    Args:
             control: Control definition"""
         self.controls[control.id] = control
         self.framework_controls[control.framework].append(control.id)
 
     async def check_compliance(
         self,
-            framework: ComplianceFramework
-            device_ids: Optional[List[str]] = None
+                framework: ComplianceFramework
+                device_ids: Optional[List[str]] = None
     ) -> List[ComplianceCheck]:
         """
         Check compliance for specified framework
-
-        Args:
+    Args:
             framework: Compliance framework
-            device_ids: Devices to check (all if None)
-
-        Returns:
+                device_ids: Devices to check (all if None)
+    Returns:
             List of compliance check results"""
         # Get applicable controls
         control_ids = self.framework_controls.get(framework, [])
@@ -296,12 +291,10 @@ class ComplianceManager:"""
     ) -> ComplianceCheck:
         """
         Check a specific control for a device
-
-        Args:
+    Args:
             control: Control to check
-            device_id: Device ID
-
-        Returns:
+                device_id: Device ID
+    Returns:
             Check result"""
         check = ComplianceCheck(
             control_id=control.id,
@@ -389,7 +382,7 @@ class ComplianceManager:"""
         # Determine status
         if violations:
             check.status = ComplianceStatus.NON_COMPLIANT
-        else:
+            else:
             check.status = ComplianceStatus.COMPLIANT
 
         check.violations = violations
@@ -431,7 +424,7 @@ class ComplianceManager:"""
         # Determine status
         if violations:
             check.status = ComplianceStatus.NON_COMPLIANT
-        else:
+            else:
             check.status = ComplianceStatus.COMPLIANT
 
         check.violations = violations
@@ -473,7 +466,7 @@ class ComplianceManager:"""
         # Determine status
         if violations:
             check.status = ComplianceStatus.NON_COMPLIANT
-        else:
+            else:
             check.status = ComplianceStatus.COMPLIANT
 
         check.violations = violations
@@ -516,7 +509,7 @@ class ComplianceManager:"""
         # Determine status
         if violations:
             check.status = ComplianceStatus.NON_COMPLIANT
-        else:
+            else:
             check.status = ComplianceStatus.COMPLIANT
 
         check.violations = violations
@@ -530,13 +523,11 @@ class ComplianceManager:"""
     ) -> ComplianceReport:
         """
         Generate compliance report
-
-        Args:
+    Args:
             framework: Compliance framework
-            start_date: Report start date
-            end_date: Report end date
-
-        Returns:
+                start_date: Report start date
+                end_date: Report end date
+    Returns:
             Compliance report"""
         import uuid
 
@@ -564,7 +555,7 @@ class ComplianceManager:"""
             overall_status = ComplianceStatus.COMPLIANT
         elif compliance_score >= 80:
             overall_status = ComplianceStatus.PARTIALLY_COMPLIANT
-        else:
+            else:
             overall_status = ComplianceStatus.NON_COMPLIANT
 
         # Generate summary
@@ -639,7 +630,7 @@ class ComplianceManager:"""
 
         def _generate_recommendations(
         self,
-        checks: List[ComplianceCheck]
+            checks: List[ComplianceCheck]
     ) -> List[str]:
         """Generate recommendations based on checks"""
         recommendations = []
@@ -687,17 +678,15 @@ class ComplianceManager:"""
 
         def export_report(
         self,
-        report: ComplianceReport,
-        format: str = "json"
+            report: ComplianceReport,
+            format: str = "json"
     ) -> str:
         """
         Export report in specified format
-
-        Args:
+    Args:
             report: Compliance report
-            format: Export format (json, html, csv)
-
-        Returns:
+                format: Export format (json, html, csv)
+    Returns:
             Exported report"""
         if format == "json":
             return self._export_json(report)
@@ -705,7 +694,7 @@ class ComplianceManager:"""
             return self._export_html(report)
         elif format == "csv":
             return self._export_csv(report)
-        else:
+            else:
             raise ValueError(f"Unsupported format: {format}")
 
     def _export_json(self, report: ComplianceReport) -> str:
@@ -798,7 +787,6 @@ class ComplianceManager:"""
             </ol>
         </body>
         </html>
-        """
         return html_content
 
     def _export_csv(self, report: ComplianceReport) -> str:"""Export report as CSV"""
@@ -849,7 +837,7 @@ class ComplianceManager:"""
 
         async def _get_last_backup_time(
         self,
-        device_id: str
+            device_id: str
     ) -> Optional[datetime]:
         """Get last backup time for device"""
         # Would query backup service
@@ -866,7 +854,6 @@ class ComplianceManager:"""
 
 class ComplianceValidator:"""
     Validates compliance against various frameworks
-    """
 
     def __init__(self):"""Initialize compliance validator"""
         self.framework_rules = self._initialize_framework_rules()
@@ -918,11 +905,9 @@ class ComplianceValidator:"""
     ) -> Dict[str, Any]:
         """
         Validate PCI DSS controls
-
-        Args:
+    Args:
             device_config: Device configuration
-
-        Returns:
+    Returns:
             Validation results"""
         results = {
             "compliant": True,
@@ -965,11 +950,9 @@ class ComplianceValidator:"""
     ) -> Dict[str, Any]:
         """
         Validate HIPAA controls
-
-        Args:
+    Args:
             device_config: Device configuration
-
-        Returns:
+    Returns:
             Validation results"""
         results = {
             "compliant": True,
@@ -1011,11 +994,9 @@ class ComplianceValidator:"""
     ) -> Dict[str, Any]:
         """
         Validate SOC2 controls
-
-        Args:
+    Args:
             device_config: Device configuration
-
-        Returns:
+    Returns:
             Validation results"""
         results = {
             "compliant": True,
@@ -1084,26 +1065,24 @@ class ReportGenerator:
         self.formatters = {
             "json": self._format_json,
             "html": self._format_html,
-            "pdf": self._format_pdf," \
-           f" "csv": self._format_csv,
+            "pdf": self._format_pdf," \"
+           f" "csv": self._format_csv,"
             "xml": self._format_xml,
         }
 
     async def generate_report(
         self,
-        framework: ComplianceFramework,
-        checks: List[ComplianceCheck],
-        format: str = "json",
+            framework: ComplianceFramework,
+            checks: List[ComplianceCheck],
+            format: str = "json",
     ) -> str:
         """
         Generate compliance report
-
-        Args:
+    Args:
             framework: Compliance framework
-            checks: List of compliance checks
-            format: Report format
-
-        Returns:
+                checks: List of compliance checks
+                format: Report format
+    Returns:
             Generated report"""
         # Calculate statistics
         stats = self._calculate_statistics(checks)
@@ -1124,7 +1103,7 @@ class ReportGenerator:
 
         def _calculate_statistics(
         self,
-        checks: List[ComplianceCheck]
+            checks: List[ComplianceCheck]
     ) -> Dict[str, Any]:
         """Calculate compliance statistics"""
         total = len(checks)
@@ -1180,7 +1159,7 @@ class ReportGenerator:
 
         def _find_critical_issues(
         self,
-        checks: List[ComplianceCheck]
+            checks: List[ComplianceCheck]
     ) -> List[str]:
         """Find critical compliance issues"""
         issues = []
@@ -1192,7 +1171,7 @@ class ReportGenerator:
 
         def _generate_recommendations(
         self,
-        checks: List[ComplianceCheck]
+            checks: List[ComplianceCheck]
     ) -> List[str]:"""Generate compliance recommendations"""
         recommendations = []
 
@@ -1217,7 +1196,7 @@ class ReportGenerator:
             return "Medium"
         elif compliance_rate >= 60:
             return "High"
-        else:
+            else:
             return "Critical"
 
     def _serialize_check(self, check: ComplianceCheck) -> Dict[str, Any]:

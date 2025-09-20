@@ -2,6 +2,7 @@
 Rollback Manager for Safe Deployments
 Phase 6 Implementation - Rollback and safety mechanisms
 """
+
 import json
 import logging
 from typing import Dict, List, Any
@@ -16,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
-class DeploymentSnapshot:"""Snapshot of device state before deployment"""
+class DeploymentSnapshot: """Snapshot of device state before deployment"""
     deployment_id: str
     device_id: str
     timestamp: datetime
@@ -26,14 +27,14 @@ class DeploymentSnapshot:"""Snapshot of device state before deployment"""
 
 
 @dataclass
-class HealthCheck:"""Health check result"""
+class HealthCheck: """Health check result"""
     check_name: str
     status: str  # healthy, degraded, failed
     message: str
     timestamp: datetime = field(default_factory=datetime.utcnow)
 
 
-class RollbackManager:"""
+class RollbackManager: """
     Manages rollback operations and safety checks
     """
 

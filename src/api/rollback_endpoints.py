@@ -1,7 +1,6 @@
 """
 Rollback and Safety API Endpoints
 Phase 6 Implementation - Rollback and health check endpoints
-"""
 from fastapi import APIRouter, HTTPException, status
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel
@@ -20,33 +19,30 @@ class HealthCheckRequest(BaseModel):
 
 
 class HealthCheckResponse(BaseModel):
-
     """Response from health check"""
 
     device_id: str
-    hostname: str
-    status: str
-    timestamp: str
-    checks: List[Dict[str, Any]]
+        hostname: str
+        status: str
+        timestamp: str
+        checks: List[Dict[str, Any]]
 
 
 class RollbackRequest(BaseModel):
-
     """Request to rollback deployment"""
 
     deployment_id: str
 
 
 class RollbackResponse(BaseModel):
-
     """Response from rollback operation"""
 
     success: bool
-    message: str
-    deployment_id: str
-    device_id: Optional[str] = None
-    rollback_time: Optional[str] = None
-    health_status: Optional[str] = None
+        message: str
+        deployment_id: str
+        device_id: Optional[str] = None
+        rollback_time: Optional[str] = None
+        health_status: Optional[str] = None
 
 
 @router.post("/health-check", response_model=HealthCheckResponse)
@@ -81,7 +77,7 @@ async def rollback_deployment(request: RollbackRequest):
     Rollback a deployment to previous configuration
 
     Restores device to the configuration saved before deployment"""
-    try:
+        try:
         result = rollback_manager.rollback_deployment(request.deployment_id)
 
         return RollbackResponse(
@@ -145,7 +141,7 @@ async def validate_deployment(deployment_id: str, device_id: str):
 
 @router.post("/safe-deploy")
 async def safe_deployment_flow(
-    config_path: str, device_id: str, enable_rollback: bool = True
+        config_path: str, device_id: str, enable_rollback: bool = True
 ):
     """
     Complete safe deployment flow with automatic rollback

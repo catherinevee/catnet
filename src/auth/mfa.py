@@ -17,18 +17,17 @@ class MFAProvider:
 
     def __init__(
         self,
-        issuer_name: str = "CatNet",
-        period: int = 30,
-        digits: int = 6,
-        algorithm: str = "SHA1",
+            issuer_name: str = "CatNet",
+            period: int = 30,
+            digits: int = 6,
+            algorithm: str = "SHA1",
     ):
         Initialize MFA provider
-
-        Args:
+    Args:
             issuer_name: Name shown in authenticator apps
-            period: Time period for TOTP in seconds (default 30)
-            digits: Number of digits in TOTP code (default 6)
-            algorithm: Hash algorithm (SHA1, SHA256, SHA512)
+                period: Time period for TOTP in seconds (default 30)
+                digits: Number of digits in TOTP code (default 6)
+                algorithm: Hash algorithm (SHA1, SHA256, SHA512)
         self.issuer_name = issuer_name
         self.period = period
         self.digits = digits
@@ -41,12 +40,10 @@ class MFAProvider:
 
     def enable_mfa(self, user_id: str, username: str) -> Dict[str, any]:
         Enable MFA for a user
-
-        Args:
+    Args:
             user_id: Unique user identifier
-            username: Username for display
-
-        Returns:
+                username: Username for display
+    Returns:
             Dict containing secret, QR code, and backup codes
         # Generate secret
         secret = pyotp.random_base32()
@@ -81,13 +78,11 @@ class MFAProvider:
         self, user_id: str, token: str, window: int = 1
     ) -> Tuple[bool, Optional[str]]:
         Verify a TOTP token
-
-        Args:
+    Args:
             user_id: User identifier
-            token: TOTP token to verify
-            window: Number of time windows to check (for clock skew)
-
-        Returns:
+                token: TOTP token to verify
+                window: Number of time windows to check (for clock skew)
+    Returns:
             Tuple of (is_valid, error_message)
         if user_id not in self.user_secrets:
             return False, "MFA not enabled for user"
@@ -108,11 +103,9 @@ class MFAProvider:
 
     def disable_mfa(self, user_id: str) -> bool:
         Disable MFA for a user
-
-        Args:
+    Args:
             user_id: User identifier
-
-        Returns:
+    Returns:
             Success status
         if user_id in self.user_secrets:
             del self.user_secrets[user_id]
@@ -124,11 +117,9 @@ class MFAProvider:
 
     def regenerate_backup_codes(self, user_id: str) -> Optional[List[str]]:
         Generate new backup codes for a user
-
-        Args:
+    Args:
             user_id: User identifier
-
-        Returns:
+    Returns:
             List of new backup codes or None if MFA not enabled
         if user_id not in self.user_secrets:
             return None
@@ -142,11 +133,9 @@ class MFAProvider:
 
     def get_recovery_codes_status(self, user_id: str) -> Dict[str, any]:
         Get status of user's recovery codes
-
-        Args:
+    Args:
             user_id: User identifier
-
-        Returns:
+    Returns:
             Dict with recovery codes status
         if user_id not in self.backup_codes:
             return {"enabled": False}
@@ -163,16 +152,14 @@ class MFAProvider:
 
         def _generate_backup_codes(
             self,
-            user_id: str,
-            count: int = 10
+                user_id: str,
+                count: int = 10
         ) -> List[str]:
         Generate backup codes for account recovery
-
-        Args:
+    Args:
             user_id: User identifier
-            count: Number of backup codes to generate
-
-        Returns:
+                count: Number of backup codes to generate
+    Returns:
             List of backup codes
         codes = []
         for _ in range(count):
@@ -187,12 +174,10 @@ class MFAProvider:
 
     def _verify_backup_code(self, user_id: str, code: str) -> bool:
         Verify and consume a backup code
-
-        Args:
+    Args:
             user_id: User identifier
-            code: Backup code to verify
-
-        Returns:
+                code: Backup code to verify
+    Returns:
             Verification status
         if user_id not in self.backup_codes:
             return False
@@ -214,11 +199,9 @@ class MFAProvider:
 
     def _generate_qr_code(self, data: str) -> str:
         Generate QR code as base64 encoded PNG
-
-        Args:
+    Args:
             data: Data to encode in QR code
-
-        Returns:
+    Returns:
             Base64 encoded PNG image
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
         qr.add_data(data)
@@ -248,22 +231,19 @@ def get_mfa_provider() -> MFAProvider:
 
 def generate_totp_secret() -> str:
     Generate a new TOTP secret
-
     Returns:
         Base32 encoded secret
     return pyotp.random_base32()
 
 
 def verify_totp_token(
-    user_id: str, token: str, secret: Optional[str] = None
+        user_id: str, token: str, secret: Optional[str] = None
 ) -> Tuple[bool, Optional[str]]:
     Verify a TOTP token
-
     Args:
         user_id: User identifier
-        token: TOTP token to verify
-        secret: Optional secret (if not using stored secret)
-
+            token: TOTP token to verify
+            secret: Optional secret (if not using stored secret)
     Returns:
         Tuple of (is_valid, error_message)
     if secret:

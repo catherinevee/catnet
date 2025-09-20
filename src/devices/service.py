@@ -1,6 +1,7 @@
 """
 Device Service - Main device management service
 """
+
 from typing import Dict, List, Optional, Any
 from datetime import datetime
 from uuid import UUID
@@ -13,7 +14,7 @@ from ..security.vault import VaultClient
 logger = get_logger(__name__)
 
 
-class DeviceService:"""Main device management service"""
+class DeviceService: """Main device management service"""
 
     def __init__(self):
         """TODO: Add docstring"""
@@ -23,7 +24,7 @@ class DeviceService:"""Main device management service"""
 
     async def connect_to_device(
         self, device_id: str, user_context: Dict[str, Any]
-    ) -> Dict[str, Any]:"""Connect to a network device"""
+    ) -> Dict[str, Any]: """Connect to a network device"""
         logger.info(f"Connecting to device {device_id}")
 
         try:

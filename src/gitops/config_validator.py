@@ -14,7 +14,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 
-class ValidationType(Enum):"""Types of validation"""
+class ValidationType(Enum): """Types of validation"""
 
     SYNTAX = "syntax"
     SECURITY = "security"
@@ -46,7 +46,7 @@ class ValidationIssue:
 
 
 @dataclass
-class ValidationResult:"""Result of configuration validation"""
+class ValidationResult: """Result of configuration validation"""
 
     is_valid: bool
     config_file: str
@@ -56,11 +56,11 @@ class ValidationResult:"""Result of configuration validation"""
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
-class ConfigValidator:"""
+class ConfigValidator: """
     Validates network device configurations
     """
 
-    def __init__(self):"""Initialize configuration validator"""
+    def __init__(self): """Initialize configuration validator"""
         # Security patterns to check
         self.security_patterns = {
             "weak_encryption": [
@@ -125,14 +125,12 @@ class ConfigValidator:"""
     ) -> ValidationResult:
         """
         Validate network device configuration
-
-        Args:
+    Args:
             config_content: Configuration content
             vendor: Device vendor (cisco, juniper)
             config_file: Configuration file name
             full_validation: Perform all validation types
-
-        Returns:
+    Returns:
             ValidationResult object"""
         result = ValidationResult(
             is_valid=True, config_file=config_file, vendor=vendor.lower()
@@ -192,8 +190,7 @@ class ConfigValidator:"""
     ) -> None:
         """
         Validate Cisco IOS/IOS-XE/NX-OS syntax
-
-        Args:
+    Args:
             config: Configuration content
             result: ValidationResult to update"""
         lines = config.splitlines()
@@ -280,8 +277,7 @@ class ConfigValidator:"""
     ) -> None:
         """
         Validate Juniper Junos syntax
-
-        Args:
+    Args:
             config: Configuration content
             result: ValidationResult to update"""
         lines = config.splitlines()
@@ -345,8 +341,7 @@ class ConfigValidator:"""
     ) -> None:
         """
         Validate security aspects of configuration
-
-        Args:
+    Args:
             config: Configuration content
             vendor: Device vendor
             result: ValidationResult to update"""
@@ -416,8 +411,7 @@ class ConfigValidator:"""
     ) -> None:
         """
         Validate compliance with policies
-
-        Args:
+    Args:
             config: Configuration content
             vendor: Device vendor
             result: ValidationResult to update"""
@@ -450,8 +444,7 @@ class ConfigValidator:"""
     ) -> None:
         """
         Validate business rules
-
-        Args:
+    Args:
             config: Configuration content
             vendor: Device vendor
             result: ValidationResult to update"""
@@ -503,8 +496,7 @@ class ConfigValidator:"""
     ) -> None:
         """
         Detect configuration conflicts
-
-        Args:
+    Args:
             config: Configuration content
             vendor: Device vendor
             result: ValidationResult to update"""
@@ -561,11 +553,9 @@ class ConfigValidator:"""
     def _is_valid_cisco_interface(self, interface: str) -> bool:
         """
         Check if Cisco interface name is valid
-
-        Args:
+    Args:
             interface: Interface name
-
-        Returns:
+    Returns:
             Validation status"""
         valid_prefixes = [
             "GigabitEthernet",
@@ -584,11 +574,9 @@ class ConfigValidator:"""
     def _is_valid_ip(self, ip: str) -> bool:
         """
         Check if IP address is valid
-
-        Args:
+    Args:
             ip: IP address string
-
-        Returns:
+    Returns:
             Validation status"""
         # Remove CIDR notation if present
         if "/" in ip:

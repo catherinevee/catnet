@@ -23,8 +23,6 @@ logger = logging.getLogger(__name__)
 
 
 class SSHKeyAuthService:
-
-
     """Service for managing SSH key authentication for users."""
 
     def __init__(self, db_session: Session, audit_logger: AuditLogger):
@@ -33,13 +31,14 @@ class SSHKeyAuthService:
         self.audit = audit_logger
 
     def calculate_fingerprint(self, public_key: str) -> str:
-        Calculate SSH key fingerprint (SHA256 format).
+        """
+        Function docstring.
 
-        Args:
+    Args:
             public_key: Public key in OpenSSH format
-
-        Returns:
-            Fingerprint string (SHA256:base64)
+        """
+    Returns:
+            Fingerprint string(SHA256: base64)
         # Remove any comments and whitespace
         key_parts = public_key.strip().split()
         if len(key_parts) < 2:
@@ -65,20 +64,18 @@ class SSHKeyAuthService:
 
     async def add_ssh_key(
         self,
-        user_id: str,
-        public_key: str,
-        key_name: str,
-        comment: Optional[str] = None,
+            user_id: str,
+            public_key: str,
+            key_name: str,
+            comment: Optional[str] = None,
     ) -> UserSSHKey:
         Add SSH public key for a user.
-
-        Args:
+    Args:
             user_id: User ID
-            public_key: SSH public key in OpenSSH format
-            key_name: Name for the key
-            comment: Optional comment
-
-        Returns:
+                public_key: SSH public key in OpenSSH format
+                key_name: Name for the key
+                comment: Optional comment
+    Returns:
             UserSSHKey object
         # Validate public key format
         if not self.validate_public_key(public_key):
@@ -140,11 +137,9 @@ class SSHKeyAuthService:
 
     def validate_public_key(self, public_key: str) -> bool:
         Validate SSH public key format.
-
-        Args:
+    Args:
             public_key: Public key string
-
-        Returns:
+    Returns:
             True if valid
         try:
             # Basic format check
@@ -188,20 +183,18 @@ class SSHKeyAuthService:
 
     async def authenticate_with_key(
         self,
-        username: str,
-        key_fingerprint: str,
-        signature: str,
-        challenge: str,
+            username: str,
+            key_fingerprint: str,
+            signature: str,
+            challenge: str,
     ) -> Optional[User]:
         Authenticate user with SSH key.
-
-        Args:
+    Args:
             username: Username
-            key_fingerprint: SSH key fingerprint
-            signature: Signature of challenge
-            challenge: Challenge string that was signed
-
-        Returns:
+                key_fingerprint: SSH key fingerprint
+                signature: Signature of challenge
+                challenge: Challenge string that was signed
+    Returns:
             User object if authenticated, None otherwise
         # Get user
         user = self.db.query(User).filter_by(username=username).first()
@@ -266,9 +259,9 @@ class SSHKeyAuthService:
 
         def verify_signature(
             self,
-            public_key: str,
-            signature: str,
-            challenge: str
+                public_key: str,
+                signature: str,
+                challenge: str
         ) -> bool:
         Verify signature using public key with full cryptographic verification.
         try:
@@ -287,7 +280,7 @@ class SSHKeyAuthService:
                 )
                 if isinstance(public_key_obj, rsa.RSAPublicKey):
                     # Verify RSA signature
-                    try:
+                        try:
                         public_key_obj.verify(
                             base64.b64decode(signature),
                             challenge.encode(),
@@ -308,7 +301,7 @@ class SSHKeyAuthService:
                 )
                 if isinstance(public_key_obj, ed25519.Ed25519PublicKey):
                     # Verify Ed25519 signature
-                    try:
+                        try:
                         public_key_obj.verify(
                             base64.b64decode(signature), challenge.encode()
                         )
@@ -323,7 +316,7 @@ class SSHKeyAuthService:
                 )
                 if isinstance(public_key_obj, ec.EllipticCurvePublicKey):
                     # Verify ECDSA signature
-                    try:
+                        try:
                         public_key_obj.verify(
                             base64.b64decode(signature),
                             challenge.encode(),
@@ -343,11 +336,9 @@ class SSHKeyAuthService:
 
     async def list_user_keys(self, user_id: str) -> List[Dict[str, Any]]:
         List all SSH keys for a user.
-
-        Args:
+    Args:
             user_id: User ID
-
-        Returns:
+    Returns:
             List of SSH key information
         keys = self.db.query(UserSSHKey).filter_by(user_id=user_id).all()
 
@@ -370,12 +361,10 @@ class SSHKeyAuthService:
 
     async def remove_ssh_key(self, user_id: str, key_id: str) -> bool:
         Remove SSH key for a user.
-
-        Args:
+    Args:
             user_id: User ID
-            key_id: SSH key ID
-
-        Returns:
+                key_id: SSH key ID
+    Returns:
             True if removed
         ssh_key = (
             self.db.query(
@@ -412,12 +401,10 @@ class SSHKeyAuthService:
 
     def cleanup_old_keys(self, user_id: str, retention_days: int = 90) -> int:
         Clean up SSH keys older than retention period.
-
-        Args:
+    Args:
             user_id: User ID
-            retention_days: Days to retain keys
-
-        Returns:
+                retention_days: Days to retain keys
+    Returns:
             Number of keys removed
         cutoff_date = datetime.utcnow() - timedelta(days=retention_days)
 
@@ -444,18 +431,16 @@ class SSHKeyAuthService:
 
         def export_public_key(
             self,
-            user_id: str,
-            key_id: str,
-            output_path: str
+                user_id: str,
+                key_id: str,
+                output_path: str
         ) -> Path:
         Export a public key to a file.
-
-        Args:
+    Args:
             user_id: User ID
-            key_id: Key ID
-            output_path: Output file path
-
-        Returns:
+                key_id: Key ID
+                output_path: Output file path
+    Returns:
             Path to exported key file
         ssh_key = (
             self.db.query(
@@ -481,13 +466,11 @@ class SSHKeyAuthService:
         self, user_id: str, old_key_id: str, new_public_key: str
     ) -> UserSSHKey:
         Rotate an SSH key.
-
-        Args:
+    Args:
             user_id: User ID
-            old_key_id: Old key ID to replace
-            new_public_key: New public key
-
-        Returns:
+                old_key_id: Old key ID to replace
+                new_public_key: New public key
+    Returns:
             New UserSSHKey object
         # Get old key
         old_key = (

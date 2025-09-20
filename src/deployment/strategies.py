@@ -18,7 +18,7 @@ from ..security.audit import AuditLogger
 logger = get_logger(__name__)
 
 
-class StrategyType(Enum):"""Deployment strategy types."""
+class StrategyType(Enum): """Deployment strategy types."""
 
     CANARY = "canary"
     ROLLING = "rolling"
@@ -36,7 +36,7 @@ class DeploymentStage:
     rollback_on_failure: bool = True
 
 
-class BaseStrategy:"""Base class for deployment strategies."""
+class BaseStrategy: """Base class for deployment strategies."""
 
     def __init__(self):
         """TODO: Add docstring"""
@@ -46,7 +46,8 @@ class BaseStrategy:"""Base class for deployment strategies."""
         self.deployed_devices: List[str] = []
         self.backup_map: Dict[str, str] = {}
 
-    async def backup_device(self, device: Device) -> str:"""Create device configuration backup."""
+    async def backup_device(
+    self, device: Device) -> str: """Create device configuration backup."""
         logger.info(f"Creating backup for device {device.hostname}")
         try:
             # Connect to device

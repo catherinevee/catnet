@@ -16,9 +16,10 @@ import json
 from collections import defaultdict
 
 
-class HistoryEventType(Enum):"""Types of history events"""
+class HistoryEventType(Enum):
+    """Types of history events"""
 
-    DEPLOYMENT_CREATED = "deployment_created"
+   DEPLOYMENT_CREATED = "deployment_created"
     DEPLOYMENT_STARTED = "deployment_started"
     DEPLOYMENT_COMPLETED = "deployment_completed"
     DEPLOYMENT_FAILED = "deployment_failed"
@@ -49,9 +50,10 @@ class HistoryEvent:
 
 
 @dataclass
-class DeploymentSummary:"""Deployment summary for history"""
+class DeploymentSummary:
+    """Deployment summary for history"""
 
-    deployment_id: str
+   deployment_id: str
     name: str
     created_at: datetime
     completed_at: Optional[datetime]
@@ -67,9 +69,10 @@ class DeploymentSummary:"""Deployment summary for history"""
 
 
 @dataclass
-class DeviceHistory:"""Device deployment history"""
+class DeviceHistory:
+    """Device deployment history"""
 
-    device_id: str
+   device_id: str
     device_hostname: str
     deployments: List[str] = field(default_factory=list)
     last_deployment: Optional[datetime] = None
@@ -81,12 +84,13 @@ class DeviceHistory:"""Device deployment history"""
     health_status: Optional[str] = None
 
 
-class DeploymentHistory:"""
+class DeploymentHistory:
+    """
     Tracks and manages deployment history
     """
 
-    def __init__(self):"""Initialize deployment history"""
-        self.events: List[HistoryEvent] = []
+    def __init__(self): """Initialize deployment history"""
+       self.events: List[HistoryEvent] = []
         self.deployment_summaries: Dict[str, DeploymentSummary] = {}
         self.device_histories: Dict[str, DeviceHistory] = {}
         self.event_index: Dict[str, List[HistoryEvent]] = defaultdict(list)
@@ -99,21 +103,19 @@ class DeploymentHistory:"""
         device_id: Optional[str] = None,
         details: Optional[Dict[str, Any]] = None,
         metadata: Optional[Dict[str, Any]] = None,
-    ) -> str:"""
+    ) -> str: """
         Record a history event
-
-        Args:
+    Args:
             event_type: Type of event
             deployment_id: Deployment ID
             user: User who triggered event
             device_id: Device ID (if applicable)
             details: Event details
             metadata: Additional metadata
-
-        Returns:
+    Returns:
             Event ID
         """
-        import uuid
+       import uuid
 
         event = HistoryEvent(
             id=str(uuid.uuid4())[:12],
@@ -153,8 +155,7 @@ class DeploymentHistory:"""
     ) -> None:
         """
         Record deployment start
-
-        Args:
+    Args:
             deployment_id: Deployment ID
             name: Deployment name
             devices: List of devices
@@ -211,8 +212,7 @@ class DeploymentHistory:"""
     ) -> None:
         """
         Record deployment completion
-
-        Args:
+    Args:
             deployment_id: Deployment ID
             status: Final status
             successful_devices: List of successful devices
@@ -249,8 +249,7 @@ class DeploymentHistory:"""
     ) -> None:
         """
         Record deployment rollback
-
-        Args:
+    Args:
             deployment_id: Deployment ID
             user: User who initiated rollback
             devices: Devices that were rolled back
@@ -280,16 +279,14 @@ class DeploymentHistory:"""
     ) -> List[Dict[str, Any]]:
         """
         Get deployment history
-
-        Args:
+    Args:
             deployment_id: Filter by deployment
             device_id: Filter by device
             user: Filter by user
             start_date: Start date filter
             end_date: End date filter
             limit: Maximum results
-
-        Returns:
+    Returns:
             List of history events"""
         events = self.events
 
@@ -317,11 +314,9 @@ class DeploymentHistory:"""
         ) -> Optional[Dict[str, Any]]:
         """
         Get deployment summary
-
-        Args:
+    Args:
             deployment_id: Deployment ID
-
-        Returns:
+    Returns:
             Deployment summary or None"""
         if deployment_id not in self.deployment_summaries:
             return None
@@ -353,11 +348,9 @@ class DeploymentHistory:"""
     def get_device_history(self, device_id: str) -> Optional[Dict[str, Any]]:
         """
         Get device deployment history
-
-        Args:
+    Args:
             device_id: Device ID
-
-        Returns:
+    Returns:
             Device history or None"""
         if device_id not in self.device_histories:
             return None
@@ -394,12 +387,10 @@ class DeploymentHistory:"""
     ) -> Dict[str, Any]:
         """
         Get deployment statistics
-
-        Args:
+    Args:
             start_date: Start date for statistics
             end_date: End date for statistics
-
-        Returns:
+    Returns:
             Statistics dictionary"""
         # Filter summaries by date
         summaries = list(self.deployment_summaries.values())
@@ -458,12 +449,10 @@ class DeploymentHistory:"""
     ) -> Dict[str, Any]:
         """
         Generate compliance report
-
-        Args:
+    Args:
             start_date: Report start date
             end_date: Report end date
-
-        Returns:
+    Returns:
             Compliance report"""
         events = [e for e in self.events if start_date <= e.timestamp <=
                   end_date]
@@ -520,13 +509,11 @@ class DeploymentHistory:"""
     ) -> str:
         """
         Export history in specified format
-
-        Args:
+    Args:
             format: Export format (json, csv)
             start_date: Start date filter
             end_date: End date filter
-
-        Returns:
+    Returns:
             Exported data as string"""
         events = self.get_deployment_history(
             start_date=start_date,
@@ -585,7 +572,7 @@ class DeploymentHistory:"""
         def _count_by_status(
             self,
             summaries: List[DeploymentSummary]
-        ) -> Dict[str, int]:"""Count deployments by status"""
+        ) -> Dict[str, int]: """Count deployments by status"""
         counts = defaultdict(int)
         for summary in summaries:
             counts[summary.status] += 1
@@ -593,8 +580,8 @@ class DeploymentHistory:"""
 
     def _get_top_deployers(
         self, summaries: List[DeploymentSummary], limit: int = 5
-    ) -> List[Dict[str, Any]]:"""Get top deployers"""
-        user_counts = defaultdict(int)
+    ) -> List[Dict[str, Any]]: """Get top deployers"""
+       user_counts = defaultdict(int)
         for summary in summaries:
             user_counts[summary.created_by] += 1
 

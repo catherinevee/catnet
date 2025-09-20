@@ -16,7 +16,7 @@ from datetime import datetime
 from enum import Enum
 
 
-class DeploymentStrategy(Enum):"""Deployment strategies"""
+class DeploymentStrategy(Enum): """Deployment strategies"""
 
     CANARY = "canary"
     ROLLING = "rolling"
@@ -67,7 +67,7 @@ class DeploymentConfig:
 
 
 @dataclass
-class DeviceDeployment:"""Individual device deployment"""
+class DeviceDeployment: """Individual device deployment"""
 
     device_id: str
     device_hostname: str
@@ -82,7 +82,7 @@ class DeviceDeployment:"""Individual device deployment"""
 
 
 @dataclass
-class Deployment:"""Deployment instance"""
+class Deployment: """Deployment instance"""
 
     id: str
     name: str
@@ -105,7 +105,7 @@ class Deployment:"""Deployment instance"""
     rollback_from: Optional[str] = None
 
 
-class DeploymentManager:"""
+class DeploymentManager: """
     Manages network configuration deployments
     """
 
@@ -114,10 +114,9 @@ class DeploymentManager:"""
         device_service=None,
         backup_service=None,
         health_service=None
-    ):"""
+    ): """
         Initialize deployment manager
-
-        Args:
+    Args:
             device_service: Service for device operations
             backup_service: Service for backup operations
             health_service: Service for health checks
@@ -141,16 +140,14 @@ class DeploymentManager:"""
     ) -> str:
         """
         Create a new deployment
-
-        Args:
+    Args:
             name: Deployment name
             description: Deployment description
             devices: List of device IDs
             configuration: Configuration to deploy
             config: Deployment configuration
             created_by: User creating deployment
-
-        Returns:
+    Returns:
             Deployment ID"""
         deployment_id = str(uuid.uuid4())[:12]
         config = config or DeploymentConfig()
@@ -192,11 +189,9 @@ class DeploymentManager:"""
     async def execute_deployment(self, deployment_id: str) -> bool:
         """
         Execute a deployment
-
-        Args:
+    Args:
             deployment_id: Deployment ID
-
-        Returns:
+    Returns:
             Success status"""
         if deployment_id not in self.deployments:
             return False
@@ -254,11 +249,9 @@ class DeploymentManager:"""
     async def _execute_canary(self, deployment: Deployment) -> bool:
         """
         Execute canary deployment
-
-        Args:
+    Args:
             deployment: Deployment instance
-
-        Returns:
+    Returns:
             Success status"""
         deployment.state = DeploymentState.IN_PROGRESS
         total_devices = len(deployment.devices)
@@ -295,11 +288,9 @@ class DeploymentManager:"""
     async def _execute_rolling(self, deployment: Deployment) -> bool:
         """
         Execute rolling deployment
-
-        Args:
+    Args:
             deployment: Deployment instance
-
-        Returns:
+    Returns:
             Success status"""
         deployment.state = DeploymentState.IN_PROGRESS
         batch_size = deployment.config.rolling_batch_size
@@ -326,11 +317,9 @@ class DeploymentManager:"""
     async def _execute_blue_green(self, deployment: Deployment) -> bool:
         """
         Execute blue-green deployment
-
-        Args:
+    Args:
             deployment: Deployment instance
-
-        Returns:
+    Returns:
             Success status"""
         deployment.state = DeploymentState.IN_PROGRESS
 
@@ -357,11 +346,9 @@ class DeploymentManager:"""
     async def _execute_direct(self, deployment: Deployment) -> bool:
         """
         Execute direct deployment
-
-        Args:
+    Args:
             deployment: Deployment instance
-
-        Returns:
+    Returns:
             Success status"""
         deployment.state = DeploymentState.IN_PROGRESS
         return await self._deploy_to_devices(deployment, deployment.devices)
@@ -371,12 +358,10 @@ class DeploymentManager:"""
     ) -> bool:
         """
         Deploy to specific devices
-
-        Args:
+    Args:
             deployment: Deployment instance
             devices: List of device IDs
-
-        Returns:
+    Returns:
             Success status"""
         tasks = []
         for device_id in devices:
@@ -408,12 +393,10 @@ class DeploymentManager:"""
     ) -> bool:
         """
         Deploy to a single device
-
-        Args:
+    Args:
             deployment: Deployment instance
             device_id: Device ID
-
-        Returns:
+    Returns:
             Success status"""
         device_deployment = deployment.device_deployments[device_id]
         device_deployment.state = DeploymentState.IN_PROGRESS
@@ -475,12 +458,10 @@ class DeploymentManager:"""
     ) -> bool:
         """
         Rollback a deployment
-
-        Args:
+    Args:
             deployment_id: Deployment ID
             target_devices: Specific devices to rollback (None for all)
-
-        Returns:
+    Returns:
             Success status"""
         if deployment_id not in self.deployments:
             return False
@@ -520,11 +501,9 @@ class DeploymentManager:"""
     async def pause_deployment(self, deployment_id: str) -> bool:
         """
         Pause a deployment
-
-        Args:
+    Args:
             deployment_id: Deployment ID
-
-        Returns:
+    Returns:
             Success status"""
         if deployment_id not in self.deployments:
             return False
@@ -538,11 +517,9 @@ class DeploymentManager:"""
     async def resume_deployment(self, deployment_id: str) -> bool:
         """
         Resume a paused deployment
-
-        Args:
+    Args:
             deployment_id: Deployment ID
-
-        Returns:
+    Returns:
             Success status"""
         if deployment_id not in self.deployments:
             return False
@@ -561,12 +538,10 @@ class DeploymentManager:"""
     ) -> bool:
         """
         Approve a deployment
-
-        Args:
+    Args:
             deployment_id: Deployment ID
             approved_by: Approver
-
-        Returns:
+    Returns:
             Success status"""
         if deployment_id not in self.deployments:
             return False
@@ -588,11 +563,9 @@ class DeploymentManager:"""
     ) -> Optional[Dict[str, Any]]:
         """
         Get deployment status
-
-        Args:
+    Args:
             deployment_id: Deployment ID
-
-        Returns:
+    Returns:
             Status dictionary or None"""
         if deployment_id not in self.deployments:
             return None

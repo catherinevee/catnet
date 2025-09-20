@@ -17,7 +17,7 @@ from collections import defaultdict
 import re
 
 
-class AlertSeverity(Enum):"""Alert severity levels"""
+class AlertSeverity(Enum): """Alert severity levels"""
 
     CRITICAL = "critical"
     HIGH = "high"
@@ -59,7 +59,7 @@ class AlertCondition:
 
 
 @dataclass
-class AlertRule:"""Alert rule definition"""
+class AlertRule: """Alert rule definition"""
 
     id: str
     name: str
@@ -74,7 +74,7 @@ class AlertRule:"""Alert rule definition"""
 
 
 @dataclass
-class Alert:"""Active alert instance"""
+class Alert: """Active alert instance"""
 
     id: str
     rule_id: str
@@ -94,7 +94,7 @@ class Alert:"""Active alert instance"""
 
 
 @dataclass
-class NotificationConfig:"""Notification configuration"""
+class NotificationConfig: """Notification configuration"""
 
     channel: AlertChannel
     recipients: List[str]
@@ -102,14 +102,13 @@ class NotificationConfig:"""Notification configuration"""
     settings: Dict[str, Any] = field(default_factory=dict)
 
 
-class AlertManager:"""
+class AlertManager: """
     Manages alerts and notifications
     """
 
-    def __init__(self, metrics_collector=None):"""
+    def __init__(self, metrics_collector=None): """
         Initialize alert manager
-
-        Args:
+    Args:
             metrics_collector: Metrics collector instance
         """
         self.metrics_collector = metrics_collector
@@ -131,7 +130,7 @@ class AlertManager:"""
         # Initialize default rules
         self._initialize_default_rules()
 
-    def _initialize_default_rules(self):"""Initialize default alert rules"""
+    def _initialize_default_rules(self): """Initialize default alert rules"""
         # High CPU usage
         self.add_rule(
             AlertRule(
@@ -231,16 +230,14 @@ class AlertManager:"""
     def add_rule(self, rule: AlertRule):
         """
         Add an alert rule
-
-        Args:
+    Args:
             rule: Alert rule"""
         self.rules[rule.id] = rule
 
     def remove_rule(self, rule_id: str):
         """
         Remove an alert rule
-
-        Args:
+    Args:
             rule_id: Rule ID"""
         if rule_id in self.rules:
             del self.rules[rule_id]
@@ -248,8 +245,7 @@ class AlertManager:"""
     def add_notification_config(self, config: NotificationConfig):
         """
         Add notification configuration
-
-        Args:
+    Args:
             config: Notification configuration"""
         self.notification_configs[config.channel] = config
 
@@ -260,8 +256,7 @@ class AlertManager:"""
         ):
         """
         Register a notification handler
-
-        Args:
+    Args:
             channel: Notification channel
             handler: Handler function"""
         self.notification_handlers[channel] = handler
@@ -272,13 +267,13 @@ class AlertManager:"""
             self.is_running = True
             self.evaluation_task = asyncio.create_task(self._evaluation_loop())
 
-    async def stop(self):"""Stop alert evaluation"""
+    async def stop(self): """Stop alert evaluation"""
         self.is_running = False
         if self.evaluation_task:
             self.evaluation_task.cancel()
             await asyncio.gather(self.evaluation_task, return_exceptions=True)
 
-    async def _evaluation_loop(self):"""Alert evaluation loop"""
+    async def _evaluation_loop(self): """Alert evaluation loop"""
         while self.is_running:
             try:
                 await self._evaluate_rules()
@@ -315,11 +310,9 @@ class AlertManager:"""
         ) -> bool:
         """
         Check if alert conditions are met
-
-        Args:
+    Args:
             conditions: List of conditions
-
-        Returns:
+    Returns:
             True if all conditions are met"""
         for condition in conditions:
             # Get metric time series
@@ -347,13 +340,11 @@ class AlertManager:"""
     ) -> bool:
         """
         Evaluate a single condition
-
-        Args:
+    Args:
             value: Metric value
             operator: Comparison operator
             threshold: Threshold value
-
-        Returns:
+    Returns:
             True if condition is met"""
         operators = {
             ">": lambda x, y: x > y,
@@ -372,8 +363,7 @@ class AlertManager:"""
     async def _trigger_alert(self, rule: AlertRule):
         """
         Trigger an alert
-
-        Args:
+    Args:
             rule: Alert rule"""
         import uuid
 
@@ -414,8 +404,7 @@ class AlertManager:"""
     async def _resolve_alert(self, rule_id: str):
         """
         Resolve an alert
-
-        Args:
+    Args:
             rule_id: Rule ID"""
         if rule_id not in self.active_alerts:
             return
@@ -443,8 +432,7 @@ class AlertManager:"""
         ):
         """
         Send alert notifications
-
-        Args:
+    Args:
             alert: Alert instance
             channels: Notification channels"""
         for channel in channels:
@@ -487,11 +475,9 @@ class AlertManager:"""
     def _is_suppressed(self, alert: Alert) -> bool:
         """
         Check if alert is suppressed
-
-        Args:
+    Args:
             alert: Alert instance
-
-        Returns:
+    Returns:
             True if suppressed"""
         # Check if alert has suppression time
         if alert.suppressed_until and alert.suppressed_until > \
@@ -537,8 +523,7 @@ class AlertManager:"""
     async def _handle_escalation(self, alert: Alert):
         """
         Handle alert escalation
-
-        Args:
+    Args:
             alert: Alert instance"""
         if alert.rule_id not in self.escalation_policies:
             return
@@ -570,12 +555,10 @@ class AlertManager:"""
     def acknowledge_alert(self, alert_id: str, acknowledged_by: str) -> bool:
         """
         Acknowledge an alert
-
-        Args:
+    Args:
             alert_id: Alert ID
             acknowledged_by: User acknowledging
-
-        Returns:
+    Returns:
             Success status"""
         for alert in self.active_alerts.values():
             if alert.id == alert_id:
@@ -588,12 +571,10 @@ class AlertManager:"""
     def suppress_alert(self, alert_id: str, duration: timedelta) -> bool:
         """
         Suppress an alert
-
-        Args:
+    Args:
             alert_id: Alert ID
             duration: Suppression duration
-
-        Returns:
+    Returns:
             Success status"""
         for alert in self.active_alerts.values():
             if alert.id == alert_id:
@@ -609,12 +590,10 @@ class AlertManager:"""
     ) -> List[Alert]:
         """
         Get active alerts
-
-        Args:
+    Args:
             severity: Filter by severity
             state: Filter by state
-
-        Returns:
+    Returns:
             List of active alerts"""
         alerts = list(self.active_alerts.values())
 
@@ -628,8 +607,7 @@ class AlertManager:"""
     def get_alert_statistics(self) -> Dict[str, Any]:
         """
         Get alert statistics
-
-        Returns:
+    Returns:
             Alert statistics"""
         active = self.get_active_alerts()
 

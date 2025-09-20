@@ -1,6 +1,7 @@
 """
 mTLS Manager for secure inter-service communication
 """
+
 import ssl
 import os
 import asyncio
@@ -18,7 +19,7 @@ from ..core.exceptions import SecurityError
 logger = get_logger(__name__)
 
 
-class MTLSManager:"""Manages mTLS connections between services"""
+class MTLSManager: """Manages mTLS connections between services"""
 
     def __init__(self, service_name: str, certs_dir: str = "certs"):
         """TODO: Add docstring"""
@@ -37,12 +38,10 @@ class MTLSManager:"""Manages mTLS connections between services"""
     ) -> ssl.SSLContext:
         """
         Create SSL context with client certificate verification
-
-        Args:
+    Args:
             target_service: Target service name for the connection
             verify_mode: SSL verification mode
-
-        Returns:
+    Returns:
             Configured SSL context for mTLS"""
         # Check cache first
         cache_key = f"{self.service_name}-{target_service or 'server'}"
@@ -126,12 +125,10 @@ class MTLSManager:"""Manages mTLS connections between services"""
     ) -> aiohttp.ClientSession:
         """
         Create aiohttp ClientSession with mTLS
-
-        Args:
+    Args:
             target_service: Target service name
             base_url: Base URL for the target service
-
-        Returns:
+    Returns:
             Configured aiohttp ClientSession"""
         ssl_context = await self.create_ssl_context(target_service)
 
@@ -161,11 +158,9 @@ class MTLSManager:"""Manages mTLS connections between services"""
     async def verify_client_cert(self, cert_data: bytes) -> Dict[str, Any]:
         """
         Verify client certificate against CA
-
-        Args:
+    Args:
             cert_data: Certificate data in PEM format
-
-        Returns:
+    Returns:
             Certificate information if valid
 
         Raises:
@@ -224,8 +219,7 @@ class MTLSManager:"""Manages mTLS connections between services"""
     async def rotate_certificate(self) -> bool:
         """
         Rotate service certificate
-
-        Returns:
+    Returns:
             True if rotation successful"""
         logger.info(f"Starting certificate rotation for {self.service_name}")
 
@@ -248,11 +242,9 @@ class MTLSManager:"""Manages mTLS connections between services"""
     ) -> Tuple[Optional[str], Optional[str]]:
         """
         Get certificate and key from Vault
-
-        Args:
+    Args:
             name: Certificate name in Vault
-
-        Returns:
+    Returns:
             Tuple of (certificate, private_key) or (None, None) if not found"""
         if name in self._cert_cache:
             return self._cert_cache[name]
@@ -272,11 +264,9 @@ class MTLSManager:"""Manages mTLS connections between services"""
     async def get_service_port(self, service_name: str) -> int:
         """
         Get service port number
-
-        Args:
+    Args:
             service_name: Service name
-
-        Returns:
+    Returns:
             Port number for the service"""
         service_ports = {
             "auth-service": 8081,
@@ -294,12 +284,10 @@ class MTLSManager:"""Manages mTLS connections between services"""
     ) -> str:
         """
         Get service URL with proper scheme
-
-        Args:
+    Args:
             service_name: Service name
             use_mtls: Whether to use HTTPS (mTLS) or HTTP
-
-        Returns:
+    Returns:
             Service URL"""
         port = await self.get_service_port(service_name)
         scheme = "https" if use_mtls else "http"
@@ -313,11 +301,9 @@ class MTLSManager:"""Manages mTLS connections between services"""
     async def health_check(self, service_name: str) -> bool:
         """
         Perform health check on a service using mTLS
-
-        Args:
+    Args:
             service_name: Target service name
-
-        Returns:
+    Returns:
             True if service is healthy"""
         try:
             url = await self.get_service_url(service_name)
@@ -343,8 +329,7 @@ class MTLSServer:
 
     async def get_ssl_context(self) -> ssl.SSLContext:"""
         Get SSL context for server
-
-        Returns:
+    Returns:
             SSL context configured for server
         """
         context = await self.mtls_manager.create_ssl_context(
@@ -360,11 +345,9 @@ class MTLSServer:
     def verify_client(self, request) -> Dict[str, Any]:
         """
         Verify client certificate from request
-
-        Args:
+    Args:
             request: HTTP request object
-
-        Returns:
+    Returns:
             Client certificate information
 
         Raises:

@@ -22,15 +22,15 @@ class OAuthConfig:
     """OAuth provider configuration"""
 
     provider_name: str
-    client_id: str
-    client_secret: str
-    authorize_url: str
-    token_url: str
-    userinfo_url: str
-    redirect_uri: str
-    scopes: List[str]
-    jwks_uri: Optional[str] = None
-    issuer: Optional[str] = None
+        client_id: str
+        client_secret: str
+        authorize_url: str
+        token_url: str
+        userinfo_url: str
+        redirect_uri: str
+        scopes: List[str]
+        jwks_uri: Optional[str] = None
+        issuer: Optional[str] = None
 
 
 class OAuth2Provider:
@@ -88,17 +88,16 @@ class OAuth2Provider:
 
     def register_provider(
         self,
-        provider_name: str,
-        client_id: str,
-        client_secret: str,
-        redirect_uri: str,
-        tenant: Optional[str] = None,
-        domain: Optional[str] = None,
-        custom_config: Optional[Dict[str, Any]] = None,
+            provider_name: str,
+            client_id: str,
+            client_secret: str,
+            redirect_uri: str,
+            tenant: Optional[str] = None,
+            domain: Optional[str] = None,
+            custom_config: Optional[Dict[str, Any]] = None,
     ) -> OAuthConfig:
         Register an OAuth2 provider
-
-        Args:
+    Args:
                         provider_name: Name of the provider (
                 google,
                 github,
@@ -106,14 +105,13 @@ class OAuth2Provider:
                 okta,
                 custom
             )
-            client_id: OAuth client ID
-            client_secret: OAuth client secret
-            redirect_uri: Redirect URI for OAuth callback
-            tenant: Azure AD tenant ID (for Azure)
-            domain: Okta domain (for Okta)
-            custom_config: Custom provider configuration
-
-        Returns:
+                client_id: OAuth client ID
+                client_secret: OAuth client secret
+                redirect_uri: Redirect URI for OAuth callback
+                tenant: Azure AD tenant ID (for Azure)
+                domain: Okta domain (for Okta)
+                custom_config: Custom provider configuration
+    Returns:
             OAuthConfig instance
         if custom_config:
             config_dict = custom_config
@@ -135,7 +133,7 @@ class OAuth2Provider:
                             "{domain}",
                             domain
                         )
-        else:
+            else:
             raise ValueError(f"Unknown provider: {provider_name}")
 
         config = OAuthConfig(
@@ -156,22 +154,20 @@ class OAuth2Provider:
 
     def generate_auth_url(
         self,
-        provider_name: str,
-        state: Optional[str] = None,
-        nonce: Optional[str] = None,
-        use_pkce: bool = True,
-        additional_params: Optional[Dict[str, str]] = None,
+            provider_name: str,
+            state: Optional[str] = None,
+            nonce: Optional[str] = None,
+            use_pkce: bool = True,
+            additional_params: Optional[Dict[str, str]] = None,
     ) -> Dict[str, str]:
         Generate OAuth2 authorization URL
-
-        Args:
+    Args:
             provider_name: Name of the OAuth provider
-            state: State parameter for CSRF protection
-            nonce: Nonce for OpenID Connect
-            use_pkce: Use PKCE flow for enhanced security
-            additional_params: Additional OAuth parameters
-
-        Returns:
+                state: State parameter for CSRF protection
+                nonce: Nonce for OpenID Connect
+                use_pkce: Use PKCE flow for enhanced security
+                additional_params: Additional OAuth parameters
+    Returns:
             Dict containing auth_url, state, and optional code_verifier
         if provider_name not in self.configs:
             raise ValueError(f"Provider {provider_name} not registered")
@@ -227,20 +223,18 @@ class OAuth2Provider:
 
     async def exchange_code(
         self,
-        provider_name: str,
-        code: str,
-        state: str,
-        code_verifier: Optional[str] = None,
+            provider_name: str,
+            code: str,
+            state: str,
+            code_verifier: Optional[str] = None,
     ) -> Dict[str, Any]:
         Exchange authorization code for access token
-
-        Args:
+    Args:
             provider_name: Name of the OAuth provider
-            code: Authorization code
-            state: State parameter for validation
-            code_verifier: PKCE code verifier
-
-        Returns:
+                code: Authorization code
+                state: State parameter for validation
+                code_verifier: PKCE code verifier
+    Returns:
             Dict containing access_token, refresh_token, etc.
         if provider_name not in self.configs:
             raise ValueError(f"Provider {provider_name} not registered")
@@ -299,12 +293,10 @@ class OAuth2Provider:
         self, provider_name: str, access_token: str
     ) -> Dict[str, Any]:
         Get user information from OAuth provider
-
-        Args:
+    Args:
             provider_name: Name of the OAuth provider
-            access_token: OAuth access token
-
-        Returns:
+                access_token: OAuth access token
+    Returns:
             User information dict
         if provider_name not in self.configs:
             raise ValueError(f"Provider {provider_name} not registered")
@@ -326,12 +318,10 @@ class OAuth2Provider:
         self, provider_name: str, refresh_token: str
     ) -> Dict[str, Any]:
         Refresh OAuth access token
-
-        Args:
+    Args:
             provider_name: Name of the OAuth provider
-            refresh_token: OAuth refresh token
-
-        Returns:
+                refresh_token: OAuth refresh token
+    Returns:
             New token response
         if provider_name not in self.configs:
             raise ValueError(f"Provider {provider_name} not registered")
@@ -361,13 +351,11 @@ class OAuth2Provider:
         self, provider_name: str, token: str, token_type: str = "access_token"
     ) -> bool:
         Revoke OAuth token
-
-        Args:
+    Args:
             provider_name: Name of the OAuth provider
-            token: Token to revoke
-            token_type: Type of token (access_token or refresh_token)
-
-        Returns:
+                token: Token to revoke
+                token_type: Type of token (access_token or refresh_token)
+    Returns:
             Success status
         if provider_name not in self.configs:
             raise ValueError(f"Provider {provider_name} not registered")
@@ -400,11 +388,9 @@ class OAuth2Provider:
 
     def _generate_code_challenge(self, verifier: str) -> str:
         Generate PKCE code challenge from verifier
-
-        Args:
+    Args:
             verifier: Code verifier
-
-        Returns:
+    Returns:
             Base64 URL encoded code challenge
         digest = hashlib.sha256(verifier.encode()).digest()
         return base64.urlsafe_b64encode(digest).decode().rstrip("=")

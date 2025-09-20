@@ -30,7 +30,7 @@ except ImportError:
 
 
 @dataclass
-class GitRepository:"""Represents a Git repository configuration"""
+class GitRepository: """Represents a Git repository configuration"""
 
     id: str
     url: str
@@ -56,8 +56,7 @@ class GitManager:
     ):
         """
         Initialize Git manager
-
-        Args:
+    Args:
             workspace_dir: Directory for cloned repositories
             max_repo_size: Maximum allowed repository size in bytes
             allowed_hosts: List of allowed Git hosts"""
@@ -84,14 +83,12 @@ class GitManager:
     ) -> GitRepository:
         """
         Add a new repository to manage
-
-        Args:
+    Args:
             url: Repository URL (HTTPS or SSH)
             branch: Branch to track
             ssh_key_path: Path to SSH key for authentication
             gpg_verify: Verify GPG signatures on commits
-
-        Returns:
+    Returns:
             GitRepository instance"""
         # Validate URL
         if not self._validate_repository_url(url):
@@ -118,11 +115,9 @@ class GitManager:
     def clone_repository(self, repo_id: str) -> Tuple[bool, Optional[str]]:
         """
         Clone a repository
-
-        Args:
+    Args:
             repo_id: Repository identifier
-
-        Returns:
+    Returns:
             Tuple of (success, error_message)"""
         if repo_id not in self.repositories:
             return False, f"Repository {repo_id} not found"
@@ -196,12 +191,10 @@ class GitManager:
     ) -> Tuple[bool, Optional[Dict[str, Any]]]:
         """
         Pull latest changes from repository
-
-        Args:
+    Args:
             repo_id: Repository identifier
             force: Force pull even with local changes
-
-        Returns:
+    Returns:
             Tuple of (success, changes_dict)"""
         if repo_id not in self.repositories:
             return False, {"error": f"Repository {repo_id} not found"}
@@ -282,13 +275,11 @@ class GitManager:
     ) -> Optional[str]:
         """
         Get content of a file from repository
-
-        Args:
+    Args:
             repo_id: Repository identifier
             file_path: Relative path to file
             commit: Specific commit to read from (default: HEAD)
-
-        Returns:
+    Returns:
             File content or None"""
         if repo_id not in self.repositories:
             return None
@@ -328,13 +319,11 @@ class GitManager:
     ) -> List[str]:
         """
         List files in repository
-
-        Args:
+    Args:
             repo_id: Repository identifier
             pattern: File pattern to match (e.g., "*.yaml")
             directory: Directory to list from
-
-        Returns:
+    Returns:
             List of file paths
         """
         if repo_id not in self.repositories:
@@ -366,13 +355,11 @@ class GitManager:
     ) -> List[Dict[str, Any]]:
         """
         Get commit history
-
-        Args:
+    Args:
             repo_id: Repository identifier
             limit: Maximum number of commits
             file_path: Get history for specific file
-
-        Returns:
+    Returns:
             List of commit information"""
         if repo_id not in self.repositories:
             return []
@@ -412,12 +399,10 @@ class GitManager:
     ) -> Tuple[bool, Optional[str]]:
         """
         Create a new branch
-
-        Args:
+    Args:
             repo_id: Repository identifier
             branch_name: Name of the new branch
-
-        Returns:
+    Returns:
             Tuple of (success, error_message)"""
         if repo_id not in self.repositories:
             return False, f"Repository {repo_id} not found"
@@ -442,11 +427,9 @@ class GitManager:
     def _validate_repository_url(self, url: str) -> bool:
         """
         Validate repository URL
-
-        Args:
+    Args:
             url: Repository URL
-
-        Returns:
+    Returns:
             Validation status"""
         # Extract host from URL
         if url.startswith("git@"):
@@ -470,11 +453,9 @@ class GitManager:
         ) -> Dict[str, str]:
         """
         Setup Git environment variables
-
-        Args:
+    Args:
             repo_config: Repository configuration
-
-        Returns:
+    Returns:
             Environment variables dict"""
         env = os.environ.copy()
 
@@ -489,11 +470,9 @@ class GitManager:
     def _ssh_key_credentials(self, ssh_key_path: str):
         """
         Create SSH key credentials callback for pygit2
-
-        Args:
+    Args:
             ssh_key_path: Path to SSH private key
-
-        Returns:
+    Returns:
             Credentials callback"""
 
         def credentials(url, username_from_url, allowed_types):
@@ -509,12 +488,10 @@ class GitManager:
     def _verify_commit_signature(self, repo: Repo, commit_sha: str) -> bool:
         """
         Verify GPG signature of a commit
-
-        Args:
+    Args:
             repo: Git repository
             commit_sha: Commit SHA to verify
-
-        Returns:
+    Returns:
             Verification status"""
         try:
             # Run git verify-commit
@@ -531,11 +508,9 @@ class GitManager:
     def _get_directory_size(self, path: str) -> int:
         """
         Get total size of a directory
-
-        Args:
+    Args:
             path: Directory path
-
-        Returns:
+    Returns:
             Size in bytes"""
         total_size = 0
         for dirpath, dirnames, filenames in os.walk(path):
