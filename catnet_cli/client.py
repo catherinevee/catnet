@@ -100,7 +100,8 @@ class CatNetAPIClient:
 
                 # Handle different status codes
                 if response.status == 401:
-                    raise AuthenticationError("Authentication required. Please \
+                    raise AuthenticationError(
+                        "Authentication required. Please \
                         login.")
                 elif response.status == 403:
                     raise AuthorizationError("Permission denied")
@@ -413,39 +414,47 @@ class CatNetAPIClient:
 
 class CatNetAPIError(Exception):
     """Base exception for API errors"""
+
     pass
 
 
 class AuthenticationError(CatNetAPIError):
     """Authentication failed"""
+
     pass
 
 
 class AuthorizationError(CatNetAPIError):
     """Authorization failed"""
+
     pass
 
 
 class NotFoundError(CatNetAPIError):
     """Resource not found"""
+
     pass
 
 
 class ServerError(CatNetAPIError):
     """Server error"""
+
     pass
 
 
 class APIError(CatNetAPIError):
     """Generic API error"""
+
     pass
 
 
 class ConnectionError(CatNetAPIError):
     """Connection failed"""
+
     pass
 
 
 class TimeoutError(CatNetAPIError):
     """Request timeout"""
+
     pass

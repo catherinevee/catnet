@@ -49,7 +49,8 @@ def fix_dataclass_indentation(content):
                                 while j < len(lines):
                                     field_content = lines[j]
                                     if field_content.strip():
-                                        # Check if this looks like a field definition
+                                        # Check if this looks like a field
+                                        # definition
                                         if not field_content.startswith("    ") and (
                                             ":" in field_content
                                             or field_content.strip().startswith('"""')
@@ -80,7 +81,8 @@ def fix_dataclass_indentation(content):
                                             fixed_lines.append(field_content)
                                     else:
                                         fixed_lines.append(field_content)
-                                        # Check if next line is a new class or function
+                                        # Check if next line is a new class or
+                                        # function
                                         if j + 1 < len(lines):
                                             peek = lines[j + 1]
                                             if (

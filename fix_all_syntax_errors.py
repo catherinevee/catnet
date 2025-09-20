@@ -56,7 +56,8 @@ def fix_ssh_auth_file():
             fixed_lines.append(line)
             continue
 
-        # If we're in a function and see Args: or Returns: without proper docstring
+        # If we're in a function and see Args: or Returns: without proper
+        # docstring
         if in_function and not in_docstring:
             if re.match(r"^\s*(Args?|Returns?|Raises?):", line):
                 # Start a docstring

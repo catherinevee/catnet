@@ -67,7 +67,8 @@ def fix_indentation_after_docstring(content):
     while i < len(lines):
         line = lines[i]
 
-        # Check if this is a method/function with incorrect docstring indentation
+        # Check if this is a method/function with incorrect docstring
+        # indentation
         if re.match(r"^(\s*)(def|async def)\s+\w+\(.*\):\s*$", line):
             indent_match = re.match(r"^(\s*)", line)
             base_indent = indent_match.group(1) if indent_match else ""

@@ -1,0 +1,776 @@
+{
+  "total_errors": 96,
+  "unique_files": 96,
+  "errors": [
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\catnet_cli\\client.py",
+      "line": 141,
+      "column": 8,
+      "error": "\"\"\"Authenticate and get token\"\"\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\fix_flake8_complete.py",
+      "line": 73,
+      "column": 33,
+      "error": "f\"{' ' * (indent + 4)}{arg.strip()},",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\fix_flake8_issues.py",
+      "line": 46,
+      "column": 0,
+      "error": "while break_point > 0 and current[break_point] not in ' ,(",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\catnet_cli\\commands\\device.py",
+      "line": 77,
+      "column": 0,
+      "error": "unindent does not match any outer indentation level",
+      "type": "indentation_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\catnet_cli\\config.py",
+      "line": 141,
+      "column": 8,
+      "error": "\"\"\"Merge two configuration dictionaries\"\"\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\catnet_cli\\utils.py",
+      "line": 54,
+      "column": 0,
+      "error": "unindent does not match any outer indentation level",
+      "type": "indentation_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\fix_black_complete.py",
+      "line": 51,
+      "column": 29,
+      "error": "f'{expected_indent}{",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\run_catnet.py",
+      "line": 19,
+      "column": 35,
+      "error": "level=logging.INFO, format=\"%(",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\catnet_cli\\commands\\vault.py",
+      "line": 137,
+      "column": 0,
+      "error": "unindent does not match any outer indentation level",
+      "type": "indentation_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\scripts\\quickstart.py",
+      "line": 77,
+      "column": 27,
+      "error": "check=True, capture_output=True, text=True)",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\api\\auth_endpoints.py",
+      "line": 34,
+      "column": 7,
+      "error": "\"\"\"Login request model\"\"\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\api\\deployment_endpoints.py",
+      "line": 26,
+      "column": 7,
+      "error": "\"\"\"Dry run deployment request\"\"\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\catnet_cli\\commands\\auth.py",
+      "line": 189,
+      "column": 0,
+      "error": "result = await client.request(",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\setup.py",
+      "line": 37,
+      "column": 21,
+      "error": "backward compatibility",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\api\\device_connection_endpoints.py",
+      "line": 16,
+      "column": 7,
+      "error": "\"\"\"Request for testing device connection\"\"\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\scripts\\generate_ca.py",
+      "line": 66,
+      "column": 12,
+      "error": "years",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\api\\device_endpoints.py",
+      "line": 15,
+      "column": 7,
+      "error": "\"\"\"Request model for creating a device\"\"\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\api\\gitops_endpoints.py",
+      "line": 26,
+      "column": 7,
+      "error": "\"\"\"Generic webhook payload\"\"\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\api\\simple_deploy_endpoints.py",
+      "line": 17,
+      "column": 7,
+      "error": "\"\"\"Request to create a deployment\"\"\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\api\\rollback_endpoints.py",
+      "line": 16,
+      "column": 7,
+      "error": "\"\"\"Request for device health check\"\"\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\auth\\mfa.py",
+      "line": 225,
+      "column": 7,
+      "error": "\"\"\"Get default MFA provider instance\"\"\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\auth\\oauth.py",
+      "line": 22,
+      "column": 7,
+      "error": "\"\"\"OAuth provider configuration\"\"\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\auth\\jwt_handler.py",
+      "line": 258,
+      "column": 7,
+      "error": "\"\"\"Get default JWT handler instance\"\"\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\auth\\session.py",
+      "line": 22,
+      "column": 7,
+      "error": "\"\"\"Represents a user session\"\"\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\auth\\saml.py",
+      "line": 24,
+      "column": 7,
+      "error": "\"\"\"SAML configuration for Service Provider\"\"\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\automation\\workflows.py",
+      "line": 22,
+      "column": 7,
+      "error": "\"\"\"Workflow execution states\"\"\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\cli\\auth_utils.py",
+      "line": 15,
+      "column": 0,
+      "error": "env_token = os.environ.get(\"CATNET_AUTH_TOKEN\")",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\auth\\ssh_auth.py",
+      "line": 38,
+      "column": 15,
+      "error": "Method implementation.",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\compliance\\reporting.py",
+      "line": 22,
+      "column": 7,
+      "error": "\"\"\"Supported compliance frameworks\"\"\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\core\\api_config.py",
+      "line": 22,
+      "column": 230,
+      "error": "def __init__(self, allowed_origins: List[str] = None, allowed_methods: List[str] = None, allowed_headers: List[str] = None, exposed_headers: List[str] = None, allow_credentials: bool = True, max_age: int = 86400, ):\"\"\"        Initialize CORS configuration",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\api\\main.py",
+      "line": 60,
+      "column": 6,
+      "error": "f\"response.headers[\"X-Frame-Options\"] = \"DENY\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\api\\middleware.py",
+      "line": 82,
+      "column": 8,
+      "error": "client_ip = request.client.host",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\core\\config.py",
+      "line": 15,
+      "column": 7,
+      "error": "\"\"\"Application settings\"\"\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\core\\logging.py",
+      "line": 13,
+      "column": 7,
+      "error": "\"\"\"JSON structured logging formatter\"\"\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\core\\metrics.py",
+      "line": 17,
+      "column": 7,
+      "error": "\"\"\"Types of metrics we collect\"\"\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\core\\rate_limiter.py",
+      "line": 26,
+      "column": 0,
+      "error": "def __init__(self, redis_url: str = \"redis://localhost:6379\", default_rate: int = 100, default_period: int = 60, ): \"\"\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\core\\performance.py",
+      "line": 32,
+      "column": 0,
+      "error": "def __init__(self, database_url: str, pool_size: int = 20, max_overflow: int = 10, pool_timeout: int = 30, pool_recycle: int = 3600, use_null_pool: bool = False, ): \"\"\"        Initialize database pool manager",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\core\\mtls.py",
+      "line": 24,
+      "column": 0,
+      "error": "def __init__(self, service_name: str, certs_dir: str = \"certs\"):",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\cli\\commands.py",
+      "line": 36,
+      "column": 8,
+      "error": "else:",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\deployment_manager.py",
+      "line": 21,
+      "column": 0,
+      "error": "CANARY = \"canary\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\core\\security_headers.py",
+      "line": 25,
+      "column": 0,
+      "error": "def __init__(self,",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\history.py",
+      "line": 22,
+      "column": 0,
+      "error": "unindent does not match any outer indentation level",
+      "type": "indentation_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\health_check.py",
+      "line": 20,
+      "column": 0,
+      "error": "CONNECTIVITY = \"connectivity\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\executor.py",
+      "line": 31,
+      "column": 8,
+      "error": "self.success = success",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\rollback.py",
+      "line": 19,
+      "column": 0,
+      "error": "HEALTH_CHECK_FAILED = \"health_check_failed\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\rollback_manager.py",
+      "line": 21,
+      "column": 0,
+      "error": "deployment_id: str",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\core\\validators.py",
+      "line": 51,
+      "column": 0,
+      "error": "def __init__(self):",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\catnet_cli\\commands\\deploy.py",
+      "line": 194,
+      "column": 0,
+      "error": "click.echo(",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\service.py",
+      "line": 21,
+      "column": 0,
+      "error": "def __init__(self):",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\validation.py",
+      "line": 19,
+      "column": 0,
+      "error": "PRE_DEPLOYMENT = \"pre_deployment\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\validator.py",
+      "line": 16,
+      "column": 0,
+      "error": "def __init__(self):",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\adapters\\cisco_adapter.py",
+      "line": 35,
+      "column": 0,
+      "error": "unindent does not match any outer indentation level",
+      "type": "indentation_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\simple_deploy.py",
+      "line": 32,
+      "column": 0,
+      "error": "id: str = field(default_factory=lambda: str(uuid.uuid4()))",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\adapters\\juniper_adapter.py",
+      "line": 34,
+      "column": 0,
+      "error": "CONFIG_COMMANDS = {",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\strategies.py",
+      "line": 23,
+      "column": 0,
+      "error": "CANARY = \"canary\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\cisco_handler.py",
+      "line": 28,
+      "column": 0,
+      "error": "unindent does not match any outer indentation level",
+      "type": "indentation_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\device_connector.py",
+      "line": 21,
+      "column": 0,
+      "error": "def __init__(self, simulation_mode: bool = True): \"\"\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\connector.py",
+      "line": 22,
+      "column": 0,
+      "error": "class DeviceConnection:",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\async_device_connector.py",
+      "line": 24,
+      "column": 0,
+      "error": "def __init__(self, max_workers: int = 5):",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\device_store.py",
+      "line": 14,
+      "column": 0,
+      "error": "id: str = field(default_factory=lambda: str(uuid.uuid4()))",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\cert_manager.py",
+      "line": 38,
+      "column": 0,
+      "error": "def __init__(self):",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\juniper_handler.py",
+      "line": 21,
+      "column": 0,
+      "error": "COMMANDS = {",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\device_manager.py",
+      "line": 21,
+      "column": 0,
+      "error": "CISCO_IOS = \"cisco_ios\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\gitops\\config_validator.py",
+      "line": 19,
+      "column": 0,
+      "error": "SYNTAX = \"syntax\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\service.py",
+      "line": 19,
+      "column": 0,
+      "error": "def __init__(self):",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\gitops\\gitops_workflow.py",
+      "line": 26,
+      "column": 0,
+      "error": "CANARY = \"canary\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\ssh_manager.py",
+      "line": 27,
+      "column": 0,
+      "error": "def __init__(self, vault_client: VaultClient):",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\gitops\\git_manager.py",
+      "line": 35,
+      "column": 0,
+      "error": "id: str",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\gitops\\secret_scanner.py",
+      "line": 21,
+      "column": 0,
+      "error": "PASSWORD = \"password\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\gitops\\simple_github_client.py",
+      "line": 16,
+      "column": 0,
+      "error": "url: str",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\gitops\\processor.py",
+      "line": 27,
+      "column": 0,
+      "error": "def __init__(self):",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\gitops\\webhook_processor.py",
+      "line": 23,
+      "column": 0,
+      "error": "GITHUB = \"github\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\monitoring\\alerting.py",
+      "line": 22,
+      "column": 0,
+      "error": "CRITICAL = \"critical\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\monitoring\\metrics.py",
+      "line": 21,
+      "column": 0,
+      "error": "COUNTER = \"counter\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\monitoring\\observability.py",
+      "line": 23,
+      "column": 0,
+      "error": "unindent does not match any outer indentation level",
+      "type": "indentation_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\monitoring\\simple_metrics.py",
+      "line": 16,
+      "column": 0,
+      "error": "name: str",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\security\\secrets_manager.py",
+      "line": 25,
+      "column": 0,
+      "error": "PASSWORD = \"password\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\gitops\\git_handler.py",
+      "line": 46,
+      "column": 31,
+      "error": "ssh_command = f\"ssh -i {ssh_key_path} -o \\\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\gitops\\service.py",
+      "line": 101,
+      "column": 0,
+      "error": "if not await self._check_permission(",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\security\\simple_security.py",
+      "line": 20,
+      "column": 0,
+      "error": "def __init__(self):",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\ml\\anomaly_detection.py",
+      "line": 80,
+      "column": 0,
+      "error": "accuracy: float",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\security\\signing.py",
+      "line": 33,
+      "column": 0,
+      "error": "def __init__(self):",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\security\\vault.py",
+      "line": 21,
+      "column": 0,
+      "error": "unindent does not match any outer indentation level",
+      "type": "indentation_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\security\\auth.py",
+      "line": 39,
+      "column": 8,
+      "error": "return self.pwd_context.verify(plain_password, hashed_password)",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\security\\vault_service.py",
+      "line": 27,
+      "column": 0,
+      "error": "STATIC = \"static\"",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\security\\encryption.py",
+      "line": 47,
+      "column": 0,
+      "error": "cipher = Cipher(",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\tests\\test_ml_anomaly.py",
+      "line": 26,
+      "column": 34,
+      "error": "\"22\": 0.1",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\tests\\test_auth.py",
+      "line": 72,
+      "column": 12,
+      "error": "roles=[\"user\"]",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\tests\\test_automation.py",
+      "line": 356,
+      "column": 0,
+      "error": "unindent does not match any outer indentation level",
+      "type": "indentation_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\main.py",
+      "line": 174,
+      "column": 0,
+      "error": "auth_manager = AuthManager(",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\tests\\unit\\test_enhanced_security.py",
+      "line": 76,
+      "column": 15,
+      "error": "print(f\"  Valid {input_type}: {value} - {'PASS' if is_valid else",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\tests\\unit\\test_monitoring.py",
+      "line": 93,
+      "column": 23,
+      "error": "print(f\"  Total deployments after test: {summary['counters'][",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\tests\\test_compliance.py",
+      "line": 137,
+      "column": 26,
+      "error": "\"lockout_attempts\": 5}",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\tests\\test_security.py",
+      "line": 119,
+      "column": 16,
+      "error": "details={\"index\": i}",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\tests\\test_gitops.py",
+      "line": 360,
+      "column": 16,
+      "error": "SecretType.AWS_CREDENTIALS]",
+      "type": "parse_error"
+    },
+    {
+      "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\tests\\test_cli.py",
+      "line": 402,
+      "column": 12,
+      "error": "input=\"secretpass\\n\",",
+      "type": "parse_error"
+    }
+  ],
+  "error_files": [
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\catnet_cli\\client.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\catnet_cli\\commands\\auth.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\catnet_cli\\commands\\deploy.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\catnet_cli\\commands\\device.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\catnet_cli\\commands\\vault.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\catnet_cli\\config.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\catnet_cli\\utils.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\fix_black_complete.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\fix_flake8_complete.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\fix_flake8_issues.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\run_catnet.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\scripts\\generate_ca.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\scripts\\quickstart.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\setup.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\api\\auth_endpoints.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\api\\deployment_endpoints.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\api\\device_connection_endpoints.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\api\\device_endpoints.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\api\\gitops_endpoints.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\api\\main.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\api\\middleware.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\api\\rollback_endpoints.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\api\\simple_deploy_endpoints.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\auth\\jwt_handler.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\auth\\mfa.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\auth\\oauth.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\auth\\saml.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\auth\\session.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\auth\\ssh_auth.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\automation\\workflows.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\cli\\auth_utils.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\cli\\commands.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\compliance\\reporting.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\core\\api_config.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\core\\config.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\core\\logging.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\core\\metrics.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\core\\mtls.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\core\\performance.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\core\\rate_limiter.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\core\\security_headers.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\core\\validators.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\deployment_manager.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\executor.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\health_check.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\history.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\rollback.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\rollback_manager.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\service.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\simple_deploy.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\strategies.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\validation.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\validator.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\adapters\\cisco_adapter.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\adapters\\juniper_adapter.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\async_device_connector.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\cert_manager.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\cisco_handler.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\connector.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\device_connector.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\device_manager.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\device_store.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\juniper_handler.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\service.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\ssh_manager.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\gitops\\config_validator.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\gitops\\git_handler.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\gitops\\git_manager.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\gitops\\gitops_workflow.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\gitops\\processor.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\gitops\\secret_scanner.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\gitops\\service.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\gitops\\simple_github_client.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\gitops\\webhook_processor.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\main.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\ml\\anomaly_detection.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\monitoring\\alerting.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\monitoring\\metrics.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\monitoring\\observability.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\monitoring\\simple_metrics.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\security\\auth.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\security\\encryption.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\security\\secrets_manager.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\security\\signing.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\security\\simple_security.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\security\\vault.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\security\\vault_service.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\tests\\test_auth.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\tests\\test_automation.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\tests\\test_cli.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\tests\\test_compliance.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\tests\\test_gitops.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\tests\\test_ml_anomaly.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\tests\\test_security.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\tests\\unit\\test_enhanced_security.py",
+    "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\tests\\unit\\test_monitoring.py"
+  ]
+}

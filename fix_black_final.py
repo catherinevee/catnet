@@ -41,7 +41,8 @@ def fix_file(filepath):
             fixed_lines.append(line)
             i += 1
 
-            # Check if next non-empty line is improperly indented docstring or code
+            # Check if next non-empty line is improperly indented docstring or
+            # code
             while i < len(lines) and not lines[i].strip():
                 fixed_lines.append(lines[i])
                 i += 1
@@ -58,7 +59,9 @@ def fix_file(filepath):
 
                     # If it's not properly indented, fix it
                     if not next_line.startswith(proper_indent):
-                        fixed_lines.append(f"{proper_indent}{next_line.strip()}\n")
+                        fixed_lines.append(
+                            f"{proper_indent}{
+                                next_line.strip()}\n")
                         modified = True
                         i += 1
                         continue
@@ -70,8 +73,11 @@ def fix_file(filepath):
                     proper_indent = base_indent + "    "
 
                     # If the indentation is wrong, fix it
-                    if len(next_line) - len(next_line.lstrip()) < len(proper_indent):
-                        fixed_lines.append(f"{proper_indent}{next_line.strip()}\n")
+                    if len(next_line) - \
+                            len(next_line.lstrip()) < len(proper_indent):
+                        fixed_lines.append(
+                            f"{proper_indent}{
+                                next_line.strip()}\n")
                         modified = True
                         i += 1
                         continue
@@ -84,9 +90,8 @@ def fix_file(filepath):
         if line.strip() == '"""' and i > 0:
             # Check if previous line is a class or function definition
             prev_line = lines[i - 1] if i > 0 else ""
-            if not (
-                prev_line.strip().endswith(":") or prev_line.strip().endswith('"""')
-            ):
+            if not (prev_line.strip().endswith(":")
+                    or prev_line.strip().endswith('"""')):
                 # Skip this orphaned docstring quote
                 modified = True
                 i += 1
@@ -138,8 +143,10 @@ def fix_specific_issues(filepath):
 
     # Fix standalone field definitions appearing without class context
     content = re.sub(
-        r"^(\s*\w+:\s*\w+.*(?:=.*)?)\n", r"    \1\n", content, flags=re.MULTILINE
-    )
+        r"^(\s*\w+:\s*\w+.*(?:=.*)?)\n",
+        r"    \1\n",
+        content,
+        flags=re.MULTILINE)
 
     # Fix enum values appearing at wrong indentation
     content = re.sub(
@@ -214,9 +221,8 @@ def main():
         print(f"✗ Black still has {errors} parsing errors")
 
         # Show first few errors
-        error_lines = [
-            line for line in result.stderr.split("\n") if "error: cannot format" in line
-        ]
+        error_lines = [line for line in result.stderr.split(
+            "\n") if "error: cannot format" in line]
         for error in error_lines[:5]:
             print(f"  {error}")
 

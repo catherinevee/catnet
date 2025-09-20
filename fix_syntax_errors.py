@@ -76,7 +76,8 @@ def fix_file(filepath):
                 j -= 1
             if j >= 0:
                 prev_line = lines[j]
-                # If previous line is incomplete (no colon, no closing bracket, etc)
+                # If previous line is incomplete (no colon, no closing bracket,
+                # etc)
                 if prev_line.strip() and not prev_line.rstrip().endswith(
                     (":", "}", ")", "]", ",", '"""', "'''", '"', "'")
                 ):

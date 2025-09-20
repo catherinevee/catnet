@@ -1,5 +1,6 @@
 """
 Extended Authentication Service Endpoints
+"""
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import Dict, Optional, List

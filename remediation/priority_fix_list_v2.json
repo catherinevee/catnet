@@ -1,0 +1,866 @@
+[
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\catnet_cli\\commands\\auth.py",
+    "priority": 1,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 101
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\api\\auth_endpoints.py",
+    "priority": 1,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 101
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\auth\\jwt_handler.py",
+    "priority": 1,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 101
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\auth\\mfa.py",
+    "priority": 1,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 101
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\auth\\oauth.py",
+    "priority": 1,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 101
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\auth\\saml.py",
+    "priority": 1,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 101
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\auth\\session.py",
+    "priority": 1,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 101
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\auth\\ssh_auth.py",
+    "priority": 1,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 101
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\cli\\auth_utils.py",
+    "priority": 1,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 101
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\core\\security_headers.py",
+    "priority": 1,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 101
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\security\\auth.py",
+    "priority": 1,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 101
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\security\\encryption.py",
+    "priority": 1,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 101
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\security\\secrets_manager.py",
+    "priority": 1,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 101
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\security\\signing.py",
+    "priority": 1,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 101
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\security\\simple_security.py",
+    "priority": 1,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 101
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\security\\vault.py",
+    "priority": 1,
+    "error_count": 1,
+    "error_types": [
+      "indentation_error"
+    ],
+    "fix_order": 101
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\security\\vault_service.py",
+    "priority": 1,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 101
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\tests\\test_auth.py",
+    "priority": 1,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 101
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\tests\\test_security.py",
+    "priority": 1,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 101
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\tests\\unit\\test_enhanced_security.py",
+    "priority": 1,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 101
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\api\\deployment_endpoints.py",
+    "priority": 2,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 201
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\api\\device_connection_endpoints.py",
+    "priority": 2,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 201
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\api\\device_endpoints.py",
+    "priority": 2,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 201
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\api\\gitops_endpoints.py",
+    "priority": 2,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 201
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\api\\main.py",
+    "priority": 2,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 201
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\api\\middleware.py",
+    "priority": 2,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 201
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\api\\rollback_endpoints.py",
+    "priority": 2,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 201
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\api\\simple_deploy_endpoints.py",
+    "priority": 2,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 201
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\core\\api_config.py",
+    "priority": 2,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 201
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\core\\config.py",
+    "priority": 2,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 201
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\core\\logging.py",
+    "priority": 2,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 201
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\core\\metrics.py",
+    "priority": 2,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 201
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\core\\mtls.py",
+    "priority": 2,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 201
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\core\\performance.py",
+    "priority": 2,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 201
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\core\\rate_limiter.py",
+    "priority": 2,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 201
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\core\\validators.py",
+    "priority": 2,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 201
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\catnet_cli\\client.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\catnet_cli\\commands\\deploy.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\catnet_cli\\commands\\device.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "indentation_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\catnet_cli\\commands\\vault.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "indentation_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\catnet_cli\\config.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\catnet_cli\\utils.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "indentation_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\cli\\commands.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\deployment_manager.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\executor.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\health_check.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\history.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "indentation_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\rollback.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\rollback_manager.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\service.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\simple_deploy.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\strategies.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\validation.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\deployment\\validator.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\gitops\\config_validator.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\gitops\\git_handler.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\gitops\\git_manager.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\gitops\\gitops_workflow.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\gitops\\processor.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\gitops\\secret_scanner.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\gitops\\service.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\gitops\\simple_github_client.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\gitops\\webhook_processor.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\tests\\test_cli.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\tests\\test_gitops.py",
+    "priority": 3,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 301
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\tests\\test_automation.py",
+    "priority": 4,
+    "error_count": 1,
+    "error_types": [
+      "indentation_error"
+    ],
+    "fix_order": 401
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\tests\\test_compliance.py",
+    "priority": 4,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 401
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\tests\\test_ml_anomaly.py",
+    "priority": 4,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 401
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\tests\\unit\\test_monitoring.py",
+    "priority": 4,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 401
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\fix_black_complete.py",
+    "priority": 5,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 501
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\fix_flake8_complete.py",
+    "priority": 5,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 501
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\fix_flake8_issues.py",
+    "priority": 5,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 501
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\run_catnet.py",
+    "priority": 5,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 501
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\scripts\\generate_ca.py",
+    "priority": 5,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 501
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\scripts\\quickstart.py",
+    "priority": 5,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 501
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\setup.py",
+    "priority": 5,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 501
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\automation\\workflows.py",
+    "priority": 5,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 501
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\compliance\\reporting.py",
+    "priority": 5,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 501
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\adapters\\cisco_adapter.py",
+    "priority": 5,
+    "error_count": 1,
+    "error_types": [
+      "indentation_error"
+    ],
+    "fix_order": 501
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\adapters\\juniper_adapter.py",
+    "priority": 5,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 501
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\async_device_connector.py",
+    "priority": 5,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 501
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\cert_manager.py",
+    "priority": 5,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 501
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\cisco_handler.py",
+    "priority": 5,
+    "error_count": 1,
+    "error_types": [
+      "indentation_error"
+    ],
+    "fix_order": 501
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\connector.py",
+    "priority": 5,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 501
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\device_connector.py",
+    "priority": 5,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 501
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\device_manager.py",
+    "priority": 5,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 501
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\device_store.py",
+    "priority": 5,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 501
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\juniper_handler.py",
+    "priority": 5,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 501
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\service.py",
+    "priority": 5,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 501
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\devices\\ssh_manager.py",
+    "priority": 5,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 501
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\main.py",
+    "priority": 5,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 501
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\ml\\anomaly_detection.py",
+    "priority": 5,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 501
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\monitoring\\alerting.py",
+    "priority": 5,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 501
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\monitoring\\metrics.py",
+    "priority": 5,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 501
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\monitoring\\observability.py",
+    "priority": 5,
+    "error_count": 1,
+    "error_types": [
+      "indentation_error"
+    ],
+    "fix_order": 501
+  },
+  {
+    "file": "C:\\Users\\cathe\\OneDrive\\Desktop\\github\\catnet\\src\\monitoring\\simple_metrics.py",
+    "priority": 5,
+    "error_count": 1,
+    "error_types": [
+      "parse_error"
+    ],
+    "fix_order": 501
+  }
+]

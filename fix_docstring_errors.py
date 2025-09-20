@@ -35,7 +35,8 @@ def fix_missing_function_docstrings(filepath):
             # Check if next line is Args: or Returns: (missing docstring)
             if i < len(lines):
                 next_line = lines[i]
-                # Check if it looks like docstring content without opening quotes
+                # Check if it looks like docstring content without opening
+                # quotes
                 if re.match(
                     r"^(\s*)(Args:|Returns:|Raises:|Note:|Example:)", next_line
                 ):
@@ -53,7 +54,8 @@ def fix_missing_function_docstrings(filepath):
                         line = lines[i]
                         # If we hit code (not indented like docstring), close the
                         # docstring
-                        if line.strip() and not line.startswith(f"{indent}    "):
+                        if line.strip() and not line.startswith(
+                                f"{indent}    "):
                             fixed_lines.append(f'{indent}    """\n')
                             break
                         fixed_lines.append(line)
@@ -119,11 +121,13 @@ def fix_class_docstrings_in_dataclasses(filepath):
                 fixed_lines.append(lines[i])
                 i += 1
 
-                # Now check if next non-empty line is a field without proper indentation
+                # Now check if next non-empty line is a field without proper
+                # indentation
                 while i < len(lines):
                     if lines[i].strip():
                         # This should be a class field
-                        if not lines[i].startswith("    def ") and ":" in lines[i]:
+                        if not lines[i].startswith(
+                                "    def ") and ":" in lines[i]:
                             # Ensure proper indentation
                             field_line = lines[i].lstrip()
                             fixed_lines.append(f"    {field_line}")
@@ -160,7 +164,9 @@ def main():
     python_files = list(src_dir.glob("**/*.py"))
 
     fixed_count = 0
-    print(f"Processing {len(python_files)} Python files for docstring fixes...")
+    print(
+        f"Processing {
+            len(python_files)} Python files for docstring fixes...")
 
     # Focus on the files Black reported as problematic
     problematic_files = [

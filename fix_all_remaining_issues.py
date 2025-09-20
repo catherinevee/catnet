@@ -152,7 +152,8 @@ def fix_indentation_issues(content):
         # Fix incorrectly indented dataclass fields
         if i > 0 and ":" in line and not line.strip().startswith("#"):
             prev_line = lines[i - 1] if i > 0 else ""
-            # Check if previous line was a docstring and this looks like a field
+            # Check if previous line was a docstring and this looks like a
+            # field
             if '"""' in prev_line or prev_line.strip() == "":
                 # Check if line starts without proper indentation
                 if line.strip() and not line.startswith("    ") and "=" in line:
