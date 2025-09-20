@@ -16,6 +16,7 @@ from catnet_cli.utils import (
 
 
 @click.group()
+
 def vault():
     """Secrets and credentials management via HashiCorp Vault"""
     pass
@@ -24,9 +25,22 @@ def vault():
 @vault.command('store')
 @click.option('--path', '-p', required=True, help='Vault path for the secret')
 @click.option('--key', '-k', required=True, help='Secret key name')
-@click.option('--value', '-v', help='Secret value (will prompt if not provided)')
-@click.option('--file', '-f', type=click.Path(exists=True), help='Read value from file')
-@click.option('--ttl', type=int, help='TTL for temporary credentials (seconds)')
+@click.option(
+    '--value',
+    '-v',
+    help='Secret value (will prompt if not provided)'
+)
+@click.option(
+    '--file',
+    '-f',
+    type=click.Path(exists=True),
+    help='Read value from file'
+)
+@click.option(
+    '--ttl',
+    type=int,
+    help='TTL for temporary credentials (seconds)'
+)
 @click.pass_context
 def store_secret(
     ctx: click.Context,
@@ -115,7 +129,11 @@ def get_secret(
     async def retrieve():
         async with CatNetAPIClient(config) as client:
             try:
-                result = await client.get_secret(path, key=key, version=version)
+                                result = await client.get_secret(
+                    path,
+                    key=key,
+                    version=version
+                )
 
                 if key:
                     # Show specific key
@@ -132,7 +150,8 @@ def get_secret(
                     for k, v in result.items():
                         if k not in ['metadata', 'lease_duration']:
                             # Mask sensitive values in display
-                            masked_value = v[:3] + '*' * (len(v) - 3) if len(v) > 3 else '*' * len(v)
+                            masked_value = v[:3] + '*' * (len(v) - 3) if \
+                                len(v) > 3 else '*' * len(v)
                             click.echo(f"{k}: {masked_value}")
 
                     if output:
@@ -155,10 +174,20 @@ def get_secret(
 
 @vault.command('rotate')
 @click.argument('path')
-@click.option('--auto-update/--no-auto-update', default=True, help='Update devices with new credentials')
+@click.option(
+    '--auto-update/--no-auto-update',
+    default=True,
+    help='Update devices with new credentials'
+)
 @click.option('--force', is_flag=True, help='Skip confirmation')
 @click.pass_context
-def rotate_credentials(ctx: click.Context, path: str, auto_update: bool, force: bool):
+
+def rotate_credentials(
+    ctx: click.Context,
+    path: str,
+    auto_update: bool,
+    force: bool
+):
     """Rotate credentials stored in Vault
 
     This will:
@@ -196,7 +225,8 @@ def rotate_credentials(ctx: click.Context, path: str, auto_update: bool, force: 
                 old_version = result.get('old_version')
 
                 print_info(f"New version: {new_version}")
-                print_info(f"Previous version: {old_version} (kept for rollback)")
+                print_info(f"Previous version: {old_version} (kept for \
+                    rollback)")
 
                 if auto_update:
                     updated_devices = result.get('updated_devices', [])
@@ -222,6 +252,7 @@ def rotate_credentials(ctx: click.Context, path: str, auto_update: bool, force: 
 @click.option('--path', '-p', default='/', help='Path to list secrets from')
 @click.option('--recursive', '-r', is_flag=True, help='List recursively')
 @click.pass_context
+
 def list_secrets(ctx: click.Context, path: str, recursive: bool):
     """List secrets stored in Vault
 
@@ -276,7 +307,13 @@ def list_secrets(ctx: click.Context, path: str, recursive: bool):
 @click.option('--version', '-v', type=int, help='Delete specific version only')
 @click.option('--force', is_flag=True, help='Skip confirmation')
 @click.pass_context
-def delete_secret(ctx: click.Context, path: str, version: Optional[int], force: bool):
+
+def delete_secret(
+    ctx: click.Context,
+    path: str,
+    version: Optional[int],
+    force: bool
+):
     """Delete a secret from Vault
 
     WARNING: This action cannot be undone unless versioning is enabled.
@@ -305,7 +342,8 @@ def delete_secret(ctx: click.Context, path: str, version: Optional[int], force: 
                 result = await client.delete_secret(path, version=version)
 
                 if version:
-                    print_success(f"Version {version} of secret at '{path}' deleted")
+                    print_success(f"Version {version} of secret at '{path}' \
+                        deleted")
                 else:
                     print_success(f"Secret at '{path}' deleted successfully")
 
@@ -323,11 +361,29 @@ def delete_secret(ctx: click.Context, path: str, version: Optional[int], force: 
 
 
 @vault.command('policy')
-@click.option('--action', type=click.Choice(['list', 'show', 'update']), default='list', help='Policy action')
+@click.option(
+    '--action',
+    type=click.Choice(['list',
+    'show',
+    'update']),
+    default='list',
+    help='Policy action'
+)
 @click.option('--name', '-n', help='Policy name')
-@click.option('--file', '-f', type=click.Path(exists=True), help='Policy file for update')
+@click.option(
+    '--file',
+    '-f',
+    type=click.Path(exists=True),
+    help='Policy file for update'
+)
 @click.pass_context
-def manage_policies(ctx: click.Context, action: str, name: Optional[str], file: Optional[str]):
+
+def manage_policies(
+    ctx: click.Context,
+    action: str,
+    name: Optional[str],
+    file: Optional[str]
+):
     """Manage Vault access policies
 
     Examples:
@@ -363,7 +419,8 @@ def manage_policies(ctx: click.Context, action: str, name: Optional[str], file: 
 
                 elif action == 'update':
                     if not name or not file:
-                        print_error("Both policy name and file required for update")
+                        print_error("Both policy name and file required for \
+                            update")
                         sys.exit(1)
 
                     with open(file, 'r') as f:
@@ -385,10 +442,28 @@ def manage_policies(ctx: click.Context, action: str, name: Optional[str], file: 
 
 @vault.command('audit')
 @click.option('--path', '-p', help='Filter audit logs by path')
-@click.option('--days', '-d', type=int, default=7, help='Number of days to look back')
-@click.option('--limit', '-l', type=int, default=50, help='Maximum number of entries')
+@click.option(
+    '--days',
+    '-d',
+    type=int,
+    default=7,
+    help='Number of days to look back'
+)
+@click.option(
+    '--limit',
+    '-l',
+    type=int,
+    default=50,
+    help='Maximum number of entries'
+)
 @click.pass_context
-def view_audit_logs(ctx: click.Context, path: Optional[str], days: int, limit: int):
+
+def view_audit_logs(
+    ctx: click.Context,
+    path: Optional[str],
+    days: int,
+    limit: int
+):
     """View Vault audit logs for secret access
 
     Examples:

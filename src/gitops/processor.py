@@ -21,6 +21,7 @@ from ..db.database import get_db
 logger = get_logger(__name__)
 
 
+
 class GitOpsProcessor:
     """Processes Git events and manages configuration synchronization"""
 
@@ -54,11 +55,13 @@ class GitOpsProcessor:
             # Check if push is to configured branch
             if branch != repository.branch:
                 logger.info(
-                    f"Ignoring push to branch {branch}, configured: {repository.branch}"
+                    f"Ignoring push to branch {branch},
+                        configured: {repository.branch}"
                 )
                 return {
                     "status": "ignored",
                     "reason": f"Branch {branch} not configured for auto-deployment",
+                        
                 }
 
             # Scan commits for secrets
@@ -97,7 +100,8 @@ class GitOpsProcessor:
                 return {
                     "status": "validated",
                     "configs": len(configs),
-                    "message": "Configurations validated, manual deployment required",
+                    "message": "Configurations validated, manual deployment \
+                        required",
                 }
 
         except SecurityError as e:
@@ -198,7 +202,8 @@ class GitOpsProcessor:
 
         try:
             # Generate repo path from URL hash
-            repo_hash = hashlib.sha256(repository.url.encode()).hexdigest()[:16]
+            repo_hash = hashlib.sha256(repository.url.encode()).hexdigest( \
+                )[:16]
             repo_path = self.repo_base_path / repo_hash
 
             # Get SSH key from Vault if configured
@@ -254,7 +259,11 @@ class GitOpsProcessor:
             logger.error(f"Failed to sync repository: {e}")
             raise
 
-    async def _scan_for_secrets(self, commits: List[Dict[str, Any]]) -> Dict[str, Any]:
+        async def _scan_for_secrets(
+        self,
+        commits: List[Dict[str,
+        Any]]
+    ) -> Dict[str, Any]:
         """Scan commits for potential secrets"""
         logger.info(f"Scanning {len(commits)} commits for secrets")
 
@@ -336,7 +345,8 @@ class GitOpsProcessor:
             try:
                 with open(config_file, "r") as f:
                     config = yaml.safe_load(f)
-                    config["_source_file"] = str(config_file.relative_to(repo_path))
+                    config["_source_file"] = \
+                        str(config_file.relative_to(repo_path))
                     configs.append(config)
             except Exception as e:
                 logger.error(f"Failed to parse {config_file}: {e}")
@@ -345,7 +355,8 @@ class GitOpsProcessor:
             try:
                 with open(config_file, "r") as f:
                     config = yaml.safe_load(f)
-                    config["_source_file"] = str(config_file.relative_to(repo_path))
+                    config["_source_file"] = \
+                        str(config_file.relative_to(repo_path))
                     configs.append(config)
             except Exception as e:
                 logger.error(f"Failed to parse {config_file}: {e}")
@@ -354,7 +365,8 @@ class GitOpsProcessor:
             try:
                 with open(config_file, "r") as f:
                     config = json.load(f)
-                    config["_source_file"] = str(config_file.relative_to(repo_path))
+                    config["_source_file"] = \
+                        str(config_file.relative_to(repo_path))
                     configs.append(config)
             except Exception as e:
                 logger.error(f"Failed to parse {config_file}: {e}")
@@ -374,15 +386,18 @@ class GitOpsProcessor:
         for config in configs:
             # Schema validation
             if "device" not in config:
-                errors.append(f"{config.get('_source_file')}: Missing 'device' field")
+                errors.append(f"{config.get('_source_file')}: Missing 'device' \
+                    field")
 
             if "vendor" not in config:
-                errors.append(f"{config.get('_source_file')}: Missing 'vendor' field")
+                errors.append(f"{config.get('_source_file')}: Missing 'vendor' \
+                    field")
 
             # Security validation
             if "password" in str(config).lower():
                 errors.append(
-                    f"{config.get('_source_file')}: Contains hardcoded password"
+                    f"{config.get('_source_file')}: Contains hardcoded \
+                        password"
                 )
 
             # Business rules validation
@@ -453,7 +468,8 @@ class GitOpsProcessor:
                 comment += f"- {warning}\n"
 
         comment += (
-            f"\n*Validated {validation_results['configs_validated']} configurations*"
+            f"\n*Validated {validation_results['configs_validated']} \
+                configurations*"
         )
 
         return comment
@@ -461,7 +477,6 @@ class GitOpsProcessor:
     def _configure_ssh(self, repo: git.Repo, ssh_key: str):
         """Configure SSH for repository"""
         # Would configure SSH key for git operations
-        pass
 
     def _get_ssh_env(self, ssh_key: str) -> Dict[str, str]:
         """Get environment variables for SSH operations"""

@@ -8,15 +8,14 @@ Handles:
 - Application performance monitoring
 """
 
-from typing import Dict, Any, Optional, List, Tuple
+from typing import Dict, Any, Optional, List
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-import asyncio
-import json
 from collections import defaultdict
 from contextlib import asynccontextmanager
 import uuid
+
 
 
 class TraceLevel(Enum):
@@ -27,6 +26,7 @@ class TraceLevel(Enum):
     WARNING = "warning"
     ERROR = "error"
     CRITICAL = "critical"
+
 
 
 class SpanKind(Enum):
@@ -40,6 +40,7 @@ class SpanKind(Enum):
 
 
 @dataclass
+
 class Span:
     """Distributed tracing span"""
 
@@ -58,6 +59,7 @@ class Span:
 
 
 @dataclass
+
 class Trace:
     """Complete trace with all spans"""
 
@@ -71,6 +73,7 @@ class Trace:
 
 
 @dataclass
+
 class LogEntry:
     """Structured log entry"""
 
@@ -85,6 +88,7 @@ class LogEntry:
 
 
 @dataclass
+
 class ServiceHealth:
     """Service health status"""
 
@@ -96,6 +100,7 @@ class ServiceHealth:
     throughput_rps: float
     dependencies: List[str] = field(default_factory=list)
     issues: List[str] = field(default_factory=list)
+
 
 
 class ObservabilityService:
@@ -136,7 +141,11 @@ class ObservabilityService:
         self.max_trace_duration = timedelta(minutes=5)
         self.log_retention = timedelta(days=7)
 
-    def create_trace(self, operation_name: str, service_name: str = "catnet") -> str:
+        def create_trace(
+        self,
+        operation_name: str,
+        service_name: str = "catnet"
+    ) -> str:
         """
         Create a new trace
 
@@ -257,7 +266,8 @@ class ObservabilityService:
 
         span = self.active_spans[span_id]
         span.end_time = datetime.utcnow()
-        span.duration_ms = (span.end_time - span.start_time).total_seconds() * 1000
+        span.duration_ms = (span.end_time - span.start_time).total_seconds() * \
+            1000
 
         # Remove from active spans
         del self.active_spans[span_id]
@@ -323,7 +333,8 @@ class ObservabilityService:
 
         trace = self.active_traces[trace_id]
         trace.end_time = datetime.utcnow()
-        trace.duration_ms = (trace.end_time - trace.start_time).total_seconds() * 1000
+        trace.duration_ms = (trace.end_time - \
+            trace.start_time).total_seconds() * 1000
 
         # End root span if still active
         if trace.root_span.span_id in self.active_spans:
@@ -440,7 +451,8 @@ class ObservabilityService:
     def _cleanup_old_logs(self):
         """Cleanup old log entries"""
         cutoff = datetime.utcnow() - self.log_retention
-        self.log_buffer = [log for log in self.log_buffer if log.timestamp > cutoff]
+        self.log_buffer = [log for log in self.log_buffer if log.timestamp > \
+            cutoff]
 
     def update_service_health(
         self,
@@ -629,7 +641,9 @@ class ObservabilityService:
         else:
             # Check completed traces
             trace = next(
-                (t for t in self.completed_traces if t.trace_id == trace_id), None
+                                (
+                    t for t in self.completed_traces if t.trace_id == trace_id
+                ), None
             )
 
         if not trace:
@@ -678,7 +692,10 @@ class ObservabilityService:
                         "operation": span.operation_name,
                         "duration_ms": span.duration_ms,
                         "status": span.status,
-                        "children": self._get_child_spans(span.span_id, span_map),
+                                                "children": self._get_child_spans(
+                            span.span_id,
+                            span_map
+                        ),
                     }
                 )
         return children
@@ -726,7 +743,8 @@ class ObservabilityService:
         # Find error patterns
         error_patterns = defaultdict(int)
         error_logs = [
-            log for log in logs if log.level in [TraceLevel.ERROR, TraceLevel.CRITICAL]
+            log for log in logs if log.level in [TraceLevel.ERROR,
+                TraceLevel.CRITICAL]
         ]
         for log in error_logs:
             # Simple pattern extraction (would be more sophisticated)
@@ -743,9 +761,12 @@ class ObservabilityService:
                 "start": min(log.timestamp for log in logs).isoformat()
                 if logs
                 else None,
-                "end": max(log.timestamp for log in logs).isoformat() if logs else None,
+                                "end": max(
+                    log.timestamp for log in logs).isoformat(
+                ) if logs else None,
             },
         }
+
 
 
 class DistributedTracer:
@@ -787,7 +808,12 @@ class DistributedTracer:
         self.spans[span.span_id] = span
         return span
 
-    def end_span(self, span_id: str, status: str = "ok", error: Optional[str] = None):
+        def end_span(
+        self,
+        span_id: str,
+        status: str = "ok",
+        error: Optional[str] = None
+    ):
         """End a span"""
         if span_id in self.spans:
             span = self.spans[span_id]
@@ -808,6 +834,7 @@ class DistributedTracer:
         if span_id in self.spans:
             return self.spans[span_id].trace_id
         return str(uuid.uuid4())
+
 
 
 class LogAggregator:
@@ -841,7 +868,7 @@ class LogAggregator:
 
         # Trim buffer if too large
         if len(self.log_buffer) > self.max_buffer_size:
-            self.log_buffer = self.log_buffer[-self.max_buffer_size :]
+            self.log_buffer = self.log_buffer[-self.max_buffer_size:]
 
     async def query_logs(
         self,
@@ -858,6 +885,7 @@ class LogAggregator:
             logs = [log for log in logs if log.level == level]
 
         return logs[-limit:]
+
 
 
 class ObservabilityManager:
@@ -877,7 +905,11 @@ class ObservabilityManager:
         self.initialized = True
         return self
 
-    async def start_trace(self, operation: str, service: str = "catnet") -> Span:
+        async def start_trace(
+        self,
+        operation: str,
+        service: str = "catnet"
+    ) -> Span:
         """Start a new trace"""
         return self.tracer.start_span(
             operation_name=operation,
@@ -886,7 +918,8 @@ class ObservabilityManager:
         )
 
     async def log(
-        self, level: TraceLevel, message: str, service: str = "catnet", **metadata
+        self, level: TraceLevel, message: str, service: str = "catnet", \
+            **metadata
     ):
         """Log a message"""
         await self.log_aggregator.log(

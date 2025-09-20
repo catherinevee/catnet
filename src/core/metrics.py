@@ -1,17 +1,18 @@
 """
 Core Metrics Module for CatNet
 
-Provides metrics collection and tracking for deployments, operations, and system health.
+Provides metrics collection and tracking for deployments, operations, and \
+    system health.
 """
 
 from typing import Dict, Any, Optional, List
-from datetime import datetime, timedelta
+from datetime import datetime
 from dataclasses import dataclass, field
 from enum import Enum
 import time
-import asyncio
 from collections import defaultdict, deque
 import statistics
+
 
 
 class MetricType(Enum):
@@ -25,6 +26,7 @@ class MetricType(Enum):
 
 
 @dataclass
+
 class Metric:
     """Represents a single metric"""
 
@@ -37,6 +39,7 @@ class Metric:
     unit: str = ""
 
 
+
 class MetricsCollector:
     """Collects and manages system metrics"""
 
@@ -45,7 +48,9 @@ class MetricsCollector:
         self.metrics: Dict[str, List[Metric]] = defaultdict(list)
         self.counters: Dict[str, float] = defaultdict(float)
         self.gauges: Dict[str, float] = {}
-        self.histograms: Dict[str, deque] = defaultdict(lambda: deque(maxlen=1000))
+                self.histograms: Dict[str, deque] = defaultdict(
+            lambda: deque(maxlen=1000)
+        )
         self.timers: Dict[str, float] = {}
 
     def increment_counter(
@@ -64,7 +69,13 @@ class MetricsCollector:
             )
         )
 
-    def set_gauge(self, name: str, value: float, labels: Dict[str, str] = None):
+        def set_gauge(
+        self,
+        name: str,
+        value: float,
+        labels: Dict[str,
+        str] = None
+    ):
         """Set a gauge metric value"""
         key = self._make_key(name, labels)
         self.gauges[key] = value
@@ -78,7 +89,13 @@ class MetricsCollector:
             )
         )
 
-    def observe_histogram(self, name: str, value: float, labels: Dict[str, str] = None):
+        def observe_histogram(
+        self,
+        name: str,
+        value: float,
+        labels: Dict[str,
+        str] = None
+    ):
         """Add an observation to a histogram"""
         key = self._make_key(name, labels)
         self.histograms[key].append(value)
@@ -165,18 +182,23 @@ class MetricsCollector:
                 count = sum(1 for v in values if v <= bucket)
                 bucket_labels = {**labels, "le": str(bucket)}
                 lines.append(
-                    f"{self.namespace}_{name}_bucket{self._format_labels(bucket_labels)} {count}"
+                    f"{self.namespace}_{name}_bucket{self._format_labels( 
+    bucket_labels)} {count}"
                 )
 
             # Add +Inf bucket and summary
             lines.append(
-                f"{self.namespace}_{name}_bucket{self._format_labels({**labels, 'le': '+Inf'})} {len(values)}"
+                f"{self.namespace}_{name}_bucket{self._format_labels({**labels, 
+    'le': '+Inf'})} {len(values)}"
             )
             lines.append(
-                f"{self.namespace}_{name}_sum{self._format_labels(labels)} {sum(values)}"
+                f"{self.namespace}_{name}_sum{self._format_labels(labels)} \
+                    {sum(
+    values)}"
             )
             lines.append(
-                f"{self.namespace}_{name}_count{self._format_labels(labels)} {len(values)}"
+                f"{self.namespace}_{name}_count{self._format_labels(labels)} { \
+    len(values)}"
             )
 
         return "\n".join(lines)
@@ -218,6 +240,7 @@ class MetricsCollector:
         self.timers.clear()
 
 
+
 class DeploymentMetrics:
     """Specialized metrics for deployment tracking"""
 
@@ -232,11 +255,18 @@ class DeploymentMetrics:
             "deployments_started_total", labels={"strategy": strategy}
         )
         self.collector.set_gauge(
-            "deployment_devices", device_count, labels={"deployment_id": deployment_id}
+            "deployment_devices",
+                device_count
+                labels={"deployment_id": deployment_id}
         )
         return self.collector.start_timer(f"deployment_{deployment_id}")
 
-    def record_deployment_end(self, deployment_id: str, timer_id: str, success: bool):
+        def record_deployment_end(
+        self,
+        deployment_id: str,
+        timer_id: str,
+        success: bool
+    ):
         """Record the end of a deployment"""
         status = "success" if success else "failure"
         self.collector.stop_timer(timer_id, labels={"status": status})
@@ -244,14 +274,21 @@ class DeploymentMetrics:
             "deployments_completed_total", labels={"status": status}
         )
 
-    def record_device_deployment(self, device_id: str, success: bool, duration: float):
+        def record_device_deployment(
+        self,
+        device_id: str,
+        success: bool,
+        duration: float
+    ):
         """Record a single device deployment"""
         status = "success" if success else "failure"
         self.collector.increment_counter(
             "device_deployments_total", labels={"status": status}
         )
         self.collector.observe_histogram(
-            "device_deployment_duration_seconds", duration, labels={"status": status}
+            "device_deployment_duration_seconds",
+                duration
+                labels={"status": status}
         )
 
     def record_rollback(self, deployment_id: str, reason: str):
@@ -308,6 +345,7 @@ class DeploymentMetrics:
         return statistics.mean(durations) if durations else 0.0
 
 
+
 class SystemMetrics:
     """System-wide metrics collection"""
 
@@ -321,7 +359,9 @@ class SystemMetrics:
         """Record API request metrics"""
         self.collector.increment_counter(
             "api_requests_total",
-            labels={"endpoint": endpoint, "method": method, "status": str(status_code)},
+                        labels={"endpoint": endpoint, "method": method, "status": str(
+                status_code
+            )},
         )
         self.collector.observe_histogram(
             "api_request_duration_seconds",
@@ -336,7 +376,12 @@ class SystemMetrics:
             "auth_attempts_total", labels={"method": method, "status": status}
         )
 
-    def record_database_query(self, operation: str, table: str, duration: float):
+        def record_database_query(
+        self,
+        operation: str,
+        table: str,
+        duration: float
+    ):
         """Record database query metrics"""
         self.collector.observe_histogram(
             "database_query_duration_seconds",
@@ -348,7 +393,9 @@ class SystemMetrics:
         """Record cache operation"""
         status = "hit" if hit else "miss"
         self.collector.increment_counter(
-            "cache_operations_total", labels={"operation": operation, "status": status}
+            "cache_operations_total",
+                labels={"operation": operation
+                "status": status}
         )
 
     def set_active_connections(self, count: int):
@@ -357,7 +404,11 @@ class SystemMetrics:
 
     def set_queue_size(self, queue_name: str, size: int):
         """Set queue size metric"""
-        self.collector.set_gauge("queue_size", size, labels={"queue": queue_name})
+                self.collector.set_gauge(
+            "queue_size",
+            size,
+            labels={"queue": queue_name}
+        )
 
     async def get_all_metrics(self) -> Dict[str, Any]:
         """Get all system metrics"""
@@ -372,7 +423,9 @@ class SystemMetrics:
     def _get_api_stats(self) -> Dict[str, Any]:
         """Get API statistics"""
         total_requests = sum(
-            v for k, v in self.collector.counters.items() if "api_requests" in k
+                        v for k, v in self.collector.counters.items(
+                
+            ) if "api_requests" in k
         )
 
         # Calculate average response time
@@ -383,7 +436,9 @@ class SystemMetrics:
 
         return {
             "total_requests": total_requests,
-            "average_response_time": statistics.mean(durations) if durations else 0,
+                        "average_response_time": statistics.mean(
+                durations
+            ) if durations else 0,
             "p95_response_time": statistics.quantiles(durations, n=20)[18]
             if durations
             else 0,
@@ -400,7 +455,9 @@ class SystemMetrics:
             if "auth_attempts" in k and "success" in k
         )
         total = sum(
-            v for k, v in self.collector.counters.items() if "auth_attempts" in k
+                        v for k, v in self.collector.counters.items(
+                
+            ) if "auth_attempts" in k
         )
 
         return {
@@ -419,7 +476,9 @@ class SystemMetrics:
 
         return {
             "total_queries": len(durations),
-            "average_query_time": statistics.mean(durations) if durations else 0,
+                        "average_query_time": statistics.mean(
+                durations
+            ) if durations else 0,
             "slowest_query": max(durations) if durations else 0,
         }
 

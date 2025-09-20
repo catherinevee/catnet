@@ -17,6 +17,7 @@ from ..security.audit import AuditLogger
 logger = get_logger(__name__)
 
 
+
 class RateLimiter:
     """
     Rate limiter implementation using Token Bucket algorithm
@@ -54,7 +55,10 @@ class RateLimiter:
             await self.redis_client.ping()
             logger.info("Rate limiter initialized with Redis backend")
         except Exception as e:
-            logger.warning(f"Redis not available, using in-memory rate limiting: {e}")
+                        logger.warning(
+                f"Redis not available,
+                using in-memory rate limiting: {e}"
+            )
             self.redis_client = None
             self._local_buckets = {}
 
@@ -99,7 +103,11 @@ class RateLimiter:
             redis_key = f"rate_limit:{key}"
 
             # Remove old entries outside the window
-            await self.redis_client.zremrangebyscore(redis_key, 0, window_start)
+                        await self.redis_client.zremrangebyscore(
+                redis_key,
+                0,
+                window_start
+            )
 
             # Count requests in current window
             current_requests = await self.redis_client.zcard(redis_key)
@@ -230,7 +238,10 @@ class RateLimiter:
                         )
                     )
 
-                    headers["Retry-After"] = str(result.get("retry_after", period))
+                                        headers["Retry-After"] = str(
+                        result.get("retry_after",
+                        period)
+                    )
 
                     raise HTTPException(
                         status_code=status.HTTP_429_TOO_MANY_REQUESTS,
@@ -249,6 +260,7 @@ class RateLimiter:
             return wrapper
 
         return decorator
+
 
 
 class EndpointRateLimits:
@@ -282,6 +294,7 @@ class EndpointRateLimits:
 rate_limiter = RateLimiter()
 
 
+
 def get_user_key(request: Request) -> str:
     """Extract user ID from request for rate limiting"""
     # Would extract from JWT token or session
@@ -289,6 +302,7 @@ def get_user_key(request: Request) -> str:
     if user:
         return f"user:{user.id}"
     return f"ip:{request.client.host if request.client else 'unknown'}"
+
 
 
 def get_ip_key(request: Request) -> str:
@@ -301,14 +315,17 @@ def get_ip_key(request: Request) -> str:
 
 
 # Example usage decorators
+
 def limit_auth_endpoint(rate: int = 5, period: int = 60):
     """Rate limit authentication endpoints"""
     return rate_limiter.limit(
         rate=rate,
         period=period,
         key_func=get_ip_key,
-        error_message="Too many authentication attempts. Please try again later.",
+        error_message="Too many authentication attempts. Please try again \
+            later.",
     )
+
 
 
 def limit_api_endpoint(rate: int = 100, period: int = 60):
@@ -319,6 +336,7 @@ def limit_api_endpoint(rate: int = 100, period: int = 60):
         key_func=get_user_key,
         error_message="API rate limit exceeded. Please slow down.",
     )
+
 
 
 def limit_deployment_endpoint(rate: int = 10, period: int = 300):

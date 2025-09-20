@@ -9,15 +9,15 @@ Handles:
 - Scheduled tasks
 """
 
-from typing import Dict, Any, Optional, List, Callable, Union
+from typing import Dict, Any, Optional, List, Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
 import asyncio
 import json
-from collections import defaultdict, deque
-import yaml
+from collections import defaultdict
 import re
+
 
 
 class WorkflowState(Enum):
@@ -31,6 +31,7 @@ class WorkflowState(Enum):
     CANCELLED = "cancelled"
 
 
+
 class TriggerType(Enum):
     """Workflow trigger types"""
 
@@ -40,6 +41,7 @@ class TriggerType(Enum):
     CONDITION = "condition"
     WEBHOOK = "webhook"
     API = "api"
+
 
 
 class ActionType(Enum):
@@ -56,7 +58,25 @@ class ActionType(Enum):
     CONDITION = "condition"
 
 
+
+class StepType(Enum):
+    """Workflow step types"""
+
+    ACTION = "action"
+    DECISION = "decision"
+    PARALLEL = "parallel"
+    LOOP = "loop"
+    WAIT = "wait"
+    APPROVAL = "approval"
+    NOTIFICATION = "notification"
+
+
+# Alias for backward compatibility
+ExecutionStatus = WorkflowState
+
+
 @dataclass
+
 class WorkflowTrigger:
     """Workflow trigger definition"""
 
@@ -68,6 +88,7 @@ class WorkflowTrigger:
 
 
 @dataclass
+
 class WorkflowAction:
     """Workflow action definition"""
 
@@ -84,6 +105,7 @@ class WorkflowAction:
 
 
 @dataclass
+
 class WorkflowStep:
     """Workflow execution step"""
 
@@ -97,6 +119,7 @@ class WorkflowStep:
 
 
 @dataclass
+
 class Workflow:
     """Workflow definition"""
 
@@ -112,6 +135,7 @@ class Workflow:
 
 
 @dataclass
+
 class WorkflowExecution:
     """Workflow execution instance"""
 
@@ -124,6 +148,7 @@ class WorkflowExecution:
     steps: List[WorkflowStep] = field(default_factory=list)
     context: Dict[str, Any] = field(default_factory=dict)
     error: Optional[str] = None
+
 
 
 class WorkflowEngine:
@@ -176,10 +201,13 @@ class WorkflowEngine:
 
     def _register_action_handlers(self):
         """Register action type handlers"""
-        self.action_handlers[ActionType.DEVICE_COMMAND] = self._execute_device_command
-        self.action_handlers[ActionType.CONFIG_CHANGE] = self._execute_config_change
+        self.action_handlers[ActionType.DEVICE_COMMAND] = \
+            self._execute_device_command
+        self.action_handlers[ActionType.CONFIG_CHANGE] = \
+            self._execute_config_change
         self.action_handlers[ActionType.ROLLBACK] = self._execute_rollback
-        self.action_handlers[ActionType.NOTIFICATION] = self._execute_notification
+        self.action_handlers[ActionType.NOTIFICATION] = \
+            self._execute_notification
         self.action_handlers[ActionType.SCRIPT] = self._execute_script
         self.action_handlers[ActionType.API_CALL] = self._execute_api_call
         self.action_handlers[ActionType.WAIT] = self._execute_wait
@@ -239,6 +267,7 @@ class WorkflowEngine:
                         parameters={
                             "channel": "slack",
                             "message": "CPU remediation completed on {{device_id}}",
+                                
                         },
                     ),
                 ],
@@ -383,7 +412,8 @@ class WorkflowEngine:
                         event_type
                         and workflow_id in self.event_subscriptions[event_type]
                     ):
-                        self.event_subscriptions[event_type].remove(workflow_id)
+                        self.event_subscriptions[event_type].remove( \
+                            workflow_id)
 
             # Cancel scheduled tasks
             if workflow_id in self.scheduled_tasks:
@@ -505,7 +535,11 @@ class WorkflowEngine:
             if execution_id in self.running_executions:
                 del self.running_executions[execution_id]
 
-    async def _execute_action(self, step: WorkflowStep, execution: WorkflowExecution):
+        async def _execute_action(
+        self,
+        step: WorkflowStep,
+        execution: WorkflowExecution
+    ):
         """Execute a workflow action"""
         step.state = WorkflowState.RUNNING
         step.started_at = datetime.utcnow()
@@ -534,14 +568,16 @@ class WorkflowEngine:
             except asyncio.TimeoutError:
                 step.error = "Action timed out"
                 if attempt < step.action.retry_count - 1:
-                    await asyncio.sleep(step.action.retry_delay.total_seconds())
+                    await asyncio.sleep(step.action.retry_delay.total_seconds( \
+                        ))
                 else:
                     step.state = WorkflowState.FAILED
 
             except Exception as e:
                 step.error = str(e)
                 if attempt < step.action.retry_count - 1:
-                    await asyncio.sleep(step.action.retry_delay.total_seconds())
+                    await asyncio.sleep(step.action.retry_delay.total_seconds( \
+                        ))
                 else:
                     step.state = WorkflowState.FAILED
 
@@ -572,7 +608,10 @@ class WorkflowEngine:
 
         # Save output if requested
         if "save_as" in parameters:
-            filename = self._substitute_variables(parameters["save_as"], context)
+                        filename = self._substitute_variables(
+                parameters["save_as"],
+                context
+            )
             # Save to file (implementation depends on storage service)
             result["file_path"] = filename
 
@@ -585,7 +624,10 @@ class WorkflowEngine:
         if not self.deployment_service:
             raise ValueError("Deployment service not available")
 
-        changes = self._substitute_variables(str(parameters["changes"]), context)
+                changes = self._substitute_variables(
+            str(parameters["changes"]),
+            context
+        )
         device_id = parameters.get("device_id") or context.get("device_id")
 
         # Check if approval required
@@ -610,12 +652,16 @@ class WorkflowEngine:
         if not self.deployment_service:
             raise ValueError("Deployment service not available")
 
-        deployment_id = parameters.get("deployment_id") or context.get("deployment_id")
+        deployment_id = parameters.get("deployment_id") or \
+            context.get("deployment_id")
 
         # Trigger rollback
-        success = await self.deployment_service.rollback_deployment(deployment_id)
+        success = await self.deployment_service.rollback_deployment( \
+            deployment_id)
 
-        return {"success": success, "rollback_completed": datetime.utcnow().isoformat()}
+                return {"success": success, "rollback_completed": datetime.utcnow(
+            ).isoformat(
+        )}
 
     async def _execute_notification(
         self, parameters: Dict[str, Any], context: Dict[str, Any]
@@ -623,7 +669,10 @@ class WorkflowEngine:
         """Execute notification action"""
         if not self.notification_service:
             # Fallback to print
-            message = self._substitute_variables(parameters["message"], context)
+                        message = self._substitute_variables(
+                parameters["message"],
+                context
+            )
             print(f"Notification: {message}")
             return {"sent": True, "method": "console"}
 
@@ -702,12 +751,15 @@ class WorkflowEngine:
         self, parameters: Dict[str, Any], context: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Execute conditional action"""
-        condition = self._substitute_variables(parameters["condition"], context)
+                condition = self._substitute_variables(
+            parameters["condition"],
+            context
+        )
 
         # Evaluate condition
         try:
             result = eval(condition, {"__builtins__": {}}, context)
-        except:
+        except Exception:
             result = False
 
         if result:
@@ -758,7 +810,6 @@ class WorkflowEngine:
     def _schedule_workflow(self, workflow: Workflow):
         """Schedule a workflow"""
         # Implementation depends on scheduler
-        pass
 
     async def handle_event(self, event: Dict[str, Any]):
         """Handle an event that might trigger workflows"""
@@ -773,7 +824,10 @@ class WorkflowEngine:
             if workflow_id in self.workflows:
                 await self.trigger_workflow(workflow_id, event)
 
-    def get_execution_status(self, execution_id: str) -> Optional[Dict[str, Any]]:
+        def get_execution_status(
+        self,
+        execution_id: str
+    ) -> Optional[Dict[str, Any]]:
         """Get workflow execution status"""
         if execution_id not in self.executions:
             return None
@@ -811,7 +865,8 @@ class WorkflowEngine:
             }
 
         successful = sum(
-            1 for e in self.execution_history if e.state == WorkflowState.COMPLETED
+            1 for e in self.execution_history if e.state == \
+                WorkflowState.COMPLETED
         )
 
         durations = []
@@ -830,7 +885,492 @@ class WorkflowEngine:
             "total_executions": total,
             "successful_executions": successful,
             "success_rate": successful / total if total > 0 else 0,
-            "average_duration": sum(durations) / len(durations) if durations else 0,
+                        "average_duration": sum(
+                durations) / len(durations
+            ) if durations else 0,
             "active_executions": len(self.running_executions),
             "by_workflow": dict(by_workflow),
         }
+
+
+
+class WorkflowBuilder:
+    """
+    Builder pattern for creating workflows
+    """
+
+    def __init__(self, name: str, description: str = ""):
+        """Initialize workflow builder"""
+        self.workflow = Workflow(
+            id=f"workflow_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}",
+            name=name,
+            description=description,
+            steps=[],
+            triggers=[],
+            metadata={},
+        )
+
+    def add_trigger(
+        self,
+        trigger_type: TriggerType,
+        config: Optional[Dict[str, Any]] = None,
+    ) -> "WorkflowBuilder":
+        """Add trigger to workflow"""
+        trigger = WorkflowTrigger(
+            type=trigger_type,
+            config=config or {},
+            conditions=[],
+        )
+        self.workflow.triggers.append(trigger)
+        return self
+
+    def add_step(
+        self,
+        name: str,
+        step_type: StepType,
+        action: Optional[WorkflowAction] = None,
+        timeout: Optional[int] = None,
+    ) -> "WorkflowBuilder":
+        """Add step to workflow"""
+        step = WorkflowStep(
+            name=name,
+            type=step_type,
+            action=action,
+            timeout=timeout,
+            retry_policy={"max_retries": 3, "backoff": "exponential"},
+        )
+        self.workflow.steps.append(step)
+        return self
+
+    def add_condition(
+        self, step_name: str, condition: Dict[str, Any]
+    ) -> "WorkflowBuilder":
+        """Add condition to a step"""
+        for step in self.workflow.steps:
+            if step.name == step_name:
+                if not hasattr(step, "conditions"):
+                    step.conditions = []
+                step.conditions.append(condition)
+                break
+        return self
+
+    def add_metadata(self, key: str, value: Any) -> "WorkflowBuilder":
+        """Add metadata to workflow"""
+        self.workflow.metadata[key] = value
+        return self
+
+    def set_timeout(self, timeout: int) -> "WorkflowBuilder":
+        """Set workflow timeout"""
+        self.workflow.timeout = timeout
+        return self
+
+    def set_retry_policy(self, policy: Dict[str, Any]) -> "WorkflowBuilder":
+        """Set workflow retry policy"""
+        self.workflow.retry_policy = policy
+        return self
+
+    def build(self) -> Workflow:
+        """Build and return the workflow"""
+        # Validate workflow
+        if not self.workflow.steps:
+            raise ValueError("Workflow must have at least one step")
+
+        if not self.workflow.triggers:
+            # Add default manual trigger
+            self.add_trigger(TriggerType.MANUAL)
+
+        return self.workflow
+
+
+
+class RemediationWorkflows:
+    """
+    Pre-defined remediation workflows
+    """
+
+    @staticmethod
+    def create_high_cpu_remediation() -> Workflow:
+        """Create workflow for high CPU remediation"""
+        builder = WorkflowBuilder(
+            name="High CPU Remediation",
+            description="Automatically remediate high CPU usage",
+        )
+
+        builder.add_trigger(
+            TriggerType.CONDITION,
+            config={"metric": "cpu_usage", "threshold": 90, "duration": 300},
+        )
+
+        builder.add_step(
+            name="identify_processes",
+            step_type=StepType.ACTION,
+            action=WorkflowAction(
+                type=ActionType.DEVICE_COMMAND,
+                command="show processes cpu sorted",
+                parameters={},
+            ),
+        )
+
+        builder.add_step(
+            name="analyze_top_consumers",
+            step_type=StepType.ACTION,
+            action=WorkflowAction(
+                type=ActionType.SCRIPT,
+                command="analyze_cpu_consumers.py",
+                parameters={"top_n": 5},
+            ),
+        )
+
+        builder.add_step(
+            name="decide_action",
+            step_type=StepType.DECISION,
+            action=WorkflowAction(
+                type=ActionType.CONDITION,
+                command="evaluate_cpu_action",
+                parameters={"threshold": 95},
+            ),
+        )
+
+        builder.add_step(
+            name="restart_service",
+            step_type=StepType.ACTION,
+            action=WorkflowAction(
+                type=ActionType.DEVICE_COMMAND,
+                command="restart process",
+                parameters={"graceful": True},
+            ),
+        )
+
+        builder.add_step(
+            name="verify_cpu",
+            step_type=StepType.ACTION,
+            action=WorkflowAction(
+                type=ActionType.WAIT,
+                command="wait",
+                parameters={"duration": 60},
+            ),
+        )
+
+        builder.add_step(
+            name="notify_team",
+            step_type=StepType.NOTIFICATION,
+            action=WorkflowAction(
+                type=ActionType.NOTIFICATION,
+                command="send_notification",
+                parameters={"channel": "ops-alerts"},
+            ),
+        )
+
+        return builder.build()
+
+    @staticmethod
+    def create_interface_flapping_remediation() -> Workflow:
+        """Create workflow for interface flapping remediation"""
+        builder = WorkflowBuilder(
+            name="Interface Flapping Remediation",
+            description="Automatically remediate flapping interfaces",
+        )
+
+        builder.add_trigger(
+            TriggerType.EVENT,
+            config={"event": "interface_flap", "threshold": 5, "window": 300},
+        )
+
+        builder.add_step(
+            name="check_interface",
+            step_type=StepType.ACTION,
+            action=WorkflowAction(
+                type=ActionType.DEVICE_COMMAND,
+                command="show interface status",
+                parameters={},
+            ),
+        )
+
+        builder.add_step(
+            name="check_errors",
+            step_type=StepType.ACTION,
+            action=WorkflowAction(
+                type=ActionType.DEVICE_COMMAND,
+                command="show interface counters errors",
+                parameters={},
+            ),
+        )
+
+        builder.add_step(
+            name="analyze_pattern",
+            step_type=StepType.ACTION,
+            action=WorkflowAction(
+                type=ActionType.SCRIPT,
+                command="analyze_flapping_pattern.py",
+                parameters={},
+            ),
+        )
+
+        builder.add_step(
+            name="apply_dampening",
+            step_type=StepType.ACTION,
+            action=WorkflowAction(
+                type=ActionType.CONFIG_CHANGE,
+                command="interface dampening",
+                parameters={"penalty": 1000, "suppress": 2000, "reuse": 750},
+            ),
+        )
+
+        builder.add_step(
+            name="monitor_stability",
+            step_type=StepType.WAIT,
+            action=WorkflowAction(
+                type=ActionType.WAIT,
+                command="wait",
+                parameters={"duration": 300},
+            ),
+        )
+
+        builder.add_step(
+            name="create_ticket",
+            step_type=StepType.ACTION,
+            action=WorkflowAction(
+                type=ActionType.API_CALL,
+                command="create_service_ticket",
+                parameters={"priority": "medium", "auto_assign": True},
+            ),
+        )
+
+        return builder.build()
+
+    @staticmethod
+    def create_memory_leak_remediation() -> Workflow:
+        """Create workflow for memory leak remediation"""
+        builder = WorkflowBuilder(
+            name="Memory Leak Remediation",
+            description="Detect and remediate memory leaks",
+        )
+
+        builder.add_trigger(
+            TriggerType.CONDITION,
+            config={
+                "metric": "memory_usage",
+                "threshold": 85,
+                "trend": "increasing",
+                "duration": 1800,
+            },
+        )
+
+        builder.add_step(
+            name="collect_memory_stats",
+            step_type=StepType.ACTION,
+            action=WorkflowAction(
+                type=ActionType.DEVICE_COMMAND,
+                command="show memory statistics",
+                parameters={},
+            ),
+        )
+
+        builder.add_step(
+            name="identify_leak_source",
+            step_type=StepType.ACTION,
+            action=WorkflowAction(
+                type=ActionType.SCRIPT,
+                command="identify_memory_leak.py",
+                parameters={"samples": 5, "interval": 60},
+            ),
+        )
+
+        builder.add_step(
+            name="check_known_issues",
+            step_type=StepType.ACTION,
+            action=WorkflowAction(
+                type=ActionType.API_CALL,
+                command="check_bug_database",
+                parameters={"vendor": "cisco", "symptom": "memory_leak"},
+            ),
+        )
+
+        builder.add_step(
+            name="apply_workaround",
+            step_type=StepType.DECISION,
+            action=WorkflowAction(
+                type=ActionType.CONDITION,
+                command="evaluate_workaround",
+                parameters={},
+            ),
+        )
+
+        builder.add_step(
+            name="clear_process",
+            step_type=StepType.ACTION,
+            action=WorkflowAction(
+                type=ActionType.DEVICE_COMMAND,
+                command="clear process",
+                parameters={"force": False},
+            ),
+        )
+
+        builder.add_step(
+            name="schedule_reload",
+            step_type=StepType.ACTION,
+            action=WorkflowAction(
+                type=ActionType.DEVICE_COMMAND,
+                command="reload in",
+                parameters={"minutes": 120,
+                    "reason": "memory_leak_remediation"}
+                    
+            ),
+        )
+
+        builder.add_metadata("severity", "high")
+        builder.add_metadata("category", "performance")
+        builder.set_timeout(7200)
+
+        return builder.build()
+
+    @staticmethod
+    def create_config_drift_remediation() -> Workflow:
+        """Create workflow for configuration drift remediation"""
+        builder = WorkflowBuilder(
+            name="Config Drift Remediation",
+            description="Detect and correct configuration drift",
+        )
+
+        builder.add_trigger(
+            TriggerType.SCHEDULE,
+            config={"cron": "0 2 * * *"},  # Daily at 2 AM
+        )
+
+        builder.add_step(
+            name="backup_current",
+            step_type=StepType.ACTION,
+            action=WorkflowAction(
+                type=ActionType.DEVICE_COMMAND,
+                command="copy running-config",
+                parameters={"destination": "backup"},
+            ),
+        )
+
+        builder.add_step(
+            name="compare_configs",
+            step_type=StepType.ACTION,
+            action=WorkflowAction(
+                type=ActionType.SCRIPT,
+                command="compare_with_golden.py",
+                parameters={"tolerance": 5},
+            ),
+        )
+
+        builder.add_step(
+            name="analyze_drift",
+            step_type=StepType.DECISION,
+            action=WorkflowAction(
+                type=ActionType.CONDITION,
+                command="evaluate_drift",
+                parameters={"critical_sections": ["acl",
+                    "routing"
+                    "security"]}
+                    
+            ),
+        )
+
+        builder.add_step(
+            name="apply_corrections",
+            step_type=StepType.ACTION,
+            action=WorkflowAction(
+                type=ActionType.CONFIG_CHANGE,
+                command="apply_config_template",
+                parameters={"mode": "merge", "validate": True},
+            ),
+        )
+
+        builder.add_step(
+            name="verify_compliance",
+            step_type=StepType.ACTION,
+            action=WorkflowAction(
+                type=ActionType.SCRIPT,
+                command="verify_compliance.py",
+                parameters={},
+            ),
+        )
+
+        builder.add_step(
+            name="update_cmdb",
+            step_type=StepType.ACTION,
+            action=WorkflowAction(
+                type=ActionType.API_CALL,
+                command="update_configuration_item",
+                parameters={"fields": ["config_version", "last_audit"]},
+            ),
+        )
+
+        return builder.build()
+
+    @staticmethod
+    def create_security_breach_response() -> Workflow:
+        """Create workflow for security breach response"""
+        builder = WorkflowBuilder(
+            name="Security Breach Response",
+            description="Immediate response to detected security breaches",
+        )
+
+        builder.add_trigger(
+            TriggerType.EVENT,
+            config={"event": "security_alert",
+                "severity": ["critical"
+                "high"]}
+                
+        )
+
+        builder.add_step(
+            name="isolate_threat",
+            step_type=StepType.ACTION,
+            action=WorkflowAction(
+                type=ActionType.CONFIG_CHANGE,
+                command="apply_quarantine_acl",
+                parameters={"immediate": True},
+            ),
+            timeout=30,
+        )
+
+        builder.add_step(
+            name="collect_evidence",
+            step_type=StepType.PARALLEL,
+            action=WorkflowAction(
+                type=ActionType.SCRIPT,
+                command="collect_forensics.py",
+                parameters={"comprehensive": True},
+            ),
+        )
+
+        builder.add_step(
+            name="block_source",
+            step_type=StepType.ACTION,
+            action=WorkflowAction(
+                type=ActionType.CONFIG_CHANGE,
+                command="update_blacklist",
+                parameters={"scope": "global"},
+            ),
+        )
+
+        builder.add_step(
+            name="notify_security",
+            step_type=StepType.NOTIFICATION,
+            action=WorkflowAction(
+                type=ActionType.NOTIFICATION,
+                command="alert_security_team",
+                parameters={"priority": "urgent", "escalate": True},
+            ),
+        )
+
+        builder.add_step(
+            name="initiate_incident",
+            step_type=StepType.ACTION,
+            action=WorkflowAction(
+                type=ActionType.API_CALL,
+                command="create_security_incident",
+                parameters={"auto_assign": True, "runbook": "security_breach"},
+            ),
+        )
+
+        builder.add_metadata("compliance", "required")
+        builder.add_metadata("audit", True)
+        builder.set_timeout(300)  # 5 minutes max
+
+        return builder.build()

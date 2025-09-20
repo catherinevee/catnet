@@ -17,6 +17,7 @@ from collections import defaultdict
 import re
 
 
+
 class AlertSeverity(Enum):
     """Alert severity levels"""
 
@@ -27,6 +28,7 @@ class AlertSeverity(Enum):
     INFO = "info"
 
 
+
 class AlertState(Enum):
     """Alert states"""
 
@@ -35,6 +37,7 @@ class AlertState(Enum):
     RESOLVED = "resolved"
     SUPPRESSED = "suppressed"
     ACKNOWLEDGED = "acknowledged"
+
 
 
 class AlertChannel(Enum):
@@ -49,6 +52,7 @@ class AlertChannel(Enum):
 
 
 @dataclass
+
 class AlertCondition:
     """Alert condition definition"""
 
@@ -60,6 +64,7 @@ class AlertCondition:
 
 
 @dataclass
+
 class AlertRule:
     """Alert rule definition"""
 
@@ -76,6 +81,7 @@ class AlertRule:
 
 
 @dataclass
+
 class Alert:
     """Active alert instance"""
 
@@ -97,6 +103,7 @@ class Alert:
 
 
 @dataclass
+
 class NotificationConfig:
     """Notification configuration"""
 
@@ -104,6 +111,7 @@ class NotificationConfig:
     recipients: List[str]
     template: Optional[str] = None
     settings: Dict[str, Any] = field(default_factory=dict)
+
 
 
 class AlertManager:
@@ -156,7 +164,8 @@ class AlertManager:
                 ],
                 annotations={
                     "summary": "High CPU usage detected",
-                    "description": "CPU usage has been above 80% for 5 minutes",
+                    "description": "CPU usage has been above 80% for 5 \
+                        minutes",
                 },
                 channels=[AlertChannel.EMAIL, AlertChannel.SLACK],
             )
@@ -180,7 +189,8 @@ class AlertManager:
                 ],
                 annotations={
                     "summary": "Multiple deployment failures",
-                    "description": "More than 3 deployments failed in the last 10 minutes",
+                    "description": "More than 3 deployments failed in the last \
+    10 minutes",
                 },
                 channels=[AlertChannel.PAGERDUTY, AlertChannel.SLACK],
             )
@@ -261,7 +271,11 @@ class AlertManager:
         """
         self.notification_configs[config.channel] = config
 
-    def register_notification_handler(self, channel: AlertChannel, handler: Callable):
+        def register_notification_handler(
+        self,
+        channel: AlertChannel,
+        handler: Callable
+    ):
         """
         Register a notification handler
 
@@ -316,7 +330,10 @@ class AlertManager:
             except Exception as e:
                 print(f"Error evaluating rule {rule.id}: {e}")
 
-    async def _check_conditions(self, conditions: List[AlertCondition]) -> bool:
+        async def _check_conditions(
+        self,
+        conditions: List[AlertCondition]
+    ) -> bool:
         """
         Check if alert conditions are met
 
@@ -444,7 +461,11 @@ class AlertManager:
         self.alert_history.append(alert)
         del self.active_alerts[rule_id]
 
-    async def _send_notifications(self, alert: Alert, channels: List[AlertChannel]):
+        async def _send_notifications(
+        self,
+        alert: Alert,
+        channels: List[AlertChannel]
+    ):
         """
         Send alert notifications
 
@@ -500,7 +521,8 @@ class AlertManager:
             True if suppressed
         """
         # Check if alert has suppression time
-        if alert.suppressed_until and alert.suppressed_until > datetime.utcnow():
+        if alert.suppressed_until and alert.suppressed_until > \
+            datetime.utcnow():
             return True
 
         # Check suppression rules
@@ -510,7 +532,12 @@ class AlertManager:
 
         return False
 
-    def _matches_suppression_rule(self, alert: Alert, rule: Dict[str, Any]) -> bool:
+        def _matches_suppression_rule(
+        self,
+        alert: Alert,
+        rule: Dict[str,
+        Any]
+    ) -> bool:
         """Check if alert matches suppression rule"""
         # Check time window
         if "time_window" in rule:
@@ -555,13 +582,17 @@ class AlertManager:
                 if alert.escalation_level < level["level"]:
                     alert.escalation_level = level["level"]
                     # Send escalation notification
-                    await self._send_escalation_notification(alert, level["channels"])
+                                        await self._send_escalation_notification(
+                        alert,
+                        level["channels"]
+                    )
 
     async def _send_escalation_notification(
         self, alert: Alert, channels: List[AlertChannel]
     ):
         """Send escalation notification"""
-        alert.message = f"ESCALATED (Level {alert.escalation_level}): {alert.message}"
+        alert.message = f"ESCALATED (Level {alert.escalation_level}): \
+            {alert.message}"
         await self._send_notifications(alert, channels)
 
     def acknowledge_alert(self, alert_id: str, acknowledged_by: str) -> bool:
@@ -653,7 +684,8 @@ class AlertManager:
 
         if resolved_alerts:
             total_duration = sum(
-                (a.ended_at - a.started_at).total_seconds() for a in resolved_alerts
+                (a.ended_at - a.started_at).total_seconds() for a in \
+                    resolved_alerts
             )
             mttr = total_duration / len(resolved_alerts)
         else:

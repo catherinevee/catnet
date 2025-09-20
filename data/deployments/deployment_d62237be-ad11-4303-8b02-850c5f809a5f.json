@@ -1,0 +1,15 @@
+{
+  "id": "d62237be-ad11-4303-8b02-850c5f809a5f",
+  "config_path": ".gitlab-ci.yml",
+  "device_id": "d463119b-9744-44d5-a63a-1b9ce66dfcef",
+  "status": "completed",
+  "created_at": "2025-09-20T03:06:31.753039",
+  "completed_at": "2025-09-20T03:06:32.886359",
+  "error_message": null,
+  "deployed_commands": [
+    "interface GigabitEthernet0/0",
+    "description Sample Interface",
+    "ip address 192.168.1.1 255.255.255.0",
+    "no shutdown"
+  ]
+}

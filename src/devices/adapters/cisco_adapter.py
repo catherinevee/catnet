@@ -7,11 +7,14 @@ Supports:
 - Cisco NX-OS
 """
 
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 import asyncio
 from datetime import datetime
 from netmiko import ConnectHandler
-from netmiko.exceptions import NetmikoAuthenticationException, NetmikoTimeoutException
+from netmiko.exceptions import (
+    NetmikoAuthenticationException,
+    NetmikoTimeoutException,
+)
 
 from ..device_manager import (
     DeviceAdapter,
@@ -21,6 +24,7 @@ from ..device_manager import (
     ConnectionProtocol,
     DeviceVendor,
 )
+
 
 
 class CiscoAdapter(DeviceAdapter):
@@ -135,7 +139,10 @@ class CiscoAdapter(DeviceAdapter):
         try:
             if connection.session_data:
                 loop = asyncio.get_event_loop()
-                await loop.run_in_executor(None, connection.session_data.disconnect)
+                                await loop.run_in_executor(
+                    None,
+                    connection.session_data.disconnect
+                )
 
             # Remove from connections
             if connection.connection_id in self.connections:
@@ -147,7 +154,11 @@ class CiscoAdapter(DeviceAdapter):
         except Exception:
             return False
 
-    async def execute_command(self, connection: DeviceConnection, command: str) -> str:
+        async def execute_command(
+        self,
+        connection: DeviceConnection,
+        command: str
+    ) -> str:
         """
         Execute command on Cisco device
 
@@ -193,7 +204,7 @@ class CiscoAdapter(DeviceAdapter):
             Configuration
         """
         # Get vendor from connection
-        device_id = connection.device_id
+        connection.device_id
         vendor = self._get_vendor_from_connection(connection)
 
         # Get command for config type
@@ -234,7 +245,10 @@ class CiscoAdapter(DeviceAdapter):
 
             # Enter configuration mode
             loop = asyncio.get_event_loop()
-            await loop.run_in_executor(None, connection.session_data.config_mode)
+                        await loop.run_in_executor(
+                None,
+                connection.session_data.config_mode
+            )
 
             # Send configuration commands
             for line in config_lines:
@@ -246,7 +260,10 @@ class CiscoAdapter(DeviceAdapter):
                 )
 
             # Exit configuration mode
-            await loop.run_in_executor(None, connection.session_data.exit_config_mode)
+                        await loop.run_in_executor(
+                None,
+                connection.session_data.exit_config_mode
+            )
 
             return True
 
@@ -257,7 +274,7 @@ class CiscoAdapter(DeviceAdapter):
                 await loop.run_in_executor(
                     None, connection.session_data.exit_config_mode
                 )
-            except:
+            except Exception:
                 pass
 
             raise Exception(f"Configuration apply failed: {str(e)}")
@@ -302,7 +319,10 @@ class CiscoAdapter(DeviceAdapter):
     ) -> Dict[str, Any]:
         """Build Netmiko connection parameters"""
         params = {
-            "device_type": self.DEVICE_TYPE_MAP.get(device.vendor, "cisco_ios"),
+                        "device_type": self.DEVICE_TYPE_MAP.get(
+                device.vendor,
+                "cisco_ios"
+            ),
             "host": device.ip_address,
             "port": device.port,
             "username": credentials.username,
@@ -323,7 +343,10 @@ class CiscoAdapter(DeviceAdapter):
 
         return params
 
-    def _get_vendor_from_connection(self, connection: DeviceConnection) -> DeviceVendor:
+        def _get_vendor_from_connection(
+        self,
+        connection: DeviceConnection
+    ) -> DeviceVendor:
         """Get device vendor from connection"""
         # In real implementation, would look up from device info
         return DeviceVendor.CISCO_IOS

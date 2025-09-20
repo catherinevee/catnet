@@ -18,7 +18,7 @@ import secrets
 import string
 from collections import defaultdict
 import hashlib
-import hmac
+
 
 
 class CredentialType(Enum):
@@ -33,6 +33,7 @@ class CredentialType(Enum):
     SERVICE_ACCOUNT = "service_account"
 
 
+
 class AccessLevel(Enum):
     """Access levels for secrets"""
 
@@ -44,6 +45,7 @@ class AccessLevel(Enum):
 
 
 @dataclass
+
 class Credential:
     """Credential object"""
 
@@ -64,6 +66,7 @@ class Credential:
 
 
 @dataclass
+
 class SecretPolicy:
     """Policy for secret management"""
 
@@ -84,6 +87,7 @@ class SecretPolicy:
 
 
 @dataclass
+
 class AccessRequest:
     """Request for secret access"""
 
@@ -98,6 +102,7 @@ class AccessRequest:
     approved_by: Optional[str] = None
     approved_at: Optional[datetime] = None
     revoked: bool = False
+
 
 
 class SecretsManager:
@@ -120,7 +125,9 @@ class SecretsManager:
         self.credentials: Dict[str, Credential] = {}
 
         # Access control
-        self.access_control: Dict[str, Dict[str, Set[AccessLevel]]] = defaultdict(
+        self.access_control: Dict[str,
+            Dict[str
+            Set[AccessLevel]]] = defaultdict(
             lambda: defaultdict(set)
         )
         self.access_requests: Dict[str, AccessRequest] = {}
@@ -289,7 +296,10 @@ class SecretsManager:
 
         # Schedule rotation if required
         if auto_rotate and policy.require_rotation:
-            self._schedule_rotation(credential.id, timedelta(days=policy.rotation_days))
+                        self._schedule_rotation(
+                credential.id,
+                timedelta(days=policy.rotation_days)
+            )
 
         # Audit log
         if self.audit_service:
@@ -412,7 +422,11 @@ class SecretsManager:
 
         # Check for reuse
         if credential.type == CredentialType.PASSWORD:
-            if self._check_password_reuse(credential.name, new_value, policy.max_reuse):
+                        if self._check_password_reuse(
+                credential.name,
+                new_value,
+                policy.max_reuse
+            ):
                 return False
 
         # Store old value for rollback
@@ -421,12 +435,14 @@ class SecretsManager:
         try:
             # Encrypt new value
             if self.vault_service:
-                encrypted_value, key_id = await self.vault_service.encrypt_data(
+                encrypted_value, key_id = await \
+                    self.vault_service.encrypt_data(
                     new_value.encode()
                 )
                 # Rotate in vault
                 await self.vault_service.rotate_secret(
                     path=f"credentials/{credential.type.value}/{credential.name}",
+                        
                     key="value",
                     new_value=encrypted_value.hex(),
                 )
@@ -443,10 +459,12 @@ class SecretsManager:
                     hashlib.sha256(new_value.encode()).hexdigest()
                 )
                 # Limit history size
-                if len(self.password_history[credential.name]) > policy.max_reuse * 2:
-                    self.password_history[credential.name] = self.password_history[
+                if len(self.password_history[credential.name]) > \
+                    policy.max_reuse * 2:
+                    self.password_history[credential.name] = \
+                        self.password_history[
                         credential.name
-                    ][-policy.max_reuse :]
+                    ][-policy.max_reuse:]
 
             # Reschedule rotation
             if policy.require_rotation:
@@ -488,7 +506,11 @@ class SecretsManager:
             return False
 
         # Check access control
-        if not self._check_access(credential_id, requester, AccessLevel.DELETE):
+                if not self._check_access(
+            credential_id,
+            requester,
+            AccessLevel.DELETE
+        ):
             return False
 
         credential = self.credentials[credential_id]
@@ -699,7 +721,8 @@ class SecretsManager:
         """Check if principal has access level"""
         if principal in self.access_control[credential_id]:
             allowed_levels = self.access_control[credential_id][principal]
-            return level in allowed_levels or AccessLevel.ADMIN in allowed_levels
+            return level in allowed_levels or AccessLevel.ADMIN in \
+                allowed_levels
         return False
 
     async def _create_access_request(

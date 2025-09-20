@@ -10,11 +10,11 @@ Manages configuration deployments with:
 
 import asyncio
 import uuid
-from typing import Dict, Any, Optional, List, Tuple
+from typing import Dict, Any, Optional, List
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-import json
+
 
 
 class DeploymentStrategy(Enum):
@@ -24,6 +24,7 @@ class DeploymentStrategy(Enum):
     ROLLING = "rolling"
     BLUE_GREEN = "blue_green"
     DIRECT = "direct"
+
 
 
 class DeploymentState(Enum):
@@ -40,6 +41,7 @@ class DeploymentState(Enum):
     PAUSED = "paused"
 
 
+
 class HealthCheckType(Enum):
     """Types of health checks"""
 
@@ -51,6 +53,7 @@ class HealthCheckType(Enum):
 
 
 @dataclass
+
 class DeploymentConfig:
     """Deployment configuration"""
 
@@ -69,6 +72,7 @@ class DeploymentConfig:
 
 
 @dataclass
+
 class DeviceDeployment:
     """Individual device deployment"""
 
@@ -85,6 +89,7 @@ class DeviceDeployment:
 
 
 @dataclass
+
 class Deployment:
     """Deployment instance"""
 
@@ -99,7 +104,9 @@ class Deployment:
     created_at: datetime
     started_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
-    device_deployments: Dict[str, DeviceDeployment] = field(default_factory=dict)
+        device_deployments: Dict[str, DeviceDeployment] = field(
+        default_factory=dict
+    )
     errors: List[str] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
     approval_status: Optional[str] = None
@@ -107,12 +114,18 @@ class Deployment:
     rollback_from: Optional[str] = None
 
 
+
 class DeploymentManager:
     """
     Manages network configuration deployments
     """
 
-    def __init__(self, device_service=None, backup_service=None, health_service=None):
+        def __init__(
+        self,
+        device_service=None,
+        backup_service=None,
+        health_service=None
+    ):
         """
         Initialize deployment manager
 
@@ -310,7 +323,7 @@ class DeploymentManager:
 
         # Process in batches
         for i in range(0, len(deployment.devices), batch_size):
-            batch = deployment.devices[i : i + batch_size]
+            batch = deployment.devices[i: i + batch_size]
             deployment.metadata["current_batch"] = i // batch_size + 1
             deployment.metadata["total_batches"] = (
                 len(deployment.devices) + batch_size - 1
@@ -345,7 +358,10 @@ class DeploymentManager:
             return False
 
         # Validate green environment
-        if not await self._check_deployment_health(deployment, deployment.devices):
+                if not await self._check_deployment_health(
+            deployment,
+            deployment.devices
+        ):
             return False
 
         # Switch traffic to green
@@ -395,13 +411,20 @@ class DeploymentManager:
 
         if tasks:
             results = await asyncio.gather(*tasks, return_exceptions=True)
-            failures = [r for r in results if isinstance(r, Exception) or not r]
+                        failures = [r for r in results if isinstance(
+                r,
+                Exception
+            ) or not r]
             if len(failures) > deployment.config.max_failures:
                 return False
 
         return True
 
-    async def _deploy_to_device(self, deployment: Deployment, device_id: str) -> bool:
+        async def _deploy_to_device(
+        self,
+        deployment: Deployment,
+        device_id: str
+    ) -> bool:
         """
         Deploy to a single device
 
@@ -423,7 +446,10 @@ class DeploymentManager:
                 device_deployment.backup_id = backup_id
 
             # Generate configuration diff
-            diff = await self._generate_diff(device_id, deployment.configuration)
+                        diff = await self._generate_diff(
+                device_id,
+                deployment.configuration
+            )
             device_deployment.config_diff = diff
 
             # Apply configuration
@@ -433,7 +459,8 @@ class DeploymentManager:
                 )
                 if not success:
                     device_deployment.state = DeploymentState.FAILED
-                    device_deployment.errors.append("Configuration apply failed")
+                    device_deployment.errors.append("Configuration apply \
+                        failed")
                     return False
 
             # Verify configuration
@@ -441,11 +468,15 @@ class DeploymentManager:
                 device_id, deployment.configuration
             ):
                 device_deployment.state = DeploymentState.FAILED
-                device_deployment.errors.append("Configuration verification failed")
+                device_deployment.errors.append("Configuration verification \
+                    failed")
                 return False
 
             # Health check
-            if not await self._device_health_check(device_id, device_deployment):
+                        if not await self._device_health_check(
+                device_id,
+                device_deployment
+            ):
                 device_deployment.state = DeploymentState.FAILED
                 device_deployment.errors.append("Health check failed")
                 return False
@@ -498,7 +529,10 @@ class DeploymentManager:
         for device_id in devices_to_rollback:
             device_deployment = deployment.device_deployments.get(device_id)
             if device_deployment and device_deployment.backup_id:
-                await self._restore_backup(device_id, device_deployment.backup_id)
+                                await self._restore_backup(
+                    device_id,
+                    device_deployment.backup_id
+                )
 
         rollback.state = DeploymentState.COMPLETED
         deployment.state = DeploymentState.ROLLED_BACK
@@ -543,7 +577,11 @@ class DeploymentManager:
             return True
         return False
 
-    async def approve_deployment(self, deployment_id: str, approved_by: str) -> bool:
+        async def approve_deployment(
+        self,
+        deployment_id: str,
+        approved_by: str
+    ) -> bool:
         """
         Approve a deployment
 
@@ -568,7 +606,10 @@ class DeploymentManager:
             return True
         return False
 
-    def get_deployment_status(self, deployment_id: str) -> Optional[Dict[str, Any]]:
+        def get_deployment_status(
+        self,
+        deployment_id: str
+    ) -> Optional[Dict[str, Any]]:
         """
         Get deployment status
 
@@ -611,13 +652,17 @@ class DeploymentManager:
                 "completed": completed,
                 "failed": failed,
                 "in_progress": in_progress,
-                "percentage": int((completed / total) * 100) if total > 0 else 0,
+                                "percentage": int(
+                    (completed / total) * 100
+                ) if total > 0 else 0,
             },
             "started_at": (
-                deployment.started_at.isoformat() if deployment.started_at else None
+                deployment.started_at.isoformat() if deployment.started_at \
+                    else None
             ),
             "completed_at": (
-                deployment.completed_at.isoformat() if deployment.completed_at else None
+                deployment.completed_at.isoformat() if deployment.completed_at \
+                    else None
             ),
             "errors": deployment.errors,
             "metadata": deployment.metadata,
@@ -639,7 +684,10 @@ class DeploymentManager:
     async def _restore_backup(self, device_id: str, backup_id: str) -> bool:
         """Restore device backup"""
         if self.backup_service:
-            return await self.backup_service.restore_backup(device_id, backup_id)
+                        return await self.backup_service.restore_backup(
+                device_id,
+                backup_id
+            )
         return True
 
     async def _generate_diff(self, device_id: str, new_config: str) -> str:
@@ -647,13 +695,24 @@ class DeploymentManager:
         # Would compare with current device config
         return f"Diff for {device_id}"
 
-    async def _apply_configuration(self, device_id: str, configuration: str) -> bool:
+        async def _apply_configuration(
+        self,
+        device_id: str,
+        configuration: str
+    ) -> bool:
         """Apply configuration to device"""
         if self.device_service:
-            return await self.device_service.apply_config(device_id, configuration)
+                        return await self.device_service.apply_config(
+                device_id,
+                configuration
+            )
         return True
 
-    async def _verify_configuration(self, device_id: str, configuration: str) -> bool:
+        async def _verify_configuration(
+        self,
+        device_id: str,
+        configuration: str
+    ) -> bool:
         """Verify configuration on device"""
         # Would verify configuration was applied correctly
         return True
@@ -671,7 +730,10 @@ class DeploymentManager:
         """Check deployment health"""
         for device_id in devices:
             device_deployment = deployment.device_deployments[device_id]
-            if not await self._device_health_check(device_id, device_deployment):
+                        if not await self._device_health_check(
+                device_id,
+                device_deployment
+            ):
                 return False
         return True
 

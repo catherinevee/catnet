@@ -1,0 +1,366 @@
+# CatNet CLI Command Reference
+
+## Overview
+CatNet CLI provides command-line interface for managing network configuration deployments with GitOps integration and enterprise-grade security.
+
+## Installation
+```bash
+pip install -e .
+# or
+python catnet_cli.py
+```
+
+## Global Options
+```
+--config, -c PATH    Path to configuration file
+--debug/--no-debug   Enable debug mode
+--help               Show help message
+```
+
+## Authentication Commands
+
+### Login
+Authenticate to CatNet system with MFA support
+```bash
+catnet auth login
+catnet auth login --username admin --mfa-token 123456
+```
+Options:
+- `--username, -u`: Username (prompted if not provided)
+- `--password, -p`: Password (prompted securely if not provided)
+- `--mfa-token, -m`: MFA token for two-factor authentication
+
+### Logout
+Logout from CatNet and clear stored credentials
+```bash
+catnet auth logout
+```
+
+### Refresh Token
+Refresh authentication token before expiration
+```bash
+catnet auth refresh
+```
+
+## GitOps Commands
+
+### Connect Repository
+Connect a Git repository for configuration management
+```bash
+catnet gitops connect --url https://github.com/org/network-configs --branch main
+catnet gitops connect -u git@github.com:org/configs.git --webhook-secret abc123
+```
+Options:
+- `--url, -u`: Git repository URL (required)
+- `--branch, -b`: Git branch (default: main)
+- `--webhook-secret`: Secret for webhook verification
+
+### Sync Repository
+Synchronize configurations from Git repository
+```bash
+catnet gitops sync --repo-id abc-123-def
+catnet gitops sync -r abc-123-def --force
+```
+Options:
+- `--repo-id, -r`: Repository ID (required)
+- `--force/--no-force`: Force sync even with conflicts
+
+### List Repositories
+List all connected Git repositories
+```bash
+catnet gitops list
+```
+
+## Deployment Commands
+
+### Create Deployment
+Create a new configuration deployment
+```bash
+catnet deploy create --config-file configs/router.yml --target device1 --target device2
+catnet deploy create -f config.json -t router1 --strategy canary --dry-run
+```
+Options:
+- `--config-file, -f`: Configuration file path (required)
+- `--target, -t`: Target devices (can specify multiple)
+- `--strategy`: Deployment strategy (rolling|canary|blue-green) (default: rolling)
+- `--dry-run/--no-dry-run`: Perform validation without actual deployment
+
+### Check Deployment Status
+Get status of a deployment
+```bash
+catnet deploy status <deployment_id>
+catnet deploy status dep-abc-123-def
+```
+
+### Approve Deployment
+Approve a pending deployment requiring authorization
+```bash
+catnet deploy approve <deployment_id>
+catnet deploy approve dep-123 --comment "Approved after review"
+```
+Options:
+- `--comment, -c`: Approval comment for audit trail
+
+### Rollback Deployment
+Rollback a deployment to previous configuration
+```bash
+catnet deploy rollback <deployment_id> --reason "Performance degradation detected"
+catnet deploy rollback dep-456 -r "Configuration error"
+```
+Options:
+- `--reason, -r`: Rollback reason (required for audit)
+
+### Deployment History
+View deployment history
+```bash
+catnet deploy history
+catnet deploy history --limit 20
+```
+Options:
+- `--limit, -l`: Number of deployments to display (default: 10)
+
+## Device Commands
+
+### List Devices
+List all managed network devices
+```bash
+catnet device list
+catnet device list --vendor cisco --status online
+```
+Options:
+- `--vendor`: Filter by vendor (cisco|juniper)
+- `--status`: Filter by status (online|offline|maintenance)
+
+### Add Device
+Add a new device to management
+```bash
+catnet device add --hostname router1 --ip 192.168.1.1 --vendor cisco --model ISR4451
+catnet device add -h switch1 -i 10.0.0.1 --vendor juniper -m EX4200
+```
+Options:
+- `--hostname, -h`: Device hostname (required)
+- `--ip, -i`: Device IP address (required)
+- `--vendor`: Device vendor (cisco|juniper) (required)
+- `--model, -m`: Device model (required)
+- `--username, -u`: Device username (stored in Vault)
+
+### Backup Device
+Create backup of device configuration
+```bash
+catnet device backup <device_id>
+catnet device backup dev-router1-prod
+```
+
+### Execute Command
+Execute command on device (with audit logging)
+```bash
+catnet device execute <device_id> --command "show version"
+catnet device execute dev-123 -c "show running-config" --no-confirm
+```
+Options:
+- `--command, -c`: Command to execute (required)
+- `--confirm/--no-confirm`: Confirmation prompt (default: confirm)
+
+### Check Device Health
+Check device health status and metrics
+```bash
+catnet device health <device_id>
+catnet device health dev-switch-core1
+```
+
+## Vault Commands
+
+### Vault Status
+Check HashiCorp Vault connection status
+```bash
+catnet vault status
+```
+
+### Rotate Credentials
+Rotate device credentials stored in Vault
+```bash
+catnet vault rotate <device_id>
+catnet vault rotate dev-router1
+```
+
+## Utility Commands
+
+### Version
+Display CatNet version information
+```bash
+catnet version
+```
+
+### System Status
+Check overall system and service status
+```bash
+catnet status
+```
+
+## Environment Variables
+
+Configuration via environment variables:
+```bash
+export CATNET_API_URL=http://localhost:8080
+export CATNET_AUTH_URL=http://localhost:8081
+export CATNET_GITOPS_URL=http://localhost:8082
+export CATNET_DEPLOY_URL=http://localhost:8083
+export CATNET_DEVICE_URL=http://localhost:8084
+export CATNET_VAULT_URL=http://localhost:8200
+export CATNET_DEBUG=1
+```
+
+## Configuration File
+
+Create `.catnet.yml` configuration file:
+```yaml
+api:
+  auth_url: http://localhost:8081
+  gitops_url: http://localhost:8082
+  deploy_url: http://localhost:8083
+  device_url: http://localhost:8084
+
+vault:
+  url: http://localhost:8200
+  namespace: catnet
+
+defaults:
+  deployment_strategy: canary
+  backup_before_deploy: true
+  require_approval: true
+
+logging:
+  level: INFO
+  format: json
+```
+
+## Examples
+
+### Complete Deployment Workflow
+```bash
+# 1. Login
+catnet auth login
+
+# 2. Connect Git repository
+catnet gitops connect --url https://github.com/org/configs
+
+# 3. Add devices
+catnet device add --hostname router1 --ip 192.168.1.1 --vendor cisco --model ISR4451
+catnet device add --hostname router2 --ip 192.168.1.2 --vendor cisco --model ISR4451
+
+# 4. Create deployment
+catnet deploy create --config-file configs/update.yml --target router1 --target router2
+
+# 5. Check status
+catnet deploy status dep-123
+
+# 6. Approve deployment
+catnet deploy approve dep-123 --comment "Reviewed and approved"
+
+# 7. Monitor deployment
+catnet deploy status dep-123
+
+# 8. Rollback if needed
+catnet deploy rollback dep-123 --reason "Unexpected behavior"
+```
+
+### Automated GitOps Workflow
+```bash
+# Setup webhook-triggered deployments
+catnet gitops connect --url git@github.com:org/network-configs.git \
+  --branch main \
+  --webhook-secret $(openssl rand -hex 32)
+
+# Repository will auto-deploy on push after validation
+```
+
+### Bulk Device Operations
+```bash
+# Backup all Cisco devices
+for device in $(catnet device list --vendor cisco --status online | grep -o 'dev-[^ ]*'); do
+  catnet device backup $device
+done
+
+# Health check all devices
+catnet device list | while read device; do
+  catnet device health $device
+done
+```
+
+### Security Operations
+```bash
+# Rotate all device credentials
+catnet device list | while read device_id; do
+  catnet vault rotate $device_id
+  echo "Rotated credentials for $device_id"
+done
+
+# Audit command execution
+catnet device execute dev-router1 --command "show users" --no-confirm
+```
+
+## Error Codes
+
+- `0`: Success
+- `1`: General error
+- `2`: Authentication error
+- `3`: Authorization error
+- `4`: Validation error
+- `5`: Deployment error
+- `6`: Network device error
+- `7`: Vault/secrets error
+- `8`: GitOps sync error
+
+## Security Notes
+
+1. **Authentication**: All commands except `version` and `help` require authentication
+2. **MFA**: Multi-factor authentication is enforced for production environments
+3. **Audit Logging**: All operations are logged with user, timestamp, and action details
+4. **Secrets Management**: No credentials are stored locally; all secrets in HashiCorp Vault
+5. **Encryption**: All device communications use SSH/TLS with certificate validation
+6. **RBAC**: Role-based access control enforces permissions per user/group
+
+## Troubleshooting
+
+### Authentication Issues
+```bash
+# Clear cached credentials
+rm -rf ~/.catnet/tokens.json
+
+# Re-authenticate
+catnet auth login --debug
+
+# Check token validity
+catnet auth refresh
+```
+
+### Connection Issues
+```bash
+# Test service connectivity
+catnet status
+
+# Enable debug logging
+export CATNET_DEBUG=1
+catnet device list
+
+# Check network connectivity
+curl -v http://localhost:8081/health
+```
+
+### Deployment Failures
+```bash
+# Get detailed deployment logs
+catnet deploy status <deployment_id> --verbose
+
+# Check device health before deployment
+catnet device health <device_id>
+
+# Verify configuration syntax
+catnet deploy create --config-file config.yml --dry-run
+```
+
+## Support
+
+- Documentation: https://docs.catnet.io
+- Issues: https://github.com/catnet/catnet/issues
+- Security: security@catnet.io (GPG key: 0xABCDEF123456789)

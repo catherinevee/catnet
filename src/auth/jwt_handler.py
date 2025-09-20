@@ -18,6 +18,7 @@ import hashlib
 from pathlib import Path
 
 
+
 class JWTHandler:
     """
     Handles JWT token operations with security best practices
@@ -158,7 +159,8 @@ class JWTHandler:
 
             # Verify token type
             if claims.get("type") != token_type:
-                return False, {"error": f"Invalid token type. Expected {token_type}"}
+                return False,
+                    {"error": f"Invalid token type. Expected {token_type}"}
 
             return True, claims
 
@@ -169,7 +171,10 @@ class JWTHandler:
         except Exception as e:
             return False, {"error": f"Token verification failed: {str(e)}"}
 
-    def refresh_token(self, refresh_token: str) -> Tuple[Optional[str], Optional[str]]:
+        def refresh_token(
+        self,
+        refresh_token: str
+    ) -> Tuple[Optional[str], Optional[str]]:
         """
         Generate new access token from refresh token
 
@@ -177,9 +182,16 @@ class JWTHandler:
             refresh_token: Valid refresh token
 
         Returns:
-            Tuple of (new_access_token, new_refresh_token) or (None, None) if invalid
+                        Tuple of (
+                new_access_token,
+                new_refresh_token) or (None,
+                None
+            ) if invalid
         """
-        is_valid, claims = self.verify_token(refresh_token, token_type="refresh")
+                is_valid, claims = self.verify_token(
+            refresh_token,
+            token_type="refresh"
+        )
 
         if not is_valid:
             return None, None
@@ -276,6 +288,7 @@ class JWTHandler:
 _default_handler = None
 
 
+
 def get_jwt_handler() -> JWTHandler:
     """Get default JWT handler instance"""
     global _default_handler
@@ -309,7 +322,11 @@ def create_access_token(
     )
 
 
-def verify_token(token: str, token_type: str = "access") -> Tuple[bool, Optional[dict]]:
+
+def verify_token(
+    token: str,
+    token_type: str = "access"
+) -> Tuple[bool, Optional[dict]]:
     """
     Verify a token
 

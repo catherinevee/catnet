@@ -1,0 +1,20 @@
+{
+  "timestamp": "2025-09-20T03:06:32.884335",
+  "device": {
+    "id": "d463119b-9744-44d5-a63a-1b9ce66dfcef",
+    "hostname": "router1.lab.local",
+    "ip": "192.168.1.1",
+    "vendor": "cisco_ios"
+  },
+  "commands": [
+    "interface GigabitEthernet0/0",
+    "description Sample Interface",
+    "ip address 192.168.1.1 255.255.255.0",
+    "no shutdown"
+  ],
+  "output": "Applied: interface GigabitEthernet0/0\nApplied: description Sample Interface\nApplied: ip address 192.168.1.1 255.255.255.0\nApplied: no shutdown",
+  "backup_file": "data\\deployments\\router1.lab.local_backup_20250920_030632.cfg",
+  "save_success": true,
+  "result": "success",
+  "connection_mode": "simulated"
+}

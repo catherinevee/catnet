@@ -15,6 +15,7 @@ from ..security.audit import AuditLogger
 logger = get_logger(__name__)
 
 
+
 class DeploymentService:
     """Main deployment orchestration service"""
 
@@ -28,7 +29,8 @@ class DeploymentService:
             )
         except Exception as e:
             logger.warning(
-                f"Could not initialize DeploymentExecutor with full dependencies: {e}"
+                f"Could not initialize DeploymentExecutor with full \
+                    dependencies: {e}"
             )
             # Create a mock connector for local testing
             from unittest.mock import Mock
@@ -62,7 +64,8 @@ class DeploymentService:
         # Create deployment record
         deployment = Deployment(
             id=deployment_uuid or deployment_id,
-            state=DeploymentState.PENDING if not dry_run else DeploymentState.DRY_RUN,
+            state=DeploymentState.PENDING if not dry_run else \
+                DeploymentState.DRY_RUN,
             created_at=datetime.utcnow(),
             created_by=user_context.get("user_id"),
         )
@@ -116,7 +119,10 @@ class DeploymentService:
             "state": deployment.state.value,
         }
 
-    async def get_deployment_status(self, deployment_id: str) -> Dict[str, Any]:
+        async def get_deployment_status(
+        self,
+        deployment_id: str
+    ) -> Dict[str, Any]:
         """Get deployment status"""
         # Would fetch from database
         return {

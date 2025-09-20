@@ -16,12 +16,17 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        level=logging.INFO, format="%(
+        asctime)s - %(name)s - %(levelname)s - %(message
+    )s"
 )
 logger = logging.getLogger("catnet")
 
 # Set environment variables for local development
-os.environ.setdefault("DATABASE_URL", "sqlite+aiosqlite:///./catnet_local.db")
+os.environ.setdefault(
+    "DATABASE_URL",
+    "sqlite+aiosqlite:///./data/catnet_local.db"
+)
 os.environ.setdefault("REDIS_URL", "redis://localhost:6379/0")
 os.environ.setdefault("VAULT_URL", "http://localhost:8200")
 os.environ.setdefault("JWT_SECRET_KEY", "dev-secret-key-change-in-production")
@@ -70,7 +75,8 @@ except ImportError as e:
 
 # Import middleware
 try:
-    from src.api.middleware import SecurityHeadersMiddleware, RateLimitMiddleware
+    from src.api.middleware import SecurityHeadersMiddleware, \
+        RateLimitMiddleware
 
     MIDDLEWARE_AVAILABLE = True
 except ImportError as e:
@@ -161,7 +167,8 @@ async def lifespan(app: FastAPI):
 # Create FastAPI application
 app = FastAPI(
     title="CatNet - Network Configuration Management System",
-    description="Security-first, GitOps-enabled network configuration deployment system",
+    description="Security-first, GitOps-enabled network configuration \
+        deployment system",
     version="1.0.0",
     lifespan=lifespan,
     docs_url="/docs",
@@ -180,7 +187,8 @@ app.add_middleware(
 
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(
-    TrustedHostMiddleware, allowed_hosts=["*"]  # Configure appropriately for production
+    TrustedHostMiddleware,
+        allowed_hosts=["*"]  # Configure appropriately for production
 )
 
 # Custom middleware temporarily disabled due to compatibility issues
@@ -280,8 +288,16 @@ async def system_info():
         "api_version": "v1",
         "description": "Network Configuration Management System",
         "capabilities": {
-            "vendors": ["Cisco IOS", "Cisco IOS-XE", "Cisco NX-OS", "Juniper Junos"],
-            "deployment_strategies": ["canary", "rolling", "blue-green", "direct"],
+            "vendors": ["Cisco IOS",
+                "Cisco IOS-XE"
+                "Cisco NX-OS"
+                "Juniper Junos"]
+                
+            "deployment_strategies": ["canary",
+                "rolling"
+                "blue-green"
+                "direct"]
+                
             "authentication": ["OAuth2", "SAML", "JWT", "API Keys", "mTLS"],
             "compliance_frameworks": [
                 "PCI-DSS",
@@ -337,7 +353,11 @@ if MONITORING_AVAILABLE:
 
 # Mount API routers
 if AUTH_AVAILABLE:
-    app.include_router(auth_router, prefix="/api/v1/auth", tags=["Authentication"])
+        app.include_router(
+        auth_router,
+        prefix="/api/v1/auth",
+        tags=["Authentication"]
+    )
     logger.info("Mounted authentication endpoints")
 
 if DEPLOYMENT_AVAILABLE:
@@ -350,9 +370,82 @@ if GITOPS_AVAILABLE:
     app.include_router(gitops_router, prefix="/api/v1/gitops", tags=["GitOps"])
     logger.info("Mounted GitOps endpoints")
 
+# Import and mount device endpoints
+try:
+    from src.api.device_endpoints import router as device_router
+        app.include_router(
+        device_router,
+        prefix="/api/v1/devices",
+        tags=["Devices"]
+    )
+    logger.info("Mounted device management endpoints")
+except ImportError as e:
+    logger.warning(f"Device endpoints not available: {e}")
 
-# Device management endpoints
-@app.get("/api/v1/devices", tags=["Devices"])
+# Import and mount simple GitOps endpoints (Phase 3)
+try:
+    from src.api.simple_gitops_endpoints import router as simple_gitops_router
+        app.include_router(
+        simple_gitops_router,
+        prefix="/api/v1/gitops",
+        tags=["GitOps"]
+    )
+    logger.info("Mounted simple GitOps endpoints")
+except ImportError as e:
+    logger.warning(f"Simple GitOps endpoints not available: {e}")
+
+# Import and mount simple deployment endpoints (Phase 4)
+try:
+    from src.api.simple_deploy_endpoints import router as simple_deploy_router
+        app.include_router(
+        simple_deploy_router,
+        prefix="/api/v1/deploy",
+        tags=["Deployment"]
+    )
+    logger.info("Mounted simple deployment endpoints")
+except ImportError as e:
+    logger.warning(f"Simple deployment endpoints not available: {e}")
+
+# Import and mount device connection endpoints (Phase 5)
+try:
+    from src.api.device_connection_endpoints import router as \
+        device_conn_router
+        app.include_router(
+        device_conn_router,
+        prefix="/api/v1/device-connection",
+        tags=["Device Connection"]
+    )
+    logger.info("Mounted device connection endpoints")
+except ImportError as e:
+    logger.warning(f"Device connection endpoints not available: {e}")
+
+# Import and mount rollback endpoints (Phase 6)
+try:
+    from src.api.rollback_endpoints import router as rollback_router
+        app.include_router(
+        rollback_router,
+        prefix="/api/v1/rollback",
+        tags=["Rollback & Safety"]
+    )
+    logger.info("Mounted rollback and safety endpoints")
+except ImportError as e:
+    logger.warning(f"Rollback endpoints not available: {e}")
+
+# Import and mount monitoring endpoints (Phase 7)
+try:
+    from src.api.monitoring_endpoints import router as monitoring_router
+        app.include_router(
+        monitoring_router,
+        prefix="/api/v1/monitoring",
+        tags=["Monitoring"]
+    )
+    logger.info("Mounted monitoring and observability endpoints")
+except ImportError as e:
+    logger.warning(f"Monitoring endpoints not available: {e}")
+
+
+# Legacy device management endpoint (deprecated - use /api/v1/devices)
+@app.get("/api/v1/devices_legacy", tags=["Devices"])
 async def list_devices():
     """List all managed devices"""
     if hasattr(app.state, "device_service"):
@@ -384,7 +477,10 @@ async def list_compliance_frameworks():
             {"id": "hipaa", "name": "HIPAA", "version": "2013"},
             {"id": "soc2", "name": "SOC2", "version": "Type II"},
             {"id": "iso-27001", "name": "ISO 27001", "version": "2013"},
-            {"id": "nist", "name": "NIST Cybersecurity Framework", "version": "1.1"},
+            {"id": "nist",
+                "name": "NIST Cybersecurity Framework"
+                "version": "1.1"}
+                
             {"id": "cis", "name": "CIS Controls", "version": "8"},
         ]
     }
@@ -501,6 +597,7 @@ async def internal_error_handler(request, exc):
     )
 
 
+
 def main():
     """Main entry point"""
 
@@ -522,22 +619,25 @@ def main():
 
     # Display component status
     print("Components:")
-    print(f"  [{'OK' if AUTH_AVAILABLE else 'MISSING'}] Authentication Service")
-    print(f"  [{'OK' if DEPLOYMENT_AVAILABLE else 'MISSING'}] Deployment Service")
+    print(f"  [{'OK' if AUTH_AVAILABLE else 'MISSING'}] Authentication \
+        Service")
+    print(f"  [{'OK' if DEPLOYMENT_AVAILABLE else 'MISSING'}] Deployment \
+        Service")
     print(f"  [{'OK' if GITOPS_AVAILABLE else 'MISSING'}] GitOps Service")
     print(f"  [{'OK' if SERVICES_AVAILABLE else 'MISSING'}] Core Services")
     print(f"  [{'OK' if MONITORING_AVAILABLE else 'MISSING'}] Monitoring")
-    print(f"  [{'OK' if MIDDLEWARE_AVAILABLE else 'MISSING'}] Security Middleware")
+    print(f"  [{'OK' if MIDDLEWARE_AVAILABLE else 'MISSING'}] Security \
+        Middleware")
     print()
 
     # Display URLs
     print("Access Points:")
-    print("  Main Application:  http://localhost:8000")
-    print("  API Documentation: http://localhost:8000/docs")
-    print("  Alternative Docs:  http://localhost:8000/redoc")
-    print("  OpenAPI Schema:    http://localhost:8000/openapi.json")
-    print("  Health Check:      http://localhost:8000/health")
-    print("  System Info:       http://localhost:8000/api/v1/info")
+    print("  Main Application:  http://localhost:8002")
+    print("  API Documentation: http://localhost:8002/docs")
+    print("  Alternative Docs:  http://localhost:8002/redoc")
+    print("  OpenAPI Schema:    http://localhost:8002/openapi.json")
+    print("  Health Check:      http://localhost:8002/health")
+    print("  System Info:       http://localhost:8002/api/v1/info")
     print()
 
     print("Starting server...")
@@ -547,7 +647,7 @@ def main():
     uvicorn.run(
         app,
         host="0.0.0.0",
-        port=8000,
+        port=8002,  # Changed to 8002 to avoid conflict
         reload=False,  # Set to True for development
         log_level="info",
         access_log=True,

@@ -35,7 +35,8 @@ def require_auth(func):
         if not get_auth_token():
             click.echo(
                 click.style(
-                    "✗ Authentication required. Please run 'catnet auth login' first.",
+                    "✗ Authentication required. Please run 'catnet auth login' \
+                        first.",
                     fg="red",
                 )
             )

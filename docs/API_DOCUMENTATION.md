@@ -1,782 +1,663 @@
 # CatNet API Documentation
 
-## Overview
-CatNet provides a comprehensive RESTful API for network configuration management with GitOps integration. All API endpoints are secured with authentication, rate limiting, and encryption.
-
 ## Base URL
+
 ```
-Production: https://api.catnet.local/api/v1
-Staging: https://api-staging.catnet.local/api/v1
+https://api.catnet.local/api/v1
 ```
 
 ## Authentication
-All API requests require authentication using JWT tokens or API keys.
 
-### JWT Authentication
+CatNet uses JWT bearer tokens for API authentication. Obtain a token through the login endpoint and include it in the Authorization header for all subsequent requests.
+
 ```http
-Authorization: Bearer <jwt_token>
+Authorization: Bearer <token>
 ```
 
-### API Key Authentication
-```http
-X-API-Key: <api_key>
-```
+## API Endpoints
 
-## Rate Limiting
-API endpoints are rate limited to prevent abuse:
-- **Authentication**: 5 requests per minute
-- **Read operations**: 100 requests per minute
-- **Write operations**: 50 requests per minute
-- **Deployment operations**: 10 requests per 5 minutes
+### Authentication Service (Port 8081)
 
-Rate limit headers are included in all responses:
-```http
-X-RateLimit-Limit: 100
-X-RateLimit-Remaining: 95
-X-RateLimit-Reset: 1631234567
-```
+#### POST /auth/login
+Authenticate user and receive access token.
 
-## API Versioning
-The API version can be specified in two ways:
-
-1. **URL Path**: `/api/v1/resource`
-2. **Header**: `X-API-Version: v1`
-
-## Common Response Codes
-| Code | Description |
-|------|-------------|
-| 200 | Success |
-| 201 | Created |
-| 204 | No Content |
-| 400 | Bad Request |
-| 401 | Unauthorized |
-| 403 | Forbidden |
-| 404 | Not Found |
-| 409 | Conflict |
-| 429 | Too Many Requests |
-| 500 | Internal Server Error |
-
-## Error Response Format
+**Request:**
 ```json
 {
-    "success": false,
-    "error": "Error message",
-    "message": "Detailed error description",
-    "timestamp": "2025-09-17T10:00:00Z",
-    "request_id": "uuid"
-}
-```
-
----
-
-## Authentication Endpoints
-
-### Login
-**POST** `/auth/login`
-
-Authenticate user and receive JWT token.
-
-**Request Body:**
-```json
-{
-    "username": "admin",
-    "password": "SecurePassword123!"
+  "username": "admin",
+  "password": "password123",
+  "mfa_code": "123456"  // Optional if MFA enabled
 }
 ```
 
 **Response:**
 ```json
 {
-    "access_token": "eyJhbGc...",
-    "refresh_token": "eyJhbGc...",
-    "token_type": "Bearer",
-    "expires_in": 3600
+  "access_token": "eyJhbGciOiJIUzI1NiIs...",
+  "refresh_token": "eyJhbGciOiJIUzI1NiIs...",
+  "token_type": "bearer",
+  "expires_in": 3600,
+  "requires_mfa": false
 }
 ```
 
-### MFA Verification
-**POST** `/auth/mfa/verify`
-
-Verify multi-factor authentication code.
-
-**Request Body:**
-```json
-{
-    "code": "123456"
-}
-```
-
-### Enroll MFA
-**POST** `/auth/mfa/enroll`
-
-Enroll in multi-factor authentication.
-
-**Request Body:**
-```json
-{
-    "method": "totp",
-    "phone_number": null,
-    "backup_email": null
-}
-```
-
-**Response:**
-```json
-{
-    "method": "totp",
-    "qr_code": "data:image/png;base64,...",
-    "backup_codes": ["ABC123", "DEF456", ...],
-    "enrolled_at": "2025-09-17T10:00:00Z"
-}
-```
-
-### Validate Certificate
-**POST** `/auth/certificate/validate`
-
-Validate X.509 certificate for authentication.
-
-**Request Body:**
-```json
-{
-    "certificate": "-----BEGIN CERTIFICATE-----...",
-    "device_id": "uuid"
-}
-```
-
-**Response:**
-```json
-{
-    "valid": true,
-    "subject": {...},
-    "issuer": {...},
-    "serial_number": "123456",
-    "not_valid_before": "2025-01-01T00:00:00Z",
-    "not_valid_after": "2026-01-01T00:00:00Z"
-}
-```
-
-### Get Sessions
-**GET** `/auth/sessions`
-
-Get all active sessions for current user.
-
-**Response:**
-```json
-[
-    {
-        "session_id": "uuid",
-        "user_id": "uuid",
-        "created_at": "2025-09-17T10:00:00Z",
-        "last_activity": "2025-09-17T10:30:00Z",
-        "ip_address": "192.168.1.1",
-        "user_agent": "Mozilla/5.0...",
-        "expires_at": "2025-09-18T10:00:00Z"
-    }
-]
-```
-
-### Refresh Token
-**POST** `/auth/refresh`
-
+#### POST /auth/refresh
 Refresh access token using refresh token.
 
-### Logout
-**DELETE** `/auth/logout`
+**Request:**
+```json
+{
+  "refresh_token": "eyJhbGciOiJIUzI1NiIs..."
+}
+```
 
-Terminate current session.
-
----
-
-## Device Management Endpoints
-
-### List Devices
-**GET** `/devices`
-
-Get list of all network devices.
-
-**Query Parameters:**
-- `page` (int): Page number (default: 1)
-- `per_page` (int): Items per page (default: 20)
-- `vendor` (string): Filter by vendor
-- `is_active` (boolean): Filter by active status
-- `location` (string): Filter by location
+#### POST /auth/mfa/setup
+Setup MFA for current user.
 
 **Response:**
 ```json
 {
-    "data": [
-        {
-            "id": "uuid",
-            "hostname": "router-01",
-            "ip_address": "192.168.1.1",
-            "vendor": "cisco_ios",
-            "model": "ISR4451",
-            "serial_number": "FTX1234567",
-            "location": "DC1",
-            "is_active": true,
-            "last_seen": "2025-09-17T10:00:00Z",
-            "certificate_status": "active"
-        }
-    ],
-    "total": 100,
-    "page": 1,
-    "per_page": 20
+  "secret": "JBSWY3DPEHPK3PXP",
+  "qr_code": "data:image/png;base64,...",
+  "backup_codes": ["12345678", "87654321", ...]
 }
 ```
 
-### Get Device
-**GET** `/devices/{device_id}`
+#### POST /auth/logout
+Invalidate current session and tokens.
 
-Get specific device details.
+### GitOps Service (Port 8082)
 
-### Create Device
-**POST** `/devices`
+#### POST /git/connect
+Connect a Git repository for configuration management.
 
-Register new network device.
-
-**Request Body:**
+**Request:**
 ```json
 {
-    "hostname": "router-02",
-    "ip_address": "192.168.1.2",
-    "vendor": "cisco_ios",
-    "model": "ISR4451",
-    "serial_number": "FTX1234568",
-    "location": "DC1",
-    "port": 22,
-    "bastion_host": null
+  "repository_url": "https://github.com/org/network-configs.git",
+  "branch": "main",
+  "webhook_secret": "secret123",
+  "auth": {
+    "type": "token",
+    "token": "github_pat_..."
+  }
 }
 ```
 
-### Update Device
-**PUT** `/devices/{device_id}`
+**Response:**
+```json
+{
+  "repository_id": "repo_123",
+  "webhook_url": "https://api.catnet.local/git/webhook/repo_123",
+  "status": "connected"
+}
+```
 
-Update device information.
+#### POST /git/webhook
+Process Git webhook events (GitHub/GitLab/Bitbucket).
 
-### Delete Device
-**DELETE** `/devices/{device_id}`
+**Headers:**
+```
+X-Hub-Signature-256: sha256=...  // GitHub
+X-Gitlab-Token: ...               // GitLab
+```
 
-Remove device from inventory.
+**Request:**
+```json
+{
+  "ref": "refs/heads/main",
+  "commits": [...],
+  "pusher": {...}
+}
+```
 
-### Backup Device
-**POST** `/devices/{device_id}/backup`
+#### GET /git/configs
+List configurations from connected repositories.
 
-Create backup of device configuration.
+**Query Parameters:**
+- `repository_id`: Filter by repository
+- `path`: Filter by path pattern
+- `device`: Filter by device
 
-### Execute Command
-**POST** `/devices/{device_id}/execute`
+**Response:**
+```json
+{
+  "configs": [
+    {
+      "id": "config_123",
+      "path": "configs/routers/router1.conf",
+      "repository": "repo_123",
+      "last_modified": "2024-01-15T10:30:00Z",
+      "commit": "abc123def",
+      "signed": true
+    }
+  ]
+}
+```
 
+### Deployment Service (Port 8083)
+
+#### POST /deployments
+Create a new deployment.
+
+**Request:**
+```json
+{
+  "config_source": "git://repo_123/configs/router1.conf",
+  "devices": ["device_001", "device_002"],
+  "strategy": "canary",
+  "strategy_config": {
+    "stages": [
+      {"percentage": 10, "wait_minutes": 5},
+      {"percentage": 50, "wait_minutes": 10},
+      {"percentage": 100}
+    ]
+  },
+  "approval_required": true,
+  "rollback_on_failure": true,
+  "health_checks": ["interface_status", "bgp_neighbors"],
+  "schedule": "2024-01-20T02:00:00Z"  // Optional scheduled deployment
+}
+```
+
+**Response:**
+```json
+{
+  "deployment_id": "deploy_789",
+  "status": "pending_approval",
+  "created_at": "2024-01-15T12:00:00Z",
+  "approval_url": "https://api.catnet.local/deployments/deploy_789/approve"
+}
+```
+
+#### GET /deployments/{id}
+Get deployment status and details.
+
+**Response:**
+```json
+{
+  "deployment_id": "deploy_789",
+  "status": "in_progress",
+  "stage": "canary",
+  "progress": {
+    "total_devices": 10,
+    "completed": 3,
+    "failed": 0,
+    "pending": 7
+  },
+  "started_at": "2024-01-15T14:00:00Z",
+  "health_status": "healthy",
+  "logs": [...]
+}
+```
+
+#### POST /deployments/{id}/approve
+Approve a pending deployment.
+
+**Request:**
+```json
+{
+  "comment": "Approved after review",
+  "approver": "admin"
+}
+```
+
+#### POST /deployments/{id}/rollback
+Initiate rollback for a deployment.
+
+**Request:**
+```json
+{
+  "reason": "Health checks failing",
+  "rollback_to": "previous"  // or specific version
+}
+```
+
+#### GET /deployments/{id}/diff
+Get configuration diff for deployment.
+
+**Response:**
+```json
+{
+  "devices": {
+    "device_001": {
+      "current": "interface GigabitEthernet0/0\n ip address 192.168.1.1 255.255.255.0",
+      "proposed": "interface GigabitEthernet0/0\n ip address 192.168.1.2 255.255.255.0",
+      "diff": "@@ -1,2 +1,2 @@\n interface GigabitEthernet0/0\n- ip address 192.168.1.1 255.255.255.0\n+ ip address 192.168.1.2 255.255.255.0"
+    }
+  }
+}
+```
+
+### Device Service (Port 8084)
+
+#### GET /devices
+List all managed devices.
+
+**Query Parameters:**
+- `vendor`: Filter by vendor (cisco, juniper)
+- `model`: Filter by model
+- `status`: Filter by status (online, offline, maintenance)
+- `tag`: Filter by tags
+
+**Response:**
+```json
+{
+  "devices": [
+    {
+      "id": "device_001",
+      "hostname": "core-router-01",
+      "ip_address": "10.0.1.1",
+      "vendor": "cisco",
+      "model": "ISR4451",
+      "software_version": "16.12.4",
+      "status": "online",
+      "last_seen": "2024-01-15T15:30:00Z",
+      "tags": ["production", "core"],
+      "location": "DC-1"
+    }
+  ],
+  "total": 150,
+  "page": 1
+}
+```
+
+#### POST /devices
+Add a new device.
+
+**Request:**
+```json
+{
+  "hostname": "new-switch-01",
+  "ip_address": "10.0.2.1",
+  "vendor": "cisco",
+  "model": "Catalyst9300",
+  "credentials": {
+    "type": "vault",
+    "path": "catnet/devices/new-switch-01"
+  },
+  "tags": ["production", "access"],
+  "monitoring": {
+    "snmp": true,
+    "netflow": true
+  }
+}
+```
+
+#### GET /devices/{id}
+Get device details.
+
+**Response:**
+```json
+{
+  "id": "device_001",
+  "hostname": "core-router-01",
+  "configuration": {
+    "current": "...",
+    "last_changed": "2024-01-10T10:00:00Z",
+    "backed_up": true
+  },
+  "metrics": {
+    "cpu": 45,
+    "memory": 62,
+    "uptime_days": 127
+  },
+  "interfaces": [...]
+}
+```
+
+#### POST /devices/{id}/backup
+Create configuration backup.
+
+**Response:**
+```json
+{
+  "backup_id": "backup_456",
+  "timestamp": "2024-01-15T16:00:00Z",
+  "size_bytes": 45678,
+  "checksum": "sha256:abc123...",
+  "location": "vault://catnet/backups/device_001/backup_456"
+}
+```
+
+#### POST /devices/{id}/execute
 Execute command on device (requires elevated permissions).
 
-**Request Body:**
+**Request:**
 ```json
 {
-    "commands": ["show version", "show running-config"],
-    "timeout": 30
-}
-```
-
----
-
-## Deployment Endpoints
-
-### Create Deployment
-**POST** `/deploy/create`
-
-Create new configuration deployment.
-
-**Request Body:**
-```json
-{
-    "config_ids": ["uuid1", "uuid2"],
-    "device_ids": ["uuid1", "uuid2"],
-    "strategy": "canary",
-    "approval_required": true,
-    "scheduled_at": null
-}
-```
-
-### Get Deployment Status
-**GET** `/deploy/{deployment_id}/status`
-
-Get current deployment status.
-
-**Response:**
-```json
-{
-    "id": "uuid",
-    "state": "in_progress",
-    "created_at": "2025-09-17T10:00:00Z",
-    "started_at": "2025-09-17T10:05:00Z",
-    "progress": 50,
-    "devices_total": 10,
-    "devices_completed": 5,
-    "devices_failed": 0
-}
-```
-
-### Approve Deployment
-**POST** `/deploy/{deployment_id}/approve`
-
-Approve pending deployment.
-
-### Rollback Deployment
-**POST** `/deploy/{deployment_id}/rollback`
-
-Rollback failed or in-progress deployment.
-
-### Dry Run Deployment
-**POST** `/deploy/dry-run`
-
-Simulate deployment without applying changes.
-
-**Request Body:**
-```json
-{
-    "config_ids": ["uuid1", "uuid2"],
-    "device_ids": ["uuid1", "uuid2"],
-    "strategy": "rolling",
-    "validation_only": false
+  "command": "show interfaces status",
+  "timeout": 30
 }
 ```
 
 **Response:**
 ```json
 {
-    "simulation_id": "uuid",
-    "validation_results": {...},
-    "affected_devices": [...],
-    "estimated_duration": 300,
-    "warnings": [],
-    "errors": [],
-    "recommendations": []
+  "output": "Port      Name   Status       Vlan       Duplex  Speed Type\nGi0/1     Server connected    1          full    1000  1000BaseTX",
+  "execution_time": 0.234,
+  "timestamp": "2024-01-15T16:15:00Z"
 }
 ```
 
-### Get Deployment Metrics
-**GET** `/deploy/metrics`
+### Compliance Service
 
-Get deployment statistics and metrics.
+#### POST /compliance/check
+Run compliance check against devices.
 
-**Query Parameters:**
-- `days` (int): Number of days to include (default: 30)
+**Request:**
+```json
+{
+  "framework": "pci-dss",  // or "hipaa", "soc2", "iso27001", "nist", "cis"
+  "devices": ["device_001", "device_002"],
+  "controls": ["1.1", "1.2", "2.3"]  // Optional specific controls
+}
+```
 
 **Response:**
 ```json
 {
-    "total_deployments": 150,
-    "successful_deployments": 145,
-    "failed_deployments": 5,
-    "rollback_count": 3,
-    "average_duration": 180.5,
-    "success_rate": 96.7,
-    "deployments_by_strategy": {
-        "canary": 50,
-        "rolling": 75,
-        "blue_green": 25
+  "report_id": "report_123",
+  "framework": "pci-dss",
+  "compliance_score": 92.5,
+  "checks": [
+    {
+      "control_id": "PCI-1.1",
+      "description": "Firewall configuration standards",
+      "status": "compliant",
+      "devices": {
+        "device_001": "compliant",
+        "device_002": "compliant"
+      }
     }
+  ],
+  "non_compliant_count": 2,
+  "recommendations": [...]
 }
 ```
 
-### Schedule Deployment
-**POST** `/deploy/schedule`
-
-Schedule deployment for future execution.
-
-**Request Body:**
-```json
-{
-    "config_ids": ["uuid1"],
-    "device_ids": ["uuid1", "uuid2"],
-    "strategy": "rolling",
-    "scheduled_time": "2025-09-18T02:00:00Z",
-    "approval_required": true,
-    "notification_emails": ["ops@example.com"]
-}
-```
-
----
-
-## GitOps Endpoints
-
-### Connect Repository
-**POST** `/git/connect`
-
-Connect Git repository for configuration management.
-
-**Request Body:**
-```json
-{
-    "url": "https://github.com/org/configs.git",
-    "branch": "main",
-    "config_path": "configs/",
-    "auto_deploy": false,
-    "gpg_verification": true
-}
-```
-
-### GitHub Webhook
-**POST** `/git/webhook/github`
-
-Handle GitHub webhook events.
-
-**Headers:**
-```http
-X-GitHub-Event: push
-X-Hub-Signature-256: sha256=...
-```
-
-### GitLab Webhook
-**POST** `/git/webhook/gitlab`
-
-Handle GitLab webhook events.
-
-**Headers:**
-```http
-X-Gitlab-Event: Push Hook
-X-Gitlab-Token: ...
-```
-
-### Get Configuration Diff
-**GET** `/git/diff/{commit_sha}`
-
-Get configuration diff for specific commit.
-
-**Response:**
-```json
-{
-    "commit_sha": "abc123...",
-    "timestamp": "2025-09-17T10:00:00Z",
-    "author": "john.doe",
-    "message": "Update router config",
-    "files_changed": ["router-01.cfg"],
-    "additions": 10,
-    "deletions": 5,
-    "diff_content": "..."
-}
-```
-
-### Sync Repository
-**POST** `/git/sync`
-
-Manually sync repository with latest changes.
-
-### List Configurations
-**GET** `/git/configs`
-
-Get list of configurations from repository.
-
----
-
-## User Management Endpoints
-
-### List Users
-**GET** `/users`
-
-Get list of all users (admin only).
-
-### Get User
-**GET** `/users/{user_id}`
-
-Get user details.
-
-### Create User
-**POST** `/users`
-
-Create new user account (admin only).
-
-**Request Body:**
-```json
-{
-    "username": "john.doe",
-    "email": "john@example.com",
-    "password": "SecurePassword123!",
-    "roles": ["operator"],
-    "is_active": true
-}
-```
-
-### Update User
-**PUT** `/users/{user_id}`
-
-Update user information.
-
-### Delete User
-**DELETE** `/users/{user_id}`
-
-Delete user account (admin only).
-
-### Change Password
-**POST** `/users/password/change`
-
-Change current user password.
-
-### Reset Password
-**POST** `/users/password/reset`
-
-Request password reset.
-
----
-
-## Configuration Templates
-
-### List Templates
-**GET** `/templates`
-
-Get list of configuration templates.
-
-### Get Template
-**GET** `/templates/{template_id}`
-
-Get template details.
-
-### Create Template
-**POST** `/templates`
-
-Create new configuration template.
-
-**Request Body:**
-```json
-{
-    "name": "interface-config",
-    "vendor": "cisco_ios",
-    "template_content": "interface {{ interface_name }}\n  description {{ description }}",
-    "variables": {
-        "interface_name": "string",
-        "description": "string"
-    },
-    "validation_rules": {}
-}
-```
-
-### Update Template
-**PUT** `/templates/{template_id}`
-
-Update configuration template.
-
-### Delete Template
-**DELETE** `/templates/{template_id}`
-
-Delete configuration template.
-
-### Render Template
-**POST** `/templates/{template_id}/render`
-
-Render template with variables.
-
----
-
-## Audit Log Endpoints
-
-### Get Audit Logs
-**GET** `/audit/logs`
-
-Retrieve audit logs.
+#### GET /compliance/reports
+List compliance reports.
 
 **Query Parameters:**
-- `start_date` (datetime): Start date filter
-- `end_date` (datetime): End date filter
-- `event_type` (string): Event type filter
-- `user_id` (uuid): User ID filter
-- `page` (int): Page number
-- `per_page` (int): Items per page
+- `framework`: Filter by framework
+- `start_date`: Start date (ISO 8601)
+- `end_date`: End date (ISO 8601)
 
-### Get Security Events
-**GET** `/audit/security`
-
-Get security-related audit events.
-
-### Export Audit Logs
-**GET** `/audit/export`
-
-Export audit logs in CSV or JSON format.
+#### GET /compliance/reports/{id}
+Get detailed compliance report.
 
 **Query Parameters:**
-- `format` (string): Export format (csv, json)
-- `start_date` (datetime): Start date
-- `end_date` (datetime): End date
+- `format`: Response format (json, html, pdf, csv)
 
----
+### Monitoring Service
 
-## Health & Monitoring
-
-### Health Check
-**GET** `/health`
-
-Get service health status.
-
-**Response:**
-```json
-{
-    "status": "healthy",
-    "version": "1.0.0",
-    "timestamp": "2025-09-17T10:00:00Z",
-    "services": {
-        "database": "healthy",
-        "redis": "healthy",
-        "vault": "healthy"
-    }
-}
-```
-
-### Readiness Check
-**GET** `/ready`
-
-Check if service is ready to accept requests.
-
-### Metrics
-**GET** `/metrics`
-
+#### GET /metrics
 Get Prometheus metrics.
 
----
+**Response (Prometheus format):**
+```
+# HELP catnet_deployments_total Total number of deployments
+# TYPE catnet_deployments_total counter
+catnet_deployments_total{status="success"} 245
+catnet_deployments_total{status="failed"} 12
 
-## WebSocket Endpoints
+# HELP catnet_device_connections Current device connections
+# TYPE catnet_device_connections gauge
+catnet_device_connections{vendor="cisco"} 85
+catnet_device_connections{vendor="juniper"} 42
+```
 
-### Real-time Deployments
-**WS** `/ws/deployments`
+#### GET /health
+Health check endpoint.
 
-Subscribe to real-time deployment updates.
-
-**Message Format:**
+**Response:**
 ```json
 {
-    "type": "deployment.update",
-    "deployment_id": "uuid",
-    "state": "in_progress",
-    "progress": 75,
-    "timestamp": "2025-09-17T10:00:00Z"
+  "status": "healthy",
+  "version": "1.0.0",
+  "services": {
+    "database": "healthy",
+    "redis": "healthy",
+    "vault": "healthy"
+  },
+  "timestamp": "2024-01-15T17:00:00Z"
 }
 ```
 
-### Device Status
-**WS** `/ws/devices`
+#### POST /alerts
+Create custom alert rule.
 
-Subscribe to device status changes.
-
----
-
-## SDK Examples
-
-### Python
-```python
-import requests
-
-class CatNetClient:
-    def __init__(self, base_url, api_key):
-        self.base_url = base_url
-        self.headers = {
-            "X-API-Key": api_key,
-            "Content-Type": "application/json"
-        }
-
-    def get_devices(self):
-        response = requests.get(
-            f"{self.base_url}/devices",
-            headers=self.headers
-        )
-        return response.json()
-
-    def create_deployment(self, config_ids, device_ids):
-        data = {
-            "config_ids": config_ids,
-            "device_ids": device_ids,
-            "strategy": "canary"
-        }
-        response = requests.post(
-            f"{self.base_url}/deploy/create",
-            json=data,
-            headers=self.headers
-        )
-        return response.json()
-
-# Usage
-client = CatNetClient("https://api.catnet.local/api/v1", "YOUR_API_KEY_HERE")
-devices = client.get_devices()
-```
-
-### cURL
-```bash
-# Get devices
-curl -X GET "https://api.catnet.local/api/v1/devices" \
-  -H "X-API-Key: YOUR_API_KEY_HERE"
-
-# Create deployment
-curl -X POST "https://api.catnet.local/api/v1/deploy/create" \
-  -H "X-API-Key: YOUR_API_KEY_HERE" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "config_ids": ["uuid1"],
-    "device_ids": ["uuid1", "uuid2"],
-    "strategy": "rolling"
-  }'
-```
-
-### JavaScript
-```javascript
-class CatNetClient {
-    constructor(baseUrl, apiKey) {
-        this.baseUrl = baseUrl;
-        this.headers = {
-            'X-API-Key': apiKey,
-            'Content-Type': 'application/json'
-        };
-    }
-
-    async getDevices() {
-        const response = await fetch(`${this.baseUrl}/devices`, {
-            headers: this.headers
-        });
-        return await response.json();
-    }
-
-    async createDeployment(configIds, deviceIds) {
-        const response = await fetch(`${this.baseUrl}/deploy/create`, {
-            method: 'POST',
-            headers: this.headers,
-            body: JSON.stringify({
-                config_ids: configIds,
-                device_ids: deviceIds,
-                strategy: 'canary'
-            })
-        });
-        return await response.json();
-    }
+**Request:**
+```json
+{
+  "name": "High CPU Alert",
+  "condition": "device.metrics.cpu > 90",
+  "duration": "5m",
+  "severity": "warning",
+  "channels": ["email", "slack"],
+  "devices": ["device_001", "device_002"]
 }
-
-// Usage
-const client = new CatNetClient('https://api.catnet.local/api/v1', 'YOUR_API_KEY_HERE');
-const devices = await client.getDevices();
 ```
 
----
+### Automation Service
 
-## API Changelog
+#### POST /workflows
+Create automation workflow.
 
-### Version 2.0 (Upcoming)
-- GraphQL support
-- Batch operations
-- Webhooks for external systems
-- Advanced filtering
+**Request:**
+```json
+{
+  "name": "Interface Flapping Remediation",
+  "trigger": {
+    "type": "event",
+    "conditions": {
+      "event_type": "interface.flapping",
+      "threshold": 5
+    }
+  },
+  "steps": [
+    {
+      "type": "device_command",
+      "device": "{{event.device_id}}",
+      "commands": ["interface {{event.interface}}", "shutdown"]
+    },
+    {
+      "type": "wait",
+      "duration": "30s"
+    },
+    {
+      "type": "device_command",
+      "device": "{{event.device_id}}",
+      "commands": ["interface {{event.interface}}", "no shutdown"]
+    },
+    {
+      "type": "notification",
+      "channel": "slack",
+      "message": "Interface {{event.interface}} remediated"
+    }
+  ]
+}
+```
 
-### Version 1.0 (Current)
-- Initial release
-- Full REST API
-- Authentication and authorization
-- Device management
-- Deployment automation
-- GitOps integration
+#### GET /workflows
+List automation workflows.
 
----
+**Response:**
+```json
+{
+  "workflows": [
+    {
+      "id": "workflow_123",
+      "name": "Interface Flapping Remediation",
+      "trigger_type": "event",
+      "enabled": true,
+      "last_executed": "2024-01-15T14:00:00Z",
+      "execution_count": 12
+    }
+  ]
+}
+```
+
+#### POST /workflows/{id}/execute
+Manually trigger workflow execution.
+
+**Request:**
+```json
+{
+  "context": {
+    "device_id": "device_001",
+    "interface": "GigabitEthernet0/0"
+  }
+}
+```
+
+### ML Anomaly Detection Service
+
+#### POST /ml/models
+Train new anomaly detection model.
+
+**Request:**
+```json
+{
+  "name": "Network Traffic Anomaly",
+  "model_type": "isolation_forest",
+  "training_data": {
+    "source": "prometheus",
+    "metrics": ["packet_rate", "error_rate", "cpu_usage"],
+    "time_range": "7d",
+    "devices": ["device_001", "device_002"]
+  }
+}
+```
+
+#### GET /ml/models/{id}/predict
+Get anomaly predictions.
+
+**Request:**
+```json
+{
+  "data": {
+    "packet_rate": 15000,
+    "error_rate": 0.15,
+    "cpu_usage": 95
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "anomaly_score": 0.89,
+  "is_anomaly": true,
+  "confidence": 0.92,
+  "explanation": "Unusually high error rate combined with high CPU usage"
+}
+```
+
+## Error Responses
+
+All API errors follow a consistent format:
+
+```json
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Invalid input parameters",
+    "details": {
+      "field": "devices",
+      "issue": "Device 'device_999' not found"
+    },
+    "request_id": "req_abc123",
+    "timestamp": "2024-01-15T18:00:00Z"
+  }
+}
+```
+
+### Common Error Codes
+
+- `AUTHENTICATION_ERROR`: Invalid or expired token
+- `AUTHORIZATION_ERROR`: Insufficient permissions
+- `VALIDATION_ERROR`: Invalid request parameters
+- `NOT_FOUND`: Resource not found
+- `CONFLICT`: Resource conflict (e.g., deployment already in progress)
+- `RATE_LIMITED`: Too many requests
+- `INTERNAL_ERROR`: Internal server error
+
+## Rate Limiting
+
+API requests are rate-limited per user:
+
+- Standard tier: 1000 requests per hour
+- Premium tier: 10000 requests per hour
+- Enterprise tier: Unlimited
+
+Rate limit headers are included in responses:
+
+```
+X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 995
+X-RateLimit-Reset: 1642267200
+```
+
+## Pagination
+
+List endpoints support pagination:
+
+**Query Parameters:**
+- `page`: Page number (default: 1)
+- `per_page`: Items per page (default: 20, max: 100)
+
+**Response Headers:**
+```
+X-Total-Count: 245
+X-Page: 1
+X-Per-Page: 20
+Link: <https://api.catnet.local/devices?page=2>; rel="next"
+```
+
+## Webhooks
+
+Configure webhooks for real-time notifications:
+
+```json
+{
+  "url": "https://your-server.com/webhook",
+  "events": ["deployment.completed", "device.offline", "compliance.failed"],
+  "secret": "webhook_secret_123"
+}
+```
+
+Webhook payload:
+
+```json
+{
+  "event": "deployment.completed",
+  "timestamp": "2024-01-15T19:00:00Z",
+  "data": {...},
+  "signature": "sha256=..."
+}
+```
+
+## SDKs and Client Libraries
+
+Official SDKs available for:
+
+- Python: `pip install catnet-client`
+- Go: `go get github.com/catnet/catnet-go`
+- JavaScript/TypeScript: `npm install @catnet/client`
+- Ruby: `gem install catnet`
+
+## API Versioning
+
+The API uses URL versioning:
+
+- Current version: `/api/v1`
+- Beta features: `/api/v2-beta`
+- Deprecated endpoints are marked with `Deprecation` headers
 
 ## Support
 
-For API support, contact:
-- Email: api-support@catnet.local
-- Documentation: https://docs.catnet.local
-- Status Page: https://status.catnet.local
-
----
-
-*Last Updated: 2025-09-17*
-*API Version: 1.0*
+- API Status: https://status.catnet.io
+- Documentation: https://docs.catnet.io/api
+- Support: api-support@catnet.io

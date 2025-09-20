@@ -9,7 +9,11 @@ from pathlib import Path
 import json
 import yaml
 
-from catnet_cli.client import CatNetAPIClient, AuthenticationError, NotFoundError
+from catnet_cli.client import (
+    CatNetAPIClient,
+    AuthenticationError,
+    NotFoundError,
+)
 from catnet_cli.utils import (
     print_success, print_error, print_info, print_warning,
     handle_error, format_table, confirm_action, format_timestamp
@@ -17,17 +21,45 @@ from catnet_cli.utils import (
 
 
 @click.group()
+
 def deploy():
     """Deployment management commands"""
     pass
 
 
 @deploy.command('create')
-@click.option('--config-file', '-f', required=True, type=click.Path(exists=True), help='Configuration file path')
-@click.option('--target', '-t', multiple=True, required=True, help='Target devices (can specify multiple)')
-@click.option('--strategy', type=click.Choice(['rolling', 'canary', 'blue-green']), default='rolling', help='Deployment strategy')
-@click.option('--dry-run/--no-dry-run', default=False, help='Perform validation without actual deployment')
-@click.option('--approval-required/--no-approval', default=True, help='Require approval before execution')
+@click.option(
+    '--config-file',
+    '-f',
+    required=True,
+    type=click.Path(exists=True),
+    help='Configuration file path'
+)
+@click.option(
+    '--target',
+    '-t',
+    multiple=True,
+    required=True,
+    help='Target devices (can specify multiple)'
+)
+@click.option(
+    '--strategy',
+    type=click.Choice(['rolling',
+    'canary',
+    'blue-green']),
+    default='rolling',
+    help='Deployment strategy'
+)
+@click.option(
+    '--dry-run/--no-dry-run',
+    default=False,
+    help='Perform validation without actual deployment'
+)
+@click.option(
+    '--approval-required/--no-approval',
+    default=True,
+    help='Require approval before execution'
+)
 @click.pass_context
 def create_deployment(
     ctx: click.Context,
@@ -40,8 +72,10 @@ def create_deployment(
     """Create a new configuration deployment
 
     Examples:
-        catnet deploy create --config-file configs/router.yml --target device1 --target device2
-        catnet deploy create -f config.json -t router1 --strategy canary --dry-run
+        catnet deploy create --config-file configs/router.yml --target device1 \
+            --target device2
+        catnet deploy create -f config.json -t router1 --strategy canary \
+            --dry-run
         catnet deploy create -f update.yaml -t switch1 -t switch2 --no-approval
     """
     config = ctx.obj.get('config', {})
@@ -101,8 +135,10 @@ def create_deployment(
                     print_info(f"Status: {status}")
 
                     if approval_required:
-                        print_info("\nDeployment requires approval before execution")
-                        print_info(f"To approve: catnet deploy approve {deployment_id}")
+                        print_info("\nDeployment requires approval before \
+                            execution")
+                        print_info(f"To approve: catnet deploy approve \
+                            {deployment_id}")
                     else:
                         print_info("\nDeployment will begin automatically")
 
@@ -127,7 +163,13 @@ def create_deployment(
 @click.option('--watch', '-w', is_flag=True, help='Watch deployment progress')
 @click.option('--interval', default=5, help='Watch interval in seconds')
 @click.pass_context
-def deployment_status(ctx: click.Context, deployment_id: str, watch: bool, interval: int):
+
+def deployment_status(
+    ctx: click.Context,
+    deployment_id: str,
+    watch: bool,
+    interval: int
+):
     """Get status of a deployment
 
     Examples:
@@ -151,12 +193,19 @@ def deployment_status(ctx: click.Context, deployment_id: str, watch: bool, inter
                     # Display status
                     click.echo(f"\n=== Deployment Status: {deployment_id} ===")
                     click.echo(f"Status: {result.get('status', 'Unknown')}")
-                    click.echo(f"Strategy: {result.get('strategy', 'Unknown')}")
+                                        click.echo(
+                        f"Strategy: {result.get('strategy',
+                        'Unknown')}"
+                    )
                     click.echo(f"Progress: {result.get('progress', 0)}%")
-                    click.echo(f"Started: {format_timestamp(result.get('started_at', ''))}")
+                                        click.echo(
+                        f"Started: {format_timestamp(result.get('started_at',
+                        ''))}"
+                    )
 
                     if result.get('completed_at'):
-                        click.echo(f"Completed: {format_timestamp(result['completed_at'])}")
+                        click.echo(f"Completed: \
+                            {format_timestamp(result['completed_at'])}")
 
                     # Device status
                     devices = result.get('devices', [])
@@ -212,7 +261,12 @@ def deployment_status(ctx: click.Context, deployment_id: str, watch: bool, inter
 @click.argument('deployment_id')
 @click.option('--comment', '-c', help='Approval comment for audit trail')
 @click.pass_context
-def approve_deployment(ctx: click.Context, deployment_id: str, comment: Optional[str]):
+
+def approve_deployment(
+    ctx: click.Context,
+    deployment_id: str,
+    comment: Optional[str]
+):
     """Approve a pending deployment requiring authorization
 
     Examples:
@@ -224,7 +278,11 @@ def approve_deployment(ctx: click.Context, deployment_id: str, comment: Optional
     debug = ctx.obj.get('debug', False)
 
     if not comment:
-        comment = click.prompt('Approval comment (optional)', default='', show_default=False)
+                comment = click.prompt(
+            'Approval comment (optional)',
+            default='',
+            show_default=False
+        )
 
     async def approve():
         async with CatNetAPIClient(config) as client:
@@ -235,21 +293,29 @@ def approve_deployment(ctx: click.Context, deployment_id: str, comment: Optional
                 click.echo(f"\n=== Deployment Details ===")
                 click.echo(f"ID: {deployment_id}")
                 click.echo(f"Strategy: {deployment.get('strategy')}")
-                click.echo(f"Targets: {', '.join(deployment.get('targets', []))}")
+                                click.echo(
+                    f"Targets: {',
+                    '.join(deployment.get('targets',
+                    []))}"
+                )
                 click.echo("")
 
                 if not confirm_action("Approve this deployment?"):
                     print_info("Approval cancelled")
                     return
 
-                result = await client.approve_deployment(deployment_id, comment)
+                                result = await client.approve_deployment(
+                    deployment_id,
+                    comment
+                )
                 print_success(f"Deployment approved successfully")
 
                 if comment:
                     print_info(f"Comment: {comment}")
 
                 print_info("\nDeployment will now proceed")
-                print_info(f"Monitor progress: catnet deploy status {deployment_id} --watch")
+                print_info(f"Monitor progress: catnet deploy status \
+                    {deployment_id} --watch")
 
                 return result
 
@@ -269,10 +335,25 @@ def approve_deployment(ctx: click.Context, deployment_id: str, comment: Optional
 
 @deploy.command('rollback')
 @click.argument('deployment_id')
-@click.option('--reason', '-r', required=True, help='Rollback reason (required for audit)')
-@click.option('--force', is_flag=True, help='Force rollback without confirmation')
+@click.option(
+    '--reason',
+    '-r',
+    required=True,
+    help='Rollback reason (required for audit)'
+)
+@click.option(
+    '--force',
+    is_flag=True,
+    help='Force rollback without confirmation'
+)
 @click.pass_context
-def rollback_deployment(ctx: click.Context, deployment_id: str, reason: str, force: bool):
+
+def rollback_deployment(
+    ctx: click.Context,
+    deployment_id: str,
+    reason: str,
+    force: bool
+):
     """Rollback a deployment to previous configuration
 
     This will:
@@ -281,14 +362,16 @@ def rollback_deployment(ctx: click.Context, deployment_id: str, reason: str, for
     - Log rollback reason for audit
 
     Examples:
-        catnet deploy rollback dep-456 --reason "Performance degradation detected"
+        catnet deploy rollback dep-456 --reason "Performance degradation \
+            detected"
         catnet deploy rollback dep-123 -r "Configuration error" --force
     """
     config = ctx.obj.get('config', {})
     debug = ctx.obj.get('debug', False)
 
     if not force:
-        print_warning("WARNING: This will rollback the deployment to the previous configuration")
+        print_warning("WARNING: This will rollback the deployment to the \
+            previous configuration")
         if not confirm_action(f"Rollback deployment '{deployment_id}'?"):
             print_info("Rollback cancelled")
             return
@@ -296,9 +379,13 @@ def rollback_deployment(ctx: click.Context, deployment_id: str, reason: str, for
     async def rollback():
         async with CatNetAPIClient(config) as client:
             try:
-                print_info(f"Initiating rollback for deployment {deployment_id}...")
+                print_info(f"Initiating rollback for deployment \
+                    {deployment_id}...")
 
-                result = await client.rollback_deployment(deployment_id, reason)
+                                result = await client.rollback_deployment(
+                    deployment_id,
+                    reason
+                )
 
                 print_success("Rollback initiated successfully")
                 print_info(f"Reason: {reason}")
@@ -315,7 +402,8 @@ def rollback_deployment(ctx: click.Context, deployment_id: str, reason: str, for
                         print_success(f"  ✓ {device}")
 
                 print_info("\nRollback completed")
-                print_info("All affected devices have been restored to previous configuration")
+                print_info("All affected devices have been restored to \
+                    previous configuration")
 
                 return result
 
@@ -334,9 +422,23 @@ def rollback_deployment(ctx: click.Context, deployment_id: str, reason: str, for
 
 
 @deploy.command('history')
-@click.option('--limit', '-l', default=10, help='Number of deployments to display')
-@click.option('--status', type=click.Choice(['all', 'completed', 'failed', 'in_progress']), default='all', help='Filter by status')
+@click.option(
+    '--limit',
+    '-l',
+    default=10,
+    help='Number of deployments to display'
+)
+@click.option(
+    '--status',
+    type=click.Choice(['all',
+    'completed',
+    'failed',
+    'in_progress']),
+    default='all',
+    help='Filter by status'
+)
 @click.pass_context
+
 def deployment_history(ctx: click.Context, limit: int, status: str):
     """View deployment history
 
@@ -355,7 +457,8 @@ def deployment_history(ctx: click.Context, limit: int, status: str):
 
                 # Filter by status if specified
                 if status != 'all':
-                    deployments = [d for d in deployments if d.get('status') == status]
+                    deployments = [d for d in deployments if d.get('status') \
+                        == status]
 
                 if not deployments:
                     print_info("No deployments found")
@@ -363,7 +466,12 @@ def deployment_history(ctx: click.Context, limit: int, status: str):
 
                 click.echo("\n=== Deployment History ===")
 
-                headers = ['ID', 'Status', 'Strategy', 'Targets', 'Started', 'User']
+                headers = ['ID',
+                    'Status'
+                    'Strategy'
+                    'Targets'
+                    'Started'
+                    'User']
                 rows = []
                 for dep in deployments:
                     rows.append([

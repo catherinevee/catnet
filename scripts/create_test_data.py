@@ -259,7 +259,8 @@ set interfaces {{ interface }} unit 0 family ethernet-switching vlan members {{ 
             "name": "cisco-acl-template",
             "vendor": DeviceVendor.CISCO_IOS,
             "template_content": """ip access-list extended {{ acl_name }}
- permit {{ protocol }} {{ source_ip }} {{ source_wildcard }} {{ dest_ip }} {{ dest_wildcard }}
+ permit {{ protocol }} {{ source_ip }} {{ source_wildcard }} {{ dest_ip }} {{ \
+     dest_wildcard }}
  deny ip any any log""",
             "variables": {
                 "acl_name": "string",

@@ -20,6 +20,7 @@ from cryptography.hazmat.backends import default_backend
 from src.security.vault import VaultClient
 
 
+
 class CertificateAuthority:
     def __init__(self, ca_name: str = "CatNet Internal CA"):
         self.ca_name = ca_name
@@ -42,10 +43,16 @@ class CertificateAuthority:
         subject = issuer = x509.Name(
             [
                 x509.NameAttribute(NameOID.COUNTRY_NAME, "US"),
-                x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "California"),
+                                x509.NameAttribute(
+                    NameOID.STATE_OR_PROVINCE_NAME,
+                    "California"
+                ),
                 x509.NameAttribute(NameOID.LOCALITY_NAME, "San Francisco"),
                 x509.NameAttribute(NameOID.ORGANIZATION_NAME, "CatNet"),
-                x509.NameAttribute(NameOID.ORGANIZATIONAL_UNIT_NAME, "Security"),
+                                x509.NameAttribute(
+                    NameOID.ORGANIZATIONAL_UNIT_NAME,
+                    "Security"
+                ),
                 x509.NameAttribute(NameOID.COMMON_NAME, self.ca_name),
             ]
         )
@@ -57,7 +64,8 @@ class CertificateAuthority:
             .public_key(self.ca_key.public_key())
             .serial_number(x509.random_serial_number())
             .not_valid_before(datetime.utcnow())
-            .not_valid_after(datetime.utcnow() + timedelta(days=3650))  # 10 years
+            .not_valid_after(datetime.utcnow() + timedelta(days=3650))  # 10 \
+                years
             .add_extension(
                 x509.BasicConstraints(ca=True, path_length=None),
                 critical=True,
@@ -77,14 +85,17 @@ class CertificateAuthority:
                 critical=True,
             )
             .add_extension(
-                x509.SubjectKeyIdentifier.from_public_key(self.ca_key.public_key()),
+                                x509.SubjectKeyIdentifier.from_public_key(
+                    self.ca_key.public_key()
+                ),
                 critical=False,
             )
             .sign(self.ca_key, hashes.SHA256(), default_backend())
         )
 
         # Serialize CA certificate and key
-        ca_cert_pem = self.ca_cert.public_bytes(encoding=serialization.Encoding.PEM)
+        ca_cert_pem = self.ca_cert.public_bytes( \
+            encoding=serialization.Encoding.PEM)
         ca_key_pem = self.ca_key.private_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.TraditionalOpenSSL,
@@ -128,11 +139,20 @@ class CertificateAuthority:
         subject = x509.Name(
             [
                 x509.NameAttribute(NameOID.COUNTRY_NAME, "US"),
-                x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "California"),
+                                x509.NameAttribute(
+                    NameOID.STATE_OR_PROVINCE_NAME,
+                    "California"
+                ),
                 x509.NameAttribute(NameOID.LOCALITY_NAME, "San Francisco"),
                 x509.NameAttribute(NameOID.ORGANIZATION_NAME, "CatNet"),
-                x509.NameAttribute(NameOID.ORGANIZATIONAL_UNIT_NAME, service_name),
-                x509.NameAttribute(NameOID.COMMON_NAME, f"{service_name}.catnet.local"),
+                                x509.NameAttribute(
+                    NameOID.ORGANIZATIONAL_UNIT_NAME,
+                    service_name
+                ),
+                                x509.NameAttribute(
+                    NameOID.COMMON_NAME,
+                    f"{service_name}.catnet.local"
+                ),
             ]
         )
 
@@ -201,7 +221,8 @@ class CertificateAuthority:
         )
 
         # Serialize certificate and key
-        cert_pem = service_cert.public_bytes(encoding=serialization.Encoding.PEM)
+        cert_pem = service_cert.public_bytes( \
+            encoding=serialization.Encoding.PEM)
         key_pem = service_key.private_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.TraditionalOpenSSL,
@@ -232,14 +253,22 @@ class CertificateAuthority:
         ca_key_path = self.certs_dir / "ca.key"
 
         with open(ca_cert_path, "rb") as f:
-            self.ca_cert = x509.load_pem_x509_certificate(f.read(), default_backend())
+                        self.ca_cert = x509.load_pem_x509_certificate(
+                f.read(),
+                default_backend()
+            )
 
         with open(ca_key_path, "rb") as f:
             self.ca_key = serialization.load_pem_private_key(
                 f.read(), password=None, backend=default_backend()
             )
 
-    async def store_in_vault(self, service_name: str, cert_pem: bytes, key_pem: bytes):
+        async def store_in_vault(
+        self,
+        service_name: str,
+        cert_pem: bytes,
+        key_pem: bytes
+    ):
         """Store certificate and key in Vault"""
         try:
             await self.vault.store_secret(
@@ -270,7 +299,12 @@ async def main():
     services = [
         ("auth-service", ["auth.catnet.local", "localhost", "127.0.0.1"]),
         ("gitops-service", ["gitops.catnet.local", "localhost", "127.0.0.1"]),
-        ("deployment-service", ["deploy.catnet.local", "localhost", "127.0.0.1"]),
+                (
+            "deployment-service",
+            ["deploy.catnet.local",
+            "localhost",
+            "127.0.0.1"]
+        ),
         ("device-service", ["devices.catnet.local", "localhost", "127.0.0.1"]),
         ("api-gateway", ["api.catnet.local", "localhost", "127.0.0.1"]),
     ]
@@ -301,7 +335,8 @@ async def main():
     for service_name, _ in services:
         cert_path = ca.certs_dir / f"{service_name}.crt"
         result = os.system(
-            f"openssl verify -CAfile {ca.certs_dir}/ca.crt {cert_path} 2>/dev/null"
+            f"openssl verify -CAfile {ca.certs_dir}/ca.crt {cert_path} \
+                2>/dev/null"
         )
         if result == 0:
             print(f"✅ {service_name}: Certificate valid")

@@ -9,7 +9,11 @@ from pathlib import Path
 import json
 import yaml
 
-from catnet_cli.client import CatNetAPIClient, AuthenticationError, NotFoundError
+from catnet_cli.client import (
+    CatNetAPIClient,
+    AuthenticationError,
+    NotFoundError,
+)
 from catnet_cli.utils import (
     print_success, print_error, print_info, print_warning,
     handle_error, format_table, confirm_action
@@ -17,17 +21,43 @@ from catnet_cli.utils import (
 
 
 @click.group()
+
 def device():
     """Device management commands"""
     pass
 
 
 @device.command('list')
-@click.option('--vendor', type=click.Choice(['cisco', 'juniper']), help='Filter by vendor')
-@click.option('--status', type=click.Choice(['online', 'offline', 'maintenance']), help='Filter by status')
-@click.option('--format', 'output_format', type=click.Choice(['table', 'json', 'yaml']), default='table', help='Output format')
+@click.option(
+    '--vendor',
+    type=click.Choice(['cisco',
+    'juniper']),
+    help='Filter by vendor'
+)
+@click.option(
+    '--status',
+    type=click.Choice(['online',
+    'offline',
+    'maintenance']),
+    help='Filter by status'
+)
+@click.option(
+    '--format',
+    'output_format',
+    type=click.Choice(['table',
+    'json',
+    'yaml']),
+    default='table',
+    help='Output format'
+)
 @click.pass_context
-def list_devices(ctx: click.Context, vendor: Optional[str], status: Optional[str], output_format: str):
+
+def list_devices(
+    ctx: click.Context,
+    vendor: Optional[str],
+    status: Optional[str],
+    output_format: str
+):
     """List all managed network devices
 
     Examples:
@@ -41,7 +71,10 @@ def list_devices(ctx: click.Context, vendor: Optional[str], status: Optional[str
     async def get_devices():
         async with CatNetAPIClient(config) as client:
             try:
-                devices = await client.list_devices(vendor=vendor, status=status)
+                                devices = await client.list_devices(
+                    vendor=vendor,
+                    status=status
+                )
 
                 if output_format == 'json':
                     click.echo(json.dumps(devices, indent=2))
@@ -52,7 +85,12 @@ def list_devices(ctx: click.Context, vendor: Optional[str], status: Optional[str
                         print_info("No devices found")
                         return
 
-                    headers = ['ID', 'Hostname', 'IP Address', 'Vendor', 'Model', 'Status']
+                    headers = ['ID',
+                        'Hostname'
+                        'IP Address'
+                        'Vendor'
+                        'Model'
+                        'Status']
                     rows = []
                     for dev in devices:
                         rows.append([
@@ -83,7 +121,13 @@ def list_devices(ctx: click.Context, vendor: Optional[str], status: Optional[str
 @device.command('add')
 @click.option('--hostname', '-h', required=True, help='Device hostname')
 @click.option('--ip', '-i', required=True, help='Device IP address')
-@click.option('--vendor', required=True, type=click.Choice(['cisco', 'juniper']), help='Device vendor')
+@click.option(
+    '--vendor',
+    required=True,
+    type=click.Choice(['cisco',
+    'juniper']),
+    help='Device vendor'
+)
 @click.option('--model', '-m', required=True, help='Device model')
 @click.option('--username', '-u', help='Device username (stored in Vault)')
 @click.option('--password', '-p', help='Device password (stored in Vault)')
@@ -106,8 +150,10 @@ def add_device(
     """Add a new device to management
 
     Examples:
-        catnet device add --hostname router1 --ip 192.168.1.1 --vendor cisco --model ISR4451
-        catnet device add -h switch1 -i 10.0.0.1 --vendor juniper -m EX4200 --username admin
+        catnet device add --hostname router1 --ip 192.168.1.1 --vendor cisco \
+            --model ISR4451
+        catnet device add -h switch1 -i 10.0.0.1 --vendor juniper -m EX4200 \
+            --username admin
     """
     config = ctx.obj.get('config', {})
     debug = ctx.obj.get('debug', False)
@@ -161,7 +207,13 @@ def add_device(
 @click.option('--output', '-o', help='Output file for backup')
 @click.option('--encrypt/--no-encrypt', default=True, help='Encrypt backup')
 @click.pass_context
-def backup_device(ctx: click.Context, device_id: str, output: Optional[str], encrypt: bool):
+
+def backup_device(
+    ctx: click.Context,
+    device_id: str,
+    output: Optional[str],
+    encrypt: bool
+):
     """Create backup of device configuration
 
     Examples:
@@ -215,7 +267,11 @@ def backup_device(ctx: click.Context, device_id: str, output: Optional[str], enc
 @device.command('execute')
 @click.argument('device_id')
 @click.option('--command', '-c', required=True, help='Command to execute')
-@click.option('--confirm/--no-confirm', default=True, help='Confirmation prompt')
+@click.option(
+    '--confirm/--no-confirm',
+    default=True,
+    help='Confirmation prompt'
+)
 @click.option('--output', '-o', help='Save output to file')
 @click.pass_context
 def execute_command(
@@ -239,11 +295,16 @@ def execute_command(
     debug = ctx.obj.get('debug', False)
 
     # Dangerous commands that require extra confirmation
-    dangerous_commands = ['reload', 'delete', 'format', 'write erase', 'request system reboot']
+    dangerous_commands = ['reload',
+        'delete'
+        'format'
+        'write erase'
+        'request system reboot']
     is_dangerous = any(cmd in command.lower() for cmd in dangerous_commands)
 
     if is_dangerous:
-        print_warning(f"WARNING: This appears to be a potentially dangerous command!")
+        print_warning(f"WARNING: This appears to be a potentially dangerous \
+            command!")
 
     if confirm:
         if not confirm_action(f"Execute '{command}' on device {device_id}?"):
@@ -296,6 +357,7 @@ def execute_command(
 @click.argument('device_id')
 @click.option('--detailed', is_flag=True, help='Show detailed health metrics')
 @click.pass_context
+
 def check_health(ctx: click.Context, device_id: str, detailed: bool):
     """Check device health status and metrics
 
@@ -309,7 +371,11 @@ def check_health(ctx: click.Context, device_id: str, detailed: bool):
     async def get_health():
         async with CatNetAPIClient(config) as client:
             try:
-                result = await client.request('GET', f'/devices/{device_id}/health', service='device')
+                                result = await client.request(
+                    'GET',
+                    f'/devices/{device_id}/health',
+                    service='device'
+                )
 
                 status = result.get('status', 'unknown')
                 metrics = result.get('metrics', {})
@@ -326,12 +392,19 @@ def check_health(ctx: click.Context, device_id: str, detailed: bool):
                 }.get(status, 'white')
 
                 click.echo(
-                    click.style(f"Status: {status.upper()}", fg=status_color, bold=True)
+                                        click.style(
+                        f"Status: {status.upper()}",
+                        fg=status_color,
+                        bold=True
+                    )
                 )
 
                 # Basic metrics
                 click.echo(f"\nCPU Usage: {metrics.get('cpu_usage', 'N/A')}%")
-                click.echo(f"Memory Usage: {metrics.get('memory_usage', 'N/A')}%")
+                                click.echo(
+                    f"Memory Usage: {metrics.get('memory_usage',
+                    'N/A')}%"
+                )
                 click.echo(f"Uptime: {metrics.get('uptime', 'N/A')}")
                 click.echo(f"Temperature: {metrics.get('temperature', 'N/A')}")
 
@@ -340,7 +413,10 @@ def check_health(ctx: click.Context, device_id: str, detailed: bool):
                 if interfaces:
                     up_count = interfaces.get('up', 0)
                     down_count = interfaces.get('down', 0)
-                    click.echo(f"\nInterfaces: {up_count} up, {down_count} down")
+                                        click.echo(
+                        f"\nInterfaces: {up_count} up,
+                        {down_count} down"
+                    )
 
                 if detailed:
                     click.echo("\n=== Detailed Metrics ===")
@@ -357,7 +433,10 @@ def check_health(ctx: click.Context, device_id: str, detailed: bool):
                             'warning': 'yellow',
                             'info': 'white'
                         }.get(severity, 'white')
-                        click.echo(click.style(f"[{severity.upper()}] {message}", fg=color))
+                                                click.echo(
+                            click.style(f"[{severity.upper()}] {message}",
+                            fg=color)
+                        )
 
                 return result
 
@@ -379,6 +458,7 @@ def check_health(ctx: click.Context, device_id: str, detailed: bool):
 @click.argument('device_id')
 @click.option('--force', is_flag=True, help='Skip confirmation')
 @click.pass_context
+
 def remove_device(ctx: click.Context, device_id: str, force: bool):
     """Remove device from management
 
@@ -395,16 +475,22 @@ def remove_device(ctx: click.Context, device_id: str, force: bool):
     debug = ctx.obj.get('debug', False)
 
     if not force:
-        if not confirm_action(f"Remove device '{device_id}' from management? This cannot be undone."):
+        if not confirm_action(f"Remove device '{device_id}' from management? \
+            This cannot be undone."):
             print_info("Device removal cancelled")
             return
 
     async def delete_device():
         async with CatNetAPIClient(config) as client:
             try:
-                result = await client.request('DELETE', f'/devices/{device_id}', service='device')
+                                result = await client.request(
+                    'DELETE',
+                    f'/devices/{device_id}',
+                    service='device'
+                )
                 print_success(f"Device '{device_id}' removed successfully")
-                print_info("Associated credentials have been deleted from Vault")
+                print_info("Associated credentials have been deleted from \
+                    Vault")
                 return result
 
             except NotFoundError:

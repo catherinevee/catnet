@@ -16,6 +16,7 @@ import asyncio
 from abc import ABC, abstractmethod
 
 
+
 class DeviceVendor(Enum):
     """Supported device vendors"""
 
@@ -24,6 +25,7 @@ class DeviceVendor(Enum):
     CISCO_NXOS = "cisco_nxos"
     JUNIPER_JUNOS = "juniper_junos"
     ARISTA_EOS = "arista_eos"
+
 
 
 class DeviceType(Enum):
@@ -36,6 +38,7 @@ class DeviceType(Enum):
     WIRELESS_CONTROLLER = "wireless_controller"
 
 
+
 class ConnectionProtocol(Enum):
     """Connection protocols"""
 
@@ -44,6 +47,7 @@ class ConnectionProtocol(Enum):
     RESTCONF = "restconf"
     GNMI = "gnmi"
     API = "api"
+
 
 
 class DeviceState(Enum):
@@ -58,6 +62,7 @@ class DeviceState(Enum):
 
 
 @dataclass
+
 class DeviceCredentials:
     """Device credentials"""
 
@@ -70,6 +75,7 @@ class DeviceCredentials:
 
 
 @dataclass
+
 class DeviceInfo:
     """Device information"""
 
@@ -93,6 +99,7 @@ class DeviceInfo:
 
 
 @dataclass
+
 class DeviceConnection:
     """Active device connection"""
 
@@ -106,6 +113,7 @@ class DeviceConnection:
     bytes_transferred: int = 0
 
 
+
 class DeviceAdapter(ABC):
     """Abstract base class for device adapters"""
 
@@ -114,36 +122,35 @@ class DeviceAdapter(ABC):
         self, device: DeviceInfo, credentials: DeviceCredentials
     ) -> DeviceConnection:
         """Establish connection to device"""
-        pass
 
     @abstractmethod
     async def disconnect(self, connection: DeviceConnection) -> bool:
         """Disconnect from device"""
-        pass
 
     @abstractmethod
-    async def execute_command(self, connection: DeviceConnection, command: str) -> str:
+        async def execute_command(
+        self,
+        connection: DeviceConnection,
+        command: str
+    ) -> str:
         """Execute command on device"""
-        pass
 
     @abstractmethod
     async def get_configuration(
         self, connection: DeviceConnection, config_type: str = "running"
     ) -> str:
         """Get device configuration"""
-        pass
 
     @abstractmethod
     async def apply_configuration(
         self, connection: DeviceConnection, configuration: str
     ) -> bool:
         """Apply configuration to device"""
-        pass
 
     @abstractmethod
     async def save_configuration(self, connection: DeviceConnection) -> bool:
         """Save device configuration"""
-        pass
+
 
 
 class DeviceManager:
@@ -180,7 +187,11 @@ class DeviceManager:
         self.retry_attempts = 3
         self.retry_delay = 5
 
-    def register_adapter(self, vendor: DeviceVendor, adapter: DeviceAdapter) -> None:
+        def register_adapter(
+        self,
+        vendor: DeviceVendor,
+        adapter: DeviceAdapter
+    ) -> None:
         """
         Register a device adapter
 
@@ -339,7 +350,10 @@ class DeviceManager:
             Command output or None
         """
         # Get or create connection
-        connection = await self._get_or_create_connection(device_id, connection_id)
+                connection = await self._get_or_create_connection(
+            device_id,
+            connection_id
+        )
         if not connection:
             return None
 
@@ -395,7 +409,10 @@ class DeviceManager:
             Configuration or None
         """
         # Get or create connection
-        connection = await self._get_or_create_connection(device_id, connection_id)
+                connection = await self._get_or_create_connection(
+            device_id,
+            connection_id
+        )
         if not connection:
             return None
 
@@ -439,7 +456,10 @@ class DeviceManager:
             Success status
         """
         # Get or create connection
-        connection = await self._get_or_create_connection(device_id, connection_id)
+                connection = await self._get_or_create_connection(
+            device_id,
+            connection_id
+        )
         if not connection:
             return False
 
@@ -448,7 +468,10 @@ class DeviceManager:
 
         try:
             # Apply configuration
-            success = await adapter.apply_configuration(connection, configuration)
+                        success = await adapter.apply_configuration(
+                connection,
+                configuration
+            )
 
             if success and save:
                 await adapter.save_configuration(connection)
@@ -545,7 +568,9 @@ class DeviceManager:
             "port": device.port,
             "tags": device.tags,
             "metadata": device.metadata,
-            "last_seen": (device.last_seen.isoformat() if device.last_seen else None),
+                        "last_seen": (
+                device.last_seen.isoformat() if device.last_seen else None
+            ),
             "last_backup": (
                 device.last_backup.isoformat() if device.last_backup else None
             ),
@@ -622,7 +647,10 @@ class DeviceManager:
             # Sequential execution
             for device_id in device_ids:
                 try:
-                    results[device_id] = await self.execute_command(device_id, command)
+                                        results[device_id] = await self.execute_command(
+                        device_id,
+                        command
+                    )
                 except Exception as e:
                     results[device_id] = e
 

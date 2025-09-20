@@ -30,6 +30,7 @@ except ImportError:
 
 
 @dataclass
+
 class GitRepository:
     """Represents a Git repository configuration"""
 
@@ -43,6 +44,7 @@ class GitRepository:
     sync_interval: int = 300  # seconds
     last_commit: Optional[str] = None
     last_sync: Optional[datetime] = None
+
 
 
 class GitManager:
@@ -64,7 +66,8 @@ class GitManager:
             max_repo_size: Maximum allowed repository size in bytes
             allowed_hosts: List of allowed Git hosts
         """
-        self.workspace_dir = workspace_dir or tempfile.mkdtemp(prefix="catnet_gitops_")
+        self.workspace_dir = workspace_dir or \
+            tempfile.mkdtemp(prefix="catnet_gitops_")
         self.max_repo_size = max_repo_size
         self.allowed_hosts = allowed_hosts or [
             "github.com",
@@ -151,7 +154,8 @@ class GitManager:
             if repo_config.ssh_key_path:
                 # Use pygit2 for SSH key authentication
                 callbacks = pygit2.RemoteCallbacks(
-                    credentials=self._ssh_key_credentials(repo_config.ssh_key_path)
+                    credentials=self._ssh_key_credentials( \
+                        repo_config.ssh_key_path)
                 )
                 pygit2.clone_repository(
                     repo_config.url,
@@ -174,7 +178,8 @@ class GitManager:
                 shutil.rmtree(repo_config.local_path)
                 return (
                     False,
-                    f"Repository exceeds size limit ({repo_size} > {self.max_repo_size})",
+                    f"Repository exceeds size limit ({repo_size} > { 
+    self.max_repo_size})",
                 )
 
             # Get latest commit
@@ -252,7 +257,8 @@ class GitManager:
                 if not self._verify_commit_signature(repo, new_commit):
                     # Rollback to previous commit
                     repo.git.reset("--hard", old_commit)
-                    return False, {"error": "GPG signature verification failed"}
+                    return False,
+                        {"error": "GPG signature verification failed"}
 
             # Get changed files
             changed_files = []
@@ -470,7 +476,10 @@ class GitManager:
         # Check if host is allowed
         return any(allowed in host for allowed in self.allowed_hosts)
 
-    def _setup_git_environment(self, repo_config: GitRepository) -> Dict[str, str]:
+        def _setup_git_environment(
+        self,
+        repo_config: GitRepository
+    ) -> Dict[str, str]:
         """
         Setup Git environment variables
 
@@ -484,7 +493,8 @@ class GitManager:
 
         if repo_config.ssh_key_path:
             # Setup SSH command with specific key
-            ssh_cmd = f"ssh -i {repo_config.ssh_key_path} -o StrictHostKeyChecking=no"
+            ssh_cmd = f"ssh -i {repo_config.ssh_key_path} -o \
+                StrictHostKeyChecking=no"
             env["GIT_SSH_COMMAND"] = ssh_cmd
 
         return env

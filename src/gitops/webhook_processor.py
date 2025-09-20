@@ -18,6 +18,7 @@ from enum import Enum
 import re
 
 
+
 class WebhookProvider(Enum):
     """Supported webhook providers"""
 
@@ -25,6 +26,7 @@ class WebhookProvider(Enum):
     GITLAB = "gitlab"
     BITBUCKET = "bitbucket"
     GENERIC = "generic"
+
 
 
 class EventType(Enum):
@@ -41,6 +43,7 @@ class EventType(Enum):
 
 
 @dataclass
+
 class WebhookEvent:
     """Represents a processed webhook event"""
 
@@ -58,6 +61,7 @@ class WebhookEvent:
     metadata: Dict[str, Any] = None
 
 
+
 class WebhookProcessor:
     """
     Processes webhooks from various Git providers
@@ -69,7 +73,11 @@ class WebhookProcessor:
         self.processed_events: List[str] = []  # Track processed event IDs
         self.event_handlers: Dict[EventType, List[callable]] = {}
 
-    def register_webhook_secret(self, repository_url: str, secret: str) -> None:
+        def register_webhook_secret(
+        self,
+        repository_url: str,
+        secret: str
+    ) -> None:
         """
         Register webhook secret for repository
 
@@ -116,7 +124,12 @@ class WebhookProcessor:
                 secret = self.webhook_secrets.get(normalized_url)
 
                 if secret:
-                    is_valid = self._verify_signature(headers, body, secret, provider)
+                                        is_valid = self._verify_signature(
+                        headers,
+                        body,
+                        secret,
+                        provider
+                    )
                     if not is_valid:
                         return False, None
                 else:
@@ -127,13 +140,29 @@ class WebhookProcessor:
 
             # Process based on provider
             if provider == WebhookProvider.GITHUB:
-                event = self._process_github_webhook(headers, payload, is_valid)
+                                event = self._process_github_webhook(
+                    headers,
+                    payload,
+                    is_valid
+                )
             elif provider == WebhookProvider.GITLAB:
-                event = self._process_gitlab_webhook(headers, payload, is_valid)
+                                event = self._process_gitlab_webhook(
+                    headers,
+                    payload,
+                    is_valid
+                )
             elif provider == WebhookProvider.BITBUCKET:
-                event = self._process_bitbucket_webhook(headers, payload, is_valid)
+                                event = self._process_bitbucket_webhook(
+                    headers,
+                    payload,
+                    is_valid
+                )
             else:
-                event = self._process_generic_webhook(headers, payload, is_valid)
+                                event = self._process_generic_webhook(
+                    headers,
+                    payload,
+                    is_valid
+                )
 
             if event:
                 # Check for duplicate events
@@ -156,7 +185,11 @@ class WebhookProcessor:
             print(f"Webhook processing error: {str(e)}")
             return False, None
 
-    def register_handler(self, event_type: EventType, handler: callable) -> None:
+        def register_handler(
+        self,
+        event_type: EventType,
+        handler: callable
+    ) -> None:
         """
         Register event handler
 
@@ -168,7 +201,11 @@ class WebhookProcessor:
             self.event_handlers[event_type] = []
         self.event_handlers[event_type].append(handler)
 
-    def _detect_provider(self, headers: Dict[str, str]) -> Optional[WebhookProvider]:
+        def _detect_provider(
+        self,
+        headers: Dict[str,
+        str]
+    ) -> Optional[WebhookProvider]:
         """
         Detect webhook provider from headers
 
@@ -191,7 +228,12 @@ class WebhookProcessor:
             return WebhookProvider.GENERIC
 
     def _verify_signature(
-        self, headers: Dict[str, str], body: str, secret: str, provider: WebhookProvider
+        self,
+            headers: Dict[str
+            str]
+            body: str
+            secret: str
+            provider: WebhookProvider
     ) -> bool:
         """
         Verify webhook signature
@@ -318,7 +360,10 @@ class WebhookProcessor:
                 commit=latest_commit.get("id"),
                 author=latest_commit.get("author", {}).get("username"),
                 timestamp=datetime.fromisoformat(
-                    latest_commit.get("timestamp", datetime.utcnow().isoformat())
+                                        latest_commit.get(
+                        "timestamp",
+                        datetime.utcnow().isoformat()
+                    )
                 ),
                 files_changed=list(set(files_changed)),
                 raw_payload=payload,
@@ -406,7 +451,10 @@ class WebhookProcessor:
                 commit=latest_commit.get("id"),
                 author=latest_commit.get("author", {}).get("name"),
                 timestamp=datetime.fromisoformat(
-                    latest_commit.get("timestamp", datetime.utcnow().isoformat())
+                                        latest_commit.get(
+                        "timestamp",
+                        datetime.utcnow().isoformat()
+                    )
                 ),
                 files_changed=list(set(files_changed)),
                 raw_payload=payload,
@@ -441,7 +489,12 @@ class WebhookProcessor:
             return None
 
         repository = payload.get("repository", {})
-        repo_url = repository.get("links", {}).get("clone", [{}])[0].get("href", "")
+                repo_url = repository.get(
+            "links",
+            {}).get("clone",
+            [{}])[0].get("href",
+            ""
+        )
 
         if event_type == EventType.PUSH:
             push = payload.get("push", {})
@@ -450,7 +503,12 @@ class WebhookProcessor:
             if changes:
                 change = changes[0]
                 branch = change.get("new", {}).get("name", "")
-                commit_hash = change.get("new", {}).get("target", {}).get("hash", "")
+                                commit_hash = change.get(
+                    "new",
+                    {}).get("target",
+                    {}).get("hash",
+                    ""
+                )
                 author = (
                     change.get("new", {})
                     .get("target", {})

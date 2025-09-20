@@ -14,6 +14,7 @@ from ..core.logging import get_logger
 logger = get_logger(__name__)
 
 
+
 class CORSConfig:
     """
     CORS configuration for production environment
@@ -112,7 +113,8 @@ class CORSConfig:
             max_age=self.max_age,
         )
 
-        logger.info(f"CORS configured with {len(self.allowed_origins)} allowed origins")
+        logger.info(f"CORS configured with {len(self.allowed_origins)} allowed \
+            origins")
 
     def is_origin_allowed(self, origin: str) -> bool:
         """Check if origin is allowed"""
@@ -131,6 +133,7 @@ class CORSConfig:
                     return True
 
         return False
+
 
 
 class APIVersioning:
@@ -187,7 +190,8 @@ class APIVersioning:
         app.middleware("http")(self._version_middleware)
 
         logger.info(
-            f"API versioning configured with versions: {self.supported_versions}"
+            f"API versioning configured with versions: \
+                {self.supported_versions}"
         )
 
     def _log_deprecation_warning(self, version: str):
@@ -249,6 +253,7 @@ class APIVersioning:
         return self.version_routers.get(version)
 
 
+
 class RequestValidation:
     """
     Request validation and sanitization
@@ -265,7 +270,10 @@ class RequestValidation:
             r"^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?"
             r"(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*$"
         ),
-        "email": re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"),
+                "email": re.compile(
+            r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,
+            }$"
+        ),
         "alphanumeric": re.compile(r"^[a-zA-Z0-9]+$"),
         "safe_string": re.compile(r"^[a-zA-Z0-9\s\-_.,!?]+$"),
     }
@@ -279,7 +287,8 @@ class RequestValidation:
     def validate_ip(cls, value: str) -> bool:
         """Validate IP address (v4 or v6)"""
         return bool(
-            cls.PATTERNS["ipv4"].match(value) or cls.PATTERNS["ipv6"].match(value)
+            cls.PATTERNS["ipv4"].match(value) or \
+                cls.PATTERNS["ipv6"].match(value)
         )
 
     @classmethod
@@ -314,7 +323,8 @@ class RequestValidation:
         value = value.replace("\x00", "")
 
         # Remove control characters
-        value = "".join(char for char in value if ord(char) >= 32 or char in "\n\r\t")
+        value = "".join(char for char in value if ord(char) >= 32 or char in \
+            "\n\r\t")
 
         # Escape HTML entities
         value = (
@@ -328,7 +338,11 @@ class RequestValidation:
         return value
 
     @classmethod
-    def validate_request_size(cls, request: Request, max_size: int = 10485760):  # 10MB
+        def validate_request_size(
+        cls,
+        request: Request,
+        max_size: int = 10485760
+    ):  # 10MB
         """Validate request body size"""
         content_length = request.headers.get("content-length")
 
@@ -337,7 +351,9 @@ class RequestValidation:
                 raise HTTPException(
                     status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
                     detail=f"Request body too large. Maximum size: {max_size} bytes",
+                        
                 )
+
 
 
 class PaginationParams(BaseModel):
@@ -359,6 +375,7 @@ class PaginationParams(BaseModel):
         return self.per_page
 
 
+
 class APIResponse(BaseModel):
     """Standard API response format"""
 
@@ -375,6 +392,7 @@ class APIResponse(BaseModel):
         json_encoders = {
             datetime: lambda v: v.isoformat(),
         }
+
 
 
 def configure_api(app, config: Dict[str, Any] = None):

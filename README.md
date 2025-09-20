@@ -37,21 +37,28 @@ graph TB
 
 ### Prerequisites
 - Python 3.11+
-- PostgreSQL 14+ (or use Docker)
+- PostgreSQL 14+ (optional, SQLite works for development)
 - 5 minutes
 
-### Install & Run (3 Commands)
+### Fastest Setup (1 Command)
+
+```bash
+# Run the quickstart script
+python quickstart.py
+```
+
+### Manual Setup (3 Commands)
 
 ```bash
 # 1. Clone and install
 git clone https://github.com/catherinevee/catnet && cd catnet
 pip install -r requirements.txt
 
-# 2. Initialize database
-python -m src.main init-db
+# 2. Set up environment
+cp config/.env.example config/.env
 
 # 3. Start the server
-python -m src.main run-server
+python run_catnet.py
 ```
 
 API documentation available at http://localhost:8000/docs
@@ -104,6 +111,45 @@ pip install -e .
 - **Immutable Audit Trail** - Digitally signed audit logs with integrity verification
 - **Dynamic Secrets** - Vault-managed credentials with automatic rotation
 - **CI/CD Pipeline** - Complete with security scanning, tests, and quality checks
+
+## GitOps Integration with GitHub
+
+CatNet seamlessly integrates with GitHub for GitOps-based network configuration management:
+
+### How It Works
+
+1. **Store Configurations in GitHub**
+   ```
+   network-configs/
+   ├── devices/
+   │   ├── routers/
+   │   └── switches/
+   └── catnet.yaml
+   ```
+
+2. **Push Changes → Auto Deploy**
+   ```bash
+   git add devices/router1.cfg
+   git commit -m "Update router1 VLAN config"
+   git push origin main
+   # CatNet automatically validates and deploys
+   ```
+
+3. **Pull Request Workflow**
+   - Create PR → CatNet validates configurations
+   - Review changes → CatNet posts analysis comments
+   - Merge PR → Automatic deployment with rollback safety
+
+### Key GitOps Features
+
+- **🔄 Webhook Integration** - Real-time sync with GitHub
+- **✅ PR Validation** - Automatic configuration validation on PRs
+- **💬 Status Updates** - Deployment status posted back to GitHub
+- **↩️ Git-based Rollback** - `git revert` triggers configuration rollback
+- **🔐 Signed Commits** - GPG verification for production changes
+- **📊 Compliance Checks** - Automated compliance validation before merge
+
+See [GitHub Integration Guide](GITHUB_INTEGRATION.md) for complete setup instructions.
 
 ## Comparison with Alternatives
 
@@ -230,6 +276,16 @@ deployment:
       - routing_table_check
 ```
 
+## Documentation
+
+- **[📖 Usage Guide](USAGE_GUIDE.md)** - Complete guide on how to use CatNet
+- **[🚀 Quick Start](quickstart.py)** - Interactive setup script
+- **[🔗 GitHub Integration](GITHUB_INTEGRATION.md)** - GitOps with GitHub
+- **[📚 API Documentation](docs/API_DOCUMENTATION.md)** - REST API reference
+- **[🔧 Deployment Guide](docs/DEPLOYMENT_GUIDE.md)** - Production deployment
+- **[🏗️ Project Structure](docs/PROJECT_STRUCTURE.md)** - Code organization
+- **[📝 Contributing](docs/CONTRIBUTING.md)** - How to contribute
+
 ## Contributing
 
 Contributions are welcome in the following areas:
@@ -238,7 +294,7 @@ Contributions are welcome in the following areas:
 - Documentation updates
 - Bug fixes
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for guidelines.
 
 ## Security
 

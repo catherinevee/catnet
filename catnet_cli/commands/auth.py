@@ -9,21 +9,46 @@ from pathlib import Path
 import sys
 
 from catnet_cli.client import CatNetAPIClient, AuthenticationError
-from catnet_cli.utils import print_success, print_error, print_info, handle_error
+from catnet_cli.utils import (
+    print_success,
+    print_error,
+    print_info,
+    handle_error,
+)
 
 
 @click.group()
+
 def auth():
     """Authentication commands"""
     pass
 
 
 @auth.command()
-@click.option('--username', '-u', prompt=True, help='Username for authentication')
-@click.option('--password', '-p', help='Password (will prompt if not provided)')
-@click.option('--mfa-token', '-m', help='MFA token for two-factor authentication')
+@click.option(
+    '--username',
+    '-u',
+    prompt=True,
+    help='Username for authentication'
+)
+@click.option(
+    '--password',
+    '-p',
+    help='Password (will prompt if not provided)'
+)
+@click.option(
+    '--mfa-token',
+    '-m',
+    help='MFA token for two-factor authentication'
+)
 @click.pass_context
-def login(ctx: click.Context, username: str, password: Optional[str], mfa_token: Optional[str]):
+
+def login(
+    ctx: click.Context,
+    username: str,
+    password: Optional[str],
+    mfa_token: Optional[str]
+):
     """Login to CatNet system with MFA support
 
     Examples:
@@ -73,6 +98,7 @@ def login(ctx: click.Context, username: str, password: Optional[str], mfa_token:
 
 @auth.command()
 @click.pass_context
+
 def logout(ctx: click.Context):
     """Logout from CatNet and clear stored credentials
 
@@ -105,6 +131,7 @@ def logout(ctx: click.Context):
 
 @auth.command()
 @click.pass_context
+
 def refresh(ctx: click.Context):
     """Refresh authentication token before expiration
 
@@ -143,6 +170,7 @@ def refresh(ctx: click.Context):
 
 @auth.command()
 @click.pass_context
+
 def whoami(ctx: click.Context):
     """Display current user information
 
@@ -163,7 +191,11 @@ def whoami(ctx: click.Context):
                     sys.exit(2)
 
                 # Get user info from API
-                result = await client.request('GET', '/auth/me', service='auth')
+                                result = await client.request(
+                    'GET',
+                    '/auth/me',
+                    service='auth'
+                )
 
                 # Display user information
                 click.echo("\n=== Current User ===")
@@ -172,13 +204,17 @@ def whoami(ctx: click.Context):
                 click.echo(f"Roles: {', '.join(result.get('roles', []))}")
 
                 if 'permissions' in result:
-                    click.echo(f"Permissions: {', '.join(result['permissions'])}")
+                                        click.echo(
+                        f"Permissions: {',
+                        '.join(result['permissions'])}"
+                    )
 
                 if 'last_login' in result:
                     click.echo(f"Last Login: {result['last_login']}")
 
                 if 'mfa_enabled' in result:
-                    mfa_status = "Enabled" if result['mfa_enabled'] else "Disabled"
+                    mfa_status = "Enabled" if result['mfa_enabled'] else \
+                        "Disabled"
                     click.echo(f"MFA: {mfa_status}")
 
                 click.echo("")
@@ -198,11 +234,13 @@ def whoami(ctx: click.Context):
 @auth.command()
 @click.option('--enable/--disable', default=True, help='Enable or disable MFA')
 @click.pass_context
+
 def mfa(ctx: click.Context, enable: bool):
     """Configure multi-factor authentication
 
     Enable or disable MFA for your account.
-    When enabling, you'll receive a QR code to scan with your authenticator app.
+    When enabling, you'll receive a QR code to scan with your authenticator \
+        app.
     """
     config = ctx.obj.get('config', {})
     debug = ctx.obj.get('debug', False)
@@ -214,13 +252,15 @@ def mfa(ctx: click.Context, enable: bool):
                     print_error("Not logged in. Please login first.")
                     sys.exit(2)
 
-                endpoint = '/auth/mfa/enable' if enable else '/auth/mfa/disable'
+                endpoint = '/auth/mfa/enable' if enable else \
+                    '/auth/mfa/disable'
                 result = await client.request('POST', endpoint, service='auth')
 
                 if enable:
                     print_success("MFA enabled successfully")
                     if 'qr_code' in result:
-                        click.echo("\nScan this QR code with your authenticator app:")
+                        click.echo("\nScan this QR code with your \
+                            authenticator app:")
                         click.echo(result['qr_code'])
                     if 'secret' in result:
                         click.echo(f"\nManual entry code: {result['secret']}")
@@ -229,7 +269,8 @@ def mfa(ctx: click.Context, enable: bool):
                         click.echo(f"  - {code}")
                 else:
                     print_success("MFA disabled successfully")
-                    print_info("Your account is now less secure. Consider re-enabling MFA.")
+                    print_info("Your account is now less secure. Consider \
+                        re-enabling MFA.")
 
                 return result
 

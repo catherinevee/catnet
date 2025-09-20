@@ -1,0 +1,6 @@
+{"timestamp": "2025-09-20T03:06:32.880361", "device": "router1.lab.local", "ip": "192.168.1.1", "vendor": "cisco_ios", "simulation_mode": true, "status": "connected (simulated)", "message": "Simulated connection successful"}
+{"timestamp": "2025-09-20T03:13:10.969191", "device": "router1.lab.local", "ip": "192.168.1.1", "vendor": "cisco_ios", "simulation_mode": true, "status": "connected (simulated)", "message": "Simulated connection successful"}
+{"timestamp": "2025-09-20T03:13:12.374429", "device": "router1.lab.local", "ip": "192.168.1.1", "vendor": "cisco_ios", "simulation_mode": true, "status": "connected (simulated)", "message": "Simulated connection successful"}
+{"timestamp": "2025-09-20T03:13:12.374429", "device": "router1.lab.local", "ip": "192.168.1.1", "vendor": "cisco_ios", "simulation_mode": true, "status": "connected (simulated)", "message": "Simulated connection successful"}
+{"timestamp": "2025-09-20T03:13:12.382282", "device": "router1.lab.local", "ip": "192.168.1.1", "vendor": "cisco_ios", "simulation_mode": true, "status": "connected (simulated)", "message": "Simulated connection successful"}
+{"timestamp": "2025-09-20T03:13:12.389374", "device": "router1.lab.local", "ip": "192.168.1.1", "vendor": "cisco_ios", "simulation_mode": true, "status": "connected (simulated)", "message": "Simulated connection successful"}

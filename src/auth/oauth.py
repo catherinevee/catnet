@@ -19,6 +19,7 @@ from urllib.parse import urlencode
 
 
 @dataclass
+
 class OAuthConfig:
     """OAuth provider configuration"""
 
@@ -32,6 +33,7 @@ class OAuthConfig:
     scopes: List[str]
     jwks_uri: Optional[str] = None
     issuer: Optional[str] = None
+
 
 
 class OAuth2Provider:
@@ -57,12 +59,15 @@ class OAuth2Provider:
         },
         "azure": {
             "authorize_url": (
-                "https://login.microsoftonline.com/{tenant}/oauth2/v2.0/authorize"
+                "https://login.microsoftonline.com/{ \
+                    tenant}/oauth2/v2.0/authorize"
             ),
             "token_url": "https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token",
+                
             "userinfo_url": "https://graph.microsoft.com/v1.0/me",
             "jwks_uri": (
-                "https://login.microsoftonline.com/{tenant}/discovery/v2.0/keys"
+                "https://login.microsoftonline.com/{ \
+                    tenant}/discovery/v2.0/keys"
             ),
             "issuer": "https://login.microsoftonline.com/{tenant}/v2.0",
             "scopes": ["openid", "email", "profile"],
@@ -80,7 +85,10 @@ class OAuth2Provider:
     def __init__(self):
         """Initialize OAuth2 provider"""
         self.configs: Dict[str, OAuthConfig] = {}
-        self.state_store: Dict[str, Dict[str, Any]] = {}  # In production, use Redis
+        self.state_store: Dict[str,
+            Dict[str
+            Any]] = {}  # In production
+            use Redis
         self.pkce_store: Dict[str, str] = {}  # Store PKCE verifiers
 
     def register_provider(
@@ -97,7 +105,13 @@ class OAuth2Provider:
         Register an OAuth2 provider
 
         Args:
-            provider_name: Name of the provider (google, github, azure, okta, custom)
+                        provider_name: Name of the provider (
+                google,
+                github,
+                azure,
+                okta,
+                custom
+            )
             client_id: OAuth client ID
             client_secret: OAuth client secret
             redirect_uri: Redirect URI for OAuth callback
@@ -117,11 +131,17 @@ class OAuth2Provider:
             if provider_name == "azure" and tenant:
                 for key in config_dict:
                     if isinstance(config_dict[key], str):
-                        config_dict[key] = config_dict[key].replace("{tenant}", tenant)
+                                                config_dict[key] = config_dict[key].replace(
+                            "{tenant}",
+                            tenant
+                        )
             elif provider_name == "okta" and domain:
                 for key in config_dict:
                     if isinstance(config_dict[key], str):
-                        config_dict[key] = config_dict[key].replace("{domain}", domain)
+                                                config_dict[key] = config_dict[key].replace(
+                            "{domain}",
+                            domain
+                        )
         else:
             raise ValueError(f"Unknown provider: {provider_name}")
 
@@ -409,8 +429,12 @@ class OAuth2Provider:
         return base64.urlsafe_b64encode(digest).decode().rstrip("=")
 
 
+# Alias for backward compatibility
+OAuthProvider = OAuth2Provider
+
 # Convenience functions
 _default_provider = None
+
 
 
 def get_oauth_provider() -> OAuth2Provider:

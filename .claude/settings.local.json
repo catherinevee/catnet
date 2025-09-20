@@ -26,7 +26,12 @@
       "Bash(az:*)",
       "Bash(for rg in tfstate-rg polandcentralrg-1-tfstate rg-terraform-state)",
       "Bash(do echo \"=== Resource Group: $rg ===\")",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(pytest:*)",
+      "Bash(grep:*)",
+      "Bash(netstat:*)",
+      "Bash(curl:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []

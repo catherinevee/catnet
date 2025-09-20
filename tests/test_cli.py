@@ -11,12 +11,14 @@ from catnet_cli.config import ConfigManager
 
 
 @pytest.fixture
+
 def runner():
     """Create a Click CLI test runner"""
     return CliRunner()
 
 
 @pytest.fixture
+
 def mock_config(tmp_path):
     """Create a temporary configuration file"""
     config_file = tmp_path / ".catnet.yml"
@@ -33,6 +35,7 @@ security:
 
 
 @pytest.fixture
+
 def mock_token_file(tmp_path):
     """Create a temporary token file"""
     token_dir = tmp_path / ".catnet"
@@ -48,6 +51,7 @@ def mock_token_file(tmp_path):
         )
     )
     return str(token_file)
+
 
 
 class TestCLICore:
@@ -76,8 +80,15 @@ class TestCLICore:
 
     def test_cli_config_option(self, runner, mock_config):
         """Test custom config file option"""
-        result = runner.invoke(cli, ["--config", mock_config, "device", "--help"])
+                result = runner.invoke(
+            cli,
+            ["--config",
+            mock_config,
+            "device",
+            "--help"]
+        )
         assert result.exit_code == 0
+
 
 
 class TestAuthCommands:
@@ -94,10 +105,16 @@ class TestAuthCommands:
                 "roles": ["admin"],
             }
         )
-        mock_client_class.return_value.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client_class.return_value.__aenter__ = \
+            AsyncMock(return_value=mock_client)
         mock_client_class.return_value.__aexit__ = AsyncMock()
 
-        result = runner.invoke(cli, ["auth", "login"], input="testuser\ntestpass\n")
+                result = runner.invoke(
+            cli,
+            ["auth",
+            "login"],
+            input="testuser\ntestpass\n"
+        )
         assert result.exit_code == 0
         assert "Successfully logged in" in result.output
 
@@ -106,7 +123,8 @@ class TestAuthCommands:
         """Test logout command"""
         mock_client = AsyncMock()
         mock_client.logout = AsyncMock(return_value={"success": True})
-        mock_client_class.return_value.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client_class.return_value.__aenter__ = \
+            AsyncMock(return_value=mock_client)
         mock_client_class.return_value.__aexit__ = AsyncMock()
 
         result = runner.invoke(cli, ["auth", "logout"])
@@ -125,13 +143,15 @@ class TestAuthCommands:
                 "roles": ["admin", "operator"],
             }
         )
-        mock_client_class.return_value.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client_class.return_value.__aenter__ = \
+            AsyncMock(return_value=mock_client)
         mock_client_class.return_value.__aexit__ = AsyncMock()
 
         result = runner.invoke(cli, ["auth", "whoami"])
         assert result.exit_code == 0
         assert "Username: testuser" in result.output
         assert "Email: test@example.com" in result.output
+
 
 
 class TestDeviceCommands:
@@ -153,7 +173,8 @@ class TestDeviceCommands:
                 }
             ]
         )
-        mock_client_class.return_value.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client_class.return_value.__aenter__ = \
+            AsyncMock(return_value=mock_client)
         mock_client_class.return_value.__aexit__ = AsyncMock()
 
         result = runner.invoke(cli, ["device", "list"])
@@ -168,7 +189,8 @@ class TestDeviceCommands:
         mock_getpass.return_value = "securepass"
         mock_client = AsyncMock()
         mock_client.add_device = AsyncMock(return_value={"id": "dev-new-123"})
-        mock_client_class.return_value.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client_class.return_value.__aenter__ = \
+            AsyncMock(return_value=mock_client)
         mock_client_class.return_value.__aexit__ = AsyncMock()
 
         result = runner.invoke(
@@ -206,13 +228,15 @@ class TestDeviceCommands:
                 },
             }
         )
-        mock_client_class.return_value.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client_class.return_value.__aenter__ = \
+            AsyncMock(return_value=mock_client)
         mock_client_class.return_value.__aexit__ = AsyncMock()
 
         result = runner.invoke(cli, ["device", "health", "dev-123"])
         assert result.exit_code == 0
         assert "Status: HEALTHY" in result.output
         assert "CPU Usage: 45%" in result.output
+
 
 
 class TestDeployCommands:
@@ -229,7 +253,8 @@ class TestDeployCommands:
         mock_client.create_deployment = AsyncMock(
             return_value={"id": "dep-123", "status": "pending"}
         )
-        mock_client_class.return_value.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client_class.return_value.__aenter__ = \
+            AsyncMock(return_value=mock_client)
         mock_client_class.return_value.__aexit__ = AsyncMock()
 
         result = runner.invoke(
@@ -262,7 +287,8 @@ class TestDeployCommands:
                 "started_at": "2025-01-01T00:00:00",
             }
         )
-        mock_client_class.return_value.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client_class.return_value.__aenter__ = \
+            AsyncMock(return_value=mock_client)
         mock_client_class.return_value.__aexit__ = AsyncMock()
 
         result = runner.invoke(cli, ["deploy", "status", "dep-123"])
@@ -280,16 +306,24 @@ class TestDeployCommands:
                 "devices_rolled_back": ["device1", "device2"],
             }
         )
-        mock_client_class.return_value.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client_class.return_value.__aenter__ = \
+            AsyncMock(return_value=mock_client)
         mock_client_class.return_value.__aexit__ = AsyncMock()
 
         result = runner.invoke(
             cli,
-            ["deploy", "rollback", "dep-123", "--reason", "Test rollback", "--force"],
+            ["deploy",
+                "rollback"
+                "dep-123"
+                "--reason"
+                "Test rollback"
+                "--force"]
+                
         )
 
         assert result.exit_code == 0
         assert "Rollback initiated successfully" in result.output
+
 
 
 class TestGitOpsCommands:
@@ -305,7 +339,8 @@ class TestGitOpsCommands:
                 "webhook_url": "https://api.catnet/webhook/123",
             }
         )
-        mock_client_class.return_value.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client_class.return_value.__aenter__ = \
+            AsyncMock(return_value=mock_client)
         mock_client_class.return_value.__aexit__ = AsyncMock()
 
         result = runner.invoke(
@@ -335,13 +370,21 @@ class TestGitOpsCommands:
                 "validation": {"valid": 2, "invalid": 0},
             }
         )
-        mock_client_class.return_value.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client_class.return_value.__aenter__ = \
+            AsyncMock(return_value=mock_client)
         mock_client_class.return_value.__aexit__ = AsyncMock()
 
-        result = runner.invoke(cli, ["gitops", "sync", "--repo-id", "repo-123"])
+                result = runner.invoke(
+            cli,
+            ["gitops",
+            "sync",
+            "--repo-id",
+            "repo-123"]
+        )
         assert result.exit_code == 0
         assert "Repository synchronized successfully" in result.output
         assert "Files synced: 2" in result.output
+
 
 
 class TestVaultCommands:
@@ -352,12 +395,19 @@ class TestVaultCommands:
         """Test secret storage"""
         mock_client = AsyncMock()
         mock_client.store_secret = AsyncMock(return_value={"version": 1})
-        mock_client_class.return_value.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client_class.return_value.__aenter__ = \
+            AsyncMock(return_value=mock_client)
         mock_client_class.return_value.__aexit__ = AsyncMock()
 
         result = runner.invoke(
             cli,
-            ["vault", "store", "--path", "devices/router1", "--key", "password"],
+            ["vault",
+                "store"
+                "--path"
+                "devices/router1"
+                "--key"
+                "password"]
+                
             input="secretpass\n",
         )
 
@@ -371,7 +421,8 @@ class TestVaultCommands:
         mock_client.get_secret = AsyncMock(
             return_value={"username": "admin", "password": "secret123"}
         )
-        mock_client_class.return_value.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client_class.return_value.__aenter__ = \
+            AsyncMock(return_value=mock_client)
         mock_client_class.return_value.__aexit__ = AsyncMock()
 
         result = runner.invoke(cli, ["vault", "get", "devices/router1"])
@@ -390,14 +441,22 @@ class TestVaultCommands:
                 "updated_devices": ["router1"],
             }
         )
-        mock_client_class.return_value.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client_class.return_value.__aenter__ = \
+            AsyncMock(return_value=mock_client)
         mock_client_class.return_value.__aexit__ = AsyncMock()
 
-        result = runner.invoke(cli, ["vault", "rotate", "devices/router1", "--force"])
+                result = runner.invoke(
+            cli,
+            ["vault",
+            "rotate",
+            "devices/router1",
+            "--force"]
+        )
 
         assert result.exit_code == 0
         assert "Credentials rotated successfully" in result.output
         assert "New version: 2" in result.output
+
 
 
 class TestConfigManager:
@@ -452,6 +511,7 @@ api:
         assert retrieved["refresh_token"] == "refresh_token"
 
 
+
 class TestErrorHandling:
     """Test error handling and edge cases"""
 
@@ -460,7 +520,8 @@ class TestErrorHandling:
         """Test authentication error handling"""
         mock_client = AsyncMock()
         mock_client.login = AsyncMock(side_effect=Exception("Auth failed"))
-        mock_client_class.return_value.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client_class.return_value.__aenter__ = \
+            AsyncMock(return_value=mock_client)
         mock_client_class.return_value.__aexit__ = AsyncMock()
 
         result = runner.invoke(cli, ["auth", "login"], input="user\npass\n")
@@ -477,7 +538,9 @@ class TestErrorHandling:
         """Test missing required option"""
         result = runner.invoke(cli, ["device", "add"])
         assert result.exit_code != 0
-        assert "Missing option" in result.output or "required" in result.output.lower()
+        assert "Missing option" in result.output or "required" in \
+            result.output.lower()
+
 
 
 class TestIntegration:
@@ -488,14 +551,12 @@ class TestIntegration:
         """Test complete deployment workflow"""
         # This would test the full flow from login to deployment
         # For now, this is a placeholder for integration testing
-        pass
 
     @patch("catnet_cli.client.aiohttp.ClientSession")
     async def test_gitops_to_deployment(self, mock_session):
         """Test GitOps to deployment workflow"""
         # This would test connecting a repo, syncing, and deploying
         # For now, this is a placeholder for integration testing
-        pass
 
 
 if __name__ == "__main__":

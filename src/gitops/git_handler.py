@@ -16,6 +16,7 @@ from ..core.logging import get_logger
 logger = get_logger(__name__)
 
 
+
 class GitHandler:
     def __init__(self, vault_client: Optional[VaultClient] = None):
         self.vault = vault_client or VaultClient()
@@ -42,7 +43,8 @@ class GitHandler:
                 os.chmod(ssh_key_path, 0o600)
 
                 # Configure git to use SSH key
-                ssh_command = f"ssh -i {ssh_key_path} -o StrictHostKeyChecking=no"
+                ssh_command = f"ssh -i {ssh_key_path} -o \
+                    StrictHostKeyChecking=no"
                 repo = Repo.clone_from(
                     repo_url,
                     temp_dir,
@@ -63,7 +65,11 @@ class GitHandler:
             shutil.rmtree(temp_dir, ignore_errors=True)
             raise Exception(f"Failed to clone repository: {str(e)}")
 
-    async def pull_latest(self, repo_path: str, branch: str = "main") -> Dict[str, Any]:
+        async def pull_latest(
+        self,
+        repo_path: str,
+        branch: str = "main"
+    ) -> Dict[str, Any]:
         try:
             repo = Repo(repo_path)
             origin = repo.remotes.origin
@@ -123,7 +129,10 @@ class GitHandler:
 
         return configs
 
-    async def parse_config_file(self, file_path: str) -> Optional[Dict[str, Any]]:
+        async def parse_config_file(
+        self,
+        file_path: str
+    ) -> Optional[Dict[str, Any]]:
         try:
             with open(file_path, "r") as f:
                 content = f.read()
@@ -141,7 +150,11 @@ class GitHandler:
         with open(file_path, "rb") as f:
             return hashlib.sha256(f.read()).hexdigest()
 
-    async def verify_commit_signature(self, repo_path: str, commit_sha: str) -> bool:
+        async def verify_commit_signature(
+        self,
+        repo_path: str,
+        commit_sha: str
+    ) -> bool:
         try:
             repo = Repo(repo_path)
             commit = repo.commit(commit_sha)
@@ -152,7 +165,11 @@ class GitHandler:
             logger.debug(f"Commit author: {commit.author.name}")
 
             # Check if commit is signed
-            signature = repo.git.show(commit_sha, "--show-signature", "--no-patch")
+                        signature = repo.git.show(
+                commit_sha,
+                "--show-signature",
+                "--no-patch"
+            )
 
             # Look for GPG signature verification
             if "gpg:" in signature.lower():
@@ -191,7 +208,12 @@ class GitHandler:
                     continue
 
                 try:
-                    with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+                                        with open(
+                        file_path,
+                        "r",
+                        encoding="utf-8",
+                        errors="ignore"
+                    ) as f:
                         content = f.read()
 
                     for pattern in patterns:
@@ -202,11 +224,9 @@ class GitHandler:
                                 {
                                     "file": file_path.replace(repo_path, ""),
                                     "line": line_num,
-                                    "pattern": pattern[
-                                        :30
+                                    "pattern": pattern[:30
                                     ],  # Truncate pattern for display
-                                    "match": match.group()[
-                                        :50
+                                    "match": match.group()[:50
                                     ],  # Truncate match for security
                                 }
                             )
@@ -216,7 +236,11 @@ class GitHandler:
 
         return secrets_found
 
-    async def get_commit_info(self, repo_path: str, commit_sha: str) -> Dict[str, Any]:
+        async def get_commit_info(
+        self,
+        repo_path: str,
+        commit_sha: str
+    ) -> Dict[str, Any]:
         try:
             repo = Repo(repo_path)
             commit = repo.commit(commit_sha)
@@ -234,7 +258,10 @@ class GitHandler:
                 "message": commit.message,
                 "timestamp": commit.committed_datetime.isoformat(),
                 "files_changed": len(commit.stats.files),
-                "signed": await self.verify_commit_signature(repo_path, commit_sha),
+                                "signed": await self.verify_commit_signature(
+                    repo_path,
+                    commit_sha
+                ),
             }
 
         except Exception as e:
@@ -269,7 +296,8 @@ class GitHandler:
 
         # Sign the manifest
         manifest_json = json.dumps(manifest, sort_keys=True)
-        manifest["signature"] = self.encryption.calculate_hash(manifest_json.encode())
+        manifest["signature"] = self.encryption.calculate_hash( \
+            manifest_json.encode())
 
         return manifest
 

@@ -1,6 +1,6 @@
 import pytest
 import asyncio
-from datetime import datetime, timedelta
+from datetime import datetime
 from unittest.mock import Mock, patch, AsyncMock
 from src.automation.workflows import (
     WorkflowEngine,
@@ -14,6 +14,7 @@ from src.automation.workflows import (
     WorkflowBuilder,
     RemediationWorkflows,
 )
+
 
 
 class TestWorkflow:
@@ -60,6 +61,7 @@ class TestWorkflow:
         assert workflow.steps[1].type == StepType.NOTIFICATION
 
 
+
 class TestWorkflowTrigger:
     def test_event_trigger(self):
         trigger = WorkflowTrigger(
@@ -73,7 +75,9 @@ class TestWorkflowTrigger:
     def test_schedule_trigger(self):
         trigger = WorkflowTrigger(
             type=TriggerType.SCHEDULE,
-            conditions={"cron": "0 2 * * *", "timezone": "UTC"},  # Daily at 2 AM
+            conditions={"cron": "0 2 * * *",
+                "timezone": "UTC"}
+                # Daily at 2 AM
         )
 
         assert trigger.type == TriggerType.SCHEDULE
@@ -92,6 +96,7 @@ class TestWorkflowTrigger:
 
         assert trigger.type == TriggerType.THRESHOLD
         assert trigger.conditions["value"] == 90
+
 
 
 class TestWorkflowEngine:
@@ -169,7 +174,9 @@ class TestWorkflowEngine:
                 id="device_step",
                 name="Execute Command",
                 type=StepType.DEVICE_COMMAND,
-                parameters={"device_id": "device123", "command": "show version"},
+                parameters={"device_id": "device123",
+                    "command": "show version"}
+                    
             )
 
             result = await engine._execute_step(step, {})
@@ -186,7 +193,8 @@ class TestWorkflowEngine:
             mock_response.status = 200
             mock_response.json = AsyncMock(return_value={"status": "success"})
 
-            mock_session.return_value.__aenter__.return_value.request = AsyncMock(
+            mock_session.return_value.__aenter__.return_value.request = \
+                AsyncMock(
                 return_value=mock_response
             )
             mock_response.__aenter__ = AsyncMock(return_value=mock_response)
@@ -196,7 +204,9 @@ class TestWorkflowEngine:
                 id="api_step",
                 name="Call API",
                 type=StepType.API_CALL,
-                parameters={"url": "https://api.example.com/status", "method": "GET"},
+                parameters={"url": "https://api.example.com/status",
+                    "method": "GET"}
+                    
             )
 
             result = await engine._execute_step(step, {})
@@ -316,8 +326,10 @@ class TestWorkflowEngine:
         await asyncio.sleep(0.1)
 
         execution = engine.executions.get(execution_id)
-        assert execution.status in [ExecutionStatus.COMPLETED, ExecutionStatus.FAILED]
+        assert execution.status in [ExecutionStatus.COMPLETED,
+            ExecutionStatus.FAILED]
         assert len(execution.step_results) >= 1
+
 
 
 class TestWorkflowBuilder:
@@ -340,12 +352,17 @@ class TestWorkflowBuilder:
         assert workflow.trigger.type == TriggerType.MANUAL
 
     def test_build_workflow_with_conditions(self):
-        builder = WorkflowBuilder("conditional_workflow", "Conditional Workflow")
+                builder = WorkflowBuilder(
+            "conditional_workflow",
+            "Conditional Workflow"
+        )
 
         workflow = (
             builder.with_trigger(TriggerType.EVENT, {"event_type": "alert"})
             .add_condition(
-                "check_severity", "Check Severity", "context['severity'] == 'high'"
+                "check_severity",
+                    "Check Severity"
+                    "context['severity'] == 'high'"
             )
             .add_device_command(
                 "restart_interface",
@@ -362,6 +379,7 @@ class TestWorkflowBuilder:
         assert workflow.steps[1].depends_on == ["check_severity"]
 
 
+
 class TestRemediationWorkflows:
     @pytest.mark.asyncio
     async def test_interface_flapping_remediation(self):
@@ -371,7 +389,8 @@ class TestRemediationWorkflows:
 
         assert workflow.name == "Interface Flapping Remediation"
         assert workflow.trigger.type == TriggerType.EVENT
-        assert workflow.trigger.conditions["event_type"] == "interface.flapping"
+        assert workflow.trigger.conditions["event_type"] == \
+            "interface.flapping"
 
         # Verify workflow has expected steps
         step_types = [step.type for step in workflow.steps]
@@ -399,6 +418,7 @@ class TestRemediationWorkflows:
         assert workflow.name == "Configuration Compliance Remediation"
         assert workflow.trigger.type == TriggerType.SCHEDULE
         assert workflow.trigger.conditions["cron"] == "0 0 * * 0"  # Weekly
+
 
 
 class TestWorkflowExecution:
@@ -447,6 +467,7 @@ class TestWorkflowExecution:
         assert "Connection timeout" in execution.error
 
 
+
 class TestWorkflowIntegration:
     @pytest.mark.asyncio
     async def test_end_to_end_remediation_workflow(self):
@@ -473,7 +494,8 @@ class TestWorkflowIntegration:
         with patch.object(
             engine, "_execute_device_command", new_callable=AsyncMock
         ) as mock_cmd:
-            mock_cmd.return_value = {"success": True, "output": "Interface disabled"}
+            mock_cmd.return_value = {"success": True,
+                "output": "Interface disabled"}
 
             # Trigger workflow
             execution_id = await engine.trigger_workflow(workflow.id, event)

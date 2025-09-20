@@ -15,6 +15,7 @@ from enum import Enum
 import asyncio
 
 
+
 class HealthCheckType(Enum):
     """Types of health checks"""
 
@@ -26,6 +27,7 @@ class HealthCheckType(Enum):
     CUSTOM = "custom"
 
 
+
 class HealthStatus(Enum):
     """Health status levels"""
 
@@ -33,6 +35,7 @@ class HealthStatus(Enum):
     DEGRADED = "degraded"
     UNHEALTHY = "unhealthy"
     UNKNOWN = "unknown"
+
 
 
 class MetricType(Enum):
@@ -47,6 +50,7 @@ class MetricType(Enum):
 
 
 @dataclass
+
 class HealthMetric:
     """Health metric"""
 
@@ -61,6 +65,7 @@ class HealthMetric:
 
 
 @dataclass
+
 class HealthCheckResult:
     """Health check result"""
 
@@ -75,6 +80,7 @@ class HealthCheckResult:
 
 
 @dataclass
+
 class HealthCheckConfig:
     """Health check configuration"""
 
@@ -98,6 +104,7 @@ class HealthCheckConfig:
             "interface_errors": {"warning": 10, "critical": 100},
         }
     )
+
 
 
 class HealthCheckService:
@@ -148,7 +155,10 @@ class HealthCheckService:
             elif check_type == HealthCheckType.SERVICE:
                 result = await self._check_services(device_id)
             elif check_type == HealthCheckType.PERFORMANCE:
-                result = await self._check_performance(device_id, config.thresholds)
+                                result = await self._check_performance(
+                    device_id,
+                    config.thresholds
+                )
             elif check_type == HealthCheckType.CONFIGURATION:
                 result = await self._check_configuration(device_id)
             elif check_type == HealthCheckType.CUSTOM:
@@ -168,7 +178,8 @@ class HealthCheckService:
                 overall_status = HealthStatus.DEGRADED
 
         # Calculate duration
-        duration_ms = int((datetime.utcnow() - start_time).total_seconds() * 1000)
+        duration_ms = int((datetime.utcnow() - start_time).total_seconds() * \
+            1000)
 
         # Create overall result
         overall_result = HealthCheckResult(
@@ -188,7 +199,8 @@ class HealthCheckService:
 
         # Keep only last 100 results per device
         if len(self.health_checks[device_id]) > 100:
-            self.health_checks[device_id] = self.health_checks[device_id][-100:]
+            self.health_checks[device_id] = \
+                self.health_checks[device_id][-100:]
 
         return overall_result
 
@@ -269,7 +281,8 @@ class HealthCheckService:
             reachable = await self._ping_device(device_id)
 
             # Check SSH/API connectivity
-            management_accessible = await self._check_management_access(device_id)
+            management_accessible = await \
+                self._check_management_access(device_id)
 
             if reachable and management_accessible:
                 status = HealthStatus.HEALTHY
@@ -319,7 +332,8 @@ class HealthCheckService:
             unhealthy_protocols = []
 
             # Check routing protocols
-            routing_protocols = await self._get_routing_protocol_status(device_id)
+            routing_protocols = await self._get_routing_protocol_status( \
+                device_id)
             for protocol, status in routing_protocols.items():
                 protocol_status[protocol] = status
                 if status != "up":
@@ -340,7 +354,9 @@ class HealthCheckService:
                 message = f"Protocol issue: {unhealthy_protocols[0]}"
             else:
                 status = HealthStatus.UNHEALTHY
-                message = f"Multiple protocol issues: {', '.join(unhealthy_protocols)}"
+                                message = f"Multiple protocol issues: {', '.join(
+                    unhealthy_protocols
+                )}"
 
             return HealthCheckResult(
                 check_type=HealthCheckType.PROTOCOL,
@@ -393,7 +409,9 @@ class HealthCheckService:
                 message = f"Service issue: {failed_services[0]}"
             else:
                 status = HealthStatus.UNHEALTHY
-                message = f"Multiple service failures: {', '.join(failed_services)}"
+                                message = f"Multiple service failures: {', '.join(
+                    failed_services
+                )}"
 
             return HealthCheckResult(
                 check_type=HealthCheckType.SERVICE,
@@ -485,7 +503,8 @@ class HealthCheckService:
             unhealthy_metrics = [
                 m for m in metrics if m.status == HealthStatus.UNHEALTHY
             ]
-            degraded_metrics = [m for m in metrics if m.status == HealthStatus.DEGRADED]
+            degraded_metrics = [m for m in metrics if m.status == \
+                HealthStatus.DEGRADED]
 
             if unhealthy_metrics:
                 status = HealthStatus.UNHEALTHY
@@ -530,7 +549,8 @@ class HealthCheckService:
 
         try:
             # Check configuration consistency
-            config_consistent = await self._verify_configuration_consistency(device_id)
+            config_consistent = await self._verify_configuration_consistency( \
+                device_id)
 
             # Check for configuration drift
             has_drift = await self._check_configuration_drift(device_id)
@@ -593,7 +613,9 @@ class HealthCheckService:
                 results[check_name] = await check_func(device_id)
 
             # Aggregate results
-            failed_checks = [name for name, result in results.items() if not result]
+                        failed_checks = [name for name, result in results.items(
+                
+            ) if not result]
 
             if not failed_checks:
                 status = HealthStatus.HEALTHY
@@ -682,7 +704,10 @@ class HealthCheckService:
             return await self.device_service.check_management_access(device_id)
         return True
 
-    async def _get_routing_protocol_status(self, device_id: str) -> Dict[str, str]:
+        async def _get_routing_protocol_status(
+        self,
+        device_id: str
+    ) -> Dict[str, str]:
         """Get routing protocol status"""
         if self.device_service:
             return await self.device_service.get_routing_protocols(device_id)
@@ -697,10 +722,16 @@ class HealthCheckService:
     async def _get_service_status(self, device_id: str, service: str) -> str:
         """Get service status"""
         if self.device_service:
-            return await self.device_service.get_service_status(device_id, service)
+                        return await self.device_service.get_service_status(
+                device_id,
+                service
+            )
         return "running"
 
-    async def _get_performance_metrics(self, device_id: str) -> Dict[str, float]:
+        async def _get_performance_metrics(
+        self,
+        device_id: str
+    ) -> Dict[str, float]:
         """Get performance metrics"""
         if self.device_service:
             return await self.device_service.get_performance_metrics(device_id)
@@ -714,7 +745,8 @@ class HealthCheckService:
     async def _verify_configuration_consistency(self, device_id: str) -> bool:
         """Verify configuration consistency"""
         if self.device_service:
-            return await self.device_service.verify_config_consistency(device_id)
+            return await self.device_service.verify_config_consistency( \
+                device_id)
         return True
 
     async def _check_configuration_drift(self, device_id: str) -> bool:
@@ -729,5 +761,6 @@ class HealthCheckService:
         """Trigger health alert"""
         # Would send actual alert
         print(
-            f"HEALTH ALERT: Device {device_id} is {result.status.value}: {result.message}"
+            f"HEALTH ALERT: Device {device_id} is {result.status.value}: { 
+    result.message}"
         )

@@ -8,10 +8,11 @@ Validates deployments with:
 - Resource availability checks
 """
 
-from typing import Dict, Any, Optional, List, Tuple
+from typing import Dict, Any, Optional, List
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
+
 
 
 class ValidationType(Enum):
@@ -25,12 +26,14 @@ class ValidationType(Enum):
     DEPENDENCY = "dependency"
 
 
+
 class ValidationSeverity(Enum):
     """Validation severity levels"""
 
     CRITICAL = "critical"
     WARNING = "warning"
     INFO = "info"
+
 
 
 class ValidationStatus(Enum):
@@ -43,6 +46,7 @@ class ValidationStatus(Enum):
 
 
 @dataclass
+
 class ValidationIssue:
     """Validation issue"""
 
@@ -55,6 +59,7 @@ class ValidationIssue:
 
 
 @dataclass
+
 class ValidationResult:
     """Validation result"""
 
@@ -69,6 +74,7 @@ class ValidationResult:
     issues: List[ValidationIssue] = field(default_factory=list)
     device_results: Dict[str, Dict[str, Any]] = field(default_factory=dict)
     metadata: Dict[str, Any] = field(default_factory=dict)
+
 
 
 class DeploymentValidator:
@@ -167,7 +173,8 @@ class DeploymentValidator:
                             severity=ValidationSeverity.CRITICAL,
                             message=f"Device {device_id} is not accessible",
                             device_id=device_id,
-                            recommendation="Verify device connectivity and credentials",
+                            recommendation="Verify device connectivity and \
+                                credentials",
                         )
                     )
                     result.failed_checks += 1
@@ -183,7 +190,8 @@ class DeploymentValidator:
                         type=ValidationType.PRE_DEPLOYMENT,
                         severity=ValidationSeverity.WARNING,
                         message="Deployment outside maintenance window",
-                        recommendation="Schedule deployment during maintenance window",
+                        recommendation="Schedule deployment during maintenance \
+                            window",
                     )
                 )
                 result.warnings += 1
@@ -228,10 +236,12 @@ class DeploymentValidator:
                             ValidationIssue(
                                 type=ValidationType.CONFIGURATION,
                                 severity=ValidationSeverity.CRITICAL,
-                                message=f"Configuration validation failed for {device_id}",
+                                message=f"Configuration validation failed for { 
+    device_id}",
                                 device_id=device_id,
                                 details={"errors": validation.errors},
-                                recommendation="Fix configuration syntax errors",
+                                recommendation="Fix configuration syntax \
+                                    errors",
                             )
                         )
                         result.failed_checks += 1
@@ -296,10 +306,13 @@ class DeploymentValidator:
                         ValidationIssue(
                             type=ValidationType.COMPATIBILITY,
                             severity=ValidationSeverity.WARNING,
-                            message=f"Configuration may not be compatible with {model} running {os_version}",
+                            message=f"Configuration may not be compatible with \
+                                {
+    model} running {os_version}",
                             device_id=device_id,
                             details={"model": model, "os_version": os_version},
-                            recommendation="Verify configuration compatibility",
+                            recommendation="Verify configuration \
+                                compatibility",
                         )
                     )
                     result.warnings += 1
@@ -348,9 +361,11 @@ class DeploymentValidator:
                             type=ValidationType.RESOURCE,
                             severity=ValidationSeverity.WARNING,
                             message=f"High CPU usage on {device_id}: {cpu_usage}%",
+                                
                             device_id=device_id,
                             details={"cpu_usage": cpu_usage},
-                            recommendation="Wait for lower CPU usage before deployment",
+                            recommendation="Wait for lower CPU usage before \
+                                deployment",
                         )
                     )
                     result.warnings += 1
@@ -362,7 +377,8 @@ class DeploymentValidator:
                         ValidationIssue(
                             type=ValidationType.RESOURCE,
                             severity=ValidationSeverity.WARNING,
-                            message=f"High memory usage on {device_id}: {memory_usage}%",
+                            message=f"High memory usage on {device_id}: { 
+    memory_usage}%",
                             device_id=device_id,
                             details={"memory_usage": memory_usage},
                             recommendation="Free up memory before deployment",
@@ -377,7 +393,8 @@ class DeploymentValidator:
                         ValidationIssue(
                             type=ValidationType.RESOURCE,
                             severity=ValidationSeverity.CRITICAL,
-                            message=f"Low storage space on {device_id}: {storage_free}MB",
+                            message=f"Low storage space on {device_id}: { 
+    storage_free}MB",
                             device_id=device_id,
                             details={"storage_free_mb": storage_free},
                             recommendation="Free up storage space",
@@ -436,7 +453,8 @@ class DeploymentValidator:
                     ValidationIssue(
                         type=ValidationType.SECURITY,
                         severity=ValidationSeverity.WARNING,
-                        message=f"Configuration enables insecure protocols: {', '.join(insecure_protocols)}",
+                        message=f"Configuration enables insecure protocols: {', 
+    '.join(insecure_protocols)}",
                         details={"protocols": insecure_protocols},
                         recommendation="Use secure protocols only",
                     )
@@ -499,8 +517,12 @@ class DeploymentValidator:
                             type=ValidationType.DEPENDENCY,
                             severity=ValidationSeverity.CRITICAL,
                             message=f"Dependent deployment {dep_id} not completed",
-                            details={"dependency": dep_id, "status": dep_status},
-                            recommendation="Wait for dependent deployments to complete",
+                                
+                            details={"dependency": dep_id,
+                                "status": dep_status}
+                                
+                            recommendation="Wait for dependent deployments to \
+                                complete",
                         )
                     )
                     result.failed_checks += 1
@@ -514,10 +536,13 @@ class DeploymentValidator:
                             ValidationIssue(
                                 type=ValidationType.DEPENDENCY,
                                 severity=ValidationSeverity.WARNING,
-                                message=f"Device dependency not satisfied: {dep['name']}",
+                                message=f"Device dependency not satisfied: \
+                                    {dep[
+    'name']}",
                                 device_id=device_id,
                                 details=dep,
                                 recommendation=f"Resolve dependency: {dep['name']}",
+                                    
                             )
                         )
                         result.warnings += 1
@@ -603,9 +628,11 @@ class DeploymentValidator:
         insecure = []
         if "telnet" in configuration.lower():
             insecure.append("telnet")
-        if "http " in configuration.lower() and "https" not in configuration.lower():
+        if "http " in configuration.lower() and "https" not in \
+            configuration.lower():
             insecure.append("http")
-        if "ftp" in configuration.lower() and "sftp" not in configuration.lower():
+        if "ftp" in configuration.lower() and "sftp" not in \
+            configuration.lower():
             insecure.append("ftp")
         return insecure
 
@@ -620,7 +647,10 @@ class DeploymentValidator:
         # Would check actual deployment status
         return "completed"
 
-    async def _check_device_dependencies(self, device_id: str) -> List[Dict[str, Any]]:
+        async def _check_device_dependencies(
+        self,
+        device_id: str
+    ) -> List[Dict[str, Any]]:
         """Check device dependencies"""
         # Would check actual device dependencies
         return []

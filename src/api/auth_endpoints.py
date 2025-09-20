@@ -1,7 +1,8 @@
 """
 Extended Authentication Service Endpoints
 """
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi.security import OAuth2PasswordRequestForm
 from typing import Dict, Optional, List
 from datetime import datetime, timedelta
 import pyotp
@@ -10,9 +11,8 @@ import io
 import base64
 from pydantic import BaseModel, EmailStr
 
-from ..security.auth import get_current_user  # Used in endpoints below
+from ..security.auth import get_current_user, AuthManager
 
-# AuthManager will be imported when token management is implemented
 from ..security.vault import VaultClient
 from ..security.audit import AuditLogger
 from ..db.models import User
@@ -20,9 +20,32 @@ from ..db.database import get_db
 from ..core.logging import get_logger
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+import os
 
 logger = get_logger(__name__)
-router = APIRouter(prefix="/auth", tags=["authentication"])
+router = APIRouter(tags=["authentication"])  # Removed prefix to avoid double \
+    /auth
+auth_manager = AuthManager(secret_key=os.getenv("JWT_SECRET_KEY", 
+    "dev-secret-key-change-in-production"))
+
+
+
+class LoginRequest(BaseModel):
+    """Login request model"""
+    username: str
+    password: str
+    mfa_code: Optional[str] = None
+
+
+
+class LoginResponse(BaseModel):
+    """Login response model"""
+    access_token: str
+    token_type: str = "bearer"
+    expires_in: int
+    refresh_token: Optional[str] = None
+    mfa_required: bool = False
+
 
 
 class MFAEnrollRequest(BaseModel):
@@ -31,6 +54,7 @@ class MFAEnrollRequest(BaseModel):
     method: str  # totp, sms, email
     phone_number: Optional[str] = None
     backup_email: Optional[EmailStr] = None
+
 
 
 class MFAEnrollResponse(BaseModel):
@@ -42,11 +66,13 @@ class MFAEnrollResponse(BaseModel):
     enrolled_at: datetime
 
 
+
 class CertificateValidationRequest(BaseModel):
     """Certificate validation request"""
 
     certificate: str  # PEM encoded certificate
     device_id: Optional[str] = None
+
 
 
 class CertificateValidationResponse(BaseModel):
@@ -61,6 +87,7 @@ class CertificateValidationResponse(BaseModel):
     device_id: Optional[str] = None
 
 
+
 class SessionInfo(BaseModel):
     """Session information"""
 
@@ -71,6 +98,169 @@ class SessionInfo(BaseModel):
     ip_address: str
     user_agent: str
     expires_at: datetime
+
+
+@router.post("/login", response_model=LoginResponse)
+async def login(
+    request: Request,
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: AsyncSession = Depends(get_db),
+):
+    """User login endpoint
+
+    Authenticates user with username/password.
+    Returns JWT tokens on success.
+    """
+    logger.info(f"Login attempt for user {form_data.username}")
+
+    # Get user from database
+    result = await db.execute(
+        select(User).where(User.username == form_data.username)
+    )
+    user = result.scalar_one_or_none()
+
+        if not user or not auth_manager.verify_password(
+        form_data.password,
+        user.password_hash
+    ):
+        logger.warning(f"Failed login attempt for {form_data.username}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    # Check if account is locked
+    if user.locked_until and user.locked_until > datetime.utcnow():
+        raise HTTPException(
+            status_code=status.HTTP_423_LOCKED,
+            detail="Account is locked",
+        )
+
+    # Reset failed login attempts on successful login
+    if user.failed_login_attempts > 0:
+        await db.execute(
+            update(User)
+            .where(User.id == user.id)
+            .values(failed_login_attempts=0, last_login=datetime.utcnow())
+        )
+        await db.commit()
+
+    # Check if MFA is enabled
+    if user.mfa_enabled and user.mfa_secret:
+        # If MFA code not provided, indicate it's required
+        if not form_data.client_id:  # Using client_id field for MFA code
+            return LoginResponse(
+                access_token="",
+                expires_in=0,
+                mfa_required=True,
+            )
+
+        # Verify MFA code
+        totp = pyotp.TOTP(user.mfa_secret)
+        if not totp.verify(form_data.client_id, valid_window=1):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid MFA code",
+            )
+
+    # Generate tokens
+    access_token = auth_manager.create_access_token(
+        subject=str(user.id),
+        additional_claims={"username": user.username,
+            "roles": user.roles or []}
+    )
+    refresh_token = auth_manager.create_refresh_token(subject=str(user.id))
+
+    # Log successful authentication
+    audit = AuditLogger()
+    await audit.log_authentication(
+        user_id=str(user.id),
+        success=True,
+        method="password",
+        ip_address=request.client.host if request.client else "unknown",
+    )
+
+    return LoginResponse(
+        access_token=access_token,
+        expires_in=3600,  # 1 hour
+        refresh_token=refresh_token,
+        mfa_required=False,
+    )
+
+
+@router.post("/logout")
+async def logout(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """User logout endpoint
+
+    Invalidates the current session.
+    """
+    logger.info(f"Logout request for user {current_user.username}")
+
+    # Log logout event
+    audit = AuditLogger()
+    await audit.log_authentication(
+        user_id=str(current_user.id),
+        success=True,
+        method="logout",
+        ip_address="unknown",
+    )
+
+    return {"message": "Successfully logged out"}
+
+
+@router.post("/refresh")
+async def refresh_token(
+    refresh_token: str,
+    db: AsyncSession = Depends(get_db),
+):
+    """Refresh access token
+
+    Exchanges a refresh token for a new access token.
+    """
+    try:
+        # Verify refresh token
+        payload = auth_manager.decode_token(refresh_token)
+        user_id = payload.get("sub")
+
+        if not user_id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid refresh token",
+            )
+
+        # Get user
+        result = await db.execute(select(User).where(User.id == user_id))
+        user = result.scalar_one_or_none()
+
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User not found",
+            )
+
+        # Generate new access token
+        new_access_token = auth_manager.create_access_token(
+            subject=str(user.id),
+            additional_claims={"username": user.username,
+                "roles": user.roles or []}
+        )
+
+        return {
+            "access_token": new_access_token,
+            "token_type": "bearer",
+            "expires_in": 3600,
+        }
+
+    except Exception as e:
+        logger.error(f"Token refresh failed: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired refresh token",
+        )
 
 
 @router.post("/mfa/enroll", response_model=MFAEnrollResponse)
@@ -166,7 +356,10 @@ async def enroll_mfa(
         )
 
 
-@router.post("/certificate/validate", response_model=CertificateValidationResponse)
+@router.post(
+    "/certificate/validate",
+    response_model=CertificateValidationResponse
+)
 async def validate_certificate(
     request: CertificateValidationRequest,
     current_user: User = Depends(get_current_user),
@@ -316,7 +509,8 @@ async def terminate_session(
     Allows users to remotely log out sessions
     """
     logger.info(
-        f"Session termination requested by {current_user.username} for {session_id}"
+        f"Session termination requested by {current_user.username} for \
+            {session_id}"
     )
 
     try:

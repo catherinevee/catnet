@@ -15,34 +15,124 @@ branch_labels = None
 depends_on = None
 
 
+
 def upgrade():
     """Add certificate-related fields to devices table"""
 
     # Add certificate fields to devices table
-    op.add_column('devices', sa.Column('certificate_serial', sa.String(255), nullable=True))
-    op.add_column('devices', sa.Column('certificate_expires_at', sa.DateTime(timezone=True), nullable=True))
-    op.add_column('devices', sa.Column('certificate_fingerprint', sa.String(128), nullable=True))
-    op.add_column('devices', sa.Column('certificate_status', sa.String(50), nullable=True, server_default='pending'))
-    op.add_column('devices', sa.Column('certificate_issued_at', sa.DateTime(timezone=True), nullable=True))
-    op.add_column('devices', sa.Column('certificate_revoked_at', sa.DateTime(timezone=True), nullable=True))
-    op.add_column('devices', sa.Column('certificate_revocation_reason', sa.String(255), nullable=True))
+        op.add_column(
+        'devices',
+        sa.Column('certificate_serial',
+        sa.String(255),
+        nullable=True)
+    )
+        op.add_column(
+        'devices',
+        sa.Column('certificate_expires_at',
+        sa.DateTime(timezone=True),
+        nullable=True)
+    )
+        op.add_column(
+        'devices',
+        sa.Column('certificate_fingerprint',
+        sa.String(128),
+        nullable=True)
+    )
+        op.add_column(
+        'devices',
+        sa.Column('certificate_status',
+        sa.String(50),
+        nullable=True,
+        server_default='pending')
+    )
+        op.add_column(
+        'devices',
+        sa.Column('certificate_issued_at',
+        sa.DateTime(timezone=True),
+        nullable=True)
+    )
+        op.add_column(
+        'devices',
+        sa.Column('certificate_revoked_at',
+        sa.DateTime(timezone=True),
+        nullable=True)
+    )
+        op.add_column(
+        'devices',
+        sa.Column('certificate_revocation_reason',
+        sa.String(255),
+        nullable=True)
+    )
 
     # Add indexes for certificate lookups
-    op.create_index('ix_devices_certificate_serial', 'devices', ['certificate_serial'])
-    op.create_index('ix_devices_certificate_fingerprint', 'devices', ['certificate_fingerprint'])
-    op.create_index('ix_devices_certificate_status', 'devices', ['certificate_status'])
+        op.create_index(
+        'ix_devices_certificate_serial',
+        'devices',
+        ['certificate_serial']
+    )
+        op.create_index(
+        'ix_devices_certificate_fingerprint',
+        'devices',
+        ['certificate_fingerprint']
+    )
+        op.create_index(
+        'ix_devices_certificate_status',
+        'devices',
+        ['certificate_status']
+    )
 
     # Add certificate fields to users table for GPG/signing certificates
-    op.add_column('users', sa.Column('signing_key_id', sa.String(255), nullable=True))
-    op.add_column('users', sa.Column('signing_key_fingerprint', sa.String(128), nullable=True))
-    op.add_column('users', sa.Column('signing_key_created_at', sa.DateTime(timezone=True), nullable=True))
-    op.add_column('users', sa.Column('signing_key_expires_at', sa.DateTime(timezone=True), nullable=True))
+        op.add_column(
+        'users',
+        sa.Column('signing_key_id',
+        sa.String(255),
+        nullable=True)
+    )
+        op.add_column(
+        'users',
+        sa.Column('signing_key_fingerprint',
+        sa.String(128),
+        nullable=True)
+    )
+        op.add_column(
+        'users',
+        sa.Column('signing_key_created_at',
+        sa.DateTime(timezone=True),
+        nullable=True)
+    )
+        op.add_column(
+        'users',
+        sa.Column('signing_key_expires_at',
+        sa.DateTime(timezone=True),
+        nullable=True)
+    )
 
     # Add signature fields to deployments table
-    op.add_column('deployments', sa.Column('config_signature', sa.Text(), nullable=True))
-    op.add_column('deployments', sa.Column('signed_by', postgresql.UUID(as_uuid=True), nullable=True))
-    op.add_column('deployments', sa.Column('signature_verified', sa.Boolean(), nullable=True, server_default='false'))
-    op.add_column('deployments', sa.Column('signature_timestamp', sa.DateTime(timezone=True), nullable=True))
+        op.add_column(
+        'deployments',
+        sa.Column('config_signature',
+        sa.Text(),
+        nullable=True)
+    )
+        op.add_column(
+        'deployments',
+        sa.Column('signed_by',
+        postgresql.UUID(as_uuid=True),
+        nullable=True)
+    )
+        op.add_column(
+        'deployments',
+        sa.Column('signature_verified',
+        sa.Boolean(),
+        nullable=True,
+        server_default='false')
+    )
+        op.add_column(
+        'deployments',
+        sa.Column('signature_timestamp',
+        sa.DateTime(timezone=True),
+        nullable=True)
+    )
 
     # Add foreign key for signed_by
     op.create_foreign_key(
@@ -53,11 +143,16 @@ def upgrade():
     )
 
 
+
 def downgrade():
     """Remove certificate-related fields"""
 
     # Drop foreign key
-    op.drop_constraint('fk_deployments_signed_by_user', 'deployments', type_='foreignkey')
+        op.drop_constraint(
+        'fk_deployments_signed_by_user',
+        'deployments',
+        type_='foreignkey'
+    )
 
     # Drop indexes
     op.drop_index('ix_devices_certificate_status', 'devices')

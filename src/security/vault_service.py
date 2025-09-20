@@ -16,13 +16,11 @@ from enum import Enum
 import asyncio
 import json
 import base64
-from pathlib import Path
 import hvac
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2
 from cryptography.hazmat.backends import default_backend
 import os
+
 
 
 class SecretType(Enum):
@@ -33,6 +31,7 @@ class SecretType(Enum):
     ROTATING = "rotating"
     CERTIFICATE = "certificate"
     ENCRYPTION_KEY = "encryption_key"
+
 
 
 class SecretEngine(Enum):
@@ -48,6 +47,7 @@ class SecretEngine(Enum):
 
 
 @dataclass
+
 class Secret:
     """Secret object"""
 
@@ -64,6 +64,7 @@ class Secret:
 
 
 @dataclass
+
 class EncryptionKey:
     """Encryption key object"""
 
@@ -77,6 +78,7 @@ class EncryptionKey:
 
 
 @dataclass
+
 class Certificate:
     """Certificate object"""
 
@@ -89,6 +91,7 @@ class Certificate:
     issued_at: datetime = field(default_factory=datetime.utcnow)
     expires_at: Optional[datetime] = None
     revoked: bool = False
+
 
 
 class VaultService:
@@ -258,7 +261,8 @@ class VaultService:
             # Add TTL if specified
             if ttl:
                 secret_data["ttl"] = int(ttl.total_seconds())
-                secret_data["expires_at"] = (datetime.utcnow() + ttl).isoformat()
+                secret_data["expires_at"] = (datetime.utcnow() + \
+                    ttl).isoformat()
 
             # Store in Vault
             if engine == SecretEngine.KV:
@@ -282,7 +286,13 @@ class VaultService:
             return True
 
         except Exception as e:
-            self._audit_log("store_secret", path, key, success=False, error=str(e))
+                        self._audit_log(
+                "store_secret",
+                path,
+                key,
+                success=False,
+                error=str(e)
+            )
             raise
 
     async def get_secret(
@@ -340,7 +350,10 @@ class VaultService:
                 engine=SecretEngine.KV,
                 version=response["data"]["metadata"]["version"],
                 created_at=datetime.fromisoformat(
-                    secret_data.get("created_at", datetime.utcnow().isoformat())
+                                        secret_data.get(
+                        "created_at",
+                        datetime.utcnow().isoformat()
+                    )
                 ),
                 metadata=secret_data.get("metadata", {}),
             )
@@ -354,7 +367,13 @@ class VaultService:
             return secret
 
         except Exception as e:
-            self._audit_log("get_secret", path, key, success=False, error=str(e))
+                        self._audit_log(
+                "get_secret",
+                path,
+                key,
+                success=False,
+                error=str(e)
+            )
             return None
 
     async def delete_secret(
@@ -386,12 +405,18 @@ class VaultService:
                 )
 
             # Clear cache
-            keys_to_remove = [k for k in self.secret_cache if k.startswith(f"{path}:")]
+            keys_to_remove = [k for k in self.secret_cache if \
+                k.startswith(f"{path}:")]
             for key in keys_to_remove:
                 del self.secret_cache[key]
 
             # Audit log
-            self._audit_log("delete_secret", path, versions=versions, success=True)
+                        self._audit_log(
+                "delete_secret",
+                path,
+                versions=versions,
+                success=True
+            )
 
             return True
 
@@ -432,7 +457,12 @@ class VaultService:
                 }
 
                 # Audit log
-                self._audit_log("generate_db_creds", database, role, success=True)
+                                self._audit_log(
+                    "generate_db_creds",
+                    database,
+                    role,
+                    success=True
+                )
 
                 return creds
 
@@ -440,7 +470,9 @@ class VaultService:
 
         except Exception as e:
             self._audit_log(
-                "generate_db_creds", database, role, success=False, error=str(e)
+                                "generate_db_creds", database, role, success=False, error=str(
+                    e
+                )
             )
             return None
 
@@ -484,7 +516,9 @@ class VaultService:
 
         except Exception as e:
             self._audit_log(
-                "generate_ssh_creds", role, username, success=False, error=str(e)
+                                "generate_ssh_creds", role, username, success=False, error=str(
+                    e
+                )
             )
             return None
 
@@ -668,7 +702,9 @@ class VaultService:
 
         except Exception as e:
             self._audit_log(
-                "revoke_certificate", serial_number, success=False, error=str(e)
+                                "revoke_certificate", serial_number, success=False, error=str(
+                    e
+                )
             )
             return False
 
@@ -759,7 +795,13 @@ class VaultService:
             return success
 
         except Exception as e:
-            self._audit_log("rotate_secret", path, key, success=False, error=str(e))
+                        self._audit_log(
+                "rotate_secret",
+                path,
+                key,
+                success=False,
+                error=str(e)
+            )
             return False
 
     async def _schedule_version_deletion(
@@ -859,15 +901,17 @@ class VaultService:
 
         if start_time:
             logs = [
-                l for l in logs if datetime.fromisoformat(l["timestamp"]) >= start_time
+                l for item in logs if datetime.fromisoformat(l["timestamp"]) \
+                    >= start_time
             ]
 
         if end_time:
             logs = [
-                l for l in logs if datetime.fromisoformat(l["timestamp"]) <= end_time
+                l for item in logs if datetime.fromisoformat(l["timestamp"]) \
+                    <= end_time
             ]
 
         if action:
-            logs = [l for l in logs if l["action"] == action]
+            logs = [l for item in logs if l["action"] == action]
 
         return logs

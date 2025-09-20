@@ -21,6 +21,7 @@ from .config_validator import ConfigValidator, ValidationResult
 from .secret_scanner import SecretScanner, SecretScanResult
 
 
+
 class DeploymentStrategy(Enum):
     """Deployment strategies"""
 
@@ -28,6 +29,7 @@ class DeploymentStrategy(Enum):
     ROLLING = "rolling"
     BLUE_GREEN = "blue_green"
     DIRECT = "direct"
+
 
 
 class WorkflowState(Enum):
@@ -44,6 +46,7 @@ class WorkflowState(Enum):
 
 
 @dataclass
+
 class WorkflowConfig:
     """GitOps workflow configuration"""
 
@@ -59,6 +62,7 @@ class WorkflowConfig:
 
 
 @dataclass
+
 class WorkflowExecution:
     """Represents a workflow execution"""
 
@@ -73,6 +77,7 @@ class WorkflowExecution:
     deployment_id: Optional[str] = None
     errors: List[str] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
+
 
 
 class GitOpsWorkflow:
@@ -196,7 +201,10 @@ class GitOpsWorkflow:
         execution = await self._create_execution(repository_id, None)
 
         # Pull latest changes
-        success, changes = self.git_manager.pull_repository(repository_id, force)
+                success, changes = self.git_manager.pull_repository(
+            repository_id,
+            force
+        )
 
         if not success:
             execution.state = WorkflowState.FAILED
@@ -227,7 +235,9 @@ class GitOpsWorkflow:
                 )
                 if not success:
                     await self._fail_workflow(
-                        execution, f"Failed to pull changes: {changes.get('error')}"
+                                                execution, f"Failed to pull changes: {changes.get(
+                            'error'
+                        )}"
                     )
                     return
 
@@ -236,11 +246,17 @@ class GitOpsWorkflow:
                 execution.repository_id, pattern="*.yml"
             )
             config_files.extend(
-                self.git_manager.list_files(execution.repository_id, pattern="*.yaml")
+                                self.git_manager.list_files(
+                    execution.repository_id,
+                    pattern="*.yaml"
+                )
             )
 
             if not config_files:
-                await self._fail_workflow(execution, "No configuration files found")
+                                await self._fail_workflow(
+                    execution,
+                    "No configuration files found"
+                )
                 return
 
             # Step 3: Validate configurations
@@ -249,7 +265,8 @@ class GitOpsWorkflow:
                 await self._validate_configurations(execution, config_files)
 
                 # Check validation results
-                has_critical = any(not r.is_valid for r in execution.validation_results)
+                has_critical = any(not r.is_valid for r in \
+                    execution.validation_results)
                 if has_critical:
                     await self._fail_workflow(
                         execution, "Configuration validation failed"
@@ -262,7 +279,8 @@ class GitOpsWorkflow:
                 await self._scan_for_secrets(execution, config_files)
 
                 # Check scan results
-                has_secrets = any(r.has_secrets for r in execution.scan_results)
+                has_secrets = any(r.has_secrets for r in \
+                    execution.scan_results)
                 if has_secrets:
                     await self._quarantine_secrets(execution)
                     await self._fail_workflow(
@@ -464,7 +482,10 @@ class GitOpsWorkflow:
         # Simulated direct deployment
         execution.metadata["deployment_status"] = "completed"
 
-    async def _check_deployment_health(self, execution: WorkflowExecution) -> bool:
+        async def _check_deployment_health(
+        self,
+        execution: WorkflowExecution
+    ) -> bool:
         """
         Check deployment health
 
@@ -505,7 +526,11 @@ class GitOpsWorkflow:
             )
             execution.metadata["quarantine_reports"].append(json.loads(report))
 
-    async def _fail_workflow(self, execution: WorkflowExecution, error: str) -> None:
+        async def _fail_workflow(
+        self,
+        execution: WorkflowExecution,
+        error: str
+    ) -> None:
         """
         Mark workflow as failed
 
@@ -517,7 +542,10 @@ class GitOpsWorkflow:
         execution.errors.append(error)
         execution.completed_at = datetime.utcnow()
 
-    async def _notify_approval_required(self, execution: WorkflowExecution) -> None:
+        async def _notify_approval_required(
+        self,
+        execution: WorkflowExecution
+    ) -> None:
         """
         Send notification that approval is required
 
@@ -525,7 +553,8 @@ class GitOpsWorkflow:
             execution: Workflow execution
         """
         # This would send actual notifications
-        execution.metadata["approval_requested"] = datetime.utcnow().isoformat()
+        execution.metadata["approval_requested"] = \
+            datetime.utcnow().isoformat()
 
     async def _send_notification(
         self, execution: WorkflowExecution, config: WorkflowConfig
@@ -540,7 +569,8 @@ class GitOpsWorkflow:
         # This would send actual webhook notification
         if config.notification_webhook:
             # Would make HTTP POST to webhook URL
-            execution.metadata["notification_sent"] = datetime.utcnow().isoformat()
+            execution.metadata["notification_sent"] = \
+                datetime.utcnow().isoformat()
 
     async def _create_execution(
         self, repository_id: str, event: Optional[WebhookEvent]
@@ -617,7 +647,10 @@ class GitOpsWorkflow:
 
         self.webhook_processor.register_handler(EventType.PUSH, handle_push)
 
-    def get_execution_status(self, execution_id: str) -> Optional[Dict[str, Any]]:
+        def get_execution_status(
+        self,
+        execution_id: str
+    ) -> Optional[Dict[str, Any]]:
         """
         Get execution status
 
@@ -638,8 +671,12 @@ class GitOpsWorkflow:
             "completed_at": execution.completed_at.isoformat()
             if execution.completed_at
             else None,
-            "validation_passed": all(r.is_valid for r in execution.validation_results),
-            "secrets_detected": any(r.has_secrets for r in execution.scan_results),
+                        "validation_passed": all(
+                r.is_valid for r in execution.validation_results
+            ),
+                        "secrets_detected": any(
+                r.has_secrets for r in execution.scan_results
+            ),
             "deployment_id": execution.deployment_id,
             "errors": execution.errors,
         }

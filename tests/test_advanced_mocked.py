@@ -5,7 +5,7 @@ without requiring ML dependencies.
 
 import pytest
 from datetime import datetime, timedelta
-from unittest.mock import Mock, patch, AsyncMock, MagicMock
+from unittest.mock import patch, AsyncMock
 import json
 
 
@@ -359,7 +359,7 @@ class TestIntegrationScenarios:
             )
 
             # Setup anomaly detector
-            model_manager = ModelManager()
+            ModelManager()
 
             # Setup workflow engine
             workflow_engine = WorkflowEngine()

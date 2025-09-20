@@ -18,6 +18,7 @@ from ..core.exceptions import SecurityError
 logger = get_logger(__name__)
 
 
+
 class MTLSManager:
     """Manages mTLS connections between services"""
 
@@ -78,7 +79,10 @@ class MTLSManager:
         key_path = self.certs_dir / f"{self.service_name}.key"
 
         if cert_path.exists() and key_path.exists():
-            context.load_cert_chain(certfile=str(cert_path), keyfile=str(key_path))
+                        context.load_cert_chain(
+                certfile=str(cert_path),
+                keyfile=str(key_path)
+            )
             logger.debug(f"Loaded service certificate from {cert_path}")
         else:
             # Try to load from Vault
@@ -196,7 +200,8 @@ class MTLSManager:
             expiry_threshold = now + timedelta(days=30)
             if cert.not_valid_after < expiry_threshold:
                 logger.warning(
-                    f"Certificate for {cn} expires soon: {cert.not_valid_after}"
+                    f"Certificate for {cn} expires soon: \
+                        {cert.not_valid_after}"
                 )
 
             # Extract service name from CN (format: service-name.catnet.local)
@@ -235,7 +240,8 @@ class MTLSManager:
             self._ssl_contexts.clear()
             self._cert_cache.clear()
 
-            logger.info(f"Certificate rotation completed for {self.service_name}")
+            logger.info(f"Certificate rotation completed for \
+                {self.service_name}")
             return True
 
         except Exception as e:
@@ -288,7 +294,11 @@ class MTLSManager:
         }
         return service_ports.get(service_name, 8080)
 
-    async def get_service_url(self, service_name: str, use_mtls: bool = True) -> str:
+        async def get_service_url(
+        self,
+        service_name: str,
+        use_mtls: bool = True
+    ) -> str:
         """
         Get service URL with proper scheme
 
@@ -320,12 +330,16 @@ class MTLSManager:
         """
         try:
             url = await self.get_service_url(service_name)
-            async with await self.create_client_session(service_name, url) as session:
+                        async with await self.create_client_session(
+                service_name,
+                url
+            ) as session:
                 async with session.get("/health") as response:
                     return response.status == 200
         except Exception as e:
             logger.error(f"Health check failed for {service_name}: {e}")
             return False
+
 
 
 class MTLSServer:
@@ -374,12 +388,14 @@ class MTLSServer:
             if ssl_object:
                 cert = ssl_object.getpeercert_bin()
                 if cert:
-                    return asyncio.run(self.mtls_manager.verify_client_cert(cert))
+                    return asyncio.run(self.mtls_manager.verify_client_cert( \
+                        cert))
 
         raise SecurityError("No client certificate provided")
 
 
 # Middleware for FastAPI to enforce mTLS
+
 class MTLSMiddleware:
     """Middleware to enforce mTLS for all requests"""
 

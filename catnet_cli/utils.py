@@ -15,6 +15,7 @@ from catnet_cli import __version__
 logger = logging.getLogger(__name__)
 
 
+
 def setup_logging(debug: bool = False):
     """Configure logging for CLI"""
     level = logging.DEBUG if debug else logging.INFO
@@ -32,6 +33,7 @@ def setup_logging(debug: bool = False):
         logging.getLogger('aiohttp').setLevel(logging.WARNING)
 
 
+
 def print_version():
     """Display version information"""
     click.echo(f"CatNet CLI v{__version__}")
@@ -39,11 +41,18 @@ def print_version():
     click.echo("Copyright (c) 2024 CatNet Team")
 
 
-async def check_service_health(url: str, service_name: str, timeout: int = 5) -> Dict[str, Any]:
+async def check_service_health(
+    url: str,
+    service_name: str,
+    timeout: int = 5
+) -> Dict[str, Any]:
     """Check health of a single service"""
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.get(f"{url}/health", timeout=timeout) as response:
+                        async with session.get(
+                f"{url}/health",
+                timeout=timeout
+            ) as response:
                 if response.status == 200:
                     data = await response.json()
                     return {
@@ -55,6 +64,7 @@ async def check_service_health(url: str, service_name: str, timeout: int = 5) ->
                     return {
                         'healthy': False,
                         'message': f"{service_name} returned status {response.status}",
+                            
                         'details': None
                     }
     except asyncio.TimeoutError:
@@ -71,7 +81,11 @@ async def check_service_health(url: str, service_name: str, timeout: int = 5) ->
         }
 
 
-async def check_system_status(config: Dict[str, Any], debug: bool = False) -> Dict[str, Dict[str, Any]]:
+async def check_system_status(
+    config: Dict[str,
+    Any],
+    debug: bool = False
+) -> Dict[str, Dict[str, Any]]:
     """Check status of all CatNet services"""
     services = {
         'API Gateway': config['api']['base_url'],
@@ -82,7 +96,7 @@ async def check_system_status(config: Dict[str, Any], debug: bool = False) -> Di
     }
 
     # Add Vault if configured
-    if vault_url := config.get('vault', {}).get('url'):
+    if vault_url:= config.get('vault', {}).get('url'):
         services['Vault'] = vault_url
 
     # Check all services concurrently
@@ -106,6 +120,7 @@ async def check_system_status(config: Dict[str, Any], debug: bool = False) -> Di
             status[name] = result
 
     return status
+
 
 
 def format_table(headers: list, rows: list) -> str:
@@ -143,6 +158,7 @@ def format_table(headers: list, rows: list) -> str:
     return "\n".join(table)
 
 
+
 def format_json(data: Any, pretty: bool = True) -> str:
     """Format data as JSON"""
     if pretty:
@@ -151,13 +167,15 @@ def format_json(data: Any, pretty: bool = True) -> str:
         return json.dumps(data)
 
 
+
 def format_timestamp(timestamp: str) -> str:
     """Format timestamp for display"""
     try:
         dt = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
         return dt.strftime('%Y-%m-%d %H:%M:%S')
-    except:
+    except Exception:
         return timestamp
+
 
 
 def confirm_action(message: str, default: bool = False) -> bool:
@@ -178,12 +196,18 @@ def confirm_action(message: str, default: bool = False) -> bool:
             click.echo("Please respond with 'y' or 'n'")
 
 
+
 def handle_error(error: Exception, debug: bool = False):
     """Handle and display errors appropriately"""
     if debug:
         # Show full traceback in debug mode
         import traceback
-        click.echo(click.style("Error Details:", fg='red', bold=True), err=True)
+                click.echo(
+            click.style("Error Details:",
+            fg='red',
+            bold=True),
+            err=True
+        )
         click.echo(traceback.format_exc(), err=True)
     else:
         # Show user-friendly message
@@ -202,9 +226,11 @@ def handle_error(error: Exception, debug: bool = False):
             )
 
 
+
 def print_success(message: str):
     """Print success message"""
     click.echo(click.style("✓ ", fg='green', bold=True) + message)
+
 
 
 def print_warning(message: str):
@@ -212,9 +238,11 @@ def print_warning(message: str):
     click.echo(click.style("⚠ ", fg='yellow', bold=True) + message)
 
 
+
 def print_error(message: str):
     """Print error message"""
     click.echo(click.style("✗ ", fg='red', bold=True) + message, err=True)
+
 
 
 def print_info(message: str):

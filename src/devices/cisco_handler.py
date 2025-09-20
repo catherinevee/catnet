@@ -17,6 +17,7 @@ from ..core.logging import get_logger
 logger = get_logger(__name__)
 
 
+
 class CiscoHandler:
     """
     Handler for Cisco IOS, IOS-XE, and NX-OS devices
@@ -32,7 +33,11 @@ class CiscoHandler:
         "nxos_rollback": "rollback running-config checkpoint backup_config",
     }
 
-    def __init__(self, connection: Any, audit_logger: Optional[AuditLogger] = None):
+        def __init__(
+        self,
+        connection: Any,
+        audit_logger: Optional[AuditLogger] = None
+    ):
         self.connection = connection
         self.audit = audit_logger or AuditLogger()
         self.device_type = self._detect_device_type()
@@ -51,7 +56,11 @@ class CiscoHandler:
         except Exception:
             return "cisco_ios"  # Default
 
-    async def execute_command(self, command: str, enable_mode: bool = False) -> str:
+        async def execute_command(
+        self,
+        command: str,
+        enable_mode: bool = False
+    ) -> str:
         """Execute single command on Cisco device"""
         try:
             if enable_mode and hasattr(self.connection, "enable"):
@@ -118,7 +127,10 @@ class CiscoHandler:
 
         return output
 
-    async def rollback_configuration(self, backup_file: str = "backup.cfg") -> str:
+        async def rollback_configuration(
+        self,
+        backup_file: str = "backup.cfg"
+    ) -> str:
         """Rollback to previous configuration"""
         if self.device_type == "cisco_nxos":
             # NX-OS rollback
@@ -202,7 +214,10 @@ class CiscoHandler:
             # Parse VLAN lines (format varies by platform)
             match = re.match(r"^(\d+)\s+(\S+)", line)
             if match:
-                vlans.append({"id": int(match.group(1)), "name": match.group(2)})
+                                vlans.append(
+                    {"id": int(match.group(1)),
+                    "name": match.group(2)}
+                )
 
         return vlans
 
@@ -307,7 +322,10 @@ class CiscoHandler:
             else:
                 output = await self.execute_command("show processes cpu")
                 # Parse IOS CPU output
-                match = re.search(r"CPU utilization for five seconds: (\d+)%", output)
+                                match = re.search(
+                    r"CPU utilization for five seconds: (\d+)%",
+                    output
+                )
 
             if match:
                 return float(match.group(1))
@@ -368,7 +386,6 @@ class CiscoHandler:
     async def enable_session_recording(self) -> None:
         """Enable session command recording"""
         # Would implement session recording
-        pass
 
     async def verify_configuration(self, expected_config: str) -> bool:
         """Verify configuration matches expected"""

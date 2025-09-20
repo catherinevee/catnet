@@ -3,10 +3,8 @@ Comprehensive tests for CatNet Deployment Service
 """
 
 import pytest
-import asyncio
-from datetime import datetime, timedelta
-from unittest.mock import Mock, AsyncMock, patch, MagicMock
-import uuid
+from datetime import datetime
+from unittest.mock import Mock, AsyncMock
 
 from src.deployment.deployment_manager import (
     DeploymentManager,
@@ -18,18 +16,10 @@ from src.deployment.deployment_manager import (
 )
 from src.deployment.rollback import (
     RollbackManager,
-    RollbackOperation,
-    RollbackReason,
-    RollbackState,
-    RollbackPoint,
 )
 from src.deployment.validation import (
     DeploymentValidator,
-    ValidationResult,
     ValidationStatus,
-    ValidationType,
-    ValidationSeverity,
-    ValidationIssue,
 )
 from src.deployment.health_check import (
     HealthCheckService,
@@ -44,6 +34,7 @@ from src.deployment.history import (
     DeploymentHistory,
     HistoryEventType,
 )
+
 
 
 class TestDeploymentManager:
@@ -65,7 +56,8 @@ class TestDeploymentManager:
     async def test_create_deployment(self):
         """Test deployment creation"""
         # Setup mocks
-        self.manager._get_device_info = AsyncMock(return_value={"hostname": "router1"})
+        self.manager._get_device_info = AsyncMock(return_value={"hostname": \
+            "router1"})
 
         # Create deployment
         deployment_id = await self.manager.create_deployment(
@@ -73,7 +65,8 @@ class TestDeploymentManager:
             description="Test deployment description",
             devices=["device1", "device2"],
             configuration=(
-                "interface GigabitEthernet0/1\n" " ip address 192.168.1.1 255.255.255.0"
+                "interface GigabitEthernet0/1\n" " ip address 192.168.1.1 \
+                    255.255.255.0"
             ),
             config=DeploymentConfig(strategy=DeploymentStrategy.CANARY),
             created_by="testuser",
@@ -131,11 +124,14 @@ class TestDeploymentManager:
         assert deployment.state == DeploymentState.COMPLETED
 
         # Verify canary deployment was executed
-        assert self.manager._deploy_to_devices.call_count == 2  # Canary + remaining
+        assert self.manager._deploy_to_devices.call_count == 2  # Canary + \
+            remaining
 
         # Check canary batch size
-        first_call_devices = self.manager._deploy_to_devices.call_args_list[0][0][1]
+        first_call_devices = self.manager._deploy_to_devices.call_args_list[0][ \
+            0][1]
         assert len(first_call_devices) == 2  # 50% of 4 devices
+
 
 
 class TestRollbackManager:
@@ -170,6 +166,7 @@ class TestRollbackManager:
         assert point.configuration == "current config"
         assert point.verified is True
         assert "device1" in self.manager.rollback_points
+
 
 
 class TestDeploymentValidator:
@@ -217,7 +214,8 @@ class TestDeploymentValidator:
             deployment_id="dep1",
             devices=["device1", "device2"],
             configuration=(
-                "interface GigabitEthernet0/1\n" " ip address 192.168.1.1 255.255.255.0"
+                "interface GigabitEthernet0/1\n" " ip address 192.168.1.1 \
+                    255.255.255.0"
             ),
             deployment_config={},
         )
@@ -226,6 +224,7 @@ class TestDeploymentValidator:
         assert result.status == ValidationStatus.PASSED
         assert result.failed_checks == 0
         assert result.total_checks > 0
+
 
 
 class TestHealthCheckService:
@@ -297,6 +296,7 @@ class TestHealthCheckService:
         assert result.status == HealthStatus.HEALTHY
         assert result.device_id == "device1"
         assert result.duration_ms is not None
+
 
 
 class TestDeploymentHistory:

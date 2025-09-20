@@ -16,8 +16,10 @@ from .ssh_manager import SSHKeyManager, SSHDeviceConnector
 # import paramiko  # Base SSH functionality
 
 
+
 class UnauthorizedException(Exception):
     pass
+
 
 
 class DeviceConnection:
@@ -36,7 +38,11 @@ class DeviceConnection:
         self.connected_at = datetime.utcnow()
         self.commands_executed = []
 
-    async def execute_command(self, command: str, enable_mode: bool = False) -> str:
+        async def execute_command(
+        self,
+        command: str,
+        enable_mode: bool = False
+    ) -> str:
         try:
             # Record command for audit
             self.commands_executed.append(
@@ -143,6 +149,7 @@ class DeviceConnection:
                 self.handler.disconnect()
         except Exception:
             pass
+
 
 
 class SecureDeviceConnector:
@@ -254,7 +261,11 @@ Host target
     StrictHostKeyChecking no
     UserKnownHostsFile /dev/null
 """
-        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".conf") as f:
+                with tempfile.NamedTemporaryFile(
+            mode="w",
+            delete=False,
+            suffix=".conf"
+        ) as f:
             f.write(config_content)
             return f.name
 
@@ -358,11 +369,13 @@ Host target
                     ssh_key = await self.ssh_manager.get_ssh_key(device_id)
                     created_at = ssh_key["created_at"]
                     self.logger.debug(
-                        f"Retrieved SSH key for device {device_id}: {created_at}"
+                        f"Retrieved SSH key for device {device_id}: \
+                            {created_at}"
                     )
 
                     # Connect using SSH key
-                    ssh_client = await self.ssh_connector.connect_with_key(device)
+                    ssh_client = await self.ssh_connector.connect_with_key( \
+                        device)
 
                     # Wrap in DeviceConnection
                     device_conn = DeviceConnection(
@@ -380,7 +393,8 @@ Host target
                     )
 
                     # Store active connection
-                    self.active_connections[device_conn.connection_id] = device_conn
+                    self.active_connections[device_conn.connection_id] = \
+                        device_conn
 
                     await self.audit.log_event(
                         event_type="device_connected_ssh_key",
@@ -398,9 +412,13 @@ Host target
                 except Exception as e:
                     # Fall back to credential-based authentication
                     self.logger.warning(
-                        f"SSH key auth failed: {e}, falling back to credentials"
+                        f"SSH key auth failed: {e},
+                            falling back to credentials"
                     )
-                    return await self.connect_to_device(device_id, user_context)
+                                        return await self.connect_to_device(
+                        device_id,
+                        user_context
+                    )
             else:
                 return await self.connect_to_device(device_id, user_context)
 
@@ -430,7 +448,11 @@ Host target
         if parallel:
             tasks = []
             for device_id in device_ids:
-                task = self._execute_on_device(device_id, commands, user_context)
+                                task = self._execute_on_device(
+                    device_id,
+                    commands,
+                    user_context
+                )
                 tasks.append(task)
 
             responses = await asyncio.gather(*tasks, return_exceptions=True)

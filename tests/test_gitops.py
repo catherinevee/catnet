@@ -19,12 +19,17 @@ from src.gitops.config_validator import (
     ValidationResult,
     ValidationType,
 )
-from src.gitops.secret_scanner import SecretScanner, SecretScanResult, SecretType
+from src.gitops.secret_scanner import (
+    SecretScanner,
+    SecretScanResult,
+    SecretType,
+)
 from src.gitops.gitops_workflow import (
     GitOpsWorkflow,
     WorkflowConfig,
     WorkflowState,
 )
+
 
 
 class TestGitManager:
@@ -57,7 +62,8 @@ class TestGitManager:
         assert self.git_manager._validate_repository_url(
             "https://github.com/test/repo.git"
         )
-        assert self.git_manager._validate_repository_url("git@github.com:test/repo.git")
+        assert self.git_manager._validate_repository_url( \
+            "git@github.com:test/repo.git")
         assert self.git_manager._validate_repository_url(
             "https://gitlab.com/test/repo.git"
         )
@@ -66,14 +72,16 @@ class TestGitManager:
         assert not self.git_manager._validate_repository_url(
             "https://evil.com/repo.git"
         )
-        assert not self.git_manager._validate_repository_url("ftp://github.com/repo")
+        assert not self.git_manager._validate_repository_url( \
+            "ftp://github.com/repo")
 
     @patch("git.Repo.clone_from")
     def test_clone_repository(self, mock_clone):
         """Test repository cloning"""
         mock_clone.return_value = MagicMock()
 
-        repo = self.git_manager.add_repository("https://github.com/test/repo.git")
+        repo = self.git_manager.add_repository( \
+            "https://github.com/test/repo.git")
 
         # Mock the repository directory
         os.makedirs(repo.local_path)
@@ -86,7 +94,8 @@ class TestGitManager:
 
     def test_get_file_content(self):
         """Test getting file content"""
-        repo = self.git_manager.add_repository("https://github.com/test/repo.git")
+        repo = self.git_manager.add_repository( \
+            "https://github.com/test/repo.git")
 
         # Create test file
         os.makedirs(repo.local_path)
@@ -100,7 +109,8 @@ class TestGitManager:
 
     def test_list_files(self):
         """Test listing repository files"""
-        repo = self.git_manager.add_repository("https://github.com/test/repo.git")
+        repo = self.git_manager.add_repository( \
+            "https://github.com/test/repo.git")
 
         # Create test files
         os.makedirs(repo.local_path)
@@ -116,6 +126,7 @@ class TestGitManager:
             mock_list.assert_called_once()
 
 
+
 class TestWebhookProcessor:
     """Test webhook processor"""
 
@@ -127,19 +138,23 @@ class TestWebhookProcessor:
         """Test webhook provider detection"""
         # GitHub
         headers = {"X-GitHub-Event": "push"}
-        assert self.processor._detect_provider(headers) == WebhookProvider.GITHUB
+        assert self.processor._detect_provider(headers) == \
+            WebhookProvider.GITHUB
 
         # GitLab
         headers = {"X-GitLab-Event": "Push Hook"}
-        assert self.processor._detect_provider(headers) == WebhookProvider.GITLAB
+        assert self.processor._detect_provider(headers) == \
+            WebhookProvider.GITLAB
 
         # Bitbucket
         headers = {"X-Event-Key": "repo:push"}
-        assert self.processor._detect_provider(headers) == WebhookProvider.BITBUCKET
+        assert self.processor._detect_provider(headers) == \
+            WebhookProvider.BITBUCKET
 
         # Generic
         headers = {"Content-Type": "application/json"}
-        assert self.processor._detect_provider(headers) == WebhookProvider.GENERIC
+        assert self.processor._detect_provider(headers) == \
+            WebhookProvider.GENERIC
 
     def test_verify_github_signature(self):
         """Test GitHub webhook signature verification"""
@@ -152,12 +167,19 @@ class TestWebhookProcessor:
         # Generate valid signature
         signature = (
             "sha256="
-            + hmac.new(secret.encode(), body.encode(), hashlib.sha256).hexdigest()
+                        + hmac.new(
+                secret.encode(),
+                body.encode(),
+                hashlib.sha256).hexdigest(
+            )
         )
 
         headers = {"X-Hub-Signature-256": signature}
 
-        self.processor.register_webhook_secret("https://github.com/test/repo", secret)
+                self.processor.register_webhook_secret(
+            "https://github.com/test/repo",
+            secret
+        )
 
         is_valid = self.processor._verify_signature(
             headers, body, secret, WebhookProvider.GITHUB
@@ -205,7 +227,9 @@ class TestWebhookProcessor:
         ]
 
         for original, expected in urls:
-            assert self.processor._normalize_repository_url(original) == expected
+            assert self.processor._normalize_repository_url(original) == \
+                expected
+
 
 
 class TestConfigValidator:
@@ -297,6 +321,7 @@ interface GigabitEthernet0/2
         assert len(conflict_issues) > 0  # Should detect duplicate IP
 
 
+
 class TestSecretScanner:
     """Test secret scanner"""
 
@@ -334,7 +359,9 @@ aws_access_key_id: AKIAIOSFODNN7EXAMPLE
             s
             for s in result.secrets
             if s.secret_type
-            in [SecretType.API_KEY, SecretType.TOKEN, SecretType.AWS_CREDENTIALS]
+            in [SecretType.API_KEY,
+                SecretType.TOKEN
+                SecretType.AWS_CREDENTIALS]
         ]
         assert len(api_secrets) > 0
 
@@ -349,7 +376,8 @@ MIIEpAIBAAKCAQEA...
 
         assert result.has_secrets
         key_secrets = [
-            s for s in result.secrets if s.secret_type == SecretType.PRIVATE_KEY
+            s for s in result.secrets if s.secret_type == \
+                SecretType.PRIVATE_KEY
         ]
         assert len(key_secrets) > 0
 
@@ -389,6 +417,7 @@ MIIEpAIBAAKCAQEA...
         )
         assert "ab" in redacted and "op" in redacted
         assert "*" in redacted
+
 
 
 class TestGitOpsWorkflow:
@@ -450,7 +479,8 @@ class TestGitOpsWorkflow:
         validation_result = ValidationResult(
             is_valid=False, config_file="config.yml", vendor="cisco"
         )
-        self.config_validator.validate_configuration.return_value = validation_result
+        self.config_validator.validate_configuration.return_value = \
+            validation_result
 
         config = WorkflowConfig(validation_required=True)
         self.workflow.workflow_configs[execution.repository_id] = config
@@ -483,7 +513,8 @@ class TestGitOpsWorkflow:
         validation_result = ValidationResult(
             is_valid=True, config_file="config.yml", vendor="cisco"
         )
-        self.config_validator.validate_configuration.return_value = validation_result
+        self.config_validator.validate_configuration.return_value = \
+            validation_result
 
         # Secrets detected
         scan_result = SecretScanResult(
@@ -492,7 +523,8 @@ class TestGitOpsWorkflow:
             secret_count=1,
         )
         self.secret_scanner.scan_file.return_value = scan_result
-        self.secret_scanner.quarantine_file.return_value = '{"quarantine": "report"}'
+        self.secret_scanner.quarantine_file.return_value = '{"quarantine": \
+            "report"}'
 
         config = WorkflowConfig(
             validation_required=True,

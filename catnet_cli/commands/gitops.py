@@ -9,8 +9,11 @@ from typing import Optional
 
 from catnet_cli.client import CatNetAPIClient, AuthenticationError
 from catnet_cli.utils import (
-    print_success, print_error, print_info,
-    handle_error, format_table
+    print_success,
+    print_error,
+    print_info,
+    handle_error,
+    format_table,
 )
 
 
@@ -20,46 +23,47 @@ def gitops():
     pass
 
 
-@gitops.command('connect')
-@click.option('--url', '-u', required=True, help='Git repository URL')
-@click.option('--branch', '-b', default='main', help='Git branch (default: main)')
-@click.option('--webhook-secret', help='Secret for webhook verification (auto-generated if not provided)')
-@click.option('--path', default='/', help='Path within repository containing configs')
+@gitops.command("connect")
+@click.option("--url", "-u", required=True, help="Git repository URL")
+@click.option("--branch", "-b", default="main", help="Git branch (default: main)")
+@click.option(
+    "--webhook-secret",
+    help="Secret for webhook verification (auto-generated if not provided)",
+)
+@click.option("--path", default="/", help="Path within repository containing configs")
 @click.pass_context
 def connect_repository(
-    ctx: click.Context,
-    url: str,
-    branch: str,
-    webhook_secret: Optional[str],
-    path: str
+    ctx: click.Context, url: str, branch: str, webhook_secret: Optional[str], path: str
 ):
     """Connect a Git repository for configuration management
 
     Examples:
         catnet gitops connect --url https://github.com/org/network-configs
         catnet gitops connect -u git@github.com:org/configs.git --branch main
-        catnet gitops connect -u https://gitlab.com/org/configs --webhook-secret abc123
+        catnet gitops connect -u https://gitlab.com/org/configs \
+            --webhook-secret abc123
     """
-    config = ctx.obj.get('config', {})
-    debug = ctx.obj.get('debug', False)
+    config = ctx.obj.get("config", {})
+    debug = ctx.obj.get("debug", False)
 
     # Generate webhook secret if not provided
     if not webhook_secret:
         webhook_secret = secrets.token_urlsafe(32)
         print_info(f"Generated webhook secret: {webhook_secret}")
-        print_info("Save this secret for configuring the webhook in your Git provider")
+        print_info(
+            "Save this secret for configuring the webhook in your Git \
+            provider"
+        )
 
     async def connect():
         async with CatNetAPIClient(config) as client:
             try:
                 result = await client.connect_repository(
-                    url=url,
-                    branch=branch,
-                    webhook_secret=webhook_secret
+                    url=url, branch=branch, webhook_secret=webhook_secret
                 )
 
-                repo_id = result.get('id')
-                webhook_url = result.get('webhook_url')
+                repo_id = result.get("id")
+                webhook_url = result.get("webhook_url")
 
                 print_success(f"Repository connected successfully")
                 print_info(f"Repository ID: {repo_id}")
@@ -72,7 +76,10 @@ def connect_repository(
                     click.echo("\nConfigure these in your Git provider:")
                     click.echo("- GitHub: Settings → Webhooks → Add webhook")
                     click.echo("- GitLab: Settings → Webhooks")
-                    click.echo("- Bitbucket: Settings → Webhooks → Add webhook")
+                    click.echo(
+                        "- Bitbucket: Settings → Webhooks → Add \
+                        webhook"
+                    )
 
                 return result
 
@@ -87,9 +94,11 @@ def connect_repository(
     loop.run_until_complete(connect())
 
 
-@gitops.command('sync')
-@click.option('--repo-id', '-r', required=True, help='Repository ID')
-@click.option('--force/--no-force', default=False, help='Force sync even with conflicts')
+@gitops.command("sync")
+@click.option("--repo-id", "-r", required=True, help="Repository ID")
+@click.option(
+    "--force/--no-force", default=False, help="Force sync even with conflicts"
+)
 @click.pass_context
 def sync_repository(ctx: click.Context, repo_id: str, force: bool):
     """Synchronize configurations from Git repository
@@ -104,8 +113,8 @@ def sync_repository(ctx: click.Context, repo_id: str, force: bool):
         catnet gitops sync --repo-id abc-123-def
         catnet gitops sync -r repo-prod-001 --force
     """
-    config = ctx.obj.get('config', {})
-    debug = ctx.obj.get('debug', False)
+    config = ctx.obj.get("config", {})
+    debug = ctx.obj.get("debug", False)
 
     async def sync():
         async with CatNetAPIClient(config) as client:
@@ -114,10 +123,10 @@ def sync_repository(ctx: click.Context, repo_id: str, force: bool):
 
                 result = await client.sync_repository(repo_id, force=force)
 
-                status = result.get('status')
-                files_synced = result.get('files_synced', [])
-                validation_results = result.get('validation', {})
-                deployments_created = result.get('deployments_created', [])
+                status = result.get("status")
+                files_synced = result.get("files_synced", [])
+                validation_results = result.get("validation", {})
+                deployments_created = result.get("deployments_created", [])
 
                 print_success(f"Repository synchronized successfully")
                 print_info(f"Status: {status}")
@@ -126,13 +135,16 @@ def sync_repository(ctx: click.Context, repo_id: str, force: bool):
                 # Show validation results
                 if validation_results:
                     click.echo("\n=== Validation Results ===")
-                    valid_count = validation_results.get('valid', 0)
-                    invalid_count = validation_results.get('invalid', 0)
-                    warning_count = validation_results.get('warnings', 0)
+                    valid_count = validation_results.get("valid", 0)
+                    invalid_count = validation_results.get("invalid", 0)
+                    warning_count = validation_results.get("warnings", 0)
 
                     print_success(f"✓ Valid configurations: {valid_count}")
                     if invalid_count > 0:
-                        print_error(f"✗ Invalid configurations: {invalid_count}")
+                        print_error(
+                            f"✗ Invalid configurations: \
+                            {invalid_count}"
+                        )
                     if warning_count > 0:
                         print_info(f"⚠ Warnings: {warning_count}")
 
@@ -155,7 +167,7 @@ def sync_repository(ctx: click.Context, repo_id: str, force: bool):
     loop.run_until_complete(sync())
 
 
-@gitops.command('list')
+@gitops.command("list")
 @click.pass_context
 def list_repositories(ctx: click.Context):
     """List all connected Git repositories
@@ -163,8 +175,8 @@ def list_repositories(ctx: click.Context):
     Examples:
         catnet gitops list
     """
-    config = ctx.obj.get('config', {})
-    debug = ctx.obj.get('debug', False)
+    config = ctx.obj.get("config", {})
+    debug = ctx.obj.get("debug", False)
 
     async def list_repos():
         async with CatNetAPIClient(config) as client:
@@ -175,16 +187,18 @@ def list_repositories(ctx: click.Context):
                     print_info("No repositories connected")
                     return
 
-                headers = ['ID', 'URL', 'Branch', 'Status', 'Last Sync']
+                headers = ["ID", "URL", "Branch", "Status", "Last Sync"]
                 rows = []
                 for repo in repositories:
-                    rows.append([
-                        repo.get('id', '')[:12],
-                        repo.get('url', ''),
-                        repo.get('branch', ''),
-                        repo.get('status', ''),
-                        repo.get('last_sync', 'Never')
-                    ])
+                    rows.append(
+                        [
+                            repo.get("id", "")[:12],
+                            repo.get("url", ""),
+                            repo.get("branch", ""),
+                            repo.get("status", ""),
+                            repo.get("last_sync", "Never"),
+                        ]
+                    )
 
                 click.echo(format_table(headers, rows))
                 click.echo(f"\nTotal repositories: {len(repositories)}")
@@ -202,9 +216,9 @@ def list_repositories(ctx: click.Context):
     loop.run_until_complete(list_repos())
 
 
-@gitops.command('disconnect')
-@click.argument('repo_id')
-@click.option('--force', is_flag=True, help='Skip confirmation')
+@gitops.command("disconnect")
+@click.argument("repo_id")
+@click.option("--force", is_flag=True, help="Skip confirmation")
 @click.pass_context
 def disconnect_repository(ctx: click.Context, repo_id: str, force: bool):
     """Disconnect a Git repository
@@ -213,11 +227,12 @@ def disconnect_repository(ctx: click.Context, repo_id: str, force: bool):
         catnet gitops disconnect repo-123
         catnet gitops disconnect repo-456 --force
     """
-    config = ctx.obj.get('config', {})
-    debug = ctx.obj.get('debug', False)
+    config = ctx.obj.get("config", {})
+    debug = ctx.obj.get("debug", False)
 
     if not force:
         from catnet_cli.utils import confirm_action
+
         if not confirm_action(f"Disconnect repository '{repo_id}'?"):
             print_info("Disconnect cancelled")
             return
@@ -226,12 +241,13 @@ def disconnect_repository(ctx: click.Context, repo_id: str, force: bool):
         async with CatNetAPIClient(config) as client:
             try:
                 result = await client.request(
-                    'DELETE',
-                    f'/gitops/{repo_id}',
-                    service='gitops'
+                    "DELETE", f"/gitops/{repo_id}", service="gitops"
                 )
 
-                print_success(f"Repository '{repo_id}' disconnected successfully")
+                print_success(
+                    f"Repository '{repo_id}' disconnected \
+                    successfully"
+                )
                 return result
 
             except AuthenticationError:

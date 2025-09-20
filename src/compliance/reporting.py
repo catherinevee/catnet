@@ -9,7 +9,7 @@ Handles:
 - Report generation
 """
 
-from typing import Dict, Any, Optional, List, Set
+from typing import Dict, Any, Optional, List
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
@@ -17,7 +17,7 @@ import json
 import csv
 import html
 from collections import defaultdict
-import hashlib
+
 
 
 class ComplianceFramework(Enum):
@@ -33,6 +33,7 @@ class ComplianceFramework(Enum):
     CUSTOM = "custom"
 
 
+
 class ComplianceStatus(Enum):
     """Compliance check status"""
 
@@ -41,6 +42,7 @@ class ComplianceStatus(Enum):
     PARTIALLY_COMPLIANT = "partially_compliant"
     NOT_APPLICABLE = "not_applicable"
     NOT_CHECKED = "not_checked"
+
 
 
 class ControlCategory(Enum):
@@ -57,6 +59,7 @@ class ControlCategory(Enum):
 
 
 @dataclass
+
 class ComplianceControl:
     """Compliance control definition"""
 
@@ -73,6 +76,7 @@ class ComplianceControl:
 
 
 @dataclass
+
 class ComplianceCheck:
     """Compliance check result"""
 
@@ -87,6 +91,7 @@ class ComplianceCheck:
 
 
 @dataclass
+
 class ComplianceReport:
     """Compliance report"""
 
@@ -105,12 +110,18 @@ class ComplianceReport:
     recommendations: List[str] = field(default_factory=list)
 
 
+
 class ComplianceManager:
     """
     Manages compliance checking and reporting
     """
 
-    def __init__(self, device_service=None, config_service=None, audit_service=None):
+        def __init__(
+        self,
+        device_service=None,
+        config_service=None,
+        audit_service=None
+    ):
         """
         Initialize compliance manager
 
@@ -125,7 +136,8 @@ class ComplianceManager:
 
         # Control definitions
         self.controls: Dict[str, ComplianceControl] = {}
-        self.framework_controls: Dict[ComplianceFramework, List[str]] = defaultdict(
+        self.framework_controls: Dict[ComplianceFramework,
+            List[str]] = defaultdict(
             list
         )
 
@@ -146,7 +158,8 @@ class ComplianceManager:
             ComplianceControl(
                 id="PCI_1.1",
                 name="Firewall Configuration Standards",
-                description="Establish firewall and router configuration standards",
+                description="Establish firewall and router configuration \
+                    standards",
                 category=ControlCategory.NETWORK_SECURITY,
                 framework=ComplianceFramework.PCI_DSS,
                 requirements=[
@@ -257,7 +270,9 @@ class ComplianceManager:
         self.framework_controls[control.framework].append(control.id)
 
     async def check_compliance(
-        self, framework: ComplianceFramework, device_ids: Optional[List[str]] = None
+        self,
+            framework: ComplianceFramework
+            device_ids: Optional[List[str]] = None
     ) -> List[ComplianceCheck]:
         """
         Check compliance for specified framework
@@ -313,17 +328,37 @@ class ComplianceManager:
         try:
             # Run validation based on control category
             if control.category == ControlCategory.ACCESS_CONTROL:
-                check = await self._check_access_control(control, device_id, check)
+                                check = await self._check_access_control(
+                    control,
+                    device_id,
+                    check
+                )
             elif control.category == ControlCategory.NETWORK_SECURITY:
-                check = await self._check_network_security(control, device_id, check)
+                                check = await self._check_network_security(
+                    control,
+                    device_id,
+                    check
+                )
             elif control.category == ControlCategory.AUDIT_LOGGING:
-                check = await self._check_audit_logging(control, device_id, check)
+                                check = await self._check_audit_logging(
+                    control,
+                    device_id,
+                    check
+                )
             elif control.category == ControlCategory.CONFIGURATION_MANAGEMENT:
-                check = await self._check_configuration(control, device_id, check)
+                                check = await self._check_configuration(
+                    control,
+                    device_id,
+                    check
+                )
             else:
                 # Run custom validation script if provided
                 if control.validation_script:
-                    check = await self._run_validation_script(control, device_id, check)
+                                        check = await self._run_validation_script(
+                        control,
+                        device_id,
+                        check
+                    )
 
         except Exception as e:
             check.status = ComplianceStatus.NOT_CHECKED
@@ -332,7 +367,8 @@ class ComplianceManager:
         return check
 
     async def _check_access_control(
-        self, control: ComplianceControl, device_id: str, check: ComplianceCheck
+        self, control: ComplianceControl, device_id: str, check: \
+            ComplianceCheck
     ) -> ComplianceCheck:
         """Check access control compliance"""
         violations = []
@@ -352,7 +388,8 @@ class ComplianceManager:
 
                 for pattern in default_patterns:
                     if pattern in config.lower():
-                        violations.append(f"Default password pattern found: {pattern}")
+                        violations.append(f"Default password pattern found: \
+                            {pattern}")
 
                 evidence.append(f"Configuration checked for default passwords")
 
@@ -376,7 +413,8 @@ class ComplianceManager:
         return check
 
     async def _check_network_security(
-        self, control: ComplianceControl, device_id: str, check: ComplianceCheck
+        self, control: ComplianceControl, device_id: str, check: \
+            ComplianceCheck
     ) -> ComplianceCheck:
         """Check network security compliance"""
         violations = []
@@ -388,7 +426,8 @@ class ComplianceManager:
             if config:
                 # Check for any-any rules
                 if "permit any any" in config:
-                    violations.append("Overly permissive firewall rule detected")
+                    violations.append("Overly permissive firewall rule \
+                        detected")
 
                 # Check for documented rules
                 if "description" not in config:
@@ -416,7 +455,8 @@ class ComplianceManager:
         return check
 
     async def _check_audit_logging(
-        self, control: ComplianceControl, device_id: str, check: ComplianceCheck
+        self, control: ComplianceControl, device_id: str, check: \
+            ComplianceCheck
     ) -> ComplianceCheck:
         """Check audit logging compliance"""
         violations = []
@@ -430,7 +470,8 @@ class ComplianceManager:
                 violations.append("Logging not configured")
             else:
                 # Check specific log levels
-                required_logs = ["logging trap informational", "logging buffer"]
+                required_logs = ["logging trap informational",
+                    "logging buffer"]
                 for req in required_logs:
                     if req not in config:
                         violations.append(f"Missing: {req}")
@@ -456,7 +497,8 @@ class ComplianceManager:
         return check
 
     async def _check_configuration(
-        self, control: ComplianceControl, device_id: str, check: ComplianceCheck
+        self, control: ComplianceControl, device_id: str, check: \
+            ComplianceCheck
     ) -> ComplianceCheck:
         """Check configuration compliance"""
         violations = []
@@ -498,7 +540,8 @@ class ComplianceManager:
         return check
 
     async def generate_report(
-        self, framework: ComplianceFramework, start_date: datetime, end_date: datetime
+        self, framework: ComplianceFramework, start_date: datetime, end_date: \
+            datetime
     ) -> ComplianceReport:
         """
         Generate compliance report
@@ -524,7 +567,8 @@ class ComplianceManager:
 
         # Calculate compliance score
         total = len(checks)
-        compliant = sum(1 for c in checks if c.status == ComplianceStatus.COMPLIANT)
+        compliant = sum(1 for c in checks if c.status == \
+            ComplianceStatus.COMPLIANT)
         non_compliant = sum(
             1 for c in checks if c.status == ComplianceStatus.NON_COMPLIANT
         )
@@ -609,7 +653,10 @@ class ComplianceManager:
             "framework": framework.value,
         }
 
-    def _generate_recommendations(self, checks: List[ComplianceCheck]) -> List[str]:
+        def _generate_recommendations(
+        self,
+        checks: List[ComplianceCheck]
+    ) -> List[str]:
         """Generate recommendations based on checks"""
         recommendations = []
 
@@ -633,7 +680,8 @@ class ComplianceManager:
                 else:
                     # Generic recommendation
                     recommendations.append(
-                        f"Address {control.name} violations on {len(control_checks)} devices"
+                        f"Address {control.name} violations on {len( 
+    control_checks)} devices"
                     )
 
         # Add priority recommendations
@@ -647,12 +695,17 @@ class ComplianceManager:
         if critical_controls:
             recommendations.insert(
                 0,
-                f"PRIORITY: Address {len(critical_controls)} critical control violations immediately",
+                f"PRIORITY: Address {len(critical_controls)} critical control \
+    violations immediately",
             )
 
         return recommendations[:20]  # Limit to top 20
 
-    def export_report(self, report: ComplianceReport, format: str = "json") -> str:
+        def export_report(
+        self,
+        report: ComplianceReport,
+        format: str = "json"
+    ) -> str:
         """
         Export report in specified format
 
@@ -717,17 +770,20 @@ class ComplianceManager:
                 .compliant {{ color: green; }}
                 .non-compliant {{ color: red; }}
                 table {{ width: 100%; border-collapse: collapse; }}
-                th, td {{ padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }}
+                th,
+                    td {{ padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }}
                 th {{ background-color: #f2f2f2; }}
             </style>
         </head>
         <body>
             <h1>Compliance Report - {report.framework.value.upper()}</h1>
             <p>Generated: {report.generated_at.isoformat()}</p>
-            <p>Period: {report.period_start.date()} to {report.period_end.date()}</p>
+            <p>Period: {report.period_start.date()} to \
+                {report.period_end.date()}</p>
 
             <h2>Overall Compliance Score</h2>
-            <div class="score {('compliant' if report.compliance_score >= 80 else 'non-compliant')}">
+            <div class="score {('compliant' if report.compliance_score >= 80 
+    else 'non-compliant')}">
                 {report.compliance_score:.1f}%
             </div>
 
@@ -747,13 +803,15 @@ class ComplianceManager:
                 </tr>
                 <tr>
                     <td>Non-Compliant Controls</td>
-                    <td class="non-compliant">{report.non_compliant_controls}</td>
+                    <td class="non-compliant">{ \
+                        report.non_compliant_controls}</td>
                 </tr>
             </table>
 
             <h2>Recommendations</h2>
             <ol>
-                {''.join(f'<li>{html.escape(rec)}</li>' for rec in report.recommendations)}
+                {''.join(f'<li>{html.escape(rec)}</li>' for rec in \
+    report.recommendations)}
             </ol>
         </body>
         </html>
@@ -808,15 +866,472 @@ class ComplianceManager:
             return "ip ssh version 2" in config
         return False
 
-    async def _get_last_backup_time(self, device_id: str) -> Optional[datetime]:
+        async def _get_last_backup_time(
+        self,
+        device_id: str
+    ) -> Optional[datetime]:
         """Get last backup time for device"""
         # Would query backup service
         return datetime.utcnow() - timedelta(days=3)  # Mock
 
     async def _run_validation_script(
-        self, control: ComplianceControl, device_id: str, check: ComplianceCheck
+        self, control: ComplianceControl, device_id: str, check: \
+            ComplianceCheck
     ) -> ComplianceCheck:
         """Run custom validation script"""
         # Would execute validation script
         check.status = ComplianceStatus.COMPLIANT
         return check
+
+
+
+class ComplianceValidator:
+    """
+    Validates compliance against various frameworks
+    """
+
+    def __init__(self):
+        """Initialize compliance validator"""
+        self.framework_rules = self._initialize_framework_rules()
+        self.validation_cache = {}
+
+        def _initialize_framework_rules(
+        self
+    ) -> Dict[ComplianceFramework, Dict[str, Any]]:
+        """Initialize validation rules for each framework"""
+        return {
+            ComplianceFramework.PCI_DSS: {
+                "firewall_required": True,
+                "encryption_required": True,
+                "access_control_required": True,
+                "audit_logging_required": True,
+                "password_policy": {
+                    "min_length": 8,
+                    "complexity": True,
+                    "expiration_days": 90,
+                },
+                "network_segmentation": True,
+            },
+            ComplianceFramework.HIPAA: {
+                "access_control_required": True,
+                "audit_logging_required": True,
+                "encryption_required": True,
+                "data_backup_required": True,
+                "incident_response_plan": True,
+            },
+            ComplianceFramework.SOC2: {
+                "security_controls": True,
+                "availability_monitoring": True,
+                "processing_integrity": True,
+                "confidentiality_controls": True,
+                "privacy_controls": True,
+            },
+            ComplianceFramework.ISO_27001: {
+                "risk_assessment": True,
+                "security_policy": True,
+                "asset_management": True,
+                "access_control": True,
+                "cryptography": True,
+                "physical_security": True,
+                "operations_security": True,
+            },
+        }
+
+    async def validate_pci_dss_controls(
+        self, device_config: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """
+        Validate PCI DSS controls
+
+        Args:
+            device_config: Device configuration
+
+        Returns:
+            Validation results
+        """
+        results = {
+            "compliant": True,
+            "violations": [],
+            "checks": {},
+        }
+
+        rules = self.framework_rules[ComplianceFramework.PCI_DSS]
+
+        # Check firewall configuration
+        if rules.get("firewall_required"):
+            has_firewall = self._check_firewall_config(device_config)
+            results["checks"]["firewall"] = has_firewall
+            if not has_firewall:
+                results["compliant"] = False
+                results["violations"].append("Firewall not properly \
+                    configured")
+
+        # Check encryption
+        if rules.get("encryption_required"):
+            has_encryption = self._check_encryption(device_config)
+            results["checks"]["encryption"] = has_encryption
+            if not has_encryption:
+                results["compliant"] = False
+                results["violations"].append("Encryption not enabled")
+
+        # Check access control
+        if rules.get("access_control_required"):
+            has_access_control = self._check_access_control(device_config)
+            results["checks"]["access_control"] = has_access_control
+            if not has_access_control:
+                results["compliant"] = False
+                results["violations"].append("Access control not properly \
+                    configured")
+
+        return results
+
+    async def validate_hipaa_controls(
+        self, device_config: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """
+        Validate HIPAA controls
+
+        Args:
+            device_config: Device configuration
+
+        Returns:
+            Validation results
+        """
+        results = {
+            "compliant": True,
+            "violations": [],
+            "checks": {},
+        }
+
+        rules = self.framework_rules[ComplianceFramework.HIPAA]
+
+        # Check access control
+        if rules.get("access_control_required"):
+            has_access_control = self._check_access_control(device_config)
+            results["checks"]["access_control"] = has_access_control
+            if not has_access_control:
+                results["compliant"] = False
+                results["violations"].append("Access control requirements not \
+                    met")
+
+        # Check audit logging
+        if rules.get("audit_logging_required"):
+            has_audit_logging = self._check_audit_logging(device_config)
+            results["checks"]["audit_logging"] = has_audit_logging
+            if not has_audit_logging:
+                results["compliant"] = False
+                results["violations"].append("Audit logging not configured")
+
+        # Check data backup
+        if rules.get("data_backup_required"):
+            has_backup = self._check_backup_config(device_config)
+            results["checks"]["data_backup"] = has_backup
+            if not has_backup:
+                results["compliant"] = False
+                results["violations"].append("Data backup not configured")
+
+        return results
+
+    async def validate_soc2_controls(
+        self, device_config: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """
+        Validate SOC2 controls
+
+        Args:
+            device_config: Device configuration
+
+        Returns:
+            Validation results
+        """
+        results = {
+            "compliant": True,
+            "violations": [],
+            "checks": {},
+        }
+
+        rules = self.framework_rules[ComplianceFramework.SOC2]
+
+        # Check security controls
+        if rules.get("security_controls"):
+            has_security = self._check_security_controls(device_config)
+            results["checks"]["security_controls"] = has_security
+            if not has_security:
+                results["compliant"] = False
+                results["violations"].append("Security controls not \
+                    implemented")
+
+        # Check availability monitoring
+        if rules.get("availability_monitoring"):
+            has_monitoring = self._check_monitoring(device_config)
+            results["checks"]["availability_monitoring"] = has_monitoring
+            if not has_monitoring:
+                results["compliant"] = False
+                results["violations"].append("Availability monitoring not \
+                    configured")
+
+        return results
+
+    def _check_firewall_config(self, config: Dict[str, Any]) -> bool:
+        """Check firewall configuration"""
+        return bool(config.get("firewall", {}).get("enabled", False))
+
+    def _check_encryption(self, config: Dict[str, Any]) -> bool:
+        """Check encryption settings"""
+        return bool(config.get("encryption", {}).get("enabled", False))
+
+    def _check_access_control(self, config: Dict[str, Any]) -> bool:
+        """Check access control configuration"""
+        return bool(config.get("access_control", {}).get("configured", False))
+
+    def _check_audit_logging(self, config: Dict[str, Any]) -> bool:
+        """Check audit logging configuration"""
+        return bool(config.get("logging", {}).get("audit_enabled", False))
+
+    def _check_backup_config(self, config: Dict[str, Any]) -> bool:
+        """Check backup configuration"""
+        return bool(config.get("backup", {}).get("enabled", False))
+
+    def _check_security_controls(self, config: Dict[str, Any]) -> bool:
+        """Check security controls"""
+        return bool(config.get("security", {}).get("controls_enabled", False))
+
+    def _check_monitoring(self, config: Dict[str, Any]) -> bool:
+        """Check monitoring configuration"""
+        return bool(config.get("monitoring", {}).get("enabled", False))
+
+
+
+class ReportGenerator:
+    """
+    Generates compliance reports in various formats
+    """
+
+    def __init__(self):
+        """Initialize report generator"""
+        self.templates = {}
+        self.formatters = {
+            "json": self._format_json,
+            "html": self._format_html,
+            "pdf": self._format_pdf,
+            "csv": self._format_csv,
+            "xml": self._format_xml,
+        }
+
+    async def generate_report(
+        self,
+        framework: ComplianceFramework,
+        checks: List[ComplianceCheck],
+        format: str = "json",
+    ) -> str:
+        """
+        Generate compliance report
+
+        Args:
+            framework: Compliance framework
+            checks: List of compliance checks
+            format: Report format
+
+        Returns:
+            Generated report
+        """
+        # Calculate statistics
+        stats = self._calculate_statistics(checks)
+
+        # Create report structure
+        report_data = {
+            "framework": framework.value,
+            "generated_at": datetime.utcnow().isoformat(),
+            "statistics": stats,
+            "checks": [self._serialize_check(check) for check in checks],
+            "compliance_score": self._calculate_score(checks),
+            "summary": self._generate_summary(checks, stats),
+        }
+
+        # Format report
+        formatter = self.formatters.get(format, self._format_json)
+        return await formatter(report_data)
+
+        def _calculate_statistics(
+        self,
+        checks: List[ComplianceCheck]
+    ) -> Dict[str, Any]:
+        """Calculate compliance statistics"""
+        total = len(checks)
+        compliant = sum(1 for c in checks if c.status == \
+            ComplianceStatus.COMPLIANT)
+        non_compliant = sum(
+            1 for c in checks if c.status == ComplianceStatus.NON_COMPLIANT
+        )
+
+        return {
+            "total_checks": total,
+            "compliant": compliant,
+            "non_compliant": non_compliant,
+            "compliance_rate": (compliant / total * 100) if total > 0 else 0,
+        }
+
+    def _calculate_score(self, checks: List[ComplianceCheck]) -> float:
+        """Calculate overall compliance score"""
+        if not checks:
+            return 0.0
+
+        total_weight = 0
+        weighted_score = 0
+
+        for check in checks:
+            weight = self._get_check_weight(check)
+            total_weight += weight
+
+            if check.status == ComplianceStatus.COMPLIANT:
+                weighted_score += weight
+            elif check.status == ComplianceStatus.PARTIALLY_COMPLIANT:
+                weighted_score += weight * 0.5
+
+        return (weighted_score / total_weight * 100) if total_weight > 0 else 0
+
+    def _get_check_weight(self, check: ComplianceCheck) -> float:
+        """Get weight for compliance check"""
+        # Critical controls have higher weight
+        critical_controls = ["PCI_1.1", "PCI_2.1", "HIPAA_164.312"]
+        if check.control_id in critical_controls:
+            return 3.0
+        return 1.0
+
+    def _generate_summary(
+        self, checks: List[ComplianceCheck], stats: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Generate report summary"""
+        return {
+            "overall_compliance": stats["compliance_rate"] >= 80,
+            "critical_issues": self._find_critical_issues(checks),
+            "recommendations": self._generate_recommendations(checks),
+            "risk_level": self._assess_risk_level(stats),
+        }
+
+        def _find_critical_issues(
+        self,
+        checks: List[ComplianceCheck]
+    ) -> List[str]:
+        """Find critical compliance issues"""
+        issues = []
+        for check in checks:
+            if check.status == ComplianceStatus.NON_COMPLIANT:
+                if len(check.violations) > 0:
+                    issues.extend(check.violations[:2])  # Limit to 2 per check
+        return issues[:10]  # Return top 10 critical issues
+
+        def _generate_recommendations(
+        self,
+        checks: List[ComplianceCheck]
+    ) -> List[str]:
+        """Generate compliance recommendations"""
+        recommendations = []
+
+        non_compliant = [
+            c for c in checks if c.status == ComplianceStatus.NON_COMPLIANT
+        ]
+
+        if non_compliant:
+            recommendations.append(
+                f"Address {len(non_compliant)} non-compliant controls"
+            )
+
+        return recommendations
+
+    def _assess_risk_level(self, stats: Dict[str, Any]) -> str:
+        """Assess overall risk level"""
+        compliance_rate = stats["compliance_rate"]
+
+        if compliance_rate >= 95:
+            return "Low"
+        elif compliance_rate >= 80:
+            return "Medium"
+        elif compliance_rate >= 60:
+            return "High"
+        else:
+            return "Critical"
+
+    def _serialize_check(self, check: ComplianceCheck) -> Dict[str, Any]:
+        """Serialize compliance check for report"""
+        return {
+            "control_id": check.control_id,
+            "device_id": check.device_id,
+            "status": check.status.value,
+            "checked_at": check.checked_at.isoformat(),
+            "violations": check.violations,
+            "evidence": check.evidence,
+            "remediation_applied": check.remediation_applied,
+        }
+
+    async def _format_json(self, data: Dict[str, Any]) -> str:
+        """Format report as JSON"""
+        return json.dumps(data, indent=2)
+
+    async def _format_html(self, data: Dict[str, Any]) -> str:
+        """Format report as HTML"""
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Compliance Report - {data['framework']}</title>
+            <style>
+                body {{ font-family: Arial, sans-serif; margin: 20px; }}
+                h1 {{ color: #333; }}
+                table {{ border-collapse: collapse; width: 100%; }}
+                th,
+                    td {{ border: 1px solid #ddd; padding: 8px; text-align: left; }}
+                th {{ background-color: #f2f2f2; }}
+                .compliant {{ color: green; }}
+                .non-compliant {{ color: red; }}
+            </style>
+        </head>
+        <body>
+            <h1>Compliance Report - {data['framework']}</h1>
+            <h2>Statistics</h2>
+            <p>Generated: {data['generated_at']}</p>
+            <p>Compliance Score: {data['compliance_score']:.2f}%</p>
+            <p>Total Checks: {data['statistics']['total_checks']}</p>
+            <p>Compliant: {data['statistics']['compliant']}</p>
+            <p>Non-Compliant: {data['statistics']['non_compliant']}</p>
+        </body>
+        </html>
+        """
+        return html_content
+
+    async def _format_pdf(self, data: Dict[str, Any]) -> str:
+        """Format report as PDF (placeholder)"""
+        # Would use a PDF generation library
+        return "PDF generation not implemented"
+
+    async def _format_csv(self, data: Dict[str, Any]) -> str:
+        """Format report as CSV"""
+        output = []
+        output.append("Control ID,Device ID,Status,Checked At,Violations")
+
+        for check in data["checks"]:
+            violations = ";".join(check["violations"])
+            output.append(
+                f"{check['control_id']},
+                    {check['device_id']}
+                    {check['status']}
+                    "
+                f"{check['checked_at']},{violations}"
+            )
+
+        return "\n".join(output)
+
+    async def _format_xml(self, data: Dict[str, Any]) -> str:
+        """Format report as XML"""
+        xml_content = f"""<?xml version="1.0" encoding="UTF-8"?>
+<ComplianceReport>
+    <Framework>{html.escape(data['framework'])}</Framework>
+    <GeneratedAt>{html.escape(data['generated_at'])}</GeneratedAt>
+    <ComplianceScore>{data['compliance_score']:.2f}</ComplianceScore>
+    <Statistics>
+        <TotalChecks>{data['statistics']['total_checks']}</TotalChecks>
+        <Compliant>{data['statistics']['compliant']}</Compliant>
+        <NonCompliant>{data['statistics']['non_compliant']}</NonCompliant>
+    </Statistics>
+</ComplianceReport>"""
+        return xml_content

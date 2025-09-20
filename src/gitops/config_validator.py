@@ -14,6 +14,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 
+
 class ValidationType(Enum):
     """Types of validation"""
 
@@ -22,6 +23,7 @@ class ValidationType(Enum):
     COMPLIANCE = "compliance"
     BUSINESS = "business"
     CONFLICT = "conflict"
+
 
 
 class Severity(Enum):
@@ -35,6 +37,7 @@ class Severity(Enum):
 
 
 @dataclass
+
 class ValidationIssue:
     """Represents a validation issue"""
 
@@ -47,6 +50,7 @@ class ValidationIssue:
 
 
 @dataclass
+
 class ValidationResult:
     """Result of configuration validation"""
 
@@ -56,6 +60,7 @@ class ValidationResult:
     issues: List[ValidationIssue] = field(default_factory=list)
     warnings: List[ValidationIssue] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
+
 
 
 class ConfigValidator:
@@ -80,7 +85,9 @@ class ConfigValidator:
                 r"ftp-server",  # FTP server
             ],
             "missing_security": [
-                r"^(?!.*service password-encryption)",  # Missing password encryption
+                                r"^(
+                    ?!.*service password-encryption
+                )",  # Missing password encryption
                 r"^(?!.*aaa new-model)",  # Missing AAA
                 r"^(?!.*login on-failure)",  # Missing login failure logging
             ],
@@ -108,7 +115,9 @@ class ConfigValidator:
         # Business rules
         self.business_rules = {
             "vlan_range": (1, 4094),
-            "interface_naming": r"^(GigabitEthernet|FastEthernet|Vlan|Loopback|Tunnel)",
+                        "interface_naming": r"^(
+                GigabitEthernet|FastEthernet|Vlan|Loopback|Tunnel
+            )",
             "ip_ranges": [
                 r"10\.\d{1,3}\.\d{1,3}\.\d{1,3}",  # RFC1918
                 r"172\.(1[6-9]|2[0-9]|3[01])\.\d{1,3}\.\d{1,3}",
@@ -169,7 +178,8 @@ class ConfigValidator:
             self._detect_conflicts(config_content, vendor, result)
 
         # Determine overall validity
-        critical_issues = [i for i in result.issues if i.severity == Severity.CRITICAL]
+        critical_issues = [i for i in result.issues if i.severity == \
+            Severity.CRITICAL]
         high_issues = [i for i in result.issues if i.severity == Severity.HIGH]
 
         result.is_valid = len(critical_issues) == 0 and len(high_issues) == 0
@@ -185,7 +195,11 @@ class ConfigValidator:
 
         return result
 
-    def _validate_cisco_syntax(self, config: str, result: ValidationResult) -> None:
+        def _validate_cisco_syntax(
+        self,
+        config: str,
+        result: ValidationResult
+    ) -> None:
         """
         Validate Cisco IOS/IOS-XE/NX-OS syntax
 
@@ -216,6 +230,7 @@ class ConfigValidator:
                             type=ValidationType.SYNTAX,
                             severity=Severity.HIGH,
                             message=f"Invalid interface name: {interface_name}",
+                                
                             line_number=line_num,
                         )
                     )
@@ -253,7 +268,8 @@ class ConfigValidator:
 
             # Check for common syntax errors
             if current_context == "interface":
-                if stripped.startswith("ip address") and "secondary" not in stripped:
+                if stripped.startswith("ip address") and "secondary" not in \
+                    stripped:
                     parts = stripped.split()
                     if len(parts) != 4:  # ip address <ip> <mask>
                         result.issues.append(
@@ -268,7 +284,11 @@ class ConfigValidator:
                             )
                         )
 
-    def _validate_juniper_syntax(self, config: str, result: ValidationResult) -> None:
+        def _validate_juniper_syntax(
+        self,
+        config: str,
+        result: ValidationResult
+    ) -> None:
         """
         Validate Juniper Junos syntax
 
@@ -326,7 +346,9 @@ class ConfigValidator:
                 ValidationIssue(
                     type=ValidationType.SYNTAX,
                     severity=Severity.CRITICAL,
-                    message=f"Unmatched braces in configuration ({brace_count} {'open' if brace_count > 0 else 'close'} braces)",
+                    message=f"Unmatched braces in configuration ({brace_count} \
+                        {
+    'open' if brace_count > 0 else 'close'} braces)",
                 )
             )
 
@@ -351,15 +373,19 @@ class ConfigValidator:
                         if pattern_type == "weak_encryption":
                             severity = Severity.CRITICAL
                             message = "Weak or no encryption detected"
-                            recommendation = "Use type 7 or stronger encryption"
+                            recommendation = "Use type 7 or stronger \
+                                encryption"
                         elif pattern_type == "insecure_protocols":
                             severity = Severity.HIGH
-                            message = f"Insecure protocol enabled: {line.strip()}"
+                            message = f"Insecure protocol enabled: \
+                                {line.strip()}"
                             recommendation = "Disable insecure protocols"
                         else:
                             severity = Severity.HIGH
-                            message = f"Missing security feature: {line.strip()}"
-                            recommendation = "Enable recommended security features"
+                            message = f"Missing security feature: \
+                                {line.strip()}"
+                            recommendation = "Enable recommended security \
+                                features"
 
                         result.issues.append(
                             ValidationIssue(
@@ -390,9 +416,11 @@ class ConfigValidator:
                             ValidationIssue(
                                 type=ValidationType.SECURITY,
                                 severity=Severity.MEDIUM,
-                                message="Potential hardcoded credential detected",
+                                message="Potential hardcoded credential \
+                                    detected",
                                 line_number=line_num,
-                                recommendation="Use vault or environment variables for secrets",
+                                recommendation="Use vault or environment 
+    variables for secrets",
                             )
                         )
 
@@ -456,7 +484,8 @@ class ConfigValidator:
                         ValidationIssue(
                             type=ValidationType.BUSINESS,
                             severity=Severity.MEDIUM,
-                            message=f"VLAN {vlan_id} outside allowed range ({min_vlan}-{max_vlan})",
+                            message=f"VLAN {vlan_id} outside allowed range ({ 
+    min_vlan}-{max_vlan})",
                             line_number=line_num,
                         )
                     )
@@ -513,6 +542,7 @@ class ConfigValidator:
                             message=f"Duplicate IP address: {ip}",
                             line_number=line_num,
                             config_section=f"Conflicts with line {ip_addresses[ip]}",
+                                
                         )
                     )
                 else:
@@ -537,7 +567,9 @@ class ConfigValidator:
                     ValidationIssue(
                         type=ValidationType.CONFLICT,
                         severity=Severity.LOW,
-                        message=f"ACL {acl_name} has many entries ({len(line_nums)})",
+                                                message=f"ACL {acl_name} has many entries (
+                            {len(line_nums)}
+                        )",
                         recommendation="Consider consolidating ACL rules",
                     )
                 )

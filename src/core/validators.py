@@ -13,6 +13,7 @@ from .logging import get_logger
 logger = get_logger(__name__)
 
 
+
 class ValidationLevel(Enum):
     ERROR = "error"
     WARNING = "warning"
@@ -20,6 +21,7 @@ class ValidationLevel(Enum):
 
 
 @dataclass
+
 class ValidationResult:
     """Validation result container"""
 
@@ -37,6 +39,7 @@ class ValidationResult:
 
     def add_info(self, message: str):
         self.info.append(message)
+
 
 
 class ConfigValidator:
@@ -73,7 +76,11 @@ class ConfigValidator:
             self.interface_descriptions_required,
         ]
 
-    async def validate_configuration(self, config: Dict[str, Any]) -> ValidationResult:
+        async def validate_configuration(
+        self,
+        config: Dict[str,
+        Any]
+    ) -> ValidationResult:
         """
         Main validation method following CLAUDE.md pattern
         """
@@ -116,7 +123,11 @@ class ConfigValidator:
 
         return result
 
-    async def validate_schema(self, config: Dict[str, Any]) -> ValidationResult:
+        async def validate_schema(
+        self,
+        config: Dict[str,
+        Any]
+    ) -> ValidationResult:
         """Layer 1: Schema validation"""
         result = ValidationResult()
 
@@ -181,7 +192,8 @@ class ConfigValidator:
                 logger.debug(f"Validating interface: {interface_context}")
                 # Validate interface name
                 if not re.match(r"interface \S+", line):
-                    result.add_error(f"Line {line_num}: Invalid interface syntax")
+                    result.add_error(f"Line {line_num}: Invalid interface \
+                        syntax")
 
             # Exit context
             elif line == "exit" or line == "end":
@@ -191,16 +203,19 @@ class ConfigValidator:
             elif "ip address" in line:
                 if "interface" not in current_context:
                     result.add_warning(
-                        f"Line {line_num}: IP address outside interface context"
+                        f"Line {line_num}: IP address outside interface \
+                            context"
                     )
 
                 # Extract and validate IP
                 match = re.search(r"ip address (\S+) (\S+)", line)
                 if match:
                     try:
-                        ipaddress.IPv4Interface(f"{match.group(1)}/{match.group(2)}")
+                        ipaddress.IPv4Interface(f"{match.group( \
+                            1)}/{match.group(2)}")
                     except ValueError:
-                        result.add_error(f"Line {line_num}: Invalid IP address or mask")
+                        result.add_error(f"Line {line_num}: Invalid IP address \
+                            or mask")
 
             # ACL validation
             elif line.startswith("access-list"):
@@ -213,7 +228,8 @@ class ConfigValidator:
                 if match:
                     vlan_id = int(match.group(1))
                     if vlan_id < 1 or vlan_id > 4094:
-                        result.add_error(f"Line {line_num}: Invalid VLAN ID {vlan_id}")
+                        result.add_error(f"Line {line_num}: Invalid VLAN ID \
+                            {vlan_id}")
 
         return result
 
@@ -234,7 +250,8 @@ class ConfigValidator:
             if line.startswith("set "):
                 # Basic syntax check
                 if not re.match(r"set \S+ \S+", line):
-                    result.add_error(f"Line {line_num}: Invalid set command syntax")
+                    result.add_error(f"Line {line_num}: Invalid set command \
+                        syntax")
 
                 # Interface validation
                 if "interfaces" in line:
@@ -251,12 +268,14 @@ class ConfigValidator:
                         try:
                             ipaddress.IPv4Interface(match.group(1))
                         except ValueError:
-                            result.add_error(f"Line {line_num}: Invalid IP address")
+                            result.add_error(f"Line {line_num}: Invalid IP \
+                                address")
 
             # Delete commands
             elif line.startswith("delete "):
                 if not re.match(r"delete \S+", line):
-                    result.add_error(f"Line {line_num}: Invalid delete command syntax")
+                    result.add_error(f"Line {line_num}: Invalid delete command \
+                        syntax")
 
         return result
 
@@ -326,7 +345,8 @@ class ConfigValidator:
         if "transport input telnet" in config.lower():
             return "Telnet access enabled - use SSH only"
 
-        if "line vty" in config.lower() and "transport input ssh" not in config.lower():
+        if "line vty" in config.lower() and "transport input ssh" not in \
+            config.lower():
             return "VTY lines should specify SSH-only access"
 
         return None
@@ -345,7 +365,11 @@ class ConfigValidator:
 
         return None
 
-    async def check_business_rules(self, config: Dict[str, Any]) -> ValidationResult:
+        async def check_business_rules(
+        self,
+        config: Dict[str,
+        Any]
+    ) -> ValidationResult:
         """Layer 4: Business rules validation"""
         result = ValidationResult()
 
@@ -432,7 +456,11 @@ class ConfigValidator:
 
         return None
 
-    async def detect_conflicts(self, config: Dict[str, Any]) -> ValidationResult:
+        async def detect_conflicts(
+        self,
+        config: Dict[str,
+        Any]
+    ) -> ValidationResult:
         """Layer 5: Conflict detection"""
         result = ValidationResult()
 
@@ -461,13 +489,14 @@ class ConfigValidator:
         for acl_num, count in acl_counts.items():
             if count > 10:  # Arbitrary threshold
                 result.add_warning(
-                    f"ACL {acl_num} has {count} entries - consider optimization"
+                    f"ACL {acl_num} has {count} entries - consider \
+                        optimization"
                 )
 
         # Check for routing conflicts
         static_routes = re.findall(r"ip route (\S+) (\S+) (\S+)", config_text)
         for i, route1 in enumerate(static_routes):
-            for route2 in static_routes[i + 1 :]:
+            for route2 in static_routes[i + 1:]:
                 if route1[0] == route2[0] and route1[1] == route2[1]:
                     result.add_warning(
                         f"Duplicate static route for {route1[0]}/{route1[1]}"
@@ -475,7 +504,12 @@ class ConfigValidator:
 
         return result
 
-    def dict_to_config_text(self, config_dict: Dict[str, Any], vendor: str) -> str:
+        def dict_to_config_text(
+        self,
+        config_dict: Dict[str,
+        Any],
+        vendor: str
+    ) -> str:
         """Convert configuration dictionary to text format"""
         # Simple conversion - would be more complex in production
         lines = []

@@ -32,6 +32,7 @@ from ..core.exceptions import SecurityError
 logger = get_logger(__name__)
 
 
+
 class DeviceCertificateManager:
     """Manages device certificates for authentication"""
 
@@ -94,10 +95,16 @@ class DeviceCertificateManager:
         subject = x509.Name(
             [
                 x509.NameAttribute(NameOID.COUNTRY_NAME, "US"),
-                x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "California"),
+                                x509.NameAttribute(
+                    NameOID.STATE_OR_PROVINCE_NAME,
+                    "California"
+                ),
                 x509.NameAttribute(NameOID.LOCALITY_NAME, "San Francisco"),
                 x509.NameAttribute(NameOID.ORGANIZATION_NAME, "CatNet"),
-                x509.NameAttribute(NameOID.ORGANIZATIONAL_UNIT_NAME, "Network Devices"),
+                                x509.NameAttribute(
+                    NameOID.ORGANIZATIONAL_UNIT_NAME,
+                    "Network Devices"
+                ),
                 x509.NameAttribute(NameOID.COMMON_NAME, device_hostname),
                 x509.NameAttribute(NameOID.SERIAL_NUMBER, device_id),
             ]
@@ -159,10 +166,15 @@ class DeviceCertificateManager:
         )
 
         # Sign the certificate
-        device_cert = cert_builder.sign(self.ca_key, hashes.SHA256(), default_backend())
+                device_cert = cert_builder.sign(
+            self.ca_key,
+            hashes.SHA256(),
+            default_backend()
+        )
 
         # Serialize certificate and key
-        cert_pem = device_cert.public_bytes(encoding=serialization.Encoding.PEM)
+        cert_pem = device_cert.public_bytes( \
+            encoding=serialization.Encoding.PEM)
         key_pem = device_key.private_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.TraditionalOpenSSL,
@@ -298,7 +310,8 @@ class DeviceCertificateManager:
             )
 
             logger.info(
-                f"Certificate revoked for device {device_id} with ID {revocation_id}"
+                f"Certificate revoked for device {device_id} with ID \
+                    {revocation_id}"
             )
             return True
 
@@ -343,14 +356,18 @@ class DeviceCertificateManager:
 
             # Check if certificate is revoked
             if await self._is_cert_revoked(device_id):
-                logger.warning(f"Certificate for device {device_id} is revoked")
+                logger.warning(f"Certificate for device {device_id} is \
+                    revoked")
                 return None
 
             # Verify certificate chain
             # In production, this would verify against the CA chain
             # For now, just check fingerprint
 
-            fingerprint = hashes.Hash(hashes.SHA256(), backend=default_backend())
+                        fingerprint = hashes.Hash(
+                hashes.SHA256(),
+                backend=default_backend()
+            )
             fingerprint.update(cert_data)
             cert_fingerprint = fingerprint.finalize().hex()
 
@@ -371,10 +388,12 @@ class DeviceCertificateManager:
                         logger.warning(f"IP mismatch for device {device_id}")
                         return None
 
-                    logger.info(f"Certificate validated for device {device_id}")
+                    logger.info(f"Certificate validated for device \
+                        {device_id}")
                     return device
 
-            logger.warning(f"Device {device_id} not found or certificate mismatch")
+            logger.warning(f"Device {device_id} not found or certificate \
+                mismatch")
             return None
 
         except Exception as e:
@@ -412,7 +431,8 @@ class DeviceCertificateManager:
                 stats["checked"] += 1
 
                 # Check if certificate needs rotation
-                if force or self._needs_rotation(device.certificate_expires_at):
+                if force or self._needs_rotation( \
+                    device.certificate_expires_at):
                     try:
                         # Issue new certificate
                         new_cert = await self.issue_device_cert(
@@ -437,7 +457,11 @@ class DeviceCertificateManager:
         logger.info(f"Certificate rotation complete: {stats}")
         return stats
 
-    def _needs_rotation(self, expires_at: datetime, days_before: int = 30) -> bool:
+        def _needs_rotation(
+        self,
+        expires_at: datetime,
+        days_before: int = 30
+    ) -> bool:
         """Check if certificate needs rotation"""
         if not expires_at:
             return True
@@ -486,7 +510,8 @@ class DeviceCertificateManager:
             Certificate status information
         """
         async with get_db() as session:
-            result = await session.execute(select(Device).where(Device.id == device_id))
+            result = await session.execute(select(Device).where(Device.id == \
+                device_id))
             device = result.scalar_one_or_none()
 
             if device:
@@ -496,7 +521,8 @@ class DeviceCertificateManager:
                     "certificate_status": device.certificate_status,
                     "certificate_serial": device.certificate_serial,
                     "certificate_fingerprint": device.certificate_fingerprint,
-                    "certificate_expires_at": device.certificate_expires_at.isoformat()
+                    "certificate_expires_at": \
+                        device.certificate_expires_at.isoformat()
                     if device.certificate_expires_at
                     else None,
                     "needs_rotation": self._needs_rotation(

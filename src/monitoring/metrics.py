@@ -8,13 +8,13 @@ Handles:
 - Custom metrics
 """
 
-from typing import Dict, Any, Optional, List, Union
+from typing import Dict, Any, Optional, List
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
 from prometheus_client import Counter, Histogram, Gauge, Summary
-import asyncio
 from collections import defaultdict, deque
+
 
 
 class MetricType(Enum):
@@ -24,6 +24,7 @@ class MetricType(Enum):
     GAUGE = "gauge"
     HISTOGRAM = "histogram"
     SUMMARY = "summary"
+
 
 
 class MetricUnit(Enum):
@@ -39,6 +40,7 @@ class MetricUnit(Enum):
 
 
 @dataclass
+
 class MetricValue:
     """Single metric value"""
 
@@ -49,6 +51,7 @@ class MetricValue:
 
 
 @dataclass
+
 class MetricDefinition:
     """Metric definition"""
 
@@ -59,6 +62,7 @@ class MetricDefinition:
     labels: List[str] = field(default_factory=list)
     buckets: Optional[List[float]] = None
     quantiles: Optional[List[float]] = None
+
 
 
 class MetricsCollector:
@@ -75,7 +79,9 @@ class MetricsCollector:
         """
         self.namespace = namespace
         self.metrics: Dict[str, Any] = {}
-        self.time_series: Dict[str, deque] = defaultdict(lambda: deque(maxlen=1000))
+                self.time_series: Dict[str, deque] = defaultdict(
+            lambda: deque(maxlen=1000)
+        )
 
         # Initialize default metrics
         self._initialize_default_metrics()
@@ -271,7 +277,11 @@ class MetricsCollector:
         }
 
     def increment_counter(
-        self, name: str, value: float = 1, labels: Optional[Dict[str, str]] = None
+        self,
+            name: str
+            value: float = 1
+            labels: Optional[Dict[str
+            str]] = None
     ):
         """
         Increment a counter metric
@@ -366,9 +376,18 @@ class MetricsCollector:
         # Store in time series
         self._store_time_series(name, value, labels)
 
-    def _store_time_series(self, name: str, value: float, labels: Dict[str, str]):
+        def _store_time_series(
+        self,
+        name: str,
+        value: float,
+        labels: Dict[str,
+        str]
+    ):
         """Store metric value in time series"""
-        key = f"{name}:{':'.join(f'{k}={v}' for k, v in sorted(labels.items()))}"
+                key = f"{name}:{':'.join(
+            f'{k}={v}' for k,
+            v in sorted(labels.items())
+        )}"
         metric_value = MetricValue(
             timestamp=datetime.utcnow(),
             value=value,
@@ -397,7 +416,10 @@ class MetricsCollector:
             List of metric values
         """
         labels = labels or {}
-        key_prefix = f"{name}:{':'.join(f'{k}={v}' for k, v in sorted(labels.items()))}"
+                key_prefix = f"{name}:{':'.join(
+            f'{k}={v}' for k,
+            v in sorted(labels.items())
+        )}"
 
         results = []
         for key, values in self.time_series.items():
@@ -522,23 +544,35 @@ class MetricsCollector:
 
         # Memory usage
         memory = psutil.virtual_memory()
-        self.set_gauge("system_memory_usage", memory.percent, {"host": "localhost"})
+                self.set_gauge(
+            "system_memory_usage",
+            memory.percent,
+            {"host": "localhost"}
+        )
         self.set_gauge(
             "system_memory_available", memory.available, {"host": "localhost"}
         )
 
         # Disk usage
         disk = psutil.disk_usage("/")
-        self.set_gauge("system_disk_usage", disk.percent, {"host": "localhost"})
+                self.set_gauge(
+            "system_disk_usage",
+            disk.percent,
+            {"host": "localhost"}
+        )
         self.set_gauge("system_disk_free", disk.free, {"host": "localhost"})
 
         # Network I/O
         net_io = psutil.net_io_counters()
         self.set_gauge(
-            "system_network_bytes_sent", net_io.bytes_sent, {"host": "localhost"}
+            "system_network_bytes_sent",
+                net_io.bytes_sent
+                {"host": "localhost"}
         )
         self.set_gauge(
-            "system_network_bytes_recv", net_io.bytes_recv, {"host": "localhost"}
+            "system_network_bytes_recv",
+                net_io.bytes_recv
+                {"host": "localhost"}
         )
 
     def export_metrics(self, format: str = "prometheus") -> str:

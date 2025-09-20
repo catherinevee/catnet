@@ -1,366 +1,834 @@
-# CatNet CLI Command Reference
+# Network CLI Architecture: Cisco and Juniper Platform Reference
 
-## Overview
-CatNet CLI provides command-line interface for managing network configuration deployments with GitOps integration and enterprise-grade security.
+## Purpose
+This document serves as a technical reference for implementing network automation across Cisco IOS, IOS XE, NX-OS, IOS XR, and Juniper JunOS platforms. It provides structured command mappings, API interfaces, and code templates optimized for Claude Code assistance in developing multi-vendor network automation solutions.
 
-## Installation
-```bash
-pip install -e .
-# or
-python catnet_cli.py
-```
+## Platform Architecture Quick Reference
 
-## Global Options
-```
---config, -c PATH    Path to configuration file
---debug/--no-debug   Enable debug mode
---help               Show help message
-```
-
-## Authentication Commands
-
-### Login
-Authenticate to CatNet system with MFA support
-```bash
-catnet auth login
-catnet auth login --username admin --mfa-token 123456
-```
-Options:
-- `--username, -u`: Username (prompted if not provided)
-- `--password, -p`: Password (prompted securely if not provided)
-- `--mfa-token, -m`: MFA token for two-factor authentication
-
-### Logout
-Logout from CatNet and clear stored credentials
-```bash
-catnet auth logout
-```
-
-### Refresh Token
-Refresh authentication token before expiration
-```bash
-catnet auth refresh
-```
-
-## GitOps Commands
-
-### Connect Repository
-Connect a Git repository for configuration management
-```bash
-catnet gitops connect --url https://github.com/org/network-configs --branch main
-catnet gitops connect -u git@github.com:org/configs.git --webhook-secret abc123
-```
-Options:
-- `--url, -u`: Git repository URL (required)
-- `--branch, -b`: Git branch (default: main)
-- `--webhook-secret`: Secret for webhook verification
-
-### Sync Repository
-Synchronize configurations from Git repository
-```bash
-catnet gitops sync --repo-id abc-123-def
-catnet gitops sync -r abc-123-def --force
-```
-Options:
-- `--repo-id, -r`: Repository ID (required)
-- `--force/--no-force`: Force sync even with conflicts
-
-### List Repositories
-List all connected Git repositories
-```bash
-catnet gitops list
-```
-
-## Deployment Commands
-
-### Create Deployment
-Create a new configuration deployment
-```bash
-catnet deploy create --config-file configs/router.yml --target device1 --target device2
-catnet deploy create -f config.json -t router1 --strategy canary --dry-run
-```
-Options:
-- `--config-file, -f`: Configuration file path (required)
-- `--target, -t`: Target devices (can specify multiple)
-- `--strategy`: Deployment strategy (rolling|canary|blue-green) (default: rolling)
-- `--dry-run/--no-dry-run`: Perform validation without actual deployment
-
-### Check Deployment Status
-Get status of a deployment
-```bash
-catnet deploy status <deployment_id>
-catnet deploy status dep-abc-123-def
-```
-
-### Approve Deployment
-Approve a pending deployment requiring authorization
-```bash
-catnet deploy approve <deployment_id>
-catnet deploy approve dep-123 --comment "Approved after review"
-```
-Options:
-- `--comment, -c`: Approval comment for audit trail
-
-### Rollback Deployment
-Rollback a deployment to previous configuration
-```bash
-catnet deploy rollback <deployment_id> --reason "Performance degradation detected"
-catnet deploy rollback dep-456 -r "Configuration error"
-```
-Options:
-- `--reason, -r`: Rollback reason (required for audit)
-
-### Deployment History
-View deployment history
-```bash
-catnet deploy history
-catnet deploy history --limit 20
-```
-Options:
-- `--limit, -l`: Number of deployments to display (default: 10)
-
-## Device Commands
-
-### List Devices
-List all managed network devices
-```bash
-catnet device list
-catnet device list --vendor cisco --status online
-```
-Options:
-- `--vendor`: Filter by vendor (cisco|juniper)
-- `--status`: Filter by status (online|offline|maintenance)
-
-### Add Device
-Add a new device to management
-```bash
-catnet device add --hostname router1 --ip 192.168.1.1 --vendor cisco --model ISR4451
-catnet device add -h switch1 -i 10.0.0.1 --vendor juniper -m EX4200
-```
-Options:
-- `--hostname, -h`: Device hostname (required)
-- `--ip, -i`: Device IP address (required)
-- `--vendor`: Device vendor (cisco|juniper) (required)
-- `--model, -m`: Device model (required)
-- `--username, -u`: Device username (stored in Vault)
-
-### Backup Device
-Create backup of device configuration
-```bash
-catnet device backup <device_id>
-catnet device backup dev-router1-prod
-```
-
-### Execute Command
-Execute command on device (with audit logging)
-```bash
-catnet device execute <device_id> --command "show version"
-catnet device execute dev-123 -c "show running-config" --no-confirm
-```
-Options:
-- `--command, -c`: Command to execute (required)
-- `--confirm/--no-confirm`: Confirmation prompt (default: confirm)
-
-### Check Device Health
-Check device health status and metrics
-```bash
-catnet device health <device_id>
-catnet device health dev-switch-core1
-```
-
-## Vault Commands
-
-### Vault Status
-Check HashiCorp Vault connection status
-```bash
-catnet vault status
-```
-
-### Rotate Credentials
-Rotate device credentials stored in Vault
-```bash
-catnet vault rotate <device_id>
-catnet vault rotate dev-router1
-```
-
-## Utility Commands
-
-### Version
-Display CatNet version information
-```bash
-catnet version
-```
-
-### System Status
-Check overall system and service status
-```bash
-catnet status
-```
-
-## Environment Variables
-
-Configuration via environment variables:
-```bash
-export CATNET_API_URL=http://localhost:8080
-export CATNET_AUTH_URL=http://localhost:8081
-export CATNET_GITOPS_URL=http://localhost:8082
-export CATNET_DEPLOY_URL=http://localhost:8083
-export CATNET_DEVICE_URL=http://localhost:8084
-export CATNET_VAULT_URL=http://localhost:8200
-export CATNET_DEBUG=1
-```
-
-## Configuration File
-
-Create `.catnet.yml` configuration file:
+### Platform Characteristics Table
 ```yaml
-api:
-  auth_url: http://localhost:8081
-  gitops_url: http://localhost:8082
-  deploy_url: http://localhost:8083
-  device_url: http://localhost:8084
+IOS_Classic:
+  execution_model: immediate
+  configuration_storage: NVRAM
+  process_model: monolithic
+  api_support: limited (SSH/Telnet only)
+  rollback: manual_archive
+  python_support: none
+  config_modes: [user_exec, privileged_exec, global_config, interface_config]
 
-vault:
-  url: http://localhost:8200
-  namespace: catnet
+IOS_XE:
+  execution_model: immediate
+  configuration_storage: NVRAM
+  process_model: modular_linux
+  api_support: [RESTCONF, NETCONF, gNMI]
+  rollback: configuration_replace
+  python_support: guest_shell
+  config_modes: [user_exec, privileged_exec, global_config, interface_config]
+  
+NX_OS:
+  execution_model: immediate
+  configuration_storage: startup-config
+  process_model: modular_linux
+  api_support: [NX-API, RESTCONF, NETCONF, gNMI]
+  rollback: checkpoint_based
+  python_support: native_interpreter
+  config_modes: [exec, config, interface_config]
+  unique_features: [VDC, feature_activation, python_onbox]
 
-defaults:
-  deployment_strategy: canary
-  backup_before_deploy: true
-  require_approval: true
+IOS_XR:
+  execution_model: commit_required
+  configuration_storage: commit_database
+  process_model: distributed_linux
+  api_support: [gRPC, NETCONF, RESTCONF]
+  rollback: numbered_commits
+  python_support: third_party_containers
+  config_modes: [exec, config, commit]
+  unique_features: [admin_plane, distributed_architecture]
 
-logging:
-  level: INFO
-  format: json
+JunOS:
+  execution_model: commit_required
+  configuration_storage: candidate_active
+  process_model: freebsd_modular
+  api_support: [NETCONF, REST, gNMI]
+  rollback: automatic_50_versions
+  python_support: PyEZ_offbox
+  config_modes: [operational, configuration]
+  unique_features: [configuration_groups, rescue_config, commit_scripts]
 ```
 
-## Examples
+## Command Structure Patterns
 
-### Complete Deployment Workflow
-```bash
-# 1. Login
-catnet auth login
+### Configuration Command Templates
 
-# 2. Connect Git repository
-catnet gitops connect --url https://github.com/org/configs
-
-# 3. Add devices
-catnet device add --hostname router1 --ip 192.168.1.1 --vendor cisco --model ISR4451
-catnet device add --hostname router2 --ip 192.168.1.2 --vendor cisco --model ISR4451
-
-# 4. Create deployment
-catnet deploy create --config-file configs/update.yml --target router1 --target router2
-
-# 5. Check status
-catnet deploy status dep-123
-
-# 6. Approve deployment
-catnet deploy approve dep-123 --comment "Reviewed and approved"
-
-# 7. Monitor deployment
-catnet deploy status dep-123
-
-# 8. Rollback if needed
-catnet deploy rollback dep-123 --reason "Unexpected behavior"
+#### Interface Configuration
+```python
+# Template for interface configuration across platforms
+interface_config = {
+    "ios": {
+        "enter_interface": "interface {interface_type}{interface_number}",
+        "set_ip": "ip address {ip_address} {subnet_mask}",
+        "set_description": "description {description}",
+        "enable": "no shutdown",
+        "disable": "shutdown",
+        "exit": "exit"
+    },
+    "ios_xe": {
+        # Identical to IOS
+        "enter_interface": "interface {interface_type}{interface_number}",
+        "set_ip": "ip address {ip_address} {subnet_mask}",
+        "set_description": "description {description}",
+        "enable": "no shutdown",
+        "disable": "shutdown",
+        "exit": "exit"
+    },
+    "nx_os": {
+        "enter_interface": "interface ethernet{slot}/{port}",
+        "set_ip": "ip address {ip_address}/{prefix_length}",
+        "set_description": "description {description}",
+        "enable": "no shutdown",
+        "disable": "shutdown",
+        "exit": "exit"
+    },
+    "ios_xr": {
+        "enter_interface": "interface GigabitEthernet{rack}/{slot}/{instance}/{port}",
+        "set_ip": "ipv4 address {ip_address} {subnet_mask}",
+        "set_description": "description {description}",
+        "enable": "no shutdown",
+        "disable": "shutdown",
+        "exit": "exit",
+        "commit": "commit"
+    },
+    "junos": {
+        "set_interface": "set interfaces {interface_type}-{fpc}/{pic}/{port}",
+        "set_unit": "set interfaces {interface_type}-{fpc}/{pic}/{port} unit {unit}",
+        "set_ip": "set interfaces {interface_type}-{fpc}/{pic}/{port} unit {unit} family inet address {ip_address}/{prefix_length}",
+        "set_description": "set interfaces {interface_type}-{fpc}/{pic}/{port} description \"{description}\"",
+        "enable": "delete interfaces {interface_type}-{fpc}/{pic}/{port} disable",
+        "disable": "set interfaces {interface_type}-{fpc}/{pic}/{port} disable",
+        "commit": "commit"
+    }
+}
 ```
 
-### Automated GitOps Workflow
-```bash
-# Setup webhook-triggered deployments
-catnet gitops connect --url git@github.com:org/network-configs.git \
-  --branch main \
-  --webhook-secret $(openssl rand -hex 32)
-
-# Repository will auto-deploy on push after validation
+#### BGP Configuration
+```python
+bgp_config = {
+    "ios": {
+        "enter_bgp": "router bgp {as_number}",
+        "set_router_id": "bgp router-id {router_id}",
+        "add_neighbor": "neighbor {neighbor_ip} remote-as {remote_as}",
+        "activate_neighbor": "neighbor {neighbor_ip} activate",
+        "advertise_network": "network {network} mask {mask}",
+        "exit": "exit"
+    },
+    "nx_os": {
+        "enable_feature": "feature bgp",
+        "enter_bgp": "router bgp {as_number}",
+        "set_router_id": "router-id {router_id}",
+        "add_neighbor": "neighbor {neighbor_ip} remote-as {remote_as}",
+        "activate_neighbor": "address-family ipv4 unicast",
+        "advertise_network": "network {network}/{prefix_length}",
+        "exit": "exit"
+    },
+    "ios_xr": {
+        "enter_bgp": "router bgp {as_number}",
+        "set_router_id": "bgp router-id {router_id}",
+        "enter_neighbor": "neighbor {neighbor_ip}",
+        "set_remote_as": "remote-as {remote_as}",
+        "enter_afi": "address-family ipv4 unicast",
+        "advertise_network": "network {network}/{prefix_length}",
+        "exit": "exit",
+        "commit": "commit"
+    },
+    "junos": {
+        "set_as": "set routing-options autonomous-system {as_number}",
+        "set_router_id": "set routing-options router-id {router_id}",
+        "create_group": "set protocols bgp group {group_name} type {external|internal}",
+        "add_neighbor": "set protocols bgp group {group_name} neighbor {neighbor_ip} peer-as {remote_as}",
+        "set_export": "set protocols bgp group {group_name} export {policy_name}",
+        "commit": "commit"
+    }
+}
 ```
 
-### Bulk Device Operations
-```bash
-# Backup all Cisco devices
-for device in $(catnet device list --vendor cisco --status online | grep -o 'dev-[^ ]*'); do
-  catnet device backup $device
-done
+### Show Command Mappings
+```python
+show_commands = {
+    "interfaces": {
+        "ios": "show ip interface brief",
+        "ios_xe": "show ip interface brief", 
+        "nx_os": "show interface brief",
+        "ios_xr": "show ipv4 interface brief",
+        "junos": "show interfaces terse"
+    },
+    "routing_table": {
+        "ios": "show ip route",
+        "ios_xe": "show ip route",
+        "nx_os": "show ip route",
+        "ios_xr": "show route",
+        "junos": "show route"
+    },
+    "bgp_neighbors": {
+        "ios": "show ip bgp neighbors",
+        "ios_xe": "show ip bgp neighbors",
+        "nx_os": "show ip bgp neighbors",
+        "ios_xr": "show bgp neighbors",
+        "junos": "show bgp neighbor"
+    },
+    "running_config": {
+        "ios": "show running-config",
+        "ios_xe": "show running-config",
+        "nx_os": "show running-config",
+        "ios_xr": "show running-config",
+        "junos": "show configuration"
+    },
+    "version": {
+        "ios": "show version",
+        "ios_xe": "show version",
+        "nx_os": "show version",
+        "ios_xr": "show version",
+        "junos": "show version"
+    }
+}
 
-# Health check all devices
-catnet device list | while read device; do
-  catnet device health $device
-done
+## Python Automation Examples
+
+### Multi-Platform Configuration Function
+```python
+from netmiko import ConnectHandler
+from jnpr.junos import Device
+import requests
+import json
+
+class MultiVendorNetwork:
+    """
+    Multi-vendor network automation class supporting all major platforms.
+    Usage: 
+        net = MultiVendorNetwork(platform='ios_xe', host='192.168.1.1')
+        net.connect(username='admin', password='password')
+        net.configure_interface('GigabitEthernet0/0', '10.1.1.1', '255.255.255.0')
+    """
+    
+    def __init__(self, platform, host):
+        self.platform = platform
+        self.host = host
+        self.connection = None
+        
+    def connect(self, username, password):
+        """Establish connection based on platform type"""
+        if self.platform in ['ios', 'ios_xe', 'nx_os', 'ios_xr']:
+            device_map = {
+                'ios': 'cisco_ios',
+                'ios_xe': 'cisco_xe',
+                'nx_os': 'cisco_nxos',
+                'ios_xr': 'cisco_xr'
+            }
+            self.connection = ConnectHandler(
+                device_type=device_map[self.platform],
+                host=self.host,
+                username=username,
+                password=password
+            )
+        elif self.platform == 'junos':
+            self.connection = Device(
+                host=self.host,
+                user=username,
+                password=password
+            )
+            self.connection.open()
+            
+    def configure_interface(self, interface, ip_address, subnet_mask=None, prefix_length=None):
+        """Configure interface IP address across platforms"""
+        commands = []
+        
+        if self.platform in ['ios', 'ios_xe']:
+            commands = [
+                f"interface {interface}",
+                f"ip address {ip_address} {subnet_mask}",
+                "no shutdown"
+            ]
+        elif self.platform == 'nx_os':
+            prefix = prefix_length or self._mask_to_prefix(subnet_mask)
+            commands = [
+                f"interface {interface}",
+                f"ip address {ip_address}/{prefix}",
+                "no shutdown"
+            ]
+        elif self.platform == 'ios_xr':
+            commands = [
+                f"interface {interface}",
+                f"ipv4 address {ip_address} {subnet_mask}",
+                "no shutdown",
+                "commit"
+            ]
+        elif self.platform == 'junos':
+            prefix = prefix_length or self._mask_to_prefix(subnet_mask)
+            commands = [
+                f"set interfaces {interface} unit 0 family inet address {ip_address}/{prefix}",
+                "commit"
+            ]
+            
+        return self._send_commands(commands)
+    
+    def _send_commands(self, commands):
+        """Send commands to device based on platform"""
+        if self.platform in ['ios', 'ios_xe', 'nx_os']:
+            return self.connection.send_config_set(commands)
+        elif self.platform == 'ios_xr':
+            return self.connection.send_config_set(commands)
+        elif self.platform == 'junos':
+            self.connection.cu.load(commands, format='set')
+            self.connection.cu.commit()
+            
+    def _mask_to_prefix(self, mask):
+        """Convert subnet mask to prefix length"""
+        return sum(bin(int(x)).count('1') for x in mask.split('.'))
 ```
 
-### Security Operations
-```bash
-# Rotate all device credentials
-catnet device list | while read device_id; do
-  catnet vault rotate $device_id
-  echo "Rotated credentials for $device_id"
-done
+### NX-OS Native Python Example
+```python
+# This runs directly on NX-OS devices
+#!/usr/bin/env python
 
-# Audit command execution
-catnet device execute dev-router1 --command "show users" --no-confirm
+from cli import cli, clid
+import json
+
+def get_interface_stats():
+    """Get interface statistics on NX-OS using native Python"""
+    # Execute command and get JSON output
+    result = clid('show interface')
+    
+    # Parse interface data
+    interfaces = result['TABLE_interface']['ROW_interface']
+    
+    # Extract key metrics
+    stats = []
+    for intf in interfaces:
+        stats.append({
+            'interface': intf['interface'],
+            'state': intf['state'],
+            'admin_state': intf['admin_state'],
+            'rx_packets': intf.get('eth_inpkts', 0),
+            'tx_packets': intf.get('eth_outpkts', 0)
+        })
+    
+    return stats
+
+# Execute on NX-OS
+if __name__ == "__main__":
+    stats = get_interface_stats()
+    print(json.dumps(stats, indent=2))
 ```
 
-## Error Codes
+### RESTCONF Example for IOS XE
+```python
+import requests
+import json
+from requests.auth import HTTPBasicAuth
 
-- `0`: Success
-- `1`: General error
-- `2`: Authentication error
-- `3`: Authorization error
-- `4`: Validation error
-- `5`: Deployment error
-- `6`: Network device error
-- `7`: Vault/secrets error
-- `8`: GitOps sync error
-
-## Security Notes
-
-1. **Authentication**: All commands except `version` and `help` require authentication
-2. **MFA**: Multi-factor authentication is enforced for production environments
-3. **Audit Logging**: All operations are logged with user, timestamp, and action details
-4. **Secrets Management**: No credentials are stored locally; all secrets in HashiCorp Vault
-5. **Encryption**: All device communications use SSH/TLS with certificate validation
-6. **RBAC**: Role-based access control enforces permissions per user/group
-
-## Troubleshooting
-
-### Authentication Issues
-```bash
-# Clear cached credentials
-rm -rf ~/.catnet/tokens.json
-
-# Re-authenticate
-catnet auth login --debug
-
-# Check token validity
-catnet auth refresh
+class IOSXE_RESTCONF:
+    """IOS XE RESTCONF automation class"""
+    
+    def __init__(self, host, username, password, port=443):
+        self.base_url = f"https://{host}:{port}/restconf"
+        self.auth = HTTPBasicAuth(username, password)
+        self.headers = {
+            "Accept": "application/yang-data+json",
+            "Content-Type": "application/yang-data+json"
+        }
+        
+    def get_interfaces(self):
+        """Get all interfaces via RESTCONF"""
+        url = f"{self.base_url}/data/ietf-interfaces:interfaces"
+        response = requests.get(url, auth=self.auth, headers=self.headers, verify=False)
+        return response.json()
+        
+    def configure_interface(self, interface_name, ip_address, subnet_mask):
+        """Configure interface via RESTCONF"""
+        url = f"{self.base_url}/data/ietf-interfaces:interfaces/interface={interface_name}"
+        
+        payload = {
+            "ietf-interfaces:interface": {
+                "name": interface_name,
+                "type": "iana-if-type:ethernetCsmacd",
+                "enabled": True,
+                "ietf-ip:ipv4": {
+                    "address": [{
+                        "ip": ip_address,
+                        "netmask": subnet_mask
+                    }]
+                }
+            }
+        }
+        
+        response = requests.patch(url, 
+                                 auth=self.auth, 
+                                 headers=self.headers, 
+                                 data=json.dumps(payload), 
+                                 verify=False)
+        return response.status_code
 ```
 
-### Connection Issues
-```bash
-# Test service connectivity
-catnet status
+### JunOS PyEZ Example
+```python
+from jnpr.junos import Device
+from jnpr.junos.utils.config import Config
+from jnpr.junos.exception import ConfigLoadError, CommitError
 
-# Enable debug logging
-export CATNET_DEBUG=1
-catnet device list
-
-# Check network connectivity
-curl -v http://localhost:8081/health
+class JunosAutomation:
+    """Juniper JunOS automation using PyEZ"""
+    
+    def __init__(self, host, username, password):
+        self.device = Device(host=host, user=username, password=password)
+        
+    def connect(self):
+        """Open connection to device"""
+        self.device.open()
+        self.config = Config(self.device)
+        
+    def configure_bgp(self, local_as, neighbor_ip, remote_as):
+        """Configure BGP using PyEZ"""
+        config_template = f"""
+        routing-options {{
+            autonomous-system {local_as};
+        }}
+        protocols {{
+            bgp {{
+                group external {{
+                    type external;
+                    neighbor {neighbor_ip} {{
+                        peer-as {remote_as};
+                    }}
+                }}
+            }}
+        }}
+        """
+        
+        try:
+            self.config.load(config_template, format='text')
+            self.config.pdiff()  # Show pending diff
+            self.config.commit(comment="BGP configured via PyEZ")
+            return True
+        except (ConfigLoadError, CommitError) as e:
+            print(f"Configuration error: {e}")
+            self.config.rollback()
+            return False
+            
+    def close(self):
+        """Close device connection"""
+        self.device.close()
 ```
 
-### Deployment Failures
-```bash
-# Get detailed deployment logs
-catnet deploy status <deployment_id> --verbose
+## Rollback and Recovery Commands
 
-# Check device health before deployment
-catnet device health <device_id>
+### Rollback Implementation by Platform
+```python
+rollback_commands = {
+    "ios": {
+        "setup_archive": [
+            "archive",
+            "path flash:config-archive",
+            "maximum 10",
+            "write-memory"
+        ],
+        "save_config": "write memory",
+        "rollback": "configure replace flash:config-archive-{number} force",
+        "compare": "show archive config differences {file1} {file2}"
+    },
+    "nx_os": {
+        "create_checkpoint": "checkpoint {checkpoint_name} description {description}",
+        "list_checkpoints": "show checkpoint summary",
+        "rollback": "rollback running-config checkpoint {checkpoint_name} atomic",
+        "rollback_verbose": "rollback running-config checkpoint {checkpoint_name} verbose",
+        "delete_checkpoint": "clear checkpoint database {checkpoint_name}",
+        "compare": "show diff rollback-patch checkpoint {checkpoint_name} running-config"
+    },
+    "ios_xr": {
+        "show_commits": "show configuration commit list",
+        "rollback_to_commit": "rollback configuration to {commit_id}",
+        "rollback_last_n": "rollback configuration last {number}",
+        "clear_uncommitted": "clear configuration inconsistency",
+        "commit_options": {
+            "basic": "commit",
+            "with_comment": "commit comment {comment}",
+            "confirmed": "commit confirmed {minutes}",
+            "best_effort": "commit best-effort"
+        },
+        "compare": "show configuration commit changes {commit_id}"
+    },
+    "junos": {
+        "show_commits": "show system commit",
+        "rollback": "rollback {number}",
+        "rollback_rescue": "rollback rescue",
+        "save_rescue": "request system configuration rescue save",
+        "compare": "show | compare rollback {number}",
+        "commit_options": {
+            "basic": "commit",
+            "check_only": "commit check",
+            "confirmed": "commit confirmed {minutes}",
+            "at_time": "commit at {time}",
+            "with_comment": "commit comment \"{comment}\"",
+            "synchronize": "commit synchronize"
+        }
+    }
+}
 
-# Verify configuration syntax
-catnet deploy create --config-file config.yml --dry-run
+## API and Automation Interfaces
+
+### Connection Methods by Platform
+```python
+# Connection templates for network automation
+connection_configs = {
+    "ios": {
+        "netmiko": {
+            "device_type": "cisco_ios",
+            "host": "{ip_address}",
+            "username": "{username}",
+            "password": "{password}",
+            "port": 22
+        },
+        "napalm": {
+            "driver": "ios",
+            "hostname": "{ip_address}",
+            "username": "{username}",
+            "password": "{password}"
+        },
+        "ansible": {
+            "ansible_network_os": "ios",
+            "ansible_connection": "network_cli"
+        }
+    },
+    "ios_xe": {
+        "netmiko": {
+            "device_type": "cisco_xe",
+            "host": "{ip_address}",
+            "username": "{username}",
+            "password": "{password}",
+            "port": 22
+        },
+        "restconf": {
+            "url": "https://{ip_address}:{port}/restconf",
+            "headers": {"Accept": "application/yang-data+json"},
+            "auth": "({username}, {password})"
+        },
+        "netconf": {
+            "host": "{ip_address}",
+            "port": 830,
+            "username": "{username}",
+            "password": "{password}",
+            "device_params": {"name": "iosxe"}
+        }
+    },
+    "nx_os": {
+        "netmiko": {
+            "device_type": "cisco_nxos",
+            "host": "{ip_address}",
+            "username": "{username}",
+            "password": "{password}",
+            "port": 22
+        },
+        "nxapi": {
+            "url": "https://{ip_address}/ins",
+            "headers": {"content-type": "application/json"},
+            "payload": {
+                "ins_api": {
+                    "version": "1.0",
+                    "type": "cli_show",
+                    "chunk": "0",
+                    "sid": "1",
+                    "input": "{command}",
+                    "output_format": "json"
+                }
+            }
+        },
+        "python_onbox": {
+            "import": "from cli import cli",
+            "execute": "cli('{command}')"
+        }
+    },
+    "ios_xr": {
+        "netmiko": {
+            "device_type": "cisco_xr",
+            "host": "{ip_address}",
+            "username": "{username}",
+            "password": "{password}",
+            "port": 22
+        },
+        "grpc": {
+            "target": "{ip_address}:57400",
+            "credentials": "ssl_channel_credentials()",
+            "metadata": [("username", "{username}"), ("password", "{password}")]
+        },
+        "netconf": {
+            "host": "{ip_address}",
+            "port": 830,
+            "username": "{username}",
+            "password": "{password}",
+            "device_params": {"name": "iosxr"}
+        }
+    },
+    "junos": {
+        "netmiko": {
+            "device_type": "juniper_junos",
+            "host": "{ip_address}",
+            "username": "{username}",
+            "password": "{password}",
+            "port": 22
+        },
+        "pyez": {
+            "host": "{ip_address}",
+            "user": "{username}",
+            "password": "{password}",
+            "port": 22,
+            "gather_facts": False
+        },
+        "netconf": {
+            "host": "{ip_address}",
+            "port": 830,
+            "username": "{username}",
+            "password": "{password}",
+            "device_params": {"name": "junos"}
+        }
+    }
+}
 ```
 
-## Support
+### YANG Model Paths
+```python
+yang_paths = {
+    "interfaces": {
+        "ios_xe": "Cisco-IOS-XE-interfaces-oper:interfaces",
+        "nx_os": "Cisco-NX-OS-device:System/intf-items",
+        "ios_xr": "Cisco-IOS-XR-ifmgr-cfg:interface-configurations",
+        "junos": "junos-conf-interfaces:configuration/interfaces"
+    },
+    "bgp": {
+        "ios_xe": "Cisco-IOS-XE-bgp-oper:bgp-state-data",
+        "nx_os": "Cisco-NX-OS-device:System/bgp-items",
+        "ios_xr": "Cisco-IOS-XR-ipv4-bgp-cfg:bgp",
+        "junos": "junos-conf-protocols:configuration/protocols/bgp"
+    },
+    "routing": {
+        "ios_xe": "Cisco-IOS-XE-native:native/ip/route",
+        "nx_os": "Cisco-NX-OS-device:System/ipv4-items",
+        "ios_xr": "Cisco-IOS-XR-ip-static-cfg:router-static",
+        "junos": "junos-conf-routing-options:configuration/routing-options"
+    }
+}
 
-- Documentation: https://docs.catnet.io
-- Issues: https://github.com/catnet/catnet/issues
-- Security: security@catnet.io (GPG key: 0xABCDEF123456789)
+## Common Configuration Tasks
+
+### VLAN Configuration
+```python
+vlan_config = {
+    "ios": [
+        "vlan {vlan_id}",
+        "name {vlan_name}",
+        "exit",
+        "interface {interface}",
+        "switchport mode access",
+        "switchport access vlan {vlan_id}"
+    ],
+    "nx_os": [
+        "vlan {vlan_id}",
+        "name {vlan_name}",
+        "exit",
+        "interface {interface}",
+        "switchport mode access",
+        "switchport access vlan {vlan_id}"
+    ],
+    "junos": [
+        "set vlans {vlan_name} vlan-id {vlan_id}",
+        "set interfaces {interface} unit 0 family ethernet-switching vlan members {vlan_name}",
+        "commit"
+    ]
+}
+```
+
+### Static Route Configuration
+```python
+static_route_config = {
+    "ios": "ip route {network} {mask} {next_hop}",
+    "ios_xe": "ip route {network} {mask} {next_hop}",
+    "nx_os": "ip route {network}/{prefix_length} {next_hop}",
+    "ios_xr": [
+        "router static",
+        "address-family ipv4 unicast",
+        "{network}/{prefix_length} {next_hop}",
+        "exit",
+        "exit",
+        "commit"
+    ],
+    "junos": [
+        "set routing-options static route {network}/{prefix_length} next-hop {next_hop}",
+        "commit"
+    ]
+}
+```
+
+### ACL Configuration
+```python
+acl_config = {
+    "ios": {
+        "create_acl": [
+            "ip access-list extended {acl_name}",
+            "{permit|deny} {protocol} {source} {source_wildcard} {dest} {dest_wildcard} eq {port}",
+            "exit"
+        ],
+        "apply_acl": [
+            "interface {interface}",
+            "ip access-group {acl_name} {in|out}"
+        ]
+    },
+    "nx_os": {
+        "create_acl": [
+            "ip access-list {acl_name}",
+            "{permit|deny} {protocol} {source}/{prefix} {dest}/{prefix} eq {port}",
+            "exit"
+        ],
+        "apply_acl": [
+            "interface {interface}",
+            "ip access-group {acl_name} {in|out}"
+        ]
+    },
+    "ios_xr": {
+        "create_acl": [
+            "ipv4 access-list {acl_name}",
+            "{permit|deny} {protocol} {source} {source_wildcard} {dest} {dest_wildcard} eq {port}",
+            "exit",
+            "commit"
+        ],
+        "apply_acl": [
+            "interface {interface}",
+            "ipv4 access-group {acl_name} {ingress|egress}",
+            "exit",
+            "commit"
+        ]
+    },
+    "junos": {
+        "create_filter": [
+            "set firewall family inet filter {filter_name} term {term_name} from source-address {source}",
+            "set firewall family inet filter {filter_name} term {term_name} from destination-address {dest}",
+            "set firewall family inet filter {filter_name} term {term_name} from protocol {protocol}",
+            "set firewall family inet filter {filter_name} term {term_name} from destination-port {port}",
+            "set firewall family inet filter {filter_name} term {term_name} then {accept|discard}"
+        ],
+        "apply_filter": [
+            "set interfaces {interface} unit {unit} family inet filter {input|output} {filter_name}",
+            "commit"
+        ]
+    }
+}
+
+## Platform-Specific Features
+
+### NX-OS Virtual Device Contexts (VDC)
+```python
+vdc_commands = {
+    "create_vdc": [
+        "vdc {vdc_name}",
+        "allocate interface ethernet{slot}/{port-range}",
+        "limit-resource module-type {module_type}",
+        "exit"
+    ],
+    "switch_vdc": "switchto vdc {vdc_name}",
+    "show_vdc": "show vdc",
+    "delete_vdc": "no vdc {vdc_name}"
+}
+```
+
+### JunOS Configuration Groups
+```python
+junos_groups = {
+    "create_group": [
+        "set groups {group_name} interfaces <*> mtu 9000",
+        "set groups {group_name} interfaces <*> description \"Managed by automation\"",
+        "set groups {group_name} system services ssh root-login deny"
+    ],
+    "apply_group": "set apply-groups {group_name}",
+    "apply_group_except": "set apply-groups-except {group_name}",
+    "show_inheritance": "show configuration | display inheritance",
+    "show_groups": "show configuration groups"
+}
+```
+
+### IOS XR Admin Plane (Legacy)
+```python
+ios_xr_admin = {
+    "enter_admin": "admin",
+    "show_platform": "show platform",
+    "show_environment": "show environment",
+    "exit_admin": "exit"
+}
+```
+
+## Error Handling and Validation
+
+### Platform-Specific Error Patterns
+```python
+error_patterns = {
+    "ios": {
+        "invalid_command": r"% Invalid input detected",
+        "incomplete_command": r"% Incomplete command",
+        "ambiguous_command": r"% Ambiguous command",
+        "config_error": r"% Error",
+        "interface_not_found": r"% Invalid interface"
+    },
+    "nx_os": {
+        "invalid_command": r"% Invalid command",
+        "incomplete_command": r"% Incomplete command",
+        "syntax_error": r"Syntax error",
+        "config_error": r"ERROR:",
+        "feature_not_enabled": r"Feature not enabled"
+    },
+    "ios_xr": {
+        "invalid_command": r"% Invalid input detected",
+        "commit_failed": r"% Failed to commit",
+        "syntax_error": r"!!% Syntax error",
+        "config_error": r"!!% Error",
+        "verify_failed": r"% Verification failed"
+    },
+    "junos": {
+        "syntax_error": r"syntax error",
+        "invalid_value": r"invalid value",
+        "commit_error": r"error: configuration check-out failed",
+        "missing_mandatory": r"missing mandatory statement",
+        "statement_not_found": r"statement not found"
+    }
+}
+
+def validate_command_output(platform, output):
+    """Validate command output for errors"""
+    errors = []
+    for error_type, pattern in error_patterns[platform].items():
+        if re.search(pattern, output, re.IGNORECASE):
+            errors.append(error_type)
+    return errors
+```
+
+## Training resources accelerate proficiency
+
+Both Cisco and Juniper offer comprehensive training programs for engineers transitioning between platforms.
+
+**Juniper** provides free training for Cisco-certified professionals through their migration program, including the "Junos as a Second Language" course and certification discounts. Their Day One book series offers practical, scenario-based learning materials.
+
+**Cisco DevNet** offers extensive programmability training with always-on sandbox environments for both NX-OS and IOS XR platforms. The DevNet certification track provides structured learning paths for network automation.
+
+**Virtual lab environments** enable risk-free practice:
+- **Cisco Nexus 9000v** and **CSR 1000v** available through DevNet
+- **Juniper vSRX** and **vMX** for full-featured testing
+- **Containerlab** and **EVE-NG** for multi-vendor topologies
+
+## Strategic platform selection depends on requirements
+
+Each platform excels in specific deployment scenarios:
+
+**Choose IOS XE** for enterprise environments requiring maximum compatibility with existing IOS configurations and operational procedures.
+
+**Deploy NX-OS** in data center environments requiring high availability, process isolation, and extensive Python programmability.
+
+**Select IOS XR** for service provider networks needing massive scale, distributed processing, and sophisticated commit/rollback capabilities.
+
+**Implement JunOS** when configuration safety, hierarchical organization, and mature NETCONF/YANG support are priorities.
+
+The command line interfaces across these platforms reflect fundamental differences in design philosophy, from Cisco's immediate execution model prioritizing simplicity to Juniper's commit-based approach emphasizing safety. While syntax variations present initial learning curves, understanding the architectural motivations behind each platform's CLI design enables network engineers to leverage platform strengths effectively. Success in multi-vendor environments requires embracing each platform's native workflows rather than forcing familiar patterns onto different systems. With proper training, lab practice, and gradual migration strategies, network teams can effectively manage heterogeneous environments while maintaining operational excellence.

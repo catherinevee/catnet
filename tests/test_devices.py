@@ -3,10 +3,8 @@ Comprehensive tests for CatNet Device Management Service
 """
 
 import pytest
-import asyncio
 from datetime import datetime
-from unittest.mock import Mock, AsyncMock, patch, MagicMock
-import uuid
+from unittest.mock import Mock, AsyncMock, patch
 
 from src.devices.device_manager import (
     DeviceManager,
@@ -166,7 +164,10 @@ class TestDeviceManager:
 
         # Mock adapter and connections
         mock_adapter = Mock(spec=DeviceAdapter)
-        mock_adapter.execute_command = AsyncMock(return_value="Command executed")
+        mock_adapter.execute_command = AsyncMock(
+            return_value="Command \
+            executed"
+        )
 
         for device_id in device_ids:
             mock_connection = DeviceConnection(

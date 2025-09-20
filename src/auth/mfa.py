@@ -13,6 +13,7 @@ import secrets
 from typing import Optional, Dict, List, Tuple
 
 
+
 class MFAProvider:
     """
     Provides MFA functionality using TOTP algorithm
@@ -64,7 +65,8 @@ class MFAProvider:
 
         # Generate provisioning URI for QR code
         totp = pyotp.TOTP(
-            secret, issuer_name=self.issuer_name, period=self.period, digits=self.digits
+            secret, issuer_name=self.issuer_name, period=self.period, \
+                digits=self.digits
         )
         provisioning_uri = totp.provisioning_uri(
             name=username, issuer_name=self.issuer_name
@@ -175,7 +177,11 @@ class MFAProvider:
             "remaining_codes": total_codes - used_codes,
         }
 
-    def _generate_backup_codes(self, user_id: str, count: int = 10) -> List[str]:
+        def _generate_backup_codes(
+        self,
+        user_id: str,
+        count: int = 10
+    ) -> List[str]:
         """
         Generate backup codes for account recovery
 
@@ -254,12 +260,14 @@ class MFAProvider:
 _default_provider = None
 
 
+
 def get_mfa_provider() -> MFAProvider:
     """Get default MFA provider instance"""
     global _default_provider
     if _default_provider is None:
         _default_provider = MFAProvider()
     return _default_provider
+
 
 
 def generate_totp_secret() -> str:

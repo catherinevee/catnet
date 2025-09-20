@@ -5,7 +5,7 @@ Supports:
 - Juniper Junos
 """
 
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 import asyncio
 from datetime import datetime
 from jnpr.junos import Device
@@ -23,8 +23,8 @@ from ..device_manager import (
     DeviceCredentials,
     DeviceConnection,
     ConnectionProtocol,
-    DeviceVendor,
 )
+
 
 
 class JuniperAdapter(DeviceAdapter):
@@ -127,7 +127,11 @@ class JuniperAdapter(DeviceAdapter):
         except Exception:
             return False
 
-    async def execute_command(self, connection: DeviceConnection, command: str) -> str:
+        async def execute_command(
+        self,
+        connection: DeviceConnection,
+        command: str
+    ) -> str:
         """
         Execute command on Juniper device
 
@@ -221,7 +225,12 @@ class JuniperAdapter(DeviceAdapter):
 
             try:
                 # Load configuration
-                await loop.run_in_executor(None, cu.load, configuration, format="text")
+                                await loop.run_in_executor(
+                    None,
+                    cu.load,
+                    configuration,
+                    format="text"
+                )
 
                 # Check for differences
                 diff = await loop.run_in_executor(None, cu.diff)
@@ -251,8 +260,11 @@ class JuniperAdapter(DeviceAdapter):
             # Rollback on commit error
             try:
                 loop = asyncio.get_event_loop()
-                await loop.run_in_executor(None, connection.session_data.cu.rollback)
-            except:
+                                await loop.run_in_executor(
+                    None,
+                    connection.session_data.cu.rollback
+                )
+            except Exception:
                 pass
             raise Exception(f"Configuration commit failed: {str(e)}")
         except Exception as e:
@@ -308,7 +320,12 @@ class JuniperAdapter(DeviceAdapter):
 
             try:
                 # Load configuration
-                await loop.run_in_executor(None, cu.load, configuration, format="text")
+                                await loop.run_in_executor(
+                    None,
+                    cu.load,
+                    configuration,
+                    format="text"
+                )
 
                 # Commit check
                 result = await loop.run_in_executor(None, cu.commit_check)

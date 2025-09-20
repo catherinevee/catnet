@@ -11,10 +11,15 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     """Add security headers to all responses."""
 
-    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+        async def dispatch(
+        self,
+        request: Request,
+        call_next: Callable
+    ) -> Response:
         # Generate request ID for tracing
         request_id = str(uuid.uuid4())
 
@@ -40,7 +45,8 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         # Content Security Policy
         csp = (
             "default-src 'self'; "
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; "
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' \
+                https://cdn.jsdelivr.net; "
             "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
             "img-src 'self' data: https:; "
             "font-src 'self' data: https://cdn.jsdelivr.net; "
@@ -58,6 +64,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         return response
 
 
+
 class RateLimitMiddleware(BaseHTTPMiddleware):
     """Rate limiting middleware."""
 
@@ -67,7 +74,11 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self.period = period
         self.clients = {}
 
-    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+        async def dispatch(
+        self,
+        request: Request,
+        call_next: Callable
+    ) -> Response:
         # Get client identifier (IP address)
         client_ip = request.client.host
 
@@ -108,9 +119,11 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         remaining = self.calls - len(self.clients[client_ip])
         response.headers["X-RateLimit-Limit"] = str(self.calls)
         response.headers["X-RateLimit-Remaining"] = str(remaining)
-        response.headers["X-RateLimit-Reset"] = str(int(current_time + self.period))
+        response.headers["X-RateLimit-Reset"] = str(int(current_time + \
+            self.period))
 
         return response
+
 
 
 class CORSMiddleware(BaseHTTPMiddleware):
@@ -120,7 +133,11 @@ class CORSMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
         self.allowed_origins = allowed_origins or ["https://localhost:3000"]
 
-    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+        async def dispatch(
+        self,
+        request: Request,
+        call_next: Callable
+    ) -> Response:
         # Handle preflight requests
         if request.method == "OPTIONS":
             response = Response(status_code=200)
@@ -145,10 +162,15 @@ class CORSMiddleware(BaseHTTPMiddleware):
         return response
 
 
+
 class AuditLoggingMiddleware(BaseHTTPMiddleware):
     """Log all API requests for audit purposes."""
 
-    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+        async def dispatch(
+        self,
+        request: Request,
+        call_next: Callable
+    ) -> Response:
         # Start timer
         start_time = time.time()
 
@@ -200,6 +222,7 @@ class AuditLoggingMiddleware(BaseHTTPMiddleware):
 
             # Re-raise exception
             raise
+
 
 
 def setup_middleware(app):

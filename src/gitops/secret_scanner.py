@@ -16,6 +16,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 
+
 class SecretType(Enum):
     """Types of secrets"""
 
@@ -32,6 +33,7 @@ class SecretType(Enum):
 
 
 @dataclass
+
 class SecretMatch:
     """Represents a detected secret"""
 
@@ -47,6 +49,7 @@ class SecretMatch:
 
 
 @dataclass
+
 class SecretScanResult:
     """Result of secret scanning"""
 
@@ -56,6 +59,7 @@ class SecretScanResult:
     secrets: List[SecretMatch] = field(default_factory=list)
     scan_time: float = 0.0
     metadata: Dict[str, Any] = field(default_factory=dict)
+
 
 
 class SecretScanner:
@@ -69,28 +73,36 @@ class SecretScanner:
         self.patterns = {
             # Passwords
             "password_literal": {
-                "pattern": r"(?i)(password|passwd|pwd)\s*[:=]\s*['\"]?([^'\"}\s]{4,})['\"]?",
+                "pattern": r"(?i)(password|passwd|pwd)\s*[:=]\s*['\"]?( \
+                    [^'\"}\s]{
+    4,})['\"]?",
                 "type": SecretType.PASSWORD,
                 "confidence": 0.9,
             },
             "cisco_password": {
-                "pattern": r"(?i)(enable\s+password|username\s+\S+\s+password)\s+(?:0\s+)?(\S+)",
+                "pattern": r"(?i)(enable\s+password|username\s+\S+\s+password) \
+    \s+(?:0\s+)?(\S+)",
                 "type": SecretType.PASSWORD,
                 "confidence": 0.95,
             },
             # API Keys
             "api_key_generic": {
-                "pattern": r"(?i)(api[_-]?key|apikey)\s*[:=]\s*['\"]?([a-zA-Z0-9]{32,})['\"]?",
+                "pattern": r"(?i)(api[_-]?key|apikey)\s*[:=]\s*['\"]?( \
+                    [a-zA-Z0-9]
+    {32,})['\"]?",
                 "type": SecretType.API_KEY,
                 "confidence": 0.85,
             },
             "aws_access_key": {
-                "pattern": r"(?i)(aws[_-]?access[_-]?key[_-]?id|AKIA[0-9A-Z]{16})",
+                                "pattern": r"(
+                    ?i)(aws[_-]?access[_-]?key[_-]?id|AKIA[0-9A-Z]{16}
+                )",
                 "type": SecretType.AWS_CREDENTIALS,
                 "confidence": 0.95,
             },
             "aws_secret_key": {
-                "pattern": r"(?i)(aws[_-]?secret[_-]?access[_-]?key)\s*[:=]\s*['\"]?([a-zA-Z0-9/+=]{40})['\"]?",
+                "pattern": r"(?i)(aws[_-]?secret[_-]?access[_-]?key)\s*[:=]\s*[ 
+    '\"]?([a-zA-Z0-9/+=]{40})['\"]?",
                 "type": SecretType.AWS_CREDENTIALS,
                 "confidence": 0.95,
             },
@@ -101,35 +113,43 @@ class SecretScanner:
                 "confidence": 0.8,
             },
             "github_token": {
-                "pattern": r"ghp_[a-zA-Z0-9]{36}|github[_-]?token\s*[:=]\s*['\"]?([a-zA-Z0-9]{40})['\"]?",
+                "pattern": r"ghp_[a-zA-Z0-9]{36}|github[_-]?token\s*[:=]\s*['\"] \
+    ?([a-zA-Z0-9]{40})['\"]?",
                 "type": SecretType.TOKEN,
                 "confidence": 0.95,
             },
             # Private Keys
             "private_key_header": {
-                "pattern": r"-----BEGIN\s+(RSA|DSA|EC|OPENSSH)?\s*PRIVATE KEY-----",
+                                "pattern": r"-----BEGIN\s+(
+                    RSA|DSA|EC|OPENSSH
+                )?\s*PRIVATE KEY-----",
                 "type": SecretType.PRIVATE_KEY,
                 "confidence": 1.0,
             },
             "ssh_private_key": {
-                "pattern": r"-----BEGIN OPENSSH PRIVATE KEY-----[\s\S]+?-----END OPENSSH PRIVATE KEY-----",
+                "pattern": r"-----BEGIN OPENSSH PRIVATE KEY-----[\s\S]+?-----END \
+    OPENSSH PRIVATE KEY-----",
                 "type": SecretType.SSH_KEY,
                 "confidence": 1.0,
             },
             # Certificates
             "certificate": {
-                "pattern": r"-----BEGIN CERTIFICATE-----[\s\S]+?-----END CERTIFICATE-----",
+                "pattern": r"-----BEGIN CERTIFICATE-----[\s\S]+?-----END \
+    CERTIFICATE-----",
                 "type": SecretType.CERTIFICATE,
                 "confidence": 1.0,
             },
             # Connection Strings
             "connection_string": {
-                "pattern": r"(?i)(mongodb|postgres|postgresql|mysql|redis|amqp|jdbc):\/\/[^:]+:[^@]+@[^\s]+",
+                "pattern": r"(?i)( 
+    mongodb|postgres|postgresql|mysql|redis|amqp|jdbc):\/\/[^:]+:[^@]+@[^\s]+",
                 "type": SecretType.CONNECTION_STRING,
                 "confidence": 0.95,
             },
             "database_url": {
-                "pattern": r"(?i)database[_-]?url\s*[:=]\s*['\"]?([^'\"}\s]+)['\"]?",
+                                "pattern": r"(
+                    ?i)database[_-]?url\s*[:=]\s*['\"]?([^'\"}\s]+
+                )['\"]?",
                 "type": SecretType.DATABASE_URL,
                 "confidence": 0.85,
             },
@@ -141,7 +161,8 @@ class SecretScanner:
             },
             # Generic secrets
             "secret_literal": {
-                "pattern": r"(?i)(secret|private[_-]?key|auth[_-]?token)\s*[:=]\s*['\"]?([^'\"}\s]{8,})['\"]?",
+                "pattern": r"(?i)(secret|private[_-]?key|auth[_-]?token)\s*[:=] \
+    \s*['\"]?([^'\"}\s]{8,})['\"]?",
                 "type": SecretType.GENERIC_SECRET,
                 "confidence": 0.7,
             },
@@ -162,7 +183,8 @@ class SecretScanner:
             r"^<.*>$",  # Placeholders
             r"^(example|test|demo|sample)",  # Example values
             r"^(password|secret|key|token)$",  # Literal words
-            r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",  # UUIDs
+            r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+                # UUIDs
         ]
 
     def scan_file(self, file_path: str, content: str) -> SecretScanResult:
@@ -225,7 +247,10 @@ class SecretScanner:
                         column_start=match.start(),
                         column_end=match.end(),
                         matched_text=matched_text,
-                        redacted_text=self._redact_secret(matched_text, secret_value),
+                                                redacted_text=self._redact_secret(
+                            matched_text,
+                            secret_value
+                        ),
                         confidence=confidence,
                         entropy=entropy,
                         rule_id=rule_id,
@@ -245,14 +270,18 @@ class SecretScanner:
                             token in s.matched_text for s in result.secrets
                         )
 
-                        if not already_detected and not self._is_whitelisted(token):
+                        if not already_detected and not \
+                            self._is_whitelisted(token):
                             secret_match = SecretMatch(
                                 secret_type=SecretType.GENERIC_SECRET,
                                 line_number=line_num,
                                 column_start=line.find(token),
                                 column_end=line.find(token) + len(token),
                                 matched_text=token,
-                                redacted_text=self._redact_secret(token, token),
+                                                                redacted_text=self._redact_secret(
+                                    token,
+                                    token
+                                ),
                                 confidence=0.6,
                                 entropy=entropy,
                                 rule_id="high_entropy",
@@ -349,7 +378,8 @@ class SecretScanner:
         for count in freq.values():
             probability = count / text_len
             if probability > 0:
-                entropy -= probability * (probability and probability * 2.0 or 0.0)
+                entropy -= probability * (probability and probability * 2.0 or \
+                    0.0)
 
         return entropy
 
@@ -406,12 +436,17 @@ class SecretScanner:
         else:
             # Show first 2 and last 2 characters
             redacted = (
-                secret_value[:2] + "*" * (len(secret_value) - 4) + secret_value[-2:]
+                secret_value[:2] + "*" * (len(secret_value) - 4) + \
+                    secret_value[-2:]
             )
 
         return full_text.replace(secret_value, redacted)
 
-    def quarantine_file(self, file_path: str, scan_result: SecretScanResult) -> str:
+        def quarantine_file(
+        self,
+        file_path: str,
+        scan_result: SecretScanResult
+    ) -> str:
         """
         Quarantine file with detected secrets
 
@@ -439,7 +474,9 @@ class SecretScanner:
             "original_file": file_path,
             "quarantine_location": quarantine_file,
             "detected_secrets": len(scan_result.secrets),
-            "secret_types": list(set(s.secret_type.value for s in scan_result.secrets)),
+                        "secret_types": list(
+                set(s.secret_type.value for s in scan_result.secrets)
+            ),
             "high_confidence_count": len(
                 [s for s in scan_result.secrets if s.confidence >= 0.8]
             ),

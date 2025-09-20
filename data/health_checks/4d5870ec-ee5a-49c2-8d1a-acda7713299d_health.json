@@ -1,0 +1,24 @@
+{
+  "status": "healthy",
+  "timestamp": "2025-09-20T03:13:12.384301",
+  "checks": [
+    {
+      "name": "device_responsive",
+      "status": "healthy",
+      "message": "Device is responding to commands",
+      "timestamp": "2025-09-20T03:13:12.384301"
+    },
+    {
+      "name": "interfaces",
+      "status": "healthy",
+      "message": "Interfaces are operational",
+      "timestamp": "2025-09-20T03:13:12.384301"
+    },
+    {
+      "name": "configuration",
+      "status": "healthy",
+      "message": "Configuration is accessible",
+      "timestamp": "2025-09-20T03:13:12.384301"
+    }
+  ]
+}

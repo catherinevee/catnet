@@ -161,6 +161,10 @@ logs/
 # Database
 *.db
 *.sqlite
+data/*.db
+data/*.sqlite
+data/.coverage
+data/coverage.xml
 
 # Temporary files
 tmp/

@@ -20,6 +20,7 @@ logging.basicConfig(
 logger = logging.getLogger("catnet")
 
 
+
 class CatNetOrchestrator:
     def __init__(self):
         self.services = {}
@@ -95,9 +96,9 @@ class CatNetOrchestrator:
 
 
 @click.group()
+
 def cli():
     """CatNet - Network Configuration Deployment System"""
-    pass
 
 
 @cli.command()
@@ -106,6 +107,7 @@ def cli():
     type=click.Choice(["all", "auth", "gitops", "deployment", "device"]),
     default="all",
 )
+
 def start(service):
     """Start CatNet services"""
     orchestrator = CatNetOrchestrator()
@@ -137,6 +139,7 @@ def start(service):
 
 
 @cli.command()
+
 def init():
     """Initialize CatNet database and configuration"""
 
@@ -161,13 +164,17 @@ def init():
         from src.db.models import User
         from src.security.auth import AuthManager
 
-        auth_manager = AuthManager(secret_key=os.getenv("JWT_SECRET_KEY", "change-me"))
+                auth_manager = AuthManager(
+            secret_key=os.getenv("JWT_SECRET_KEY",
+            "change-me")
+        )
 
         async with db_manager.session_scope() as session:
             # Check if admin exists
             from sqlalchemy import select
 
-            result = await session.execute(select(User).where(User.username == "admin"))
+            result = await session.execute(select(User).where(User.username == \
+                "admin"))
             admin = result.scalar_one_or_none()
 
             if not admin:
@@ -184,9 +191,13 @@ def init():
                 session.add(admin)
                 await session.commit()
                 logger.info(
-                    "Default admin user created (username: admin, password: admin123)"
+                                        "Default admin user created (
+                        username: admin,
+                        password: admin123
+                    )"
                 )
-                logger.warning("⚠️  CHANGE THE DEFAULT ADMIN PASSWORD IMMEDIATELY!")
+                logger.warning("⚠️  CHANGE THE DEFAULT ADMIN PASSWORD \
+                    IMMEDIATELY!")
             else:
                 logger.info("Admin user already exists")
 
@@ -195,9 +206,15 @@ def init():
 
 @cli.command()
 @click.option("--host", default="192.168.1.1")
-@click.option("--vendor", type=click.Choice(["cisco_ios", "cisco_xe", "juniper"]))
+@click.option(
+    "--vendor",
+    type=click.Choice(["cisco_ios",
+    "cisco_xe",
+    "juniper"])
+)
 @click.option("--username", prompt=True)
 @click.option("--password", prompt=True, hide_input=True)
+
 def test_connection(host, vendor, username, password):
     """Test connection to a network device"""
     from netmiko import ConnectHandler
@@ -222,6 +239,7 @@ def test_connection(host, vendor, username, password):
 
 
 @cli.command()
+
 def validate_config():
     """Validate CatNet configuration"""
     logger.info("Validating configuration...")
@@ -238,7 +256,10 @@ def validate_config():
             missing.append(var)
 
     if missing:
-        logger.error(f"Missing required environment variables: {', '.join(missing)}")
+                logger.error(
+            f"Missing required environment variables: {',
+            '.join(missing)}"
+        )
         sys.exit(1)
 
     # Test database connection
@@ -278,6 +299,7 @@ def validate_config():
 @cli.command()
 @click.option("--coverage", is_flag=True, help="Run with coverage report")
 @click.option("--verbose", is_flag=True, help="Verbose output")
+
 def test(coverage, verbose):
     """Run test suite"""
     import subprocess
@@ -296,6 +318,7 @@ def test(coverage, verbose):
 
 
 @cli.command()
+
 def generate_keys():
     """Generate RSA keypair for signing"""
     from src.security.encryption import EncryptionManager

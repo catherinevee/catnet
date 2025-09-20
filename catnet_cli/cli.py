@@ -17,9 +17,9 @@ from catnet_cli.config import ConfigManager
 from catnet_cli.utils import setup_logging, print_version
 
 
-@click.group(context_settings=dict(help_option_names=['-h', '--help']))
-@click.option('--config', '-c', type=click.Path(), help='Path to configuration file')
-@click.option('--debug/--no-debug', default=False, help='Enable debug mode')
+@click.group(context_settings=dict(help_option_names=["-h", "--help"]))
+@click.option("--config", "-c", type=click.Path(), help="Path to configuration file")
+@click.option("--debug/--no-debug", default=False, help="Enable debug mode")
 @click.pass_context
 def cli(ctx: click.Context, config: Optional[str], debug: bool):
     """CatNet CLI - Network Configuration Management System
@@ -32,14 +32,14 @@ def cli(ctx: click.Context, config: Optional[str], debug: bool):
 
     # Load configuration
     config_manager = ConfigManager(config_path=config)
-    ctx.obj['config'] = config_manager.load()
-    ctx.obj['debug'] = debug
+    ctx.obj["config"] = config_manager.load()
+    ctx.obj["debug"] = debug
 
     # Setup logging
     setup_logging(debug)
 
     # Store config manager for other commands
-    ctx.obj['config_manager'] = config_manager
+    ctx.obj["config_manager"] = config_manager
 
 
 @cli.command()
@@ -54,8 +54,8 @@ def status(ctx: click.Context):
     """Check overall system and service status"""
     from catnet_cli.utils import check_system_status
 
-    debug = ctx.obj.get('debug', False)
-    config = ctx.obj.get('config', {})
+    debug = ctx.obj.get("debug", False)
+    config = ctx.obj.get("config", {})
 
     # Run async status check
     loop = asyncio.get_event_loop()
@@ -66,21 +66,21 @@ def status(ctx: click.Context):
         click.echo("\n=== CatNet System Status ===\n")
 
         for service, status in result.items():
-            status_symbol = "✓" if status['healthy'] else "✗"
-            status_color = "green" if status['healthy'] else "red"
+            status_symbol = "✓" if status["healthy"] else "✗"
+            status_color = "green" if status["healthy"] else "red"
 
             click.echo(
-                click.style(f"{status_symbol} {service}: ", fg=status_color) +
-                status.get('message', 'Unknown')
+                click.style(f"{status_symbol} {service}: ", fg=status_color)
+                + status.get("message", "Unknown")
             )
 
-            if debug and 'details' in status:
+            if debug and "details" in status:
                 click.echo(f"  Details: {status['details']}")
 
         click.echo("")
 
         # Exit with error if any service unhealthy
-        if not all(s['healthy'] for s in result.values()):
+        if not all(s["healthy"] for s in result.values()):
             sys.exit(1)
 
     except Exception as e:
@@ -110,5 +110,5 @@ def main():
         sys.exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -19,6 +19,7 @@ import hmac
 
 
 @dataclass
+
 class Session:
     """Represents a user session"""
 
@@ -37,6 +38,7 @@ class Session:
     refresh_token: Optional[str] = None
     mfa_verified: bool = False
     auth_method: str = "password"  # password, oauth, saml, ssh
+
 
 
 class SessionManager:
@@ -255,7 +257,8 @@ class SessionManager:
 
         Args:
             session_id: Session identifier
-            additional_time: Additional seconds to add (default: session_lifetime)
+            additional_time: Additional seconds to add (default: \
+                session_lifetime)
 
         Returns:
             Success status
@@ -266,7 +269,8 @@ class SessionManager:
             return False
 
         additional_seconds = additional_time or self.session_lifetime
-        session.expires_at = datetime.utcnow() + timedelta(seconds=additional_seconds)
+        session.expires_at = datetime.utcnow() + \
+            timedelta(seconds=additional_seconds)
 
         return True
 
@@ -440,7 +444,11 @@ class SessionManager:
         )
 
         # Create HMAC for integrity
-        h = hmac.new(self.session_secret.encode(), data.encode(), hashlib.sha256)
+                h = hmac.new(
+            self.session_secret.encode(),
+            data.encode(),
+            hashlib.sha256
+        )
 
         return h.hexdigest()
 
@@ -463,7 +471,12 @@ class SessionManager:
         for session_id in expired:
             self.terminate_session(session_id)
 
-    def _log_security_event(self, event_type: str, details: Dict[str, Any]) -> None:
+        def _log_security_event(
+        self,
+        event_type: str,
+        details: Dict[str,
+        Any]
+    ) -> None:
         """
         Log security events
 
@@ -483,6 +496,7 @@ class SessionManager:
 
 # Convenience functions
 _default_manager = None
+
 
 
 def get_session_manager() -> SessionManager:

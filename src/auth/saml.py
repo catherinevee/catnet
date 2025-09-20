@@ -21,6 +21,7 @@ from urllib.parse import urlencode
 
 
 @dataclass
+
 class SAMLConfig:
     """SAML configuration for Service Provider"""
 
@@ -35,10 +36,12 @@ class SAMLConfig:
     sp_key: Optional[str] = None  # SP's private key
     want_assertions_signed: bool = True
     want_assertions_encrypted: bool = False
-    name_id_format: str = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
+    name_id_format: str = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddre \
+        ss"
     authn_context: str = (
         "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport"
     )
+
 
 
 class SAMLProvider:
@@ -56,8 +59,11 @@ class SAMLProvider:
     def __init__(self):
         """Initialize SAML provider"""
         self.configs: Dict[str, SAMLConfig] = {}
-        self.session_index_store: Dict[str, str] = {}  # user_id -> session_index
-        self.request_store: Dict[str, Dict[str, Any]] = {}  # request_id -> request_data
+        self.session_index_store: Dict[str,
+            str] = {}  # user_id -> session_index
+        self.request_store: Dict[str,
+            Dict[str
+            Any]] = {}  # request_id -> request_data
 
     def register_config(self, name: str, config: SAMLConfig) -> None:
         """
@@ -104,14 +110,16 @@ class SAMLProvider:
                            IssueInstant="{issue_instant}"
                            Destination="{config.idp_sso_url}"
                            AssertionConsumerServiceURL="{config.acs_url}"
-                           ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                           ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings: \
+    HTTP-POST"
                            ForceAuthn="{str(force_authn).lower()}"
                            IsPassive="{str(is_passive).lower()}">
             <saml:Issuer>{config.entity_id}</saml:Issuer>
             <samlp:NameIDPolicy Format="{config.name_id_format}"
                                AllowCreate="true"/>
             <samlp:RequestedAuthnContext Comparison="minimum">
-                <saml:AuthnContextClassRef>{config.authn_context}</saml:AuthnContextClassRef>
+                <saml:AuthnContextClassRef>{ \
+                    config.authn_context}</saml:AuthnContextClassRef>
             </samlp:RequestedAuthnContext>
         </samlp:AuthnRequest>
         """
@@ -186,7 +194,10 @@ class SAMLProvider:
                 return False, {"error": "Invalid conditions"}
 
             # Extract assertions
-            assertions = root.xpath("//saml:Assertion", namespaces=self.NAMESPACES)
+                        assertions = root.xpath(
+                "//saml:Assertion",
+                namespaces=self.NAMESPACES
+            )
             if not assertions:
                 return False, {"error": "No assertions found"}
 
@@ -240,12 +251,14 @@ class SAMLProvider:
                             IssueInstant="{issue_instant}"
                             Destination="{config.idp_sls_url}">
             <saml:Issuer>{config.entity_id}</saml:Issuer>
-            <saml:NameID Format="{config.name_id_format}">{name_id}</saml:NameID>
+            <saml:NameID Format="{config.name_id_format}">{ \
+                name_id}</saml:NameID>
         """
 
         if session_index:
             logout_request += (
-                f"    <samlp:SessionIndex>{session_index}</samlp:SessionIndex>\n"
+                f"    <samlp:SessionIndex>{ \
+                    session_index}</samlp:SessionIndex>\n"
             )
 
         logout_request += "</samlp:LogoutRequest>"
@@ -282,14 +295,20 @@ class SAMLProvider:
         metadata = f"""<?xml version="1.0"?>
         <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
                          entityID="{config.entity_id}">
-            <SPSSODescriptor AuthnRequestsSigned="{'true' if config.sp_key else 'false'}"
-                            WantAssertionsSigned="{str(config.want_assertions_signed).lower()}"
-                            protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+            <SPSSODescriptor AuthnRequestsSigned="{'true' if config.sp_key else \
+    'false'}"
+                            WantAssertionsSigned="{str( 
+    config.want_assertions_signed).lower()}"
+                            protocolSupportEnumeration="urn:oasis:names:tc:SAML: \
+    2.0:protocol">
         """
 
         if config.sp_cert:
             # Add signing certificate
-            cert_data = config.sp_cert.replace("-----BEGIN CERTIFICATE-----", "")
+                        cert_data = config.sp_cert.replace(
+                "-----BEGIN CERTIFICATE-----",
+                ""
+            )
             cert_data = cert_data.replace("-----END CERTIFICATE-----", "")
             cert_data = cert_data.replace("\n", "")
 
@@ -297,17 +316,20 @@ class SAMLProvider:
                 <KeyDescriptor use="signing">
                     <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
                         <ds:X509Data>
-                            <ds:X509Certificate>{cert_data}</ds:X509Certificate>
+                            <ds:X509Certificate>{ \
+                                cert_data}</ds:X509Certificate>
                         </ds:X509Data>
                     </ds:KeyInfo>
                 </KeyDescriptor>
             """
 
         metadata += f"""
-                <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+                <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0: \
+    bindings:HTTP-Redirect"
                                     Location="{config.sls_url}"/>
                 <NameIDFormat>{config.name_id_format}</NameIDFormat>
-                <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0: \
+    bindings:HTTP-POST"
                                          Location="{config.acs_url}"
                                          index="0"/>
             </SPSSODescriptor>
@@ -330,7 +352,8 @@ class SAMLProvider:
         )
         if (
             not status
-            or status[0].get("Value") != "urn:oasis:names:tc:SAML:2.0:status:Success"
+            or status[0].get("Value") != "urn:oasis:names:tc:SAML:2.0:status:Su \
+                ccess"
         ):
             return False
 
@@ -347,9 +370,16 @@ class SAMLProvider:
         except Exception:
             return False
 
-    def _validate_conditions(self, root: etree.Element, config: SAMLConfig) -> bool:
+        def _validate_conditions(
+        self,
+        root: etree.Element,
+        config: SAMLConfig
+    ) -> bool:
         """Validate SAML conditions"""
-        conditions = root.xpath("//saml:Conditions", namespaces=self.NAMESPACES)
+                conditions = root.xpath(
+            "//saml:Conditions",
+            namespaces=self.NAMESPACES
+        )
         if not conditions:
             return True
 
@@ -383,12 +413,16 @@ class SAMLProvider:
 
         # Extract attributes
         attr_statements = assertion.xpath(
-            ".//saml:AttributeStatement/saml:Attribute", namespaces=self.NAMESPACES
+            ".//saml:AttributeStatement/saml:Attribute", \
+                namespaces=self.NAMESPACES
         )
 
         for attr in attr_statements:
             name = attr.get("Name")
-            values = attr.xpath(".//saml:AttributeValue", namespaces=self.NAMESPACES)
+                        values = attr.xpath(
+                ".//saml:AttributeValue",
+                namespaces=self.NAMESPACES
+            )
             if values:
                 if len(values) == 1:
                     attributes[name] = values[0].text
@@ -397,7 +431,10 @@ class SAMLProvider:
 
         return attributes
 
-    def _extract_session_index(self, assertion: etree.Element) -> Optional[str]:
+        def _extract_session_index(
+        self,
+        assertion: etree.Element
+    ) -> Optional[str]:
         """Extract session index from assertion"""
         authn_statements = assertion.xpath(
             ".//saml:AuthnStatement", namespaces=self.NAMESPACES
@@ -417,6 +454,7 @@ class SAMLProvider:
 
 # Convenience functions
 _default_provider = None
+
 
 
 def get_saml_provider() -> SAMLProvider:

@@ -8,12 +8,13 @@ Maintains comprehensive deployment history:
 - Analytics and insights
 """
 
-from typing import Dict, Any, Optional, List, Tuple
+from typing import Dict, Any, Optional, List
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
 import json
 from collections import defaultdict
+
 
 
 class HistoryEventType(Enum):
@@ -36,6 +37,7 @@ class HistoryEventType(Enum):
 
 
 @dataclass
+
 class HistoryEvent:
     """Deployment history event"""
 
@@ -50,6 +52,7 @@ class HistoryEvent:
 
 
 @dataclass
+
 class DeploymentSummary:
     """Deployment summary for history"""
 
@@ -69,6 +72,7 @@ class DeploymentSummary:
 
 
 @dataclass
+
 class DeviceHistory:
     """Device deployment history"""
 
@@ -82,6 +86,7 @@ class DeviceHistory:
     average_deployment_time: Optional[float] = None
     last_health_check: Optional[datetime] = None
     health_status: Optional[str] = None
+
 
 
 class DeploymentHistory:
@@ -241,7 +246,8 @@ class DeploymentHistory:
         for device_id in successful_devices:
             if device_id in self.device_histories:
                 self.device_histories[device_id].successful_deployments += 1
-                self.device_histories[device_id].last_deployment = datetime.utcnow()
+                self.device_histories[device_id].last_deployment = \
+                    datetime.utcnow()
 
         for device_id in failed_devices:
             if device_id in self.device_histories:
@@ -320,7 +326,10 @@ class DeploymentHistory:
         # Convert to dictionaries and limit
         return [self._event_to_dict(e) for e in events[:limit]]
 
-    def get_deployment_summary(self, deployment_id: str) -> Optional[Dict[str, Any]]:
+        def get_deployment_summary(
+        self,
+        deployment_id: str
+    ) -> Optional[Dict[str, Any]]:
         """
         Get deployment summary
 
@@ -378,7 +387,8 @@ class DeploymentHistory:
             "successful_deployments": history.successful_deployments,
             "failed_deployments": history.failed_deployments,
             "success_rate": (
-                (history.successful_deployments / history.total_deployments * 100)
+                (history.successful_deployments / history.total_deployments * \
+                    100)
                 if history.total_deployments > 0
                 else 0
             ),
@@ -390,7 +400,8 @@ class DeploymentHistory:
             if history.last_health_check
             else None,
             "health_status": history.health_status,
-            "recent_deployments": history.deployments[-10:],  # Last 10 deployments
+            "recent_deployments": history.deployments[-10:],
+                # Last 10 deployments
         }
 
     def get_statistics(
@@ -432,11 +443,12 @@ class DeploymentHistory:
         failed = len([s for s in summaries if s.status == "failed"])
         rolled_back = len([s for s in summaries if s.rollback_count > 0])
 
-        durations = [s.duration_minutes for s in summaries if s.duration_minutes]
+        durations = [s.duration_minutes for s in summaries if \
+            s.duration_minutes]
         avg_duration = sum(durations) / len(durations) if durations else 0
 
         total_devices = sum(s.devices_total for s in summaries)
-        successful_devices = sum(s.devices_successful for s in summaries)
+        sum(s.devices_successful for s in summaries)
 
         return {
             "total_deployments": total,
@@ -444,8 +456,14 @@ class DeploymentHistory:
             "failed_deployments": failed,
             "average_duration_minutes": round(avg_duration, 2),
             "total_devices_deployed": total_devices,
-            "success_rate": round((successful / total * 100) if total > 0 else 0, 2),
-            "rollback_rate": round((rolled_back / total * 100) if total > 0 else 0, 2),
+                        "success_rate": round(
+                (successful / total * 100) if total > 0 else 0,
+                2
+            ),
+                        "rollback_rate": round(
+                (rolled_back / total * 100) if total > 0 else 0,
+                2
+            ),
             "deployments_by_strategy": self._count_by_strategy(summaries),
             "deployments_by_status": self._count_by_status(summaries),
             "top_deployers": self._get_top_deployers(summaries),
@@ -466,7 +484,8 @@ class DeploymentHistory:
         Returns:
             Compliance report
         """
-        events = [e for e in self.events if start_date <= e.timestamp <= end_date]
+        events = [e for e in self.events if start_date <= e.timestamp <= \
+            end_date]
 
         # Group events by type
         events_by_type = defaultdict(list)
@@ -483,7 +502,8 @@ class DeploymentHistory:
         failed_deployments = len(
             events_by_type[HistoryEventType.DEPLOYMENT_FAILED.value]
         )
-        rollbacks = len(events_by_type[HistoryEventType.DEPLOYMENT_ROLLED_BACK.value])
+        rollbacks = len(events_by_type[HistoryEventType.DEPLOYMENT_ROLLED_BACK. \
+            value])
 
         return {
             "report_period": {
@@ -506,7 +526,9 @@ class DeploymentHistory:
             "rollback_count": rollbacks,
             "events_by_type": {k: len(v) for k, v in events_by_type.items()},
             "unique_users": len(set(e.user for e in events)),
-            "unique_devices": len(set(e.device_id for e in events if e.device_id)),
+                        "unique_devices": len(
+                set(e.device_id for e in events if e.device_id)
+            ),
         }
 
     def export_history(
@@ -570,14 +592,20 @@ class DeploymentHistory:
             "metadata": event.metadata,
         }
 
-    def _count_by_strategy(self, summaries: List[DeploymentSummary]) -> Dict[str, int]:
+        def _count_by_strategy(
+        self,
+        summaries: List[DeploymentSummary]
+    ) -> Dict[str, int]:
         """Count deployments by strategy"""
         counts = defaultdict(int)
         for summary in summaries:
             counts[summary.strategy] += 1
         return dict(counts)
 
-    def _count_by_status(self, summaries: List[DeploymentSummary]) -> Dict[str, int]:
+        def _count_by_status(
+        self,
+        summaries: List[DeploymentSummary]
+    ) -> Dict[str, int]:
         """Count deployments by status"""
         counts = defaultdict(int)
         for summary in summaries:
@@ -592,7 +620,11 @@ class DeploymentHistory:
         for summary in summaries:
             user_counts[summary.created_by] += 1
 
-        sorted_users = sorted(user_counts.items(), key=lambda x: x[1], reverse=True)
+                sorted_users = sorted(
+            user_counts.items(),
+            key=lambda x: x[1],
+            reverse=True
+        )
         return [
             {"user": user, "deployment_count": count}
             for user, count in sorted_users[:limit]

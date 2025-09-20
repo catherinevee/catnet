@@ -23,6 +23,7 @@ logger = get_logger(__name__)
 router = APIRouter(prefix="/git", tags=["gitops"])
 
 
+
 class WebhookPayload(BaseModel):
     """Generic webhook payload"""
 
@@ -31,6 +32,7 @@ class WebhookPayload(BaseModel):
     commits: List[Dict[str, Any]]
     pusher: Dict[str, str]
     sender: Dict[str, Any]
+
 
 
 class ConfigDiff(BaseModel):
@@ -46,10 +48,16 @@ class ConfigDiff(BaseModel):
     diff_content: str
 
 
-def verify_github_signature(payload: bytes, signature: str, secret: str) -> bool:
+
+def verify_github_signature(
+    payload: bytes,
+    signature: str,
+    secret: str
+) -> bool:
     """Verify GitHub webhook signature"""
     expected = hmac.new(secret.encode(), payload, hashlib.sha256).hexdigest()
     return hmac.compare_digest(f"sha256={expected}", signature)
+
 
 
 def verify_gitlab_signature(payload: bytes, token: str, secret: str) -> bool:
@@ -240,7 +248,11 @@ async def handle_gitlab_webhook(
 
         # Verify token
         if x_gitlab_token:
-            if not verify_gitlab_signature(payload, x_gitlab_token, webhook_secret):
+                        if not verify_gitlab_signature(
+                payload,
+                x_gitlab_token,
+                webhook_secret
+            ):
                 logger.error(f"Invalid GitLab token for {repo_url}")
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,

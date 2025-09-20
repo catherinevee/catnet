@@ -1,17 +1,17 @@
 import pytest
 import json
 from datetime import datetime, timedelta
-from unittest.mock import Mock, patch, AsyncMock
+from unittest.mock import patch, AsyncMock
 from src.compliance.reporting import (
     ComplianceManager,
     ComplianceFramework,
     ComplianceCheck,
     ComplianceStatus,
-    ComplianceControl,
     ComplianceReport,
     ComplianceValidator,
     ReportGenerator,
 )
+
 
 
 class TestComplianceFramework:
@@ -22,6 +22,7 @@ class TestComplianceFramework:
         assert ComplianceFramework.ISO_27001.value == "ISO-27001"
         assert ComplianceFramework.NIST.value == "NIST"
         assert ComplianceFramework.CIS.value == "CIS"
+
 
 
 class TestComplianceCheck:
@@ -52,6 +53,7 @@ class TestComplianceCheck:
 
         assert check.status == ComplianceStatus.NON_COMPLIANT
         assert check.remediation is not None
+
 
 
 class TestComplianceValidator:
@@ -115,7 +117,10 @@ class TestComplianceValidator:
         assert len(checks) > 0
 
         # Verify access controls
-        access_check = next((c for c in checks if "164.312(a)" in c.control_id), None)
+                access_check = next(
+            (c for c in checks if "164.312(a)" in c.control_id),
+            None
+        )
         assert access_check is not None
 
     @pytest.mark.asyncio
@@ -130,12 +135,18 @@ class TestComplianceValidator:
                 "ip_forwarding": True,
                 "proxy_arp": False,
             },
-            "passwords": {"encrypted": True, "min_length": 14, "lockout_attempts": 5},
+            "passwords": {"encrypted": True,
+                "min_length": 14
+                "lockout_attempts": 5}
+                
             "banner": {
                 "login": "Authorized access only",
                 "motd": "This system is monitored",
             },
-            "snmp": {"enabled": True, "version": 3, "default_community": False},
+            "snmp": {"enabled": True,
+                "version": 3
+                "default_community": False}
+                
         }
 
         checks = await validator.validate_cis(device_config)
@@ -147,6 +158,7 @@ class TestComplianceValidator:
             (c for c in checks if "password" in c.description.lower()), None
         )
         assert password_check is not None
+
 
 
 class TestComplianceManager:
@@ -196,7 +208,9 @@ class TestComplianceManager:
             ]
 
             checks = await manager.check_compliance(
-                framework=ComplianceFramework.CIS, device_ids=["router1", "switch1"]
+                framework=ComplianceFramework.CIS,
+                    device_ids=["router1"
+                    "switch1"]
             )
 
             # Should have checks for both devices
@@ -353,9 +367,11 @@ class TestComplianceManager:
 
         csv_output = manager.export_report(report, format="csv")
 
-        assert "Control ID,Description,Status,Device,Evidence,Remediation" in csv_output
+        assert "Control ID,Description,Status,Device,Evidence,Remediation" in \
+            csv_output
         assert "CIS-1.1" in csv_output
         assert "COMPLIANT" in csv_output
+
 
 
 class TestReportGenerator:
@@ -421,6 +437,7 @@ class TestReportGenerator:
         assert len(lines) == 3  # Header + 2 checks
         assert "HIPAA-164.308" in lines[1]
         assert "NON_COMPLIANT" in lines[2]
+
 
 
 class TestComplianceIntegration:
@@ -525,7 +542,8 @@ class TestComplianceIntegration:
             assert len(all_checks) > 0
 
             # Verify different control IDs
-            control_prefixes = {check.control_id.split("-")[0] for check in all_checks}
+            control_prefixes = {check.control_id.split("-")[0] for check in \
+                all_checks}
             assert len(control_prefixes) >= 2  # Multiple framework prefixes
 
     @pytest.mark.asyncio
