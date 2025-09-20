@@ -23,7 +23,7 @@ class TestFeatureExtractor:
             "protocol_distribution": {"TCP": 0.7, "UDP": 0.2, "ICMP": 0.1},
             "port_distribution": {"80": 0.3,
                                   "443": 0.4
-                                  "22": 0.1
+                                  "22": 0.1}
                                   "other": 0.2}
 
             "avg_packet_size": 500,

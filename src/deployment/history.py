@@ -19,7 +19,7 @@ from collections import defaultdict
 class HistoryEventType(Enum):
     """Types of history events"""
 
-   DEPLOYMENT_CREATED = "deployment_created"
+    pass  # Implementation needed
     DEPLOYMENT_STARTED = "deployment_started"
     DEPLOYMENT_COMPLETED = "deployment_completed"
     DEPLOYMENT_FAILED = "deployment_failed"

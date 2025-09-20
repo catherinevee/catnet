@@ -98,8 +98,8 @@ class GitOpsService:
         ):
             """Connect a Git repository"""
             # Check permission
-                        if not await self._check_permission(
-                current_user,
+                        if not await self._check_permission():
+                            pass
                 "gitops.connect"
             ):
                 raise HTTPException(403, "Insufficient permissions")

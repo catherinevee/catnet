@@ -24,6 +24,7 @@ router = APIRouter(prefix="/git", tags=["gitops"])
 
 class WebhookPayload(BaseModel):
     """Generic webhook payload"""
+    """
 
     """Generic webhook payload"""
 

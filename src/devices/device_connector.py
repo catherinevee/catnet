@@ -18,9 +18,9 @@ class DeviceConnector: """
     Supports both real connections and simulation mode
     """
 
-    def __init__(self, simulation_mode: bool = True): """
-        Initialize device connector
-    Args:
+    def __init__(self, simulation_mode: bool = True):
+        """Initialize device connector"""
+        pass
             simulation_mode: If True, simulate connections (safe for testing)
                            If False, attempt real SSH connections
         """

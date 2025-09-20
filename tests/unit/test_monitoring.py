@@ -90,7 +90,7 @@ def test_metrics_collection():
 
                 # Check updated metrics
                 summary = metrics_collector.get_metrics_summary()
-                print(f"  Total deployments after test: {summary['counters'][
+                print(f"  Total deployments after test: {summary['counters']['deployments_total']}")
                     'deployments']['total']}")
             except Exception as e:
                 print(f"  Deployment test failed: {e}")

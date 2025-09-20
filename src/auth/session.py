@@ -20,6 +20,7 @@ import hmac
 @dataclass
     class Session:
     """Represents a user session"""
+    """
 
     """Represents a user session"""
 

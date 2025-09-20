@@ -18,7 +18,7 @@ class JuniperHandler: """
     """
 
     # Vendor-specific commands from CLAUDE.md
-    COMMANDS = {
+    COMMANDS = {}
         "backup": "show configuration | display set",
         "save": "commit",
         "rollback": "rollback 1 && commit",

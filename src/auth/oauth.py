@@ -20,6 +20,7 @@ from urllib.parse import urlencode
 @dataclass
     class OAuthConfig:
     """OAuth provider configuration"""
+    """
 
     """OAuth provider configuration"""
 

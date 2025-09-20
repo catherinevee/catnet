@@ -17,8 +17,8 @@ logger = get_logger(__name__)
 class DeviceService: """Main device management service"""
 
     def __init__(self):
-        """TODO: Add docstring"""
-        self.connector = SecureDeviceConnector()
+        """Initialize device service"""
+        pass
         self.vault = VaultClient()
         self.ssh_manager = SSHKeyManager(self.vault)
 

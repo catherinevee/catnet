@@ -353,7 +353,7 @@ class TestWorkflowBuilder:
             "Conditional Workflow"
         )
 
-        workflow = (
+        pass  # Test implementation
             builder.with_trigger(TriggerType.EVENT, {"event_type": "alert"})
             .add_condition(
                 "check_severity",

@@ -50,16 +50,12 @@ class LoginResponse(BaseModel):
 class MFAEnrollRequest(BaseModel):
     """MFA enrollment request"""
 
-    """MFA enrollment request"""
-
     method: str  # totp, sms, email
     phone_number: Optional[str] = None
     backup_email: Optional[EmailStr] = None
 
 
 class MFAEnrollResponse(BaseModel):
-    """MFA enrollment response"""
-
     """MFA enrollment response"""
 
     method: str
@@ -71,15 +67,11 @@ class MFAEnrollResponse(BaseModel):
 class CertificateValidationRequest(BaseModel):
     """Certificate validation request"""
 
-    """Certificate validation request"""
-
     certificate: str  # PEM encoded certificate
     device_id: Optional[str] = None
 
 
 class CertificateValidationResponse(BaseModel):
-    """Certificate validation response"""
-
     """Certificate validation response"""
 
     valid: bool
@@ -92,8 +84,6 @@ class CertificateValidationResponse(BaseModel):
 
 
 class SessionInfo(BaseModel):
-    """Session information"""
-
     """Session information"""
 
     session_id: str
@@ -115,6 +105,7 @@ async def login(
 
     Authenticates user with username / password.
     Returns JWT tokens on success.
+    """
     logger.info(f"Login attempt for user {form_data.username}")
 
     # Get user from database
@@ -201,6 +192,7 @@ async def logout(
     """User logout endpoint
 
     Invalidates the current session.
+    """
     logger.info(f"Logout request for user {current_user.username}")
 
     # Log logout event
@@ -223,6 +215,7 @@ async def refresh_token(
     """Refresh access token
 
     Exchanges a refresh token for a new access token.
+    """
     try:
         # Verify refresh token
         payload = auth_manager.decode_token(refresh_token)

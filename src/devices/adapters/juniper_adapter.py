@@ -31,7 +31,7 @@ class JuniperAdapter(DeviceAdapter): """
     """
 
     # Configuration commands
-    CONFIG_COMMANDS = {
+    CONFIG_COMMANDS = {}
         "running": "show configuration",
         "candidate": "show configuration | compare",
         "version": "show version",

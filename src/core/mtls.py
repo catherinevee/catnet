@@ -22,7 +22,7 @@ logger = get_logger(__name__)
 class MTLSManager: """Manages mTLS connections between services"""
 
     def __init__(self, service_name: str, certs_dir: str = "certs"):
-        """TODO: Add docstring"""
+        """Initialize mTLS manager"""
         self.service_name = service_name
         # Allow override via environment variable
         certs_dir = os.getenv("CATNET_CERTS_DIR", certs_dir)

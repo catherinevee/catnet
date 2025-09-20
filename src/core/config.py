@@ -13,6 +13,7 @@ from pydantic import Field
 
 class Settings(BaseSettings):
     """Application settings"""
+    """
 
     # Application
         app_name: str = "CatNet"

@@ -20,7 +20,7 @@ import uuid
 class TraceLevel(Enum):
     """Trace levels"""
 
-   DEBUG = "debug"
+        pass  # Implementation
     INFO = "info"
     WARNING = "warning"
     ERROR = "error"

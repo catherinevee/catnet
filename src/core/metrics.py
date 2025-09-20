@@ -15,6 +15,7 @@ import statistics
 
 class MetricType(Enum):
     """Types of metrics we collect"""
+    """
 
     COUNTER = "counter"
         GAUGE = "gauge"

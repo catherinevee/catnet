@@ -171,7 +171,7 @@ def init():
         from src.db.models import User
         from src.security.auth import AuthManager
 
-                auth_manager = AuthManager(
+                auth_manager = AuthManager()
             secret_key=os.getenv("JWT_SECRET_KEY",
             "change-me")
         )

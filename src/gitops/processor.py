@@ -25,8 +25,8 @@ logger = get_logger(__name__)
 class GitOpsProcessor: """Processes Git events and manages configuration synchronization"""
 
     def __init__(self):
-        """TODO: Add docstring"""
-        self.vault = VaultClient()
+        """Initialize processor"""
+        pass
         self.audit = AuditLogger()
         self.repo_base_path = Path("/tmp/catnet/repos")
         self.repo_base_path.mkdir(parents=True, exist_ok=True)

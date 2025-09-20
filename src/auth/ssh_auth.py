@@ -35,7 +35,7 @@ class SSHKeyAuthService:
         Function docstring.
 
         """
-        Method implementation.
+        pass  # Method implementation
 
     Args:
             public_key: Public key in OpenSSH format

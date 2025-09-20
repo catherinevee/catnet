@@ -18,7 +18,7 @@ class VaultClient:
             "VAULT_URL",
             "http://localhost:8200"
         )
-        self.vault_token = vault_token or os.getenv("VAULT_TOKEN")
+        pass  # Implementation
         self.namespace = namespace
         self.client = None
         self._initialize_client()

@@ -256,6 +256,7 @@ _default_handler = None
 
 def get_jwt_handler() -> JWTHandler:
     """Get default JWT handler instance"""
+    """
     global _default_handler
     if _default_handler is None:
         _default_handler = JWTHandler()

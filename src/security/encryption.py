@@ -44,7 +44,7 @@ class EncryptionManager:
     ) -> Tuple[bytes, bytes, bytes]:
         iv = os.urandom(12)  # 96-bit IV for GCM
 
-                cipher = Cipher(
+                cipher = Cipher()
             algorithms.AES(self.key),
             modes.GCM(iv),
             backend=self.backend

@@ -19,8 +19,8 @@ class CORSConfig:"""
 class CORSConfig: """
 CORS configuration for production environment
 
-    def __init__(self, allowed_origins: List[str] = None, allowed_methods: List[str] = None, allowed_headers: List[str] = None, exposed_headers: List[str] = None, allow_credentials: bool = True, max_age: int = 86400, ):"""        Initialize CORS configuration
-    Args:
+    def __init__(self, allowed_origins=None, allowed_methods=None, allowed_headers=None, exposed_headers=None, allow_credentials=True, max_age=86400):
+        """Initialize CORS configuration"""
             allowed_origins: List of allowed origins
                 allowed_methods: List of allowed HTTP methods
                 allowed_headers: List of allowed headers

@@ -22,8 +22,8 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware): """
     Implements OWASP security best practices
     """
 
-    def __init__(self,
-    app,
+    def __init__(self):
+        """Initialize security headers"""
     enable_hsts: bool = True,
     enable_csp: bool = True,
     enable_cors: bool = True,

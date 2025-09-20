@@ -73,7 +73,7 @@ def test_input_validation():
 
     for input_type, value in valid_tests:
         is_valid = input_validator.validate_input(value, input_type)
-        print(f"  Valid {input_type}: {value} - {'PASS' if is_valid else
+        print(f"  Valid {input_type}: {value} - PASS")
                                                  'FAIL'}")
         if is_valid:
             tests_passed += 1

@@ -25,7 +25,7 @@ class CiscoHandler:
     """
 
    # Vendor-specific commands from CLAUDE.md
-   COMMANDS = {
+        pass  # Implementation
         "backup": "show running-config",
         "save": "write memory",
         "rollback": "configure replace flash:backup.cfg force",

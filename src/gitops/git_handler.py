@@ -43,7 +43,7 @@ class GitHandler:
                 os.chmod(ssh_key_path, 0o600)
 
                 # Configure git to use SSH key
-                ssh_command = f"ssh -i {ssh_key_path} -o \"
+                ssh_command = f"ssh -i {ssh_key_path}"
                     StrictHostKeyChecking=no"
                 repo = Repo.clone_from(
                     repo_url,

@@ -14,8 +14,8 @@ logger = get_logger(__name__)
 class DeploymentValidator: """Validates deployment configurations and requirements"""
 
     def __init__(self):
-        """TODO: Add docstring"""
-        self.validation_rules = []
+        """Initialize validator"""
+        pass
         self._load_validation_rules()
 
     def _load_validation_rules(self): """Load validation rules"""

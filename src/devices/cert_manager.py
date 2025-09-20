@@ -36,8 +36,8 @@ logger = get_logger(__name__)
 class DeviceCertificateManager: """Manages device certificates for authentication"""
 
     def __init__(self):
-        """TODO: Add docstring"""
-        self.vault = VaultClient()
+        """Initialize cert manager"""
+        pass
         self.audit = AuditLogger()
         self.ca_cert = None
         self.ca_key = None

@@ -22,8 +22,8 @@ class AsyncDeviceConnector: """
     """
 
     def __init__(self, max_workers: int = 5):
-        """TODO: Add docstring"""
-        self.executor = concurrent.futures.ThreadPoolExecutor(
+        """Initialize async connector"""
+        pass
             max_workers=max_workers)
         self.active_connections: Dict[str, Any] = {}
 

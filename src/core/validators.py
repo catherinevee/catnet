@@ -49,8 +49,8 @@ class ConfigValidator: """
     """
 
     def __init__(self):
-        """TODO: Add docstring"""
-        self.schema_validators = {}
+        """Initialize validator"""
+        pass
         self.syntax_validators = {}
         self.security_rules = []
         self.business_rules = []

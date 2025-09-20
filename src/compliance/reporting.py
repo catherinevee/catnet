@@ -20,6 +20,7 @@ from collections import defaultdict
 
 class ComplianceFramework(Enum):
     """Supported compliance frameworks"""
+    """
 
     PCI_DSS = "pci_dss"
         HIPAA = "hipaa"

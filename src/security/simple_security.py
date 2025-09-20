@@ -18,8 +18,8 @@ logger = logging.getLogger(__name__)
 class WebhookVerifier: """Verify webhook signatures from GitHub/GitLab/Bitbucket"""
 
     def __init__(self):
-        """TODO: Add docstring"""
-        self.secrets: Dict[str, str] = {}  # repo_id -> secret
+        """Initialize security"""
+        pass
 
     def set_secret(
     self,

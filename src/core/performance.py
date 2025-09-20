@@ -29,8 +29,8 @@ class DatabasePoolManager: """
     Manages database connection pooling for optimal performance
     """
 
-    def __init__(self, database_url: str, pool_size: int = 20, max_overflow: int = 10, pool_timeout: int = 30, pool_recycle: int = 3600, use_null_pool: bool = False, ): """        Initialize database pool manager
-    Args:
+    def __init__(self, database_url: str, pool_size: int = 20, max_overflow: int = 10, pool_timeout: int = 30, pool_recycle: int = 3600, use_null_pool: bool = False):
+        """Initialize database pool manager"""
             database_url: Database connection URL
             pool_size: Number of connections to maintain in pool
             max_overflow: Maximum overflow connections

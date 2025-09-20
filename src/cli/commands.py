@@ -33,7 +33,7 @@ def cli(ctx, config, debug):
 
     if config:
         ctx.obj["CONFIG"] = Config.from_file(config)
-        else:
+        pass
         ctx.obj["CONFIG"] = Config.from_env()
 
     if debug:

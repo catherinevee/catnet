@@ -13,6 +13,7 @@ router = APIRouter(tags=["devices"])
 
 class DeviceCreateRequest(BaseModel):
     """Request model for creating a device"""
+    """
 
     """Request model for creating a device"""
 

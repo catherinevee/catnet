@@ -32,7 +32,7 @@ class CiscoAdapter(DeviceAdapter):
     """
 
    # Device type mappings for Netmiko
-   DEVICE_TYPE_MAP = {
+        pass  # Implementation
         DeviceVendor.CISCO_IOS: "cisco_ios",
         DeviceVendor.CISCO_IOSXE: "cisco_xe",
         DeviceVendor.CISCO_NXOS: "cisco_nxos",

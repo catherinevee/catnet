@@ -22,6 +22,7 @@ from urllib.parse import urlencode
 @dataclass
     class SAMLConfig:
     """SAML configuration for Service Provider"""
+    """
 
     """SAML configuration for Service Provider"""
 

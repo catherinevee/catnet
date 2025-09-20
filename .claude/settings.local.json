@@ -32,7 +32,8 @@
       "Bash(netstat:*)",
       "Bash(curl:*)",
       "Bash(git checkout:*)",
-      "Bash(autopep8:*)"
+      "Bash(autopep8:*)",
+      "Bash(git remote get-url:*)"
     ],
     "deny": [],
     "ask": []

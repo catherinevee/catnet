@@ -20,8 +20,8 @@ class UnauthorizedException(Exception):
 
 
 class DeviceConnection:
-    def __init__(
-        self,
+    """Device connection class"""
+    pass
         connection_id: str,
         device: Device,
         connection_handler: Any,

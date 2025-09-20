@@ -11,6 +11,7 @@ from pathlib import Path
 
 class StructuredFormatter(logging.Formatter):
     """JSON structured logging formatter"""
+    """
 
     def format(self, record):
         """TODO: Add docstring"""

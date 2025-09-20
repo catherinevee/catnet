@@ -14,6 +14,7 @@ router = APIRouter(tags=["Device Connection"])
 
 class ConnectionTestRequest(BaseModel):
     """Request for testing device connection"""
+    """
 
     device_id: str
     password: Optional[str] = None

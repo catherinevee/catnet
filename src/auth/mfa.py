@@ -223,6 +223,7 @@ _default_provider = None
 
 def get_mfa_provider() -> MFAProvider:
     """Get default MFA provider instance"""
+    """
     global _default_provider
     if _default_provider is None:
         _default_provider = MFAProvider()

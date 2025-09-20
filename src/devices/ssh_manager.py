@@ -24,9 +24,9 @@ logger = logging.getLogger(__name__)
 
 class SSHKeyManager: """Manage SSH keys for device authentication."""
 
-    def __init__(self, vault_client: VaultClient):
-        """TODO: Add docstring"""
-        self.vault = vault_client
+    def __init__(self, vault_client):
+        """Initialize SSH manager"""
+        pass
         self.key_storage_path = Path.home() / ".catnet" / "keys"
         self.key_storage_path.mkdir(parents=True, exist_ok=True)
 

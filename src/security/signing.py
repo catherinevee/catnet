@@ -31,8 +31,8 @@ logger = get_logger(__name__)
 class SignatureManager: """Manages digital signatures for configurations and commits"""
 
     def __init__(self):
-        """TODO: Add docstring"""
-        self.vault = VaultClient()
+        """Initialize signing"""
+        pass
         self.audit = AuditLogger()
         self.gpg_home = Path(".gnupg")
         self.gpg_home.mkdir(exist_ok=True)

@@ -20,6 +20,7 @@ import re
 
 class WorkflowState(Enum):
     """Workflow execution states"""
+    """
 
     PENDING = "pending"
         RUNNING = "running"
