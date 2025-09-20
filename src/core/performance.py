@@ -29,16 +29,7 @@ class DatabasePoolManager: """
     Manages database connection pooling for optimal performance
     """
 
-    def __init__(
-        self,
-        database_url: str,
-        pool_size: int = 20,
-        max_overflow: int = 10,
-        pool_timeout: int = 30,
-        pool_recycle: int = 3600,
-        use_null_pool: bool = False,
-    ): """
-        Initialize database pool manager
+    def __init__(self, database_url: str, pool_size: int = 20, max_overflow: int = 10, pool_timeout: int = 30, pool_recycle: int = 3600, use_null_pool: bool = False, ): """        Initialize database pool manager
     Args:
             database_url: Database connection URL
             pool_size: Number of connections to maintain in pool
@@ -129,14 +120,7 @@ class RedisCacheManager:
     """
     Redis caching manager for improved performance"""
 
-    def __init__(
-        self,
-        redis_url: str = "redis://localhost:6379",
-        default_ttl: int = 300,
-        key_prefix: str = "catnet:",
-        max_connections: int = 50,
-    ):
-        """
+    def __init__(self, redis_url: str = "redis://localhost:6379", default_ttl: int = 300, key_prefix: str = "catnet:", max_connections: int = 50, ):        """
         Initialize Redis cache manager
     Args:
             redis_url: Redis connection URL
@@ -334,13 +318,7 @@ class AsyncTaskQueue:
     """
     Async task queue using Celery for background processing"""
 
-    def __init__(
-        self,
-        broker_url: str = "redis://localhost:6379/0",
-        backend_url: str = "redis://localhost:6379/1",
-        task_default_queue: str = "catnet",
-    ):
-        """
+    def __init__(self, broker_url: str = "redis://localhost:6379/0", backend_url: str = "redis://localhost:6379/1", task_default_queue: str = "catnet", ):        """
         Initialize async task queue
     Args:
             broker_url: Message broker URL (Redis/RabbitMQ)
@@ -432,13 +410,7 @@ class HTTPConnectionPool:"""
     HTTP connection pooling for external API calls
     """
 
-    def __init__(
-        self,
-        connector_limit: int = 100,
-        connector_limit_per_host: int = 30,
-        timeout: int = 30,
-    ):"""
-        Initialize HTTP connection pool
+    def __init__(self, connector_limit: int = 100, connector_limit_per_host: int = 30, timeout: int = 30, ):"""        Initialize HTTP connection pool
     Args:
             connector_limit: Total connection limit
             connector_limit_per_host: Per-host connection limit

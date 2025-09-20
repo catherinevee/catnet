@@ -34,11 +34,14 @@ class SSHKeyAuthService:
         """
         Function docstring.
 
+        """
+        Method implementation.
+
     Args:
             public_key: Public key in OpenSSH format
         """
-    Returns:
-            Fingerprint string(SHA256: base64)
+            Returns:
+                Fingerprint string(SHA256: base64)
         # Remove any comments and whitespace
         key_parts = public_key.strip().split()
         if len(key_parts) < 2:
@@ -62,13 +65,15 @@ class SSHKeyAuthService:
         except Exception as e:
             raise ValueError(f"Failed to calculate fingerprint: {str(e)}")
 
+        """
     async def add_ssh_key(
         self,
-            user_id: str,
-            public_key: str,
-            key_name: str,
-            comment: Optional[str] = None,
+        user_id: str,
+        public_key: str,
+        key_name: str,
+        comment: Optional[str] = None,
     ) -> UserSSHKey:
+        """
         Add SSH public key for a user.
     Args:
             user_id: User ID
@@ -137,6 +142,9 @@ class SSHKeyAuthService:
 
     def validate_public_key(self, public_key: str) -> bool:
         Validate SSH public key format.
+        """
+        Method implementation.
+        
     Args:
             public_key: Public key string
     Returns:
@@ -181,6 +189,7 @@ class SSHKeyAuthService:
         }
         return key_type_map.get(parts[0], "unknown")
 
+        """
     async def authenticate_with_key(
         self,
             username: str,
@@ -336,6 +345,9 @@ class SSHKeyAuthService:
 
     async def list_user_keys(self, user_id: str) -> List[Dict[str, Any]]:
         List all SSH keys for a user.
+        """
+        Method implementation.
+        
     Args:
             user_id: User ID
     Returns:
@@ -462,6 +474,7 @@ class SSHKeyAuthService:
         logger.info(f"Exported SSH key {key_id} to {key_path}")
         return key_path
 
+        """
     async def rotate_ssh_key(
         self, user_id: str, old_key_id: str, new_public_key: str
     ) -> UserSSHKey:

@@ -2,6 +2,17 @@
 """
 Create test data for CatNet testing phases
 """
+from sqlalchemy import select
+from src.security.auth import AuthManager
+from src.db.models import (
+    User,
+    Device,
+    GitRepository,
+    ConfigTemplate,
+    DeviceVendor,
+    DeploymentState,
+)
+from src.db.database import init_database
 import asyncio
 import sys
 import os
@@ -12,18 +23,6 @@ import json
 
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from src.db.database import init_database
-from src.db.models import (
-    User,
-    Device,
-    GitRepository,
-    ConfigTemplate,
-    DeviceVendor,
-    DeploymentState,
-)
-from src.security.auth import AuthManager
-from sqlalchemy import select
 
 
 async def create_test_users(session):

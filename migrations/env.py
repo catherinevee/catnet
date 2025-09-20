@@ -1,3 +1,4 @@
+from src.db.models import Base
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
@@ -9,7 +10,6 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.db.models import Base
 
 # this is the Alembic Config object
 config = context.config

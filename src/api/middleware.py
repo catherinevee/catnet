@@ -11,7 +11,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+class SecurityHeadersMiddleware(BaseModel):
     """Add security headers to all responses."""
 
     async def dispatch(
@@ -63,7 +63,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         return response
 
 
-class RateLimitMiddleware(BaseHTTPMiddleware):
+class RateLimitMiddleware(BaseModel):
     """Rate limiting middleware."""
 
     def __init__(self, app, calls: int = 100, period: int = 60):
@@ -124,7 +124,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         return response
 
 
-class CORSMiddleware(BaseHTTPMiddleware):
+class CORSMiddleware(BaseModel):
     """CORS middleware with security considerations."""
 
     def __init__(self, app, allowed_origins: list = None):
@@ -161,7 +161,7 @@ class CORSMiddleware(BaseHTTPMiddleware):
         return response
 
 
-class AuditLoggingMiddleware(BaseHTTPMiddleware):
+class AuditLoggingMiddleware(BaseModel):
     """Log all API requests for audit purposes."""
 
     async def dispatch(

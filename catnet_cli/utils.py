@@ -15,7 +15,6 @@ from catnet_cli import __version__
 logger = logging.getLogger(__name__)
 
 
-
 def setup_logging(debug: bool = False):
     """Configure logging for CLI"""
     level = logging.DEBUG if debug else logging.INFO
@@ -31,7 +30,6 @@ def setup_logging(debug: bool = False):
     if not debug:
         logging.getLogger('urllib3').setLevel(logging.WARNING)
         logging.getLogger('aiohttp').setLevel(logging.WARNING)
-
 
 
 def print_version():

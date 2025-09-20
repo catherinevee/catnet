@@ -18,7 +18,6 @@ from catnet_cli.utils import (
 
 
 @click.group()
-
 def auth():
     """Authentication commands"""
     pass
@@ -42,7 +41,6 @@ def auth():
     help='MFA token for two-factor authentication'
 )
 @click.pass_context
-
 def login(
     ctx: click.Context,
     username: str,
@@ -98,7 +96,6 @@ def login(
 
 @auth.command()
 @click.pass_context
-
 def logout(ctx: click.Context):
     """Logout from CatNet and clear stored credentials
 
@@ -131,7 +128,6 @@ def logout(ctx: click.Context):
 
 @auth.command()
 @click.pass_context
-
 def refresh(ctx: click.Context):
     """Refresh authentication token before expiration
 
@@ -170,7 +166,6 @@ def refresh(ctx: click.Context):
 
 @auth.command()
 @click.pass_context
-
 def whoami(ctx: click.Context):
     """Display current user information
 

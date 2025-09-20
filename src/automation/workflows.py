@@ -71,7 +71,7 @@ ExecutionStatus = WorkflowState
 
 
 @dataclass
-class WorkflowTrigger:
+    class WorkflowTrigger:
     """Workflow trigger definition"""
 
     type: TriggerType
@@ -82,7 +82,7 @@ class WorkflowTrigger:
 
 
 @dataclass
-class WorkflowAction:
+    class WorkflowAction:
     """Workflow action definition"""
 
     id: str
@@ -98,7 +98,7 @@ class WorkflowAction:
 
 
 @dataclass
-class WorkflowStep:
+    class WorkflowStep:
     """Workflow execution step"""
 
     action: WorkflowAction
@@ -111,7 +111,7 @@ class WorkflowStep:
 
 
 @dataclass
-class Workflow:
+    class Workflow:
     """Workflow definition"""
 
     id: str
@@ -126,7 +126,7 @@ class Workflow:
 
 
 @dataclass
-class WorkflowExecution:
+    class WorkflowExecution:
     """Workflow execution instance"""
 
     id: str

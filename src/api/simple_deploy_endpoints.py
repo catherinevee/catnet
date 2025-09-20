@@ -205,7 +205,7 @@ async def rollback_deployment(deployment_id: str):
 
 @router.post("/deploy-flow")
 async def full_deployment_flow(config_path: str, device_id: str):
-    """TODO: Add docstring"""
+    """
     Complete deployment flow in one call
 
     1. Create deployment
@@ -213,6 +213,7 @@ async def full_deployment_flow(config_path: str, device_id: str):
     3. Return result
 
     This is the main endpoint that wires everything together!
+    """
     try:
         # Step 1: Create deployment
         deployment = deployment_pipeline.create_deployment(

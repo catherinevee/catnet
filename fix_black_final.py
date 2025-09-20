@@ -13,7 +13,7 @@ def fix_file(filepath):
     try:
         with open(filepath, "r", encoding="utf-8") as f:
             lines = f.readlines()
-    except:
+    except BaseException:
         return False
 
     fixed_lines = []
@@ -37,7 +37,7 @@ def fix_file(filepath):
                 continue
 
         # Fix function/method definitions with improper docstrings
-        if re.match(r'^(\s*)(async\s+)?def\s+\w+\(.*\):\s*$', line):
+        if re.match(r"^(\s*)(async\s+)?def\s+\w+\(.*\):\s*$", line):
             fixed_lines.append(line)
             i += 1
 
@@ -49,8 +49,10 @@ def fix_file(filepath):
             if i < len(lines):
                 next_line = lines[i]
                 # Check if it's a docstring that's not indented properly
-                if next_line.strip().startswith('"""') or next_line.strip().startswith("'''"):
-                    indent_match = re.match(r'^(\s*)', line)
+                if next_line.strip().startswith('"""') or next_line.strip().startswith(
+                    "'''"
+                ):
+                    indent_match = re.match(r"^(\s*)", line)
                     base_indent = indent_match.group(1) if indent_match else ""
                     proper_indent = base_indent + "    "
 
@@ -62,8 +64,8 @@ def fix_file(filepath):
                         continue
 
                 # Check if it's code without docstring that starts too far left
-                elif next_line.strip() and not next_line.strip().startswith('#'):
-                    indent_match = re.match(r'^(\s*)', line)
+                elif next_line.strip() and not next_line.strip().startswith("#"):
+                    indent_match = re.match(r"^(\s*)", line)
                     base_indent = indent_match.group(1) if indent_match else ""
                     proper_indent = base_indent + "    "
 
@@ -81,8 +83,10 @@ def fix_file(filepath):
         # Fix standalone docstrings appearing randomly
         if line.strip() == '"""' and i > 0:
             # Check if previous line is a class or function definition
-            prev_line = lines[i-1] if i > 0 else ""
-            if not (prev_line.strip().endswith(':') or prev_line.strip().endswith('"""')):
+            prev_line = lines[i - 1] if i > 0 else ""
+            if not (
+                prev_line.strip().endswith(":") or prev_line.strip().endswith('"""')
+            ):
                 # Skip this orphaned docstring quote
                 modified = True
                 i += 1
@@ -96,10 +100,13 @@ def fix_file(filepath):
                 modified = True
 
         # Fix lines with broken quotes in headers
-        if 'response.headers[' in line and '] = "' in line:
+        if "response.headers[" in line and '] = "' in line:
             # Fix pattern like: f"response.headers["X-Frame-Options"] = "DENY"
-            line = re.sub(r'f"response\.headers\["([^"]+)"\] = "([^"]+)"',
-                         r'response.headers["\1"] = "\2"', line)
+            line = re.sub(
+                r'f"response\.headers\["([^"]+)"\] = "([^"]+)"',
+                r'response.headers["\1"] = "\2"',
+                line,
+            )
             modified = True
 
         fixed_lines.append(line)
@@ -118,25 +125,31 @@ def fix_specific_issues(filepath):
     try:
         with open(filepath, "r", encoding="utf-8") as f:
             content = f.read()
-    except:
+    except BaseException:
         return False
 
     original = content
 
     # Remove all blank lines between class definition and its content
-    content = re.sub(r'(class\s+\w+.*:)\n\n+(\s+)', r'\1\n\2', content)
+    content = re.sub(r"(class\s+\w+.*:)\n\n+(\s+)", r"\1\n\2", content)
 
     # Fix Calculate SSH key fingerprint appearing on wrong line
-    content = re.sub(r'(\s+)Calculate SSH key fingerprint.*\n', '', content)
+    content = re.sub(r"(\s+)Calculate SSH key fingerprint.*\n", "", content)
 
     # Fix standalone field definitions appearing without class context
-    content = re.sub(r'^(\s*\w+:\s*\w+.*(?:=.*)?)\n', r'    \1\n', content, flags=re.MULTILINE)
+    content = re.sub(
+        r"^(\s*\w+:\s*\w+.*(?:=.*)?)\n", r"    \1\n", content, flags=re.MULTILINE
+    )
 
     # Fix enum values appearing at wrong indentation
-    content = re.sub(r'^(\s*[A-Z_]+\s*=\s*"[^"]+")$', r'    \1', content, flags=re.MULTILINE)
+    content = re.sub(
+        r'^(\s*[A-Z_]+\s*=\s*"[^"]+")$', r"    \1", content, flags=re.MULTILINE
+    )
 
     # Remove "Documentation placeholder" strings
-    content = re.sub(r'^\s*Documentation placeholder\s*\n', '', content, flags=re.MULTILINE)
+    content = re.sub(
+        r"^\s*Documentation placeholder\s*\n", "", content, flags=re.MULTILINE
+    )
 
     if content != original:
         with open(filepath, "w", encoding="utf-8") as f:
@@ -189,10 +202,9 @@ def main():
     # Test with Black
     print("\nTesting with Black...")
     import subprocess
+
     result = subprocess.run(
-        ["python", "-m", "black", "--check", "src/"],
-        capture_output=True,
-        text=True
+        ["python", "-m", "black", "--check", "src/"], capture_output=True, text=True
     )
 
     if result.returncode == 0:
@@ -202,7 +214,9 @@ def main():
         print(f"✗ Black still has {errors} parsing errors")
 
         # Show first few errors
-        error_lines = [line for line in result.stderr.split('\n') if 'error: cannot format' in line]
+        error_lines = [
+            line for line in result.stderr.split("\n") if "error: cannot format" in line
+        ]
         for error in error_lines[:5]:
             print(f"  {error}")
 

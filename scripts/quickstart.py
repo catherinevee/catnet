@@ -68,13 +68,13 @@ DEBUG=true
         print("\n📦 Installing dependencies...")
         try:
             subprocess.run([sys.executable,
-                "-m"
-                "pip"
-                "install"
-                "-r"
-                "requirements.txt"]
-                
-                         check=True, capture_output=True, text=True)
+                            "-m"
+                            "pip"
+                            "install"
+                            "-r"
+                            "requirements.txt"]
+
+                           check=True, capture_output=True, text=True)
             print("✅ Dependencies installed")
         except subprocess.CalledProcessError as e:
             print(f"⚠️  Some dependencies may have failed to install: {e}")
@@ -98,16 +98,16 @@ DEBUG=true
         # Try to run migrations if alembic is available
         try:
             subprocess.run(["alembic", "upgrade", "head"],
-                         capture_output=True, text=True, check=False)
+                           capture_output=True, text=True, check=False)
             print("✅ Database migrations applied")
         except FileNotFoundError:
             print("ℹ️  Alembic not found - skipping migrations")
 
     def show_next_steps(self):
         """Show next steps to the user"""
-        print("\n" + "="*50)
+        print("\n" + "=" * 50)
         print("🚀 Quick Start Complete!")
-        print("="*50)
+        print("=" * 50)
         print("\nNext steps:")
         print("\n1️⃣  Start the API server:")
         print("   python run_catnet.py")
@@ -117,10 +117,10 @@ DEBUG=true
         print("   http://localhost:8000/docs")
         print("\n4️⃣  Read the usage guide:")
         print("   USAGE_GUIDE.md")
-        print("\n" + "="*50)
+        print("\n" + "=" * 50)
 
         # Offer to start the server
-                print(
+        print(
             "\nWould you like to start the CatNet server now? (y/n): ",
             end=""
         )
@@ -155,6 +155,7 @@ def main():
     """Main entry point"""
     quickstart = CatNetQuickStart()
     quickstart.run()
+
 
 if __name__ == "__main__":
     main()

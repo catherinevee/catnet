@@ -11,7 +11,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-
 class CatNetAPIClient:
     """Async API client for CatNet services"""
 
@@ -92,7 +91,7 @@ class CatNetAPIClient:
                 json=data,
                 params=params,
                 headers=request_headers,
-                                timeout=aiohttp.ClientTimeout(
+                timeout=aiohttp.ClientTimeout(
                     total=self.config['api']['timeout']
                 ),
                 ssl=self.config['security']['verify_ssl']
@@ -134,11 +133,11 @@ class CatNetAPIClient:
     # Convenience methods for common operations
 
         async def login(
-        self,
-        username: str,
-        password: str,
-        mfa_token: Optional[str] = None
-    ) -> Dict[str, Any]:
+            self,
+            username: str,
+            password: str,
+            mfa_token: Optional[str] = None
+        ) -> Dict[str, Any]:
         """Authenticate and get token"""
         data = {
             'username': username,
@@ -147,12 +146,12 @@ class CatNetAPIClient:
         if mfa_token:
             data['mfa_token'] = mfa_token
 
-                result = await self.request(
-            'POST',
-            '/auth/login',
-            service='auth',
-            data=data
-        )
+            result = await self.request(
+                'POST',
+                '/auth/login',
+                service='auth',
+                data=data
+            )
 
         # Save token
         if 'access_token' in result:
@@ -165,7 +164,7 @@ class CatNetAPIClient:
         """Logout and clear token"""
         if self.token:
             try:
-                                result = await self.request(
+                result = await self.request(
                     'POST',
                     '/auth/logout',
                     service='auth'
@@ -211,10 +210,10 @@ class CatNetAPIClient:
 
     # Device operations
         async def list_devices(
-        self,
-        vendor: Optional[str] = None,
-        status: Optional[str] = None
-    ) -> List[Dict[str, Any]]:
+            self,
+            vendor: Optional[str] = None,
+            status: Optional[str] = None
+        ) -> List[Dict[str, Any]]:
         """List devices with optional filters"""
         params = {}
         if vendor:
@@ -222,16 +221,16 @@ class CatNetAPIClient:
         if status:
             params['status'] = status
 
-                return await self.request(
-            'GET',
-            '/devices',
-            service='device',
-            params=params
-        )
+            return await self.request(
+                'GET',
+                '/devices',
+                service='device',
+                params=params
+            )
 
     async def add_device(self, device_data: Dict[str, Any]) -> Dict[str, Any]:
         """Add new device"""
-                return await self.request(
+        return await self.request(
             'POST',
             '/devices',
             service='device',
@@ -240,17 +239,17 @@ class CatNetAPIClient:
 
     async def backup_device(self, device_id: str) -> Dict[str, Any]:
         """Create device backup"""
-                return await self.request(
+        return await self.request(
             'POST',
             f'/devices/{device_id}/backup',
             service='device'
         )
 
         async def execute_command(
-        self,
-        device_id: str,
-        command: str
-    ) -> Dict[str, Any]:
+            self,
+            device_id: str,
+            command: str
+        ) -> Dict[str, Any]:
         """Execute command on device"""
         return await self.request(
             'POST',
@@ -261,11 +260,11 @@ class CatNetAPIClient:
 
     # GitOps operations
         async def connect_repository(
-        self,
-        url: str,
-        branch: str = 'main',
-        webhook_secret: Optional[str] = None
-    ) -> Dict[str, Any]:
+            self,
+            url: str,
+            branch: str = 'main',
+            webhook_secret: Optional[str] = None
+        ) -> Dict[str, Any]:
         """Connect Git repository"""
         data = {
             'url': url,
@@ -274,18 +273,18 @@ class CatNetAPIClient:
         if webhook_secret:
             data['webhook_secret'] = webhook_secret
 
-                return await self.request(
-            'POST',
-            '/gitops/connect',
-            service='gitops',
-            data=data
-        )
+            return await self.request(
+                'POST',
+                '/gitops/connect',
+                service='gitops',
+                data=data
+            )
 
         async def sync_repository(
-        self,
-        repo_id: str,
-        force: bool = False
-    ) -> Dict[str, Any]:
+            self,
+            repo_id: str,
+            force: bool = False
+        ) -> Dict[str, Any]:
         """Sync repository"""
         return await self.request(
             'POST',
@@ -296,7 +295,7 @@ class CatNetAPIClient:
 
     async def list_repositories(self) -> List[Dict[str, Any]]:
         """List connected repositories"""
-                return await self.request(
+        return await self.request(
             'GET',
             '/gitops/repositories',
             service='gitops'
@@ -333,7 +332,7 @@ class CatNetAPIClient:
             'dry_run': dry_run
         }
 
-                return await self.request(
+        return await self.request(
             'POST',
             '/deployments',
             service='deploy',
@@ -341,38 +340,38 @@ class CatNetAPIClient:
         )
 
         async def get_deployment_status(
-        self,
-        deployment_id: str
-    ) -> Dict[str, Any]:
+            self,
+            deployment_id: str
+        ) -> Dict[str, Any]:
         """Get deployment status"""
-                return await self.request(
+        return await self.request(
             'GET',
             f'/deployments/{deployment_id}',
             service='deploy'
         )
 
         async def approve_deployment(
-        self,
-        deployment_id: str,
-        comment: Optional[str] = None
-    ) -> Dict[str, Any]:
+            self,
+            deployment_id: str,
+            comment: Optional[str] = None
+        ) -> Dict[str, Any]:
         """Approve deployment"""
         data = {}
         if comment:
             data['comment'] = comment
 
-                return await self.request(
-            'POST',
-            f'/deployments/{deployment_id}/approve',
-            service='deploy',
-            data=data
-        )
+            return await self.request(
+                'POST',
+                f'/deployments/{deployment_id}/approve',
+                service='deploy',
+                data=data
+            )
 
         async def rollback_deployment(
-        self,
-        deployment_id: str,
-        reason: str
-    ) -> Dict[str, Any]:
+            self,
+            deployment_id: str,
+            reason: str
+        ) -> Dict[str, Any]:
         """Rollback deployment"""
         return await self.request(
             'POST',
@@ -382,11 +381,11 @@ class CatNetAPIClient:
         )
 
         async def get_deployment_history(
-        self,
-        limit: int = 10
-    ) -> List[Dict[str, Any]]:
+            self,
+            limit: int = 10
+        ) -> List[Dict[str, Any]]:
         """Get deployment history"""
-                return await self.request(
+        return await self.request(
             'GET',
             '/deployments/history',
             service='deploy',
@@ -403,7 +402,7 @@ class CatNetAPIClient:
 
     async def rotate_credentials(self, device_id: str) -> Dict[str, Any]:
         """Rotate device credentials"""
-                return await self.request(
+        return await self.request(
             'POST',
             f'/vault/rotate/{device_id}',
             service='base'
@@ -417,11 +416,9 @@ class CatNetAPIError(Exception):
     pass
 
 
-
 class AuthenticationError(CatNetAPIError):
     """Authentication failed"""
     pass
-
 
 
 class AuthorizationError(CatNetAPIError):
@@ -429,11 +426,9 @@ class AuthorizationError(CatNetAPIError):
     pass
 
 
-
 class NotFoundError(CatNetAPIError):
     """Resource not found"""
     pass
-
 
 
 class ServerError(CatNetAPIError):
@@ -441,17 +436,14 @@ class ServerError(CatNetAPIError):
     pass
 
 
-
 class APIError(CatNetAPIError):
     """Generic API error"""
     pass
 
 
-
 class ConnectionError(CatNetAPIError):
     """Connection failed"""
     pass
-
 
 
 class TimeoutError(CatNetAPIError):

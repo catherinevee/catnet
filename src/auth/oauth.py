@@ -18,7 +18,9 @@ from urllib.parse import urlencode
 
 
 @dataclass
-class OAuthConfig:
+    class OAuthConfig:
+    """OAuth provider configuration"""
+
     """OAuth provider configuration"""
 
     provider_name: str
@@ -387,13 +389,15 @@ class OAuth2Provider:
             return response.status_code == 200
 
     def _generate_code_challenge(self, verifier: str) -> str:
+        """
         Generate PKCE code challenge from verifier
-    Args:
-            verifier: Code verifier
-    Returns:
-            Base64 URL encoded code challenge
+        Args:
+        verifier: Code verifier
+        Returns:
+        Base64 URL encoded code challenge
         digest = hashlib.sha256(verifier.encode()).digest()
         return base64.urlsafe_b64encode(digest).decode().rstrip("=")
+        """
 
 
 # Alias for backward compatibility

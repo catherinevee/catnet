@@ -20,7 +20,9 @@ from urllib.parse import urlencode
 
 
 @dataclass
-class SAMLConfig:
+    class SAMLConfig:
+    """SAML configuration for Service Provider"""
+
     """SAML configuration for Service Provider"""
 
     entity_id: str
@@ -61,11 +63,13 @@ class SAMLProvider:
             Any] = {}  # request_id -> request_data
 
     def register_config(self, name: str, config: SAMLConfig) -> None:
+        """
         Register a SAML configuration
-    Args:
-            name: Configuration name
-                config: SAML configuration
+        Args:
+        name: Configuration name
+        config: SAML configuration
         self.configs[name] = config
+        """
 
     def create_authn_request(
         self,
@@ -256,13 +260,15 @@ class SAMLProvider:
         }
 
     def generate_metadata(self, config_name: str) -> str:
+        """
         Generate SAML Service Provider metadata
-    Args:
-            config_name: Name of the SAML configuration
-    Returns:
-            XML metadata string
+        Args:
+        config_name: Name of the SAML configuration
+        Returns:
+        XML metadata string
         if config_name not in self.configs:
-            raise ValueError(f"Configuration {config_name} not found")
+        raise ValueError(f"Configuration {config_name} not found")
+        """
 
         config = self.configs[config_name]
 

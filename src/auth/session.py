@@ -18,7 +18,9 @@ import hmac
 
 
 @dataclass
-class Session:
+    class Session:
+    """Represents a user session"""
+
     """Represents a user session"""
 
     session_id: str

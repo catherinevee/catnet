@@ -25,24 +25,28 @@ router = APIRouter(prefix="/git", tags=["gitops"])
 class WebhookPayload(BaseModel):
     """Generic webhook payload"""
 
+    """Generic webhook payload"""
+
     ref: str
-        repository: Dict[str, Any]
-        commits: List[Dict[str, Any]]
-        pusher: Dict[str, str]
-        sender: Dict[str, Any]
+    repository: Dict[str, Any]
+    commits: List[Dict[str, Any]]
+    pusher: Dict[str, str]
+    sender: Dict[str, Any]
 
 
 class ConfigDiff(BaseModel):
     """Configuration diff response"""
 
+    """Configuration diff response"""
+
     commit_sha: str
-        timestamp: datetime
-        author: str
-        message: str
-        files_changed: List[str]
-        additions: int
-        deletions: int
-        diff_content: str
+    timestamp: datetime
+    author: str
+    message: str
+    files_changed: List[str]
+    additions: int
+    deletions: int
+    diff_content: str
 
 
 def verify_github_signature(

@@ -2,6 +2,12 @@
 """
 Generate Certificate Authority and service certificates for mTLS
 """
+from src.security.vault import VaultClient
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.x509.oid import NameOID, ExtensionOID
+from cryptography import x509
 import os
 import sys
 import asyncio
@@ -11,14 +17,6 @@ from typing import Tuple, Optional
 
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from cryptography import x509
-from cryptography.x509.oid import NameOID, ExtensionOID
-from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.hazmat.backends import default_backend
-from src.security.vault import VaultClient
-
 
 
 class CertificateAuthority:
@@ -43,13 +41,13 @@ class CertificateAuthority:
         subject = issuer = x509.Name(
             [
                 x509.NameAttribute(NameOID.COUNTRY_NAME, "US"),
-                                x509.NameAttribute(
+                x509.NameAttribute(
                     NameOID.STATE_OR_PROVINCE_NAME,
                     "California"
                 ),
                 x509.NameAttribute(NameOID.LOCALITY_NAME, "San Francisco"),
                 x509.NameAttribute(NameOID.ORGANIZATION_NAME, "CatNet"),
-                                x509.NameAttribute(
+                x509.NameAttribute(
                     NameOID.ORGANIZATIONAL_UNIT_NAME,
                     "Security"
                 ),
@@ -65,7 +63,7 @@ class CertificateAuthority:
             .serial_number(x509.random_serial_number())
             .not_valid_before(datetime.utcnow())
             .not_valid_after(datetime.utcnow() + timedelta(days=3650))  # 10 \
-                years
+            years
             .add_extension(
                 x509.BasicConstraints(ca=True, path_length=None),
                 critical=True,
@@ -85,7 +83,7 @@ class CertificateAuthority:
                 critical=True,
             )
             .add_extension(
-                                x509.SubjectKeyIdentifier.from_public_key(
+                x509.SubjectKeyIdentifier.from_public_key(
                     self.ca_key.public_key()
                 ),
                 critical=False,
@@ -94,7 +92,7 @@ class CertificateAuthority:
         )
 
         # Serialize CA certificate and key
-        ca_cert_pem = self.ca_cert.public_bytes( \
+        ca_cert_pem = self.ca_cert.public_bytes(
             encoding=serialization.Encoding.PEM)
         ca_key_pem = self.ca_key.private_bytes(
             encoding=serialization.Encoding.PEM,
@@ -139,17 +137,17 @@ class CertificateAuthority:
         subject = x509.Name(
             [
                 x509.NameAttribute(NameOID.COUNTRY_NAME, "US"),
-                                x509.NameAttribute(
+                x509.NameAttribute(
                     NameOID.STATE_OR_PROVINCE_NAME,
                     "California"
                 ),
                 x509.NameAttribute(NameOID.LOCALITY_NAME, "San Francisco"),
                 x509.NameAttribute(NameOID.ORGANIZATION_NAME, "CatNet"),
-                                x509.NameAttribute(
+                x509.NameAttribute(
                     NameOID.ORGANIZATIONAL_UNIT_NAME,
                     service_name
                 ),
-                                x509.NameAttribute(
+                x509.NameAttribute(
                     NameOID.COMMON_NAME,
                     f"{service_name}.catnet.local"
                 ),
@@ -221,7 +219,7 @@ class CertificateAuthority:
         )
 
         # Serialize certificate and key
-        cert_pem = service_cert.public_bytes( \
+        cert_pem = service_cert.public_bytes(
             encoding=serialization.Encoding.PEM)
         key_pem = service_key.private_bytes(
             encoding=serialization.Encoding.PEM,
@@ -253,7 +251,7 @@ class CertificateAuthority:
         ca_key_path = self.certs_dir / "ca.key"
 
         with open(ca_cert_path, "rb") as f:
-                        self.ca_cert = x509.load_pem_x509_certificate(
+            self.ca_cert = x509.load_pem_x509_certificate(
                 f.read(),
                 default_backend()
             )
@@ -264,11 +262,11 @@ class CertificateAuthority:
             )
 
         async def store_in_vault(
-        self,
-        service_name: str,
-        cert_pem: bytes,
-        key_pem: bytes
-    ):
+            self,
+            service_name: str,
+            cert_pem: bytes,
+            key_pem: bytes
+        ):
         """Store certificate and key in Vault"""
         try:
             await self.vault.store_secret(
@@ -299,11 +297,11 @@ async def main():
     services = [
         ("auth-service", ["auth.catnet.local", "localhost", "127.0.0.1"]),
         ("gitops-service", ["gitops.catnet.local", "localhost", "127.0.0.1"]),
-                (
+        (
             "deployment-service",
             ["deploy.catnet.local",
-            "localhost",
-            "127.0.0.1"]
+             "localhost",
+             "127.0.0.1"]
         ),
         ("device-service", ["devices.catnet.local", "localhost", "127.0.0.1"]),
         ("api-gateway", ["api.catnet.local", "localhost", "127.0.0.1"]),

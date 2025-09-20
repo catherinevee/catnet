@@ -55,7 +55,7 @@ class ControlCategory(Enum):
 
 
 @dataclass
-class ComplianceControl:
+    class ComplianceControl:
     """Compliance control definition"""
 
     id: str
@@ -71,7 +71,7 @@ class ComplianceControl:
 
 
 @dataclass
-class ComplianceCheck:
+    class ComplianceCheck:
     """Compliance check result"""
 
     control_id: str
@@ -85,7 +85,7 @@ class ComplianceCheck:
 
 
 @dataclass
-class ComplianceReport:
+    class ComplianceReport:
     """Compliance report"""
 
     id: str

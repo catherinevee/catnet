@@ -16,29 +16,29 @@ class ConnectionTestRequest(BaseModel):
     """Request for testing device connection"""
 
     device_id: str
-        password: Optional[str] = None
-        simulation_mode: bool = True
+    password: Optional[str] = None
+    simulation_mode: bool = True
 
 
 class ConnectionTestResponse(BaseModel):
     """Response from connection test"""
 
     device_id: str
-        hostname: str
-        ip_address: str
-        connection_successful: bool
-        connection_mode: str
-        message: str
-        timestamp: str
+    hostname: str
+    ip_address: str
+    connection_successful: bool
+    connection_mode: str
+    message: str
+    timestamp: str
 
 
 class DeviceCommandRequest(BaseModel):
     """Request to send command to device"""
 
     device_id: str
-        command: str
-        password: Optional[str] = None
-        simulation_mode: bool = True
+    command: str
+    password: Optional[str] = None
+    simulation_mode: bool = True
 
 
 @router.post("/test", response_model=ConnectionTestResponse)

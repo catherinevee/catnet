@@ -1,6 +1,9 @@
 """
 Main CLI entry point for CatNet
 """
+from catnet_cli.utils import setup_logging, print_version
+from catnet_cli.config import ConfigManager
+from catnet_cli.commands import auth, gitops, deploy, device, vault
 import click
 import asyncio
 import sys
@@ -11,10 +14,6 @@ import json
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from catnet_cli.commands import auth, gitops, deploy, device, vault
-from catnet_cli.config import ConfigManager
-from catnet_cli.utils import setup_logging, print_version
 
 
 @click.group(context_settings=dict(help_option_names=["-h", "--help"]))

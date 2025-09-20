@@ -7,8 +7,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 with open("requirements.txt", "r", encoding="utf-8") as fh:
-    requirements = [line.strip() for line in fh if line.strip() and not \
-        line.startswith("#")]
+    requirements = [line.strip() for line in fh if line.strip() and not
+                    line.startswith("#")]
 
 setup(
     name="catnet",
@@ -34,7 +34,7 @@ setup(
         "console_scripts": [
             "catnet=catnet_cli.cli:cli",
             "catnet-legacy=src.main:cli",  # Keep legacy entry point for \
-                backward compatibility
+            backward compatibility
         ],
     },
     include_package_data=True,

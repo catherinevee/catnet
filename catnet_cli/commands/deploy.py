@@ -21,7 +21,6 @@ from catnet_cli.utils import (
 
 
 @click.group()
-
 def deploy():
     """Deployment management commands"""
     pass
@@ -163,7 +162,6 @@ def create_deployment(
 @click.option('--watch', '-w', is_flag=True, help='Watch deployment progress')
 @click.option('--interval', default=5, help='Watch interval in seconds')
 @click.pass_context
-
 def deployment_status(
     ctx: click.Context,
     deployment_id: str,
@@ -261,7 +259,6 @@ def deployment_status(
 @click.argument('deployment_id')
 @click.option('--comment', '-c', help='Approval comment for audit trail')
 @click.pass_context
-
 def approve_deployment(
     ctx: click.Context,
     deployment_id: str,

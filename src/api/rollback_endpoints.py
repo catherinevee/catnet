@@ -15,20 +15,26 @@ router = APIRouter(tags=["Rollback & Safety"])
 class HealthCheckRequest(BaseModel):
     """Request for device health check"""
 
+    """Request for device health check"""
+
     device_id: str
 
 
 class HealthCheckResponse(BaseModel):
     """Response from health check"""
 
+    """Response from health check"""
+
     device_id: str
-        hostname: str
-        status: str
-        timestamp: str
-        checks: List[Dict[str, Any]]
+    hostname: str
+    status: str
+    timestamp: str
+    checks: List[Dict[str, Any]]
 
 
 class RollbackRequest(BaseModel):
+    """Request to rollback deployment"""
+
     """Request to rollback deployment"""
 
     deployment_id: str
@@ -37,12 +43,14 @@ class RollbackRequest(BaseModel):
 class RollbackResponse(BaseModel):
     """Response from rollback operation"""
 
+    """Response from rollback operation"""
+
     success: bool
-        message: str
-        deployment_id: str
-        device_id: Optional[str] = None
-        rollback_time: Optional[str] = None
-        health_status: Optional[str] = None
+    message: str
+    deployment_id: str
+    device_id: Optional[str] = None
+    rollback_time: Optional[str] = None
+    health_status: Optional[str] = None
 
 
 @router.post("/health-check", response_model=HealthCheckResponse)

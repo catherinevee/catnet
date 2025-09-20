@@ -39,6 +39,8 @@ class RollbackState(Enum):
 class RollbackPoint:
     """Point-in-time snapshot for rollback"""
 
+    """Point-in-time snapshot for rollback"""
+
     id: str
     device_id: str
     timestamp: datetime
@@ -70,10 +72,12 @@ class RollbackManager: """
     """
 
     def __init__(self, device_service=None, backup_service=None): """
+        """
         Initialize rollback manager
-    Args:
-            device_service: Service for device operations
-            backup_service: Service for backup operations
+        Args:
+        device_service: Service for device operations
+        backup_service: Service for backup operations
+        """
         """
         self.device_service = device_service
         self.backup_service = backup_service

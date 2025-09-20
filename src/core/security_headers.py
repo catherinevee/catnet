@@ -22,16 +22,15 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware): """
     Implements OWASP security best practices
     """
 
-    def __init__(
-        self,
-        app,
-        enable_hsts: bool = True,
-        enable_csp: bool = True,
-        enable_cors: bool = True,
-        allowed_origins: List[str] = None,
-        csp_directives: Dict[str, str] = None,
-    ):
-        super().__init__(app)
+    def __init__(self,
+    app,
+    enable_hsts: bool = True,
+    enable_csp: bool = True,
+    enable_cors: bool = True,
+    allowed_origins: List[str] = None,
+    csp_directives: Dict[str,
+    str] = None,
+     ): super().__init__(app)
         self.enable_hsts = enable_hsts
         self.enable_csp = enable_csp
         self.enable_cors = enable_cors
@@ -178,14 +177,7 @@ class CSRFProtection:
     CSRF Protection implementation
     Uses double-submit cookie pattern"""
 
-    def __init__(
-        self,
-        secret_key: str,
-        cookie_name: str = "csrf_token",
-        header_name: str = "X-CSRF-Token",
-        excluded_paths: Optional[List[str]] = None,
-    ):
-        self.secret_key = secret_key
+    def __init__(self, secret_key: str, cookie_name: str = "csrf_token", header_name: str = "X-CSRF-Token", excluded_paths: Optional[List[str]] = None, ):        self.secret_key = secret_key
         self.cookie_name = cookie_name
         self.header_name = header_name
         self.excluded_paths = excluded_paths or [
@@ -299,14 +291,7 @@ class RequestSignatureVerification:
     Request signature verification for API calls
     Implements HMAC-SHA256 signing"""
 
-    def __init__(
-        self,
-        secret_key: str,
-        header_name: str = "X-Signature",
-        timestamp_header: str = "X-Timestamp",
-        max_age: int = 300,  # 5 minutes
-    ):
-        self.secret_key = secret_key
+    def __init__(self, secret_key: str, header_name: str = "X-Signature", timestamp_header: str = "X-Timestamp", max_age: int = 300,  # 5 minutes ):        self.secret_key = secret_key
         self.header_name = header_name
         self.timestamp_header = timestamp_header
         self.max_age = max_age

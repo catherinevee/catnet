@@ -19,16 +19,7 @@ class CORSConfig:"""
 class CORSConfig: """
 CORS configuration for production environment
 
-    def __init__(
-        self,
-            allowed_origins: List[str] = None,
-            allowed_methods: List[str] = None,
-            allowed_headers: List[str] = None,
-            exposed_headers: List[str] = None,
-            allow_credentials: bool = True,
-            max_age: int = 86400,
-    ):"""
-        Initialize CORS configuration
+    def __init__(self, allowed_origins: List[str] = None, allowed_methods: List[str] = None, allowed_headers: List[str] = None, exposed_headers: List[str] = None, allow_credentials: bool = True, max_age: int = 86400, ):"""        Initialize CORS configuration
     Args:
             allowed_origins: List of allowed origins
                 allowed_methods: List of allowed HTTP methods
@@ -135,14 +126,7 @@ class APIVersioning:
     """
     API versioning implementation"""
 
-    def __init__(
-        self,
-            default_version: str = "v1",
-            supported_versions: List[str] = None,
-            deprecated_versions: List[str] = None,
-            version_header: str = "X-API-Version",
-    ):
-        """
+    def __init__(self, default_version: str = "v1", supported_versions: List[str] = None, deprecated_versions: List[str] = None, version_header: str = "X-API-Version", ):        """
         Initialize API versioning
     Args:
             default_version: Default API version

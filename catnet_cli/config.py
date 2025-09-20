@@ -11,7 +11,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-
 class ConfigManager:
     """Manage CLI configuration from files and environment"""
 
@@ -109,25 +108,25 @@ class ConfigManager:
         config = {}
 
         # API URLs
-        if url:= os.getenv('CATNET_API_URL'):
+        if url := os.getenv('CATNET_API_URL'):
             config.setdefault('api', {})['base_url'] = url
-        if url:= os.getenv('CATNET_AUTH_URL'):
+        if url := os.getenv('CATNET_AUTH_URL'):
             config.setdefault('api', {})['auth_url'] = url
-        if url:= os.getenv('CATNET_GITOPS_URL'):
+        if url := os.getenv('CATNET_GITOPS_URL'):
             config.setdefault('api', {})['gitops_url'] = url
-        if url:= os.getenv('CATNET_DEPLOY_URL'):
+        if url := os.getenv('CATNET_DEPLOY_URL'):
             config.setdefault('api', {})['deploy_url'] = url
-        if url:= os.getenv('CATNET_DEVICE_URL'):
+        if url := os.getenv('CATNET_DEVICE_URL'):
             config.setdefault('api', {})['device_url'] = url
 
         # Vault
-        if url:= os.getenv('CATNET_VAULT_URL'):
+        if url := os.getenv('CATNET_VAULT_URL'):
             config.setdefault('vault', {})['url'] = url
-        if namespace:= os.getenv('CATNET_VAULT_NAMESPACE'):
+        if namespace := os.getenv('CATNET_VAULT_NAMESPACE'):
             config.setdefault('vault', {})['namespace'] = namespace
 
         # Debug
-        if debug:= os.getenv('CATNET_DEBUG'):
+        if debug := os.getenv('CATNET_DEBUG'):
             config['debug'] = debug.lower() in ['1', 'true', 'yes']
 
         return config

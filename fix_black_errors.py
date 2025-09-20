@@ -14,16 +14,22 @@ def fix_documentation_placeholders(filepath):
     try:
         with open(filepath, "r", encoding="utf-8") as f:
             content = f.read()
-    except:
+    except BaseException:
         return False
 
     original_content = content
 
     # Pattern 1: Remove standalone "Documentation placeholder" lines
-    content = re.sub(r'^[ \t]*"""[ \t]*\n[ \t]*Documentation placeholder[ \t]*\n[ \t]*"""[ \t]*\n', '', content, flags=re.MULTILINE)
+    content = re.sub(
+        r'^[ \t]*"""[ \t]*\n[ \t]*Documentation placeholder[ \t]*\n[ \t]*"""[ \t]*\n',
+        "",
+        content,
+        flags=re.MULTILINE,
+    )
 
-    # Pattern 2: Remove incorrectly placed Documentation placeholder at wrong indentation
-    content = re.sub(r'\n[ \t]*Documentation placeholder[ \t]*\n', '\n', content)
+    # Pattern 2: Remove incorrectly placed Documentation placeholder at wrong
+    # indentation
+    content = re.sub(r"\n[ \t]*Documentation placeholder[ \t]*\n", "\n", content)
 
     # Pattern 3: Fix docstrings that have Documentation placeholder breaking them
     # Match docstrings with Documentation placeholder interrupting them
@@ -38,21 +44,19 @@ def fix_documentation_placeholders(filepath):
         r'^([ \t]*)(""".*?)\n[ \t]*"""[ \t]*\n[ \t]*Documentation placeholder[ \t]*\n[ \t]*"""',
         fix_broken_docstring,
         content,
-        flags=re.MULTILINE
+        flags=re.MULTILINE,
     )
 
     # Pattern 4: Remove duplicate pass statements
-    content = re.sub(r'(\n[ \t]*pass[ \t]*\n)([ \t]*pass[ \t]*\n)+', r'\1', content)
+    content = re.sub(r"(\n[ \t]*pass[ \t]*\n)([ \t]*pass[ \t]*\n)+", r"\1", content)
 
     # Pattern 5: Remove pass statements right before function/class definitions
-    content = re.sub(r'\n[ \t]*pass[ \t]*\n([ \t]*(?:def|class|async def))', r'\n\1', content)
+    content = re.sub(
+        r"\n[ \t]*pass[ \t]*\n([ \t]*(?:def|class|async def))", r"\n\1", content
+    )
 
     # Pattern 6: Fix methods that have pass followed by docstring
-    content = re.sub(
-        r'(def [^:]+:)\n([ \t]*)pass\n([ \t]*""")',
-        r'\1\n\3',
-        content
-    )
+    content = re.sub(r'(def [^:]+:)\n([ \t]*)pass\n([ \t]*""")', r"\1\n\3", content)
 
     if content != original_content:
         with open(filepath, "w", encoding="utf-8") as f:
@@ -67,7 +71,7 @@ def fix_file_specific_issues(filepath):
     try:
         with open(filepath, "r", encoding="utf-8") as f:
             lines = f.readlines()
-    except:
+    except BaseException:
         return False
 
     filename = os.path.basename(filepath)
@@ -85,9 +89,11 @@ def fix_file_specific_issues(filepath):
 
         # Fix broken docstrings
         if i < len(lines) - 2:
-            if (line.strip() == '"""' and
-                lines[i + 1].strip() == "Documentation placeholder" and
-                lines[i + 2].strip() == '"""'):
+            if (
+                line.strip() == '"""'
+                and lines[i + 1].strip() == "Documentation placeholder"
+                and lines[i + 2].strip() == '"""'
+            ):
                 # Skip these three lines, they're a broken docstring
                 i += 3
                 modified = True

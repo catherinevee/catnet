@@ -13,7 +13,7 @@ def fix_file(filepath):
     try:
         with open(filepath, "r", encoding="utf-8") as f:
             lines = f.readlines()
-    except:
+    except BaseException:
         return False
 
     modified = False
@@ -65,7 +65,8 @@ def fix_file(filepath):
             )
             modified = True
 
-        # Fix indentation issues - if a line starts with def/class but previous non-empty line doesn't end properly
+        # Fix indentation issues - if a line starts with def/class but previous
+        # non-empty line doesn't end properly
         if (
             line.strip().startswith("def ") or line.strip().startswith("class ")
         ) and i > 0:

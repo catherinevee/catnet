@@ -23,13 +23,7 @@ class RateLimiter: """
     Supports per-user and per-IP rate limiting with Redis backend
     """
 
-    def __init__(
-        self,
-        redis_url: str = "redis://localhost:6379",
-        default_rate: int = 100,
-        default_period: int = 60,
-    ):
-        """
+    def __init__(self, redis_url: str = "redis://localhost:6379", default_rate: int = 100, default_period: int = 60, ): """
         Initialize rate limiter
     Args:
             redis_url: Redis connection URL

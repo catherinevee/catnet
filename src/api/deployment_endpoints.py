@@ -26,56 +26,56 @@ class DryRunRequest(BaseModel):
     """Dry run deployment request"""
 
     config_ids: List[str]
-        device_ids: List[str]
-        strategy: str = "rolling"
-        validation_only: bool = False
+    device_ids: List[str]
+    strategy: str = "rolling"
+    validation_only: bool = False
 
 
 class DryRunResponse(BaseModel):
     """Dry run deployment response"""
 
     simulation_id: str
-        validation_results: Dict[str, Any]
-        affected_devices: List[Dict[str, str]]
-        estimated_duration: int  # seconds
-        warnings: List[str]
-        errors: List[str]
-        recommendations: List[str]
+    validation_results: Dict[str, Any]
+    affected_devices: List[Dict[str, str]]
+    estimated_duration: int  # seconds
+    warnings: List[str]
+    errors: List[str]
+    recommendations: List[str]
 
 
 class DeploymentMetrics(BaseModel):
     """Deployment metrics response"""
 
     total_deployments: int
-        successful_deployments: int
-        failed_deployments: int
-        rollback_count: int
-        average_duration: float  # seconds
-        success_rate: float  # percentage
-        deployments_by_strategy: Dict[str, int]
-        deployments_by_vendor: Dict[str, int]
-        recent_deployments: List[Dict[str, Any]]
+    successful_deployments: int
+    failed_deployments: int
+    rollback_count: int
+    average_duration: float  # seconds
+    success_rate: float  # percentage
+    deployments_by_strategy: Dict[str, int]
+    deployments_by_vendor: Dict[str, int]
+    recent_deployments: List[Dict[str, Any]]
 
 
 class ScheduledDeploymentRequest(BaseModel):
     """Scheduled deployment request"""
 
     config_ids: List[str]
-        device_ids: List[str]
-        strategy: str = "rolling"
-        scheduled_time: datetime
-        approval_required: bool = True
-        notification_emails: List[str] = []
-        maintenance_window_id: Optional[str] = None
+    device_ids: List[str]
+    strategy: str = "rolling"
+    scheduled_time: datetime
+    approval_required: bool = True
+    notification_emails: List[str] = []
+    maintenance_window_id: Optional[str] = None
 
 
 class ScheduledDeploymentResponse(BaseModel):
     """Scheduled deployment response"""
 
     deployment_id: str
-        scheduled_time: datetime
-        status: str
-        notification_sent: bool
+    scheduled_time: datetime
+    status: str
+    notification_sent: bool
 
 
 @router.post("/dry-run", response_model=DryRunResponse)
@@ -84,13 +84,15 @@ async def dry_run_deployment(
         current_user: User = Depends(get_current_user),
         db: AsyncSession = Depends(get_db),
 ):
-    Perform a dry-run deployment simulation
+    """
+    Perform a dry - run deployment simulation
 
     This endpoint:
     - Validates configurations without applying
     - Simulates deployment execution
     - Identifies potential issues
     - Provides recommendations
+    """
     logger.info(
         f"Dry-run deployment requested by {current_user.username} "
         f"for {len(request.device_ids)} devices"
@@ -151,8 +153,7 @@ async def dry_run_deployment(
                 backup_age = (datetime.utcnow() - device.last_backup).days
                 if backup_age > 7:
                     warnings.append(
-                        f"Device {device_id}"
-                            device.hostname} backup is {backup_age} days \
+                        f"Device {device.hostname} backup is {backup_age} days "
                             old")
                 else:
                 warnings.append(f"Device {device.hostname} has no backup")
@@ -242,6 +243,7 @@ async def get_deployment_metrics(
         current_user: User = Depends(get_current_user),
         db: AsyncSession = Depends(get_db),
 ):
+    """
     Get deployment metrics and statistics
 
     Provides:
@@ -249,6 +251,7 @@ async def get_deployment_metrics(
     - Average duration
     - Strategy breakdown
     - Recent deployment history
+    """
     logger.info(f"Deployment metrics requested by {current_user.username}")
 
     try:
@@ -387,6 +390,7 @@ async def schedule_deployment(
         current_user: User = Depends(get_current_user),
         db: AsyncSession = Depends(get_db),
 ):
+    """
     Schedule a deployment for future execution
 
     Features:
@@ -394,6 +398,7 @@ async def schedule_deployment(
     - Maintenance window validation
     - Email notifications
     - Automatic execution
+    """
     logger.info(
         f"Scheduled deployment requested by {current_user.username} "
         f"for {request.scheduled_time}"
@@ -425,7 +430,7 @@ async def schedule_deployment(
         # Create deployment record
         deployment = Deployment(
             created_by=current_user.id,
-            config_hash="pending",  # Will be calculated when configs are \
+            config_hash="pending",  # Will be calculated when configs are
             loaded
             signature="pending",  # Will be signed before execution
             state=DeploymentState.PENDING,
@@ -457,8 +462,8 @@ async def schedule_deployment(
             try:
                 # Send email notifications (simplified)
                 logger.info(
-                    f"Sending notifications to" \
-    f"{len(request.notification_emails)} recipients"
+                    f"Sending notifications to" \" \
+        "f"{len(request.notification_emails)} recipients"
                 )
                 notification_sent = True
             except Exception as e:

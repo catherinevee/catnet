@@ -39,14 +39,17 @@ def fix_file(filepath):
             # Check if next line is a docstring
             if i < len(lines):
                 next_line = lines[i]
-                # Check if docstring has wrong indentation (should be indented 4 spaces from class)
+                # Check if docstring has wrong indentation (should be indented 4 spaces
+                # from class)
                 docstring_match = re.match(r'^(\s*)(""".*""")\s*$', next_line)
                 if docstring_match:
                     current_indent = docstring_match.group(1)
                     expected_indent = class_indent + "    "
                     if current_indent != expected_indent:
                         # Fix docstring indentation
-                        fixed_lines.append(f'{expected_indent}{docstring_match.group(2).strip()}\n')
+                        fixed_lines.append(
+                            f'{expected_indent}{
+                                docstring_match.group(2).strip()}\n')
                         fixed = True
                         after_class_docstring = True
                         i += 1
@@ -91,7 +94,8 @@ def fix_file(filepath):
             # Reset flags if we hit an empty line or a new class/function
             if not line.strip() or re.match(r'^\s*(def|class)', line):
                 after_class_docstring = False
-                if re.match(r'^\S', line):  # No indentation means we're out of the class
+                if re.match(
+                        r'^\S', line):  # No indentation means we're out of the class
                     in_class = False
                     class_indent = ""
 
@@ -142,7 +146,9 @@ def fix_function_docstrings(filepath):
                     expected_indent = func_indent + "    "
                     if current_indent != expected_indent:
                         # Fix docstring indentation
-                        fixed_lines.append(f'{expected_indent}{docstring_match.group(2).strip()}\n')
+                        fixed_lines.append(
+                            f'{expected_indent}{
+                                docstring_match.group(2).strip()}\n')
                         fixed = True
                         i += 1
                     else:

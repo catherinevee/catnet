@@ -49,49 +49,59 @@ class LoginResponse(BaseModel):
 class MFAEnrollRequest(BaseModel):
     """MFA enrollment request"""
 
+    """MFA enrollment request"""
+
     method: str  # totp, sms, email
-        phone_number: Optional[str] = None
-        backup_email: Optional[EmailStr] = None
+    phone_number: Optional[str] = None
+    backup_email: Optional[EmailStr] = None
 
 
 class MFAEnrollResponse(BaseModel):
     """MFA enrollment response"""
 
+    """MFA enrollment response"""
+
     method: str
-        qr_code: Optional[str] = None  # Base64 encoded QR code for TOTP
-        backup_codes: List[str] = []
-        enrolled_at: datetime
+    qr_code: Optional[str] = None  # Base64 encoded QR code for TOTP
+    backup_codes: List[str] = []
+    enrolled_at: datetime
 
 
 class CertificateValidationRequest(BaseModel):
     """Certificate validation request"""
 
+    """Certificate validation request"""
+
     certificate: str  # PEM encoded certificate
-        device_id: Optional[str] = None
+    device_id: Optional[str] = None
 
 
 class CertificateValidationResponse(BaseModel):
     """Certificate validation response"""
 
+    """Certificate validation response"""
+
     valid: bool
-        subject: Dict[str, str]
-        issuer: Dict[str, str]
-        serial_number: str
-        not_valid_before: datetime
-        not_valid_after: datetime
-        device_id: Optional[str] = None
+    subject: Dict[str, str]
+    issuer: Dict[str, str]
+    serial_number: str
+    not_valid_before: datetime
+    not_valid_after: datetime
+    device_id: Optional[str] = None
 
 
 class SessionInfo(BaseModel):
     """Session information"""
 
+    """Session information"""
+
     session_id: str
-        user_id: str
-        created_at: datetime
-        last_activity: datetime
-        ip_address: str
-        user_agent: str
-        expires_at: datetime
+    user_id: str
+    created_at: datetime
+    last_activity: datetime
+    ip_address: str
+    user_agent: str
+    expires_at: datetime
 
 
 @router.post("/login", response_model=LoginResponse)

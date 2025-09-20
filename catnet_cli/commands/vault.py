@@ -16,7 +16,6 @@ from catnet_cli.utils import (
 
 
 @click.group()
-
 def vault():
     """Secrets and credentials management via HashiCorp Vault"""
     pass

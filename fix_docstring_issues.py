@@ -13,25 +13,25 @@ def fix_class_docstrings(content):
     # Fix pattern: class Name:"""docstring"""
     content = re.sub(
         r'^(\s*)(class\s+\w+.*:)("""[^"]*""")$',
-        r'\1\2\n\1    \3',
+        r"\1\2\n\1    \3",
         content,
-        flags=re.MULTILINE
+        flags=re.MULTILINE,
     )
 
     # Fix pattern: class Name(Base):"""docstring"""
     content = re.sub(
         r'^(\s*)(class\s+\w+\([^)]*\):)("""[^"]*""")$',
-        r'\1\2\n\1    \3',
+        r"\1\2\n\1    \3",
         content,
-        flags=re.MULTILINE
+        flags=re.MULTILINE,
     )
 
     # Fix pattern: def func():"""docstring"""
     content = re.sub(
         r'^(\s*)(def\s+\w+\([^)]*\):)("""[^"]*""")$',
-        r'\1\2\n\1    \3',
+        r"\1\2\n\1    \3",
         content,
-        flags=re.MULTILINE
+        flags=re.MULTILINE,
     )
 
     return content
@@ -39,7 +39,7 @@ def fix_class_docstrings(content):
 
 def fix_broken_strings(content):
     """Fix broken string literals."""
-    lines = content.split('\n')
+    lines = content.split("\n")
     fixed_lines = []
 
     for i, line in enumerate(lines):
@@ -55,12 +55,12 @@ def fix_broken_strings(content):
 
         fixed_lines.append(line)
 
-    return '\n'.join(fixed_lines)
+    return "\n".join(fixed_lines)
 
 
 def fix_indentation_after_docstring(content):
     """Fix incorrect indentation after docstrings."""
-    lines = content.split('\n')
+    lines = content.split("\n")
     fixed_lines = []
     i = 0
 
@@ -68,8 +68,8 @@ def fix_indentation_after_docstring(content):
         line = lines[i]
 
         # Check if this is a method/function with incorrect docstring indentation
-        if re.match(r'^(\s*)(def|async def)\s+\w+\(.*\):\s*$', line):
-            indent_match = re.match(r'^(\s*)', line)
+        if re.match(r"^(\s*)(def|async def)\s+\w+\(.*\):\s*$", line):
+            indent_match = re.match(r"^(\s*)", line)
             base_indent = indent_match.group(1) if indent_match else ""
             expected_indent = base_indent + "    "
 
@@ -82,7 +82,9 @@ def fix_indentation_after_docstring(content):
                 # If next line is not properly indented docstring or code
                 if next_line.strip() and not next_line.startswith(expected_indent):
                     # It's likely a misplaced docstring or code
-                    if next_line.strip().startswith('"""') or next_line.strip().startswith("'''"):
+                    if next_line.strip().startswith(
+                        '"""'
+                    ) or next_line.strip().startswith("'''"):
                         fixed_lines.append(expected_indent + next_line.strip())
                     else:
                         fixed_lines.append(next_line)
@@ -94,7 +96,7 @@ def fix_indentation_after_docstring(content):
 
         i += 1
 
-    return '\n'.join(fixed_lines)
+    return "\n".join(fixed_lines)
 
 
 def fix_file(filepath):
@@ -102,7 +104,7 @@ def fix_file(filepath):
     try:
         with open(filepath, "r", encoding="utf-8") as f:
             content = f.read()
-    except:
+    except BaseException:
         return False
 
     original = content
@@ -113,7 +115,9 @@ def fix_file(filepath):
     content = fix_indentation_after_docstring(content)
 
     # Remove any standalone "Documentation placeholder" lines
-    content = re.sub(r'^\s*Documentation placeholder\s*$', '', content, flags=re.MULTILINE)
+    content = re.sub(
+        r"^\s*Documentation placeholder\s*$", "", content, flags=re.MULTILINE
+    )
 
     # Fix broken multiline strings in specific patterns
     content = re.sub(r'(\w+)\s*"\s*\n\s*f"', r'\1" \\\n    f"', content)
@@ -156,10 +160,11 @@ def main():
     # Now run Black
     print("\nRunning Black formatter...")
     import subprocess
+
     result = subprocess.run(
         ["python", "-m", "black", "src/", "--line-length", "88"],
         capture_output=True,
-        text=True
+        text=True,
     )
 
     if result.returncode == 0:

@@ -14,12 +14,14 @@ router = APIRouter(tags=["devices"])
 class DeviceCreateRequest(BaseModel):
     """Request model for creating a device"""
 
+    """Request model for creating a device"""
+
     hostname: str = Field(..., description="Device hostname")
-        ip_address: str = Field(..., description="Device IP address")
-        vendor: str = Field(default="cisco_ios", description="Device vendor")
-        username: str = Field(default="admin", description="SSH username")
-        ssh_port: int = Field(default=22, description="SSH port")
-        tags: List[str] = Field(
+    ip_address: str = Field(..., description="Device IP address")
+    vendor: str = Field(default="cisco_ios", description="Device vendor")
+    username: str = Field(default="admin", description="SSH username")
+    ssh_port: int = Field(default=22, description="SSH port")
+    tags: List[str] = Field(
     default_factory=list,
      description="Device tags")
 
@@ -27,28 +29,32 @@ class DeviceCreateRequest(BaseModel):
 class DeviceUpdateRequest(BaseModel):
     """Request model for updating a device"""
 
+    """Request model for updating a device"""
+
     hostname: Optional[str] = None
-        ip_address: Optional[str] = None
-        vendor: Optional[str] = None
-        username: Optional[str] = None
-        ssh_port: Optional[int] = None
-        is_active: Optional[bool] = None
-        tags: Optional[List[str]] = None
+    ip_address: Optional[str] = None
+    vendor: Optional[str] = None
+    username: Optional[str] = None
+    ssh_port: Optional[int] = None
+    is_active: Optional[bool] = None
+    tags: Optional[List[str]] = None
 
 
 class DeviceResponse(BaseModel):
     """Response model for device information"""
 
+    """Response model for device information"""
+
     id: str
-        hostname: str
-        ip_address: str
-        vendor: str
-        username: str
-        ssh_port: int
-        added_at: str
-        last_seen: Optional[str] = None
-        is_active: bool
-        tags: List[str]
+    hostname: str
+    ip_address: str
+    vendor: str
+    username: str
+    ssh_port: int
+    added_at: str
+    last_seen: Optional[str] = None
+    is_active: bool
+    tags: List[str]
 
 
 @router.post("", response_model=DeviceResponse,

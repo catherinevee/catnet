@@ -21,7 +21,6 @@ from catnet_cli.utils import (
 
 
 @click.group()
-
 def device():
     """Device management commands"""
     pass
@@ -51,7 +50,6 @@ def device():
     help='Output format'
 )
 @click.pass_context
-
 def list_devices(
     ctx: click.Context,
     vendor: Optional[str],
