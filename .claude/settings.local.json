@@ -33,7 +33,9 @@
       "Bash(curl:*)",
       "Bash(git checkout:*)",
       "Bash(autopep8:*)",
-      "Bash(git remote get-url:*)"
+      "Bash(git remote get-url:*)",
+      "Bash(for:*)",
+      "Bash(do echo -n \"$file: \")"
     ],
     "deny": [],
     "ask": []
