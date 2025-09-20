@@ -18,23 +18,23 @@ from urllib.parse import urlencode
 
 
 @dataclass
-    class OAuthConfig:
-    """OAuth provider configuration"""OAuth provider configuration"""
+class OAuthConfig:
+    """OAuth provider configuration"""
 
     provider_name: str
-        client_id: str
-        client_secret: str
-        authorize_url: str
-        token_url: str
-        userinfo_url: str
-        redirect_uri: str
-        scopes: List[str]
-        jwks_uri: Optional[str] = None
-        issuer: Optional[str] = None
+    client_id: str
+    client_secret: str
+    authorize_url: str
+    token_url: str
+    userinfo_url: str
+    redirect_uri: str
+    scopes: List[str]
+    jwks_uri: Optional[str] = None
+    issuer: Optional[str] = None
 
 
 class OAuth2Provider:
-    Handles OAuth2 authentication flows
+    """Handles OAuth2 authentication flows"""
 
     # Well-known OAuth2 provider configurations
     PROVIDERS = {

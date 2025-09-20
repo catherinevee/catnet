@@ -13,7 +13,7 @@ router = APIRouter(tags=["Rollback & Safety"])
 
 
 class HealthCheckRequest(BaseModel):
-    """Request for device health check"""Request for device health check"""
+    """Request for device health check"""
 
     device_id: str
 

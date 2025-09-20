@@ -13,7 +13,7 @@ router = APIRouter(tags=["Device Connection"])
 
 
 class ConnectionTestRequest(BaseModel):
-    """Request for testing device connection"""Response from connection test"""
+    """Request for testing device connection"""
 
     device_id: str
     hostname: str

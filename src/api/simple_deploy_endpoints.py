@@ -14,7 +14,7 @@ router = APIRouter(tags=["Deployment"])
 
 
 class CreateDeploymentRequest(BaseModel):
-    """Request to create a deployment"""Deployment response model"""
+    """Request to create a deployment"""
     id: str
     config_path: str
     device_id: str

@@ -154,10 +154,9 @@ async def dry_run_deployment(
                 backup_age = (datetime.utcnow() - device.last_backup).days
                 if backup_age > 7:
                     warnings.append(
-                        f"Device {
-    device.hostname} backup is {backup_age} days "
-                            old")
-                else:
+                        f"Device {device.hostname} backup is {backup_age} days old"
+                    )
+            else:
                 warnings.append(f"Device {device.hostname} has no backup")
 
             validation_results[device.hostname] = device_result

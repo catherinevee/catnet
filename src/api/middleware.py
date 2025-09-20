@@ -79,49 +79,49 @@ class RateLimitMiddleware(BaseModel):
                 call_next: Callable
         ) -> Response:
             # Get client identifier (IP address)
-        client_ip = request.client.host
+            client_ip = request.client.host
 
-        # Check rate limit
-        current_time = time.time()
+            # Check rate limit
+            current_time = time.time()
 
-        if client_ip not in self.clients:
-            self.clients[client_ip] = []
+            if client_ip not in self.clients:
+                self.clients[client_ip] = []
 
-        # Remove old requests outside the time window
-        self.clients[client_ip] = [
-            req_time
-            for req_time in self.clients[client_ip]
-            if current_time - req_time < self.period
-        ]
+            # Remove old requests outside the time window
+            self.clients[client_ip] = [
+                req_time
+                for req_time in self.clients[client_ip]
+                if current_time - req_time < self.period
+            ]
 
-        # Check if limit exceeded
-        if len(self.clients[client_ip]) >= self.calls:
-            logger.warning(f"Rate limit exceeded for client {client_ip}")
-            return Response(
-                content="Rate limit exceeded",
-                status_code=429,
-                headers={
-                    "Retry-After": str(self.period),
-                    "X-RateLimit-Limit": str(self.calls),
-                    "X-RateLimit-Remaining": "0",
-                    "X-RateLimit-Reset": str(int(current_time + self.period)),
-                },
-            )
+            # Check if limit exceeded
+            if len(self.clients[client_ip]) >= self.calls:
+                logger.warning(f"Rate limit exceeded for client {client_ip}")
+                return Response(
+                    content="Rate limit exceeded",
+                    status_code=429,
+                    headers={
+                        "Retry-After": str(self.period),
+                        "X-RateLimit-Limit": str(self.calls),
+                        "X-RateLimit-Remaining": "0",
+                        "X-RateLimit-Reset": str(int(current_time + self.period)),
+                    },
+                )
 
-        # Add current request
-        self.clients[client_ip].append(current_time)
+            # Add current request
+            self.clients[client_ip].append(current_time)
 
-        # Process request
-        response = await call_next(request)
+            # Process request
+            response = await call_next(request)
 
-        # Add rate limit headers
-        remaining = self.calls - len(self.clients[client_ip])
-        response.headers["X-RateLimit-Limit"] = str(self.calls)
-        response.headers["X-RateLimit-Remaining"] = str(remaining)
-        response.headers["X-RateLimit-Reset"] = str(int(current_time +
-                                                        self.period))
+            # Add rate limit headers
+            remaining = self.calls - len(self.clients[client_ip])
+            response.headers["X-RateLimit-Limit"] = str(self.calls)
+            response.headers["X-RateLimit-Remaining"] = str(remaining)
+            response.headers["X-RateLimit-Reset"] = str(int(current_time +
+                                                            self.period))
 
-        return response
+            return response
 
 
 class CORSMiddleware(BaseModel):
