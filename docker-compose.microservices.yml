@@ -1,0 +1,382 @@
+version: '3.9'
+
+services:
+  # PostgreSQL Database for all services
+  postgres:
+    image: postgres:14-alpine
+    container_name: catnet-postgres
+    environment:
+      POSTGRES_USER: catnet
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-catnet_secure_password}
+      POSTGRES_MULTIPLE_DATABASES: catnet_auth,catnet_gitops,catnet_deployment,catnet_device,catnet_monitoring
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-multiple-db.sh:/docker-entrypoint-initdb.d/init-multiple-db.sh
+    ports:
+      - "5432:5432"
+    networks:
+      - catnet
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U catnet"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # TimescaleDB for time-series metrics
+  timescaledb:
+    image: timescale/timescaledb:latest-pg14
+    container_name: catnet-timescaledb
+    environment:
+      POSTGRES_USER: catnet
+      POSTGRES_PASSWORD: ${TIMESCALE_PASSWORD:-catnet_timescale_password}
+      POSTGRES_DB: catnet_metrics
+    volumes:
+      - timescale_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - catnet
+
+  # Redis for caching and sessions
+  redis:
+    image: redis:7-alpine
+    container_name: catnet-redis
+    command: redis-server --requirepass ${REDIS_PASSWORD:-catnet_redis_password} --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - catnet
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # RabbitMQ for message queuing
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: catnet-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: catnet
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-catnet_rabbit_password}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - catnet
+
+  # HashiCorp Vault for secrets
+  vault:
+    image: vault:latest
+    container_name: catnet-vault
+    cap_add:
+      - IPC_LOCK
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_TOKEN:-catnet_vault_token}
+      VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
+    ports:
+      - "8200:8200"
+    networks:
+      - catnet
+    command: server -dev
+
+  # API Gateway (Port 8080)
+  api-gateway:
+    build:
+      context: .
+      dockerfile: docker/gateway.dockerfile
+      args:
+        SERVICE_PATH: src/api_gateway
+    container_name: catnet-gateway
+    environment:
+      SERVICE_NAME: api-gateway
+      SERVICE_PORT: 8080
+      REDIS_HOST: redis
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-catnet_redis_password}
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: ${VAULT_TOKEN:-catnet_vault_token}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    ports:
+      - "8080:8080"
+    networks:
+      - catnet
+    depends_on:
+      - redis
+      - vault
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Authentication Service (Port 8081)
+  auth-service:
+    build:
+      context: .
+      dockerfile: docker/microservice.dockerfile
+      args:
+        SERVICE_PATH: src/services/auth
+    container_name: catnet-auth
+    environment:
+      SERVICE_NAME: authentication
+      SERVICE_PORT: 8081
+      DATABASE_URL: postgresql+asyncpg://catnet:${POSTGRES_PASSWORD:-catnet_secure_password}@postgres:5432/catnet_auth
+      REDIS_HOST: redis
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-catnet_redis_password}
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: ${VAULT_TOKEN:-catnet_vault_token}
+      JWT_SECRET_KEY: ${JWT_SECRET:-catnet_jwt_secret}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    ports:
+      - "8081:8081"
+    networks:
+      - catnet
+    depends_on:
+      - postgres
+      - redis
+      - vault
+
+  # GitOps Service (Port 8082)
+  gitops-service:
+    build:
+      context: .
+      dockerfile: docker/microservice.dockerfile
+      args:
+        SERVICE_PATH: src/services/gitops
+    container_name: catnet-gitops
+    environment:
+      SERVICE_NAME: gitops
+      SERVICE_PORT: 8082
+      DATABASE_URL: postgresql+asyncpg://catnet:${POSTGRES_PASSWORD:-catnet_secure_password}@postgres:5432/catnet_gitops
+      REDIS_HOST: redis
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-catnet_redis_password}
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: ${VAULT_TOKEN:-catnet_vault_token}
+      GIT_REPOS_PATH: /app/repos
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    volumes:
+      - git_repos:/app/repos
+      - ~/.ssh:/app/.ssh:ro
+    ports:
+      - "8082:8082"
+    networks:
+      - catnet
+    depends_on:
+      - postgres
+      - redis
+      - vault
+
+  # Deployment Service (Port 8083)
+  deployment-service:
+    build:
+      context: .
+      dockerfile: docker/microservice.dockerfile
+      args:
+        SERVICE_PATH: src/services/deployment
+    container_name: catnet-deployment
+    environment:
+      SERVICE_NAME: deployment
+      SERVICE_PORT: 8083
+      DATABASE_URL: postgresql+asyncpg://catnet:${POSTGRES_PASSWORD:-catnet_secure_password}@postgres:5432/catnet_deployment
+      REDIS_HOST: redis
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-catnet_redis_password}
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: catnet
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-catnet_rabbit_password}
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: ${VAULT_TOKEN:-catnet_vault_token}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    ports:
+      - "8083:8083"
+    networks:
+      - catnet
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+      - vault
+
+  # Device Service (Port 8084)
+  device-service:
+    build:
+      context: .
+      dockerfile: docker/microservice.dockerfile
+      args:
+        SERVICE_PATH: src/services/device
+    container_name: catnet-device
+    environment:
+      SERVICE_NAME: device
+      SERVICE_PORT: 8084
+      DATABASE_URL: postgresql+asyncpg://catnet:${POSTGRES_PASSWORD:-catnet_secure_password}@postgres:5432/catnet_device
+      REDIS_HOST: redis
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-catnet_redis_password}
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: ${VAULT_TOKEN:-catnet_vault_token}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    volumes:
+      - device_configs:/app/configs
+      - device_backups:/app/backups
+    ports:
+      - "8084:8084"
+      - "830:830"    # NETCONF
+      - "161:161/udp" # SNMP
+    networks:
+      - catnet
+    depends_on:
+      - postgres
+      - redis
+      - vault
+
+  # Monitoring Service (Port 8085)
+  monitoring-service:
+    build:
+      context: .
+      dockerfile: docker/microservice.dockerfile
+      args:
+        SERVICE_PATH: src/services/monitoring
+    container_name: catnet-monitoring
+    environment:
+      SERVICE_NAME: monitoring
+      SERVICE_PORT: 8085
+      DATABASE_URL: postgresql+asyncpg://catnet:${POSTGRES_PASSWORD:-catnet_secure_password}@postgres:5432/catnet_monitoring
+      TIMESCALE_URL: postgresql+asyncpg://catnet:${TIMESCALE_PASSWORD:-catnet_timescale_password}@timescaledb:5432/catnet_metrics
+      REDIS_HOST: redis
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-catnet_redis_password}
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: ${VAULT_TOKEN:-catnet_vault_token}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    ports:
+      - "8085:8085"
+      - "2055:2055/udp"  # NetFlow
+      - "514:514/udp"    # Syslog
+    networks:
+      - catnet
+    depends_on:
+      - postgres
+      - timescaledb
+      - redis
+      - vault
+
+  # Background Worker Service
+  worker-service:
+    build:
+      context: .
+      dockerfile: docker/worker.dockerfile
+    container_name: catnet-worker
+    environment:
+      DATABASE_URL: postgresql+asyncpg://catnet:${POSTGRES_PASSWORD:-catnet_secure_password}@postgres:5432/catnet
+      REDIS_HOST: redis
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-catnet_redis_password}
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: catnet
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-catnet_rabbit_password}
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: ${VAULT_TOKEN:-catnet_vault_token}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    networks:
+      - catnet
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+      - vault
+    deploy:
+      replicas: 2
+
+  # Prometheus for metrics
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: catnet-prometheus
+    volumes:
+      - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    ports:
+      - "9090:9090"
+    networks:
+      - catnet
+
+  # Grafana for visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: catnet-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./configs/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./configs/grafana/datasources:/etc/grafana/provisioning/datasources
+    ports:
+      - "3000:3000"
+    networks:
+      - catnet
+    depends_on:
+      - prometheus
+
+  # Jaeger for distributed tracing
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: catnet-jaeger
+    environment:
+      COLLECTOR_OTLP_ENABLED: true
+    ports:
+      - "16686:16686"  # Jaeger UI
+      - "4317:4317"    # OTLP gRPC
+    networks:
+      - catnet
+
+  # Consul for service discovery
+  consul:
+    image: consul:latest
+    container_name: catnet-consul
+    command: agent -server -bootstrap-expect=1 -ui -client=0.0.0.0
+    ports:
+      - "8500:8500"
+      - "8600:8600/udp"
+    volumes:
+      - consul_data:/consul/data
+    networks:
+      - catnet
+
+  # NGINX reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: catnet-nginx
+    volumes:
+      - ./configs/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./configs/nginx/sites:/etc/nginx/conf.d:ro
+      - ./certs:/etc/nginx/certs:ro
+    ports:
+      - "443:443"
+      - "80:80"
+    networks:
+      - catnet
+    depends_on:
+      - api-gateway
+
+volumes:
+  postgres_data:
+  timescale_data:
+  redis_data:
+  rabbitmq_data:
+  vault_data:
+  prometheus_data:
+  grafana_data:
+  consul_data:
+  git_repos:
+  device_configs:
+  device_backups:
+
+networks:
+  catnet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
