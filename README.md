@@ -8,12 +8,7 @@
 [![Code Size](https://img.shields.io/github/languages/code-size/catherinevee/catnet)](https://github.com/catherinevee/catnet)
 [![Security Scan](https://img.shields.io/badge/security-A%2B-green.svg)](https://github.com/catherinevee/catnet/security)
 [![License](https://img.shields.io/github/license/catherinevee/catnet)](LICENSE)
-[![Last Commit](https://img.shields.io/github/last-commit/catherinevee/catnet)](https://github.com/catherinevee/catnet/commits/main)
-[![GitHub Stars](https://img.shields.io/github/stars/catherinevee/catnet?style=social)](https://github.com/catherinevee/catnet/stargazers)
 [![Release Version](https://img.shields.io/github/v/release/catherinevee/catnet?include_prereleases)](https://github.com/catherinevee/catnet/releases)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-[![Documentation](https://img.shields.io/badge/docs-complete-brightgreen.svg)](https://github.com/catherinevee/catnet/tree/main/docs)
-[![Maintenance](https://img.shields.io/badge/maintained-yes-green.svg)](https://github.com/catherinevee/catnet/commits/main)
 
 ## Project Status
 
