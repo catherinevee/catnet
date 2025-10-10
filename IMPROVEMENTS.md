@@ -769,3 +769,28 @@ CatNet has TWO separate FastAPI applications:
 - Deployment service testing
 - Device connector testing
 
+
+### Test Coverage Expansion - Batch 2 (2025-10-09)
+
+**New Test Files Created:**
+
+3. **tests/unit/auth/test_permissions.py** (598 lines)
+   - 11 test classes with 45+ test methods
+   - Tests for: RBAC, role hierarchy, permission checking, decorators
+   - Edge cases: inactive users, multiple roles, resource-based permissions
+   - Coverage: Complete permission system
+
+4. **tests/unit/deployment/test_strategies.py** (565 lines)
+   - 7 test classes with 35+ test methods
+   - Tests for: Canary, rolling, blue-green, all-at-once strategies
+   - Edge cases: partial failures, invalid configs, empty device lists
+   - Coverage: All deployment patterns
+
+**Cumulative Test Progress:**
+- **Test files:** 9 → 13 (+4 total)
+- **New test methods:** 145+ (65 from batch 1, 80 from batch 2)
+- **Lines of test code:** +2,211 (1,048 batch 1 + 1,163 batch 2)
+- **Module coverage:** Auth (JWT, MFA, RBAC) + Deployment (strategies)
+
+**Estimated Coverage:** ~15-20% (up from ~5%)
+
