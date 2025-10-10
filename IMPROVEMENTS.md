@@ -821,3 +821,44 @@ CatNet has TWO separate FastAPI applications:
 - Analysis: Route duplication documented
 - Quality gates: 15+ automated pre-commit hooks configured
 
+
+---
+
+## 📅 Week 2 Planning (2025-10-16)
+
+### Goals
+1. Expand test coverage to 40%+ (target 60+ total test files)
+2. Fix CI/CD workflow quality gates
+3. Resolve route duplication issue
+4. Add CODE_OF_CONDUCT.md
+5. Begin integration test expansion
+
+### Priority Tasks
+
+**High Priority - Testing:**
+- [ ] GitOps webhook handler tests
+- [ ] Security/encryption module tests  
+- [ ] LDAP authentication tests
+- [ ] Device vendor tests (Cisco, Juniper)
+- [ ] API endpoint integration tests
+
+**High Priority - Infrastructure:**
+- [ ] Fix CI/CD workflow (remove || true bypasses)
+- [ ] Resolve route duplication (choose canonical structure)
+- [ ] Add CODE_OF_CONDUCT.md
+- [ ] Initialize pre-commit baseline (secrets detection)
+
+**Medium Priority:**
+- [ ] Vault integration tests
+- [ ] Database model tests
+- [ ] Configuration parser tests
+- [ ] Backup/restore tests
+- [ ] Monitoring metrics tests
+
+### Test Coverage Roadmap
+
+**Current:** ~20-25% (14 test files, 185+ tests)  
+**Week 2 Target:** 40% (25+ test files, 350+ tests)  
+**Week 3-4 Target:** 60% (40+ test files, 500+ tests)  
+**Final Target:** 80%+ (60+ test files, 700+ tests)
+
