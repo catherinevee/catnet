@@ -739,3 +739,33 @@ CatNet has TWO separate FastAPI applications:
 
 **Status:** Analysis complete, awaiting decision on which app file to standardize on.
 
+
+### Test Coverage Expansion - 2025-10-09
+
+**New Test Files Created:**
+
+1. **tests/unit/auth/test_jwt_handler.py** (529 lines)
+   - 8 test classes with 30+ test methods
+   - Tests for: initialization, token generation, validation, revocation, refresh
+   - Edge cases: expired tokens, invalid signatures, malformed tokens
+   - Coverage: JWT authentication lifecycle
+
+2. **tests/unit/auth/test_mfa.py** (519 lines)
+   - 9 test classes with 35+ test methods
+   - Tests for: TOTP, backup codes, enrollment, verification, rate limiting
+   - Edge cases: expired configs, disabled MFA, invalid codes
+   - Coverage: Complete MFA functionality
+
+**Test Coverage Progress:**
+- **Before:** 9 test files, ~5% coverage estimate
+- **After:** 11 test files (+2)
+- **New Tests:** 65+ test methods added
+- **Focus Areas:** Authentication security (JWT + MFA)
+
+**Next Test Targets:**
+- RBAC/Permissions testing
+- LDAP authentication testing  
+- OAuth/SAML testing
+- Deployment service testing
+- Device connector testing
+
