@@ -702,3 +702,40 @@ This document tracks all improvements being made to CatNet based on the comprehe
 4. Add CODE_OF_CONDUCT.md
 5. Create .secrets.baseline for detect-secrets
 
+
+### Route Duplication Analysis - 2025-10-09
+
+**Finding:**
+CatNet has TWO separate FastAPI applications:
+
+1. **Root-level `main.py`** (older/simpler version)
+   - Uses: `src.api.*_routes` modules
+   - Imports: `auth_routes, deployment_routes, device_routes, gitops_routes`
+   - Simpler middleware setup
+   - Direct module imports
+
+2. **`src/api/main.py`** (newer/more complete version)
+   - Uses: `src.api.routes.*` modules  
+   - Imports from `.routes` directory (14 files)
+   - More comprehensive middleware (security, audit, rate limiting)
+   - Better structured with lifespan management
+
+3. **`src/api/app.py`** (alternative version)
+   - Uses: `src.api.routes.*_endpoints` modules
+   - Imports from `.routes` directory with `_endpoints` suffix
+   - Prometheus metrics integration
+   - Different middleware configuration
+
+**Directory Structure:**
+- `src/api/routes/` - 14 files (used by both app.py and main.py)
+- `src/api/routers/` - 6 files (not currently used by any main file)
+
+**Recommendation:**
+- **Keep:** `src/api/main.py` (most complete implementation)
+- **Keep:** `src/api/routes/` directory
+- **Remove:** Root-level `main.py` (superseded)
+- **Decision needed:** `src/api/routers/` appears unused - verify then remove
+- **Decision needed:** Consolidate `src/api/app.py` into `main.py` or choose one
+
+**Status:** Analysis complete, awaiting decision on which app file to standardize on.
+
