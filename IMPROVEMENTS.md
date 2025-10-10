@@ -794,3 +794,30 @@ CatNet has TWO separate FastAPI applications:
 
 **Estimated Coverage:** ~15-20% (up from ~5%)
 
+
+### Test Coverage Expansion - Batch 3 (2025-10-09)
+
+**New Test File Created:**
+
+5. **tests/unit/devices/test_connector.py** (535 lines)
+   - 8 test classes with 40+ test methods
+   - Tests for: Device connections, authentication, session management
+   - Connection pooling, bastion hosts, command execution
+   - Security: Audit logging, credential encryption, dangerous command blocking
+   - Edge cases: Inactive devices, unsupported vendors, timeout handling
+   - Coverage: Complete device connector functionality
+
+**Cumulative Test Progress:**
+- **Test files:** 9 → 14 (+5 total, +56%)
+- **New test methods:** 185+ (65 batch 1, 80 batch 2, 40 batch 3)
+- **Lines of test code:** +2,746 (2,211 previous + 535 new)
+- **Module coverage:** Auth (JWT, MFA, RBAC) + Deployment (strategies) + Devices (connector)
+
+**Estimated Coverage:** ~20-25% (up from ~5%)
+
+**Week 1 Summary:**
+- Documentation: 5 files (IMPROVEMENTS, SECURITY, CONTRIBUTING, pre-commit, yamllint)
+- Tests: 5 new test files, 185+ test methods, 2,746 lines
+- Analysis: Route duplication documented
+- Quality gates: 15+ automated pre-commit hooks configured
+
