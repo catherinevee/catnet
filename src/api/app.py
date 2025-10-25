@@ -12,7 +12,7 @@ from typing import Optional
 from prometheus_client import make_asgi_app, Counter, Histogram, Gauge
 import asyncio
 
-from ..db.database import database, init_db
+from ..db.database import db as database, init_db
 from ..security.vault import VaultClient
 from .routes import (
     auth_endpoints,
