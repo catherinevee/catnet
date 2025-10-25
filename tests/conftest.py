@@ -20,7 +20,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import sessionmaker
 
-from src.api.main import app
+from src.api.app import app
 from src.db.base import Base
 from src.db.session import get_session
 from src.auth.models import User

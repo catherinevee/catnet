@@ -1,8 +1,5 @@
-from . import auth_routes, deployment_routes, device_routes, gitops_routes
+"""CatNet API module."""
 
-__all__ = [
-    "auth_routes",
-    "deployment_routes",
-    "device_routes",
-    "gitops_routes"
-]
+from .app import app
+
+__all__ = ["app"]

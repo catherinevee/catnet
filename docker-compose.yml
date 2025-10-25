@@ -84,7 +84,7 @@ services:
   catnet-main:
     build: .
     container_name: catnet-main
-    command: python main.py --service main
+    command: uvicorn src.api.app:app --host 0.0.0.0 --port 8000 --service main
     environment:
       DATABASE_URL: postgresql+asyncpg://catnet:${DB_PASSWORD:-catnet_password}@postgres:5432/catnet
       REDIS_URL: redis://default:${REDIS_PASSWORD:-redis_password}@redis:6379/0
@@ -116,7 +116,7 @@ services:
   catnet-auth:
     build: .
     container_name: catnet-auth
-    command: python main.py --service auth
+    command: uvicorn src.api.app:app --host 0.0.0.0 --port 8000 --service auth
     environment:
       DATABASE_URL: postgresql+asyncpg://catnet:${DB_PASSWORD:-catnet_password}@postgres:5432/catnet
       REDIS_URL: redis://default:${REDIS_PASSWORD:-redis_password}@redis:6379/0
@@ -144,7 +144,7 @@ services:
   catnet-gitops:
     build: .
     container_name: catnet-gitops
-    command: python main.py --service gitops
+    command: uvicorn src.api.app:app --host 0.0.0.0 --port 8000 --service gitops
     environment:
       DATABASE_URL: postgresql+asyncpg://catnet:${DB_PASSWORD:-catnet_password}@postgres:5432/catnet
       REDIS_URL: redis://default:${REDIS_PASSWORD:-redis_password}@redis:6379/0
@@ -173,7 +173,7 @@ services:
   catnet-deployment:
     build: .
     container_name: catnet-deployment
-    command: python main.py --service deployment
+    command: uvicorn src.api.app:app --host 0.0.0.0 --port 8000 --service deployment
     environment:
       DATABASE_URL: postgresql+asyncpg://catnet:${DB_PASSWORD:-catnet_password}@postgres:5432/catnet
       REDIS_URL: redis://default:${REDIS_PASSWORD:-redis_password}@redis:6379/0
@@ -203,7 +203,7 @@ services:
   catnet-device:
     build: .
     container_name: catnet-device
-    command: python main.py --service device
+    command: uvicorn src.api.app:app --host 0.0.0.0 --port 8000 --service device
     environment:
       DATABASE_URL: postgresql+asyncpg://catnet:${DB_PASSWORD:-catnet_password}@postgres:5432/catnet
       REDIS_URL: redis://default:${REDIS_PASSWORD:-redis_password}@redis:6379/0
