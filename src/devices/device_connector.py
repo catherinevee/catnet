@@ -14,12 +14,39 @@ from ..security.audit import AuditLogger
 logger = logging.getLogger(__name__)
 
 class DeviceConnection:
+    """
+    Manages a secure connection to a network device.
+
+    Handles both Netmiko (CLI) and NAPALM (API) connections to network devices
+    with session logging, bastion host support, and credential management.
+
+    Attributes:
+        device: Device model instance with connection details
+        credentials: Dictionary containing username/password from Vault
+        session_id: Unique session identifier for audit logging
+        connection: Netmiko connection handler
+        napalm_driver: NAPALM driver for vendor-agnostic operations
+
+    Example:
+        >>> conn = DeviceConnection(device, credentials, session_id)
+        >>> await conn.connect()
+        >>> output = await conn.send_config("interface GigabitEthernet0/1\nshutdown")
+        >>> await conn.disconnect()
+    """
     def __init__(
         self,
         device: Device,
         credentials: Dict[str, Any],
         session_id: str
     ):
+        """
+        Initialize device connection with credentials.
+
+        Args:
+            device: Device model instance containing connection details
+            credentials: Dictionary with 'username' and 'password' keys
+            session_id: Unique session ID for logging and audit trail
+        """
         self.device = device
         self.credentials = credentials
         self.session_id = session_id
@@ -191,6 +218,24 @@ Host {self.device.hostname}
 
 
 class SecureDeviceConnector:
+    """
+    Secure wrapper for device connections with credential management.
+
+    Provides high-level interface for device connections with automatic
+    credential retrieval from Vault, audit logging, and session management.
+    Handles connection pooling and cleanup.
+
+    Attributes:
+        db: SQLAlchemy database session
+        vault: HashiCorp Vault client for credential retrieval
+        audit: Audit logger for compliance tracking
+        _connections: Dictionary of active connections by session ID
+
+    Example:
+        >>> connector = SecureDeviceConnector(db, vault, audit)
+        >>> async with connector.connect_device(device_id) as conn:
+        ...     output = await conn.send_config("show version")
+    """
     def __init__(
         self,
         db: Session,
