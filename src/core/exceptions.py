@@ -288,3 +288,83 @@ def handle_errors(func):
             logger.exception(f"Unexpected error in {func.__name__}")
             raise CatNetError("Operation failed", {"original_error": str(e)})
     return wrapper
+
+class DeploymentNotFoundError(DeploymentError):
+    """Deployment not found in database."""
+    def __init__(self, deployment_id: str):
+        message = (
+            f"Deployment {deployment_id} not found. "
+            "Verify the deployment ID or check your permissions. "
+            "Use 'catnet deployments list' to see available deployments."
+        )
+        super().__init__(message, {"deployment_id": deployment_id})
+        self.code = "DEPLOYMENT_NOT_FOUND"
+        self.deployment_id = deployment_id
+
+
+class DeploymentStateError(DeploymentError):
+    """Deployment is in invalid state for requested operation."""
+    def __init__(
+        self,
+        deployment_id: str,
+        current_state: str,
+        required_state: str,
+        operation: str
+    ):
+        message = (
+            f"Cannot {operation} deployment {deployment_id}. "
+            f"Current state: {current_state}, required state: {required_state}. "
+            f"Check deployment status with: catnet deployment status {deployment_id}"
+        )
+        details = {
+            "deployment_id": deployment_id,
+            "current_state": current_state,
+            "required_state": required_state,
+            "operation": operation
+        }
+        super().__init__(message, details)
+        self.code = "DEPLOYMENT_STATE_ERROR"
+        self.deployment_id = deployment_id
+        self.current_state = current_state
+        self.required_state = required_state
+
+
+class DeviceNotFoundError(DeviceConnectionError):
+    """Device not found in inventory."""
+    def __init__(self, device_id: str):
+        message = (
+            f"Device {device_id} not found in inventory. "
+            "Verify the device ID or check if device was decommissioned. "
+            "Use 'catnet devices list' to see available devices."
+        )
+        super().__init__(message, device_id)
+        self.code = "DEVICE_NOT_FOUND"
+
+
+class SecretExposedError(SecurityError):
+    """CRITICAL: Secrets detected in Git commit."""
+    def __init__(
+        self,
+        repository: str,
+        commit_hash: str,
+        secrets_found: list,
+        affected_files: list
+    ):
+        message = (
+            f"SECURITY ALERT: {len(secrets_found)} secret(s) detected in commit {commit_hash}. "
+            f"Repository: {repository}. Commit has been quarantined. "
+            "Immediate action required: 1) Rotate exposed credentials, "
+            "2) Remove secrets from Git history, 3) Review security procedures."
+        )
+        details = {
+            "repository": repository,
+            "commit_hash": commit_hash,
+            "secrets_count": len(secrets_found),
+            "affected_files": affected_files,
+            "severity": "CRITICAL"
+        }
+        super().__init__(message, details)
+        self.code = "SECRET_EXPOSED"
+        self.repository = repository
+        self.commit_hash = commit_hash
+        self.secrets_found = secrets_found

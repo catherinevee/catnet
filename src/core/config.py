@@ -59,6 +59,10 @@ class Settings(BaseSettings):
     git_default_branch: str = Field(default="main", env="GIT_DEFAULT_BRANCH")
     git_webhook_secret: SecretStr = Field(..., env="GIT_WEBHOOK_SECRET")
     gpg_verification_enabled: bool = Field(default=True, env="GPG_VERIFICATION_ENABLED")
+    gpg_home_dir: Path = Field(default=Path("/var/catnet/.gnupg"), env="GPG_HOME_DIR")
+    gpg_trusted_keys: List[str] = Field(default=[], env="GPG_TRUSTED_KEYS")
+    gpg_reject_untrusted: bool = Field(default=True, env="GPG_REJECT_UNTRUSTED")
+    gpg_require_signatures: bool = Field(default=True, env="GPG_REQUIRE_SIGNATURES")
 
     # Deployment Settings
     canary_stages: List[int] = Field(default=[5, 25, 50, 100], env="CANARY_STAGES")
@@ -78,8 +82,7 @@ class Settings(BaseSettings):
     # Network Device Defaults
     default_device_timeout: int = Field(default=30, env="DEFAULT_DEVICE_TIMEOUT")
     default_device_port_ssh: int = Field(default=22, env="DEFAULT_DEVICE_PORT_SSH")
-    default_device_port_telnet: int = Field(default=23, env="DEFAULT_DEVICE_PORT_TELNET")
-    enable_telnet: bool = Field(default=False, env="ENABLE_TELNET")
+    # Telnet support removed for security compliance (NIST 800-53, CIS, PCI DSS)
 
     # Session Recording
     session_recording_enabled: bool = Field(default=True, env="SESSION_RECORDING_ENABLED")
