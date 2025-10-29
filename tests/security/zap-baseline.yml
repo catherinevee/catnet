@@ -1,0 +1,250 @@
+# OWASP ZAP Baseline Scan Configuration
+# Dynamic Application Security Testing (DAST)
+#
+# Run with:
+#   docker run -v $(pwd):/zap/wrk/:rw \
+#     -t owasp/zap2docker-stable zap-baseline.py \
+#     -t http://catnet-api:8000 \
+#     -c zap-baseline.yml \
+#     -r zap-baseline-report.html
+
+env:
+  contexts:
+    - name: "CatNet API"
+      urls:
+        - "http://localhost:8000"
+      includePaths:
+        - "http://localhost:8000/api/.*"
+      excludePaths:
+        - "http://localhost:8000/api/docs.*"
+        - "http://localhost:8000/api/redoc.*"
+        - "http://localhost:8000/api/openapi.json"
+      authentication:
+        method: "bearer"
+        parameters:
+          token: "${CATNET_API_TOKEN}"
+      sessionManagement:
+        method: "cookie"
+      technology:
+        - Python
+        - FastAPI
+        - PostgreSQL
+        - Redis
+
+  parameters:
+    failOnError: true
+    failOnWarning: false
+    progressToStdout: true
+
+jobs:
+  - type: passiveScan-config
+    parameters:
+      # Maximum alerts to raise per rule
+      maxAlertsPerRule: 10
+      # Scan level: Off, Default, Medium, High
+      scanOnlyInScope: true
+    rules:
+      # Disable specific passive scan rules (if needed)
+      # - id: 10015  # Re-examine Cache-control Directives
+      #   threshold: "off"
+
+  - type: spider
+    parameters:
+      # Spider configuration
+      maxDuration: 10  # minutes
+      maxDepth: 5
+      maxChildren: 10
+      acceptCookies: true
+      handleODataParametersVisited: false
+      parseComments: true
+      parseGit: false
+      parseSitemapXml: true
+      parseSVNEntries: false
+      postForm: true
+      processForm: true
+      requestWaitTime: 1000  # ms
+      sendRefererHeader: true
+      userAgent: "OWASP ZAP"
+    policyDefinition:
+      rules:
+        - id: 0  # Spider
+          threshold: "medium"
+
+  - type: activeScan
+    parameters:
+      # Active scan configuration
+      maxRuleDurationInMins: 10
+      maxScanDurationInMins: 30
+      delayInMs: 0
+      threadPerHost: 2
+      maxAlertsPerRule: 10
+    policyDefinition:
+      defaultStrength: "medium"
+      defaultThreshold: "medium"
+      rules:
+        # SQL Injection
+        - id: 40018
+          name: "SQL Injection"
+          threshold: "low"
+          strength: "high"
+
+        # Cross Site Scripting (Reflected)
+        - id: 40012
+          name: "Cross Site Scripting (Reflected)"
+          threshold: "low"
+          strength: "high"
+
+        # Cross Site Scripting (Persistent)
+        - id: 40014
+          name: "Cross Site Scripting (Persistent)"
+          threshold: "low"
+          strength: "high"
+
+        # Path Traversal
+        - id: 6
+          name: "Path Traversal"
+          threshold: "low"
+          strength: "high"
+
+        # Remote File Inclusion
+        - id: 7
+          name: "Remote File Inclusion"
+          threshold: "medium"
+          strength: "medium"
+
+        # CRLF Injection
+        - id: 40003
+          name: "CRLF Injection"
+          threshold: "medium"
+          strength: "medium"
+
+        # Command Injection
+        - id: 90020
+          name: "Remote OS Command Injection"
+          threshold: "low"
+          strength: "high"
+
+        # Buffer Overflow
+        - id: 30001
+          name: "Buffer Overflow"
+          threshold: "medium"
+          strength: "low"
+
+        # Format String Error
+        - id: 30002
+          name: "Format String Error"
+          threshold: "medium"
+          strength: "medium"
+
+        # External Redirect
+        - id: 20019
+          name: "External Redirect"
+          threshold: "medium"
+          strength: "medium"
+
+        # LDAP Injection
+        - id: 40015
+          name: "LDAP Injection"
+          threshold: "low"
+          strength: "high"
+
+        # XPath Injection
+        - id: 90021
+          name: "XPath Injection"
+          threshold: "medium"
+          strength: "medium"
+
+        # XML External Entity Attack
+        - id: 90023
+          name: "XML External Entity Attack"
+          threshold: "low"
+          strength: "high"
+
+        # Server Side Include
+        - id: 40009
+          name: "Server Side Include"
+          threshold: "medium"
+          strength: "medium"
+
+        # Server Side Template Injection
+        - id: 90035
+          name: "Server Side Template Injection"
+          threshold: "low"
+          strength: "high"
+
+  - type: report
+    parameters:
+      template: "traditional-html"
+      reportDir: "/zap/wrk"
+      reportFile: "zap-report.html"
+      reportTitle: "CatNet Security Scan Report"
+      reportDescription: "OWASP ZAP baseline security scan for CatNet API"
+    risks:
+      - "high"
+      - "medium"
+      - "low"
+      - "info"
+
+# Alert filters (suppress false positives)
+alertFilters:
+  # Suppress alerts for specific URLs
+  - ruleId: 10021  # X-Content-Type-Options header missing
+    url: "http://localhost:8000/metrics"
+    newRisk: "Info"
+    parameter: ""
+
+  - ruleId: 10020  # X-Frame-Options header not set
+    url: "http://localhost:8000/health"
+    newRisk: "Info"
+
+  # Suppress for specific parameters
+  - ruleId: 10015  # Re-examine Cache-control Directives
+    url: "http://localhost:8000/api/v1/.*"
+    parameter: ""
+    newRisk: "Info"
+
+# Authentication configuration
+authentication:
+  - name: "JWT Authentication"
+    type: "bearer"
+    method: "header"
+    parameters:
+      headerName: "Authorization"
+      prefix: "Bearer "
+    loginUrl: "http://localhost:8000/api/v1/auth/login"
+    loginRequestData: |
+      {
+        "username": "${ZAP_USERNAME}",
+        "password": "${ZAP_PASSWORD}"
+      }
+    loggedInRegex: "\\Q{\"access_token\":\\E"
+    loggedOutRegex: "\\Q{\"error\":\"UNAUTHORIZED\"\\E"
+
+# Global exclusions
+globalExclusions:
+  - name: "Logout endpoints"
+    regex: ".*/api/v1/auth/logout.*"
+  - name: "Delete operations"
+    regex: ".*/api/v1/.*/delete.*"
+  - name: "API documentation"
+    regex: ".*/api/(docs|redoc|openapi.json).*"
+
+# Custom rules for CatNet
+customRules:
+  - name: "Check for exposed /metrics endpoint"
+    description: "Verify /metrics endpoint requires authentication"
+    url: "http://localhost:8000/metrics"
+    expectedStatus: [401, 403]
+
+  - name: "Check for debug mode disabled"
+    description: "Verify debug information is not leaked"
+    url: "http://localhost:8000/api/v1/nonexistent"
+    notContains: ["Traceback", "DEBUG", "/src/", "Exception"]
+
+  - name: "Check CORS headers"
+    description: "Verify CORS is properly configured"
+    url: "http://localhost:8000/api/v1/devices"
+    headers:
+      Origin: "http://evil.com"
+    expectedHeaders:
+      Access-Control-Allow-Origin: "!http://evil.com"

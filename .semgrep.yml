@@ -1,0 +1,296 @@
+# Semgrep Configuration for CatNet
+# Static Application Security Testing (SAST)
+#
+# Run with: semgrep --config .semgrep.yml src/
+# Or in CI: semgrep ci
+
+rules:
+  # ===== Custom CatNet Security Rules =====
+
+  - id: hardcoded-secret
+    pattern-either:
+      - pattern: password = "..."
+      - pattern: api_key = "..."
+      - pattern: secret = "..."
+      - pattern: token = "..."
+      - pattern: AUTH_TOKEN = "..."
+    message: Possible hardcoded secret detected
+    languages: [python]
+    severity: ERROR
+    metadata:
+      category: security
+      cwe: "CWE-798: Use of Hard-coded Credentials"
+      owasp: "A02:2021 - Cryptographic Failures"
+
+  - id: sql-injection-raw-query
+    patterns:
+      - pattern: db.execute($QUERY)
+      - pattern-not: db.execute("...")
+      - metavariable-regex:
+          metavariable: $QUERY
+          regex: .*f".*|.*format\(.*|.*%.*
+    message: Possible SQL injection via string formatting
+    languages: [python]
+    severity: ERROR
+    metadata:
+      category: security
+      cwe: "CWE-89: SQL Injection"
+      owasp: "A03:2021 - Injection"
+
+  - id: command-injection
+    patterns:
+      - pattern-either:
+          - pattern: os.system($CMD)
+          - pattern: subprocess.call($CMD, shell=True)
+          - pattern: subprocess.run($CMD, shell=True)
+          - pattern: subprocess.Popen($CMD, shell=True)
+      - metavariable-regex:
+          metavariable: $CMD
+          regex: .*f".*|.*format\(.*|.*\+.*
+    message: Possible command injection via shell=True
+    languages: [python]
+    severity: ERROR
+    metadata:
+      category: security
+      cwe: "CWE-78: OS Command Injection"
+      owasp: "A03:2021 - Injection"
+
+  - id: weak-cryptography-md5
+    pattern-either:
+      - pattern: hashlib.md5(...)
+      - pattern: hashlib.sha1(...)
+    message: Weak cryptographic algorithm (MD5/SHA1) detected
+    languages: [python]
+    severity: WARNING
+    metadata:
+      category: security
+      cwe: "CWE-327: Use of a Broken or Risky Cryptographic Algorithm"
+      owasp: "A02:2021 - Cryptographic Failures"
+
+  - id: insecure-random
+    pattern: random.random()
+    message: Using insecure random for security purposes. Use secrets module instead.
+    languages: [python]
+    severity: WARNING
+    metadata:
+      category: security
+      cwe: "CWE-338: Use of Cryptographically Weak PRNG"
+
+  - id: debug-mode-enabled
+    patterns:
+      - pattern: DEBUG = True
+      - pattern-not-inside: |
+          if os.getenv("ENVIRONMENT") == "development":
+            ...
+    message: Debug mode should not be enabled in production
+    languages: [python]
+    severity: WARNING
+    metadata:
+      category: security
+      owasp: "A05:2021 - Security Misconfiguration"
+
+  - id: missing-authentication-check
+    patterns:
+      - pattern: |
+          @app.post(...)
+          async def $FUNC(...):
+            ...
+      - pattern-not: |
+          @app.post(..., dependencies=[Depends(get_current_user)])
+          async def $FUNC(...):
+            ...
+      - pattern-not: |
+          @app.post(...)
+          async def $FUNC(..., current_user: User = Depends(get_current_user)):
+            ...
+    message: API endpoint may be missing authentication check
+    languages: [python]
+    severity: WARNING
+    metadata:
+      category: security
+      owasp: "A01:2021 - Broken Access Control"
+
+  - id: eval-usage
+    pattern: eval(...)
+    message: Use of eval() is dangerous and should be avoided
+    languages: [python]
+    severity: ERROR
+    metadata:
+      category: security
+      cwe: "CWE-95: Improper Neutralization of Directives in Dynamically Evaluated Code"
+
+  - id: pickle-usage
+    pattern-either:
+      - pattern: pickle.loads(...)
+      - pattern: pickle.load(...)
+    message: Pickle can execute arbitrary code during deserialization
+    languages: [python]
+    severity: WARNING
+    metadata:
+      category: security
+      cwe: "CWE-502: Deserialization of Untrusted Data"
+
+  - id: yaml-unsafe-load
+    pattern: yaml.load($DATA, ...)
+    message: Use yaml.safe_load() instead of yaml.load()
+    languages: [python]
+    severity: ERROR
+    metadata:
+      category: security
+      cwe: "CWE-502: Deserialization of Untrusted Data"
+
+  - id: request-without-timeout
+    pattern-either:
+      - pattern: requests.get(..., timeout=None)
+      - pattern: requests.post(..., timeout=None)
+      - pattern: httpx.get(..., timeout=None)
+      - pattern: httpx.post(..., timeout=None)
+    message: HTTP request without timeout can hang indefinitely
+    languages: [python]
+    severity: WARNING
+    metadata:
+      category: security
+      cwe: "CWE-400: Uncontrolled Resource Consumption"
+
+  - id: exception-too-broad
+    pattern: |
+      try:
+        ...
+      except Exception:
+        pass
+    message: Catching broad Exception and ignoring it
+    languages: [python]
+    severity: WARNING
+    metadata:
+      category: security
+
+  - id: logging-sensitive-data
+    patterns:
+      - pattern-either:
+          - pattern: logger.$METHOD(..., password=...)
+          - pattern: logger.$METHOD(..., token=...)
+          - pattern: logger.$METHOD(..., secret=...)
+          - pattern: logger.$METHOD(..., api_key=...)
+      - metavariable-pattern:
+          metavariable: $METHOD
+          patterns:
+            - pattern-either:
+                - pattern: info
+                - pattern: debug
+                - pattern: warning
+                - pattern: error
+    message: Possible logging of sensitive data
+    languages: [python]
+    severity: ERROR
+    metadata:
+      category: security
+      owasp: "A09:2021 - Security Logging and Monitoring Failures"
+
+  - id: jwt-none-algorithm
+    patterns:
+      - pattern: jwt.decode(..., algorithms=["none"])
+      - pattern: jwt.decode(..., algorithms=[..., "none", ...])
+    message: JWT 'none' algorithm allows token forgery
+    languages: [python]
+    severity: ERROR
+    metadata:
+      category: security
+      cwe: "CWE-327"
+      owasp: "A02:2021 - Cryptographic Failures"
+
+  - id: mass-assignment
+    patterns:
+      - pattern: $MODEL(**request.dict())
+      - pattern-not: $MODEL(**request.dict(exclude={...}))
+    message: Possible mass assignment vulnerability. Use explicit field mapping.
+    languages: [python]
+    severity: WARNING
+    metadata:
+      category: security
+      owasp: "A01:2021 - Broken Access Control"
+
+  - id: path-traversal
+    patterns:
+      - pattern-either:
+          - pattern: open($PATH, ...)
+          - pattern: Path($PATH)
+      - metavariable-regex:
+          metavariable: $PATH
+          regex: .*\.\./.*|.*user.*|.*request.*
+    message: Possible path traversal vulnerability
+    languages: [python]
+    severity: ERROR
+    metadata:
+      category: security
+      cwe: "CWE-22: Path Traversal"
+
+  - id: ssrf-request
+    patterns:
+      - pattern: requests.$METHOD($URL, ...)
+      - metavariable-regex:
+          metavariable: $URL
+          regex: .*request.*|.*user.*|.*input.*
+    message: Possible SSRF via user-controlled URL
+    languages: [python]
+    severity: WARNING
+    metadata:
+      category: security
+      cwe: "CWE-918: SSRF"
+      owasp: "A10:2021 - SSRF"
+
+  - id: ldap-injection
+    patterns:
+      - pattern: $LDAP.search($FILTER, ...)
+      - metavariable-regex:
+          metavariable: $FILTER
+          regex: .*f".*|.*format\(.*|.*\+.*
+    message: Possible LDAP injection via string formatting
+    languages: [python]
+    severity: ERROR
+    metadata:
+      category: security
+      cwe: "CWE-90: LDAP Injection"
+      owasp: "A03:2021 - Injection"
+
+# Include community rulesets
+extends:
+  # OWASP Top 10
+  - p/owasp-top-ten
+
+  # Security best practices
+  - p/security-audit
+
+  # Python security
+  - p/python
+
+  # Bandit equivalent rules
+  - p/bandit
+
+  # CI/CD security
+  - p/ci
+
+  # Supply chain security
+  - p/supply-chain
+
+  # Django/Flask (if applicable)
+  - p/flask
+  - p/django
+
+# Paths to analyze
+paths:
+  include:
+    - src/
+    - tests/
+  exclude:
+    - tests/fixtures/
+    - "*.pyc"
+    - __pycache__/
+    - "*.egg-info/"
+    - ".venv/"
+    - "venv/"
+    - "node_modules/"
+
+# Output configuration
+output:
+  format: json
+  destination: semgrep-results.json

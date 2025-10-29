@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: catnet-api
+  namespace: catnet
+  labels:
+    app: catnet
+    component: api
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8000
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: catnet
+    component: api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: catnet-api-headless
+  namespace: catnet
+  labels:
+    app: catnet
+    component: api
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - port: 8000
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: catnet
+    component: api
