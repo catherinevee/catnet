@@ -84,7 +84,7 @@ services:
   catnet-main:
     build: .
     container_name: catnet-main
-    command: uvicorn src.api.app:app --host 0.0.0.0 --port 8000 --service main
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000
     environment:
       DATABASE_URL: postgresql+asyncpg://catnet:${DB_PASSWORD:-catnet_password}@postgres:5432/catnet
       REDIS_URL: redis://default:${REDIS_PASSWORD:-redis_password}@redis:6379/0
@@ -116,7 +116,7 @@ services:
   catnet-auth:
     build: .
     container_name: catnet-auth
-    command: uvicorn src.api.app:app --host 0.0.0.0 --port 8000 --service auth
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8081
     environment:
       DATABASE_URL: postgresql+asyncpg://catnet:${DB_PASSWORD:-catnet_password}@postgres:5432/catnet
       REDIS_URL: redis://default:${REDIS_PASSWORD:-redis_password}@redis:6379/0
@@ -144,7 +144,7 @@ services:
   catnet-gitops:
     build: .
     container_name: catnet-gitops
-    command: uvicorn src.api.app:app --host 0.0.0.0 --port 8000 --service gitops
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8082
     environment:
       DATABASE_URL: postgresql+asyncpg://catnet:${DB_PASSWORD:-catnet_password}@postgres:5432/catnet
       REDIS_URL: redis://default:${REDIS_PASSWORD:-redis_password}@redis:6379/0
@@ -173,7 +173,7 @@ services:
   catnet-deployment:
     build: .
     container_name: catnet-deployment
-    command: uvicorn src.api.app:app --host 0.0.0.0 --port 8000 --service deployment
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8083
     environment:
       DATABASE_URL: postgresql+asyncpg://catnet:${DB_PASSWORD:-catnet_password}@postgres:5432/catnet
       REDIS_URL: redis://default:${REDIS_PASSWORD:-redis_password}@redis:6379/0
@@ -203,7 +203,7 @@ services:
   catnet-device:
     build: .
     container_name: catnet-device
-    command: uvicorn src.api.app:app --host 0.0.0.0 --port 8000 --service device
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8084
     environment:
       DATABASE_URL: postgresql+asyncpg://catnet:${DB_PASSWORD:-catnet_password}@postgres:5432/catnet
       REDIS_URL: redis://default:${REDIS_PASSWORD:-redis_password}@redis:6379/0

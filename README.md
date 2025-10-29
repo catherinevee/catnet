@@ -295,8 +295,8 @@ bandit -r src/
 catnet/
 ├── alembic/           # Database migrations (Alembic)
 ├── src/
-│   ├── api/           # FastAPI application
-│   │   ├── app.py     # Main application entry point
+│   ├── main.py        # Main application entry point
+│   ├── api/           # FastAPI routes and middleware
 │   │   ├── routes/    # API route definitions
 │   │   └── middleware/ # Custom middleware
 │   ├── auth/          # Authentication service

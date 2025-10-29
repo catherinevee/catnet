@@ -83,13 +83,13 @@ quality: lint type-check security-scan ## Run all code quality checks
 
 # Development targets
 run: ## Run the application (production mode)
-	uvicorn src.api.main:app --host 0.0.0.0 --port 8080
+	uvicorn src.main:app --host 0.0.0.0 --port 8000
 
 run-dev: ## Run the application (development mode)
-	uvicorn src.api.main:app --host 0.0.0.0 --port 8080 --reload
+	uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
 
 run-debug: ## Run the application with debugging
-	python -m debugpy --listen 5678 --wait-for-client -m uvicorn src.api.main:app --host 0.0.0.0 --port 8080 --reload
+	python -m debugpy --listen 5678 --wait-for-client -m uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
 
 # Docker targets
 docker-build: ## Build Docker image
@@ -156,13 +156,13 @@ restore: ## Restore from backup (usage: make restore BACKUP=backup_name)
 
 # Monitoring and maintenance
 health-check: ## Check system health
-	curl -f http://localhost:8080/health || exit 1
+	curl -f http://localhost:8000/health || exit 1
 
 logs: ## View application logs
 	tail -f logs/catnet.log
 
 metrics: ## View metrics endpoint
-	curl http://localhost:8080/metrics
+	curl http://localhost:8000/metrics
 
 # Development workflow targets
 dev-setup: install-dev db-migrate db-seed ## Setup development environment
@@ -212,7 +212,7 @@ k8s-port-forward: ## Port forward to Kubernetes service
 
 # Performance and load testing
 load-test: ## Run load tests
-	locust -f tests/performance/locustfile.py --host=http://localhost:8080
+	locust -f tests/performance/locustfile.py --host=http://localhost:8000
 
 stress-test: ## Run stress tests
 	python tests/test_runner.py performance

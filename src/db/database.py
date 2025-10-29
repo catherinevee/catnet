@@ -24,22 +24,39 @@ class Database:
             return
 
         try:
-            # Create async engine with connection pooling
+            # Create async engine with optimized connection pooling
+            # Pool configuration:
+            # - pool_size: Core pool of persistent connections (50)
+            # - max_overflow: Additional connections when pool is full (100)
+            # - pool_pre_ping: Verify connections before use
+            # - pool_recycle: Recycle connections after 1 hour to prevent stale connections
+            # - pool_timeout: Wait up to 30s for available connection
             self.engine = create_async_engine(
                 settings.database_url,
                 echo=settings.is_development,
                 pool_pre_ping=True,
-                pool_size=20,
-                max_overflow=40,
+                pool_size=50,  # Increased from 20
+                max_overflow=100,  # Increased from 40
                 pool_recycle=3600,
                 pool_timeout=30,
+                # Connection arguments for PostgreSQL
                 connect_args={
                     "server_settings": {
                         "application_name": "catnet",
-                        "jit": "off"
+                        "jit": "off",  # Disable JIT for consistent performance
+                        "statement_timeout": "60000",  # 60s query timeout
+                        "idle_in_transaction_session_timeout": "300000"  # 5m idle timeout
                     },
                     "command_timeout": 60,
-                    "ssl": "require" if settings.is_production else "prefer"
+                    "ssl": "require" if settings.is_production else "prefer",
+                    "prepared_statement_cache_size": 500,  # Cache prepared statements
+                    "prepared_statement_name_func": lambda: f"__asyncpg_{id(object())}__"
+                },
+                # Enable connection pooling optimizations
+                execution_options={
+                    "isolation_level": "READ COMMITTED",
+                    "postgresql_readonly": False,
+                    "postgresql_deferrable": False
                 }
             )
 

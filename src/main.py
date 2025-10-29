@@ -8,6 +8,8 @@ import os
 from pathlib import Path
 from contextlib import asynccontextmanager
 from typing import Any, Dict
+import time
+import asyncio
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -20,6 +22,7 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from prometheus_fastapi_instrumentator import Instrumentator
+from prometheus_client import Counter, Histogram, Gauge
 import structlog
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
@@ -36,7 +39,19 @@ from src.api import (
     health_router,
     admin_router
 )
+from src.api.routes import discovery_endpoints, monitoring_endpoints
+from src.cache.redis_cache import redis_cache
+from src.api.middleware.cache_middleware import (
+    CacheMiddleware,
+    CacheInvalidationMiddleware,
+    ConditionalCacheMiddleware
+)
+from src.monitoring.health_monitor import health_monitor, sla_monitor
 from src.security.audit import AuditLogger
+from src.api.routes import security_audit_endpoints
+from src.security.security_scanner import security_scanner
+from src.auth.mfa import mfa_manager
+from src.auth.api_key_manager import api_key_manager
 from src.middleware import (
     SecurityMiddleware,
     RequestLoggingMiddleware,
@@ -68,6 +83,85 @@ logger = structlog.get_logger(__name__)
 
 # Initialize rate limiter
 limiter = Limiter(key_func=get_remote_address)
+# Custom Prometheus metrics
+custom_request_count = Counter(
+    'catnet_requests_total',
+    'Total requests by method, endpoint, and status',
+    ['method', 'endpoint', 'status']
+)
+
+custom_request_duration = Histogram(
+    'catnet_request_duration_seconds',
+    'Request duration in seconds',
+    ['method', 'endpoint']
+)
+
+active_device_connections = Gauge(
+    'catnet_active_device_connections',
+    'Number of active device connections'
+)
+
+deployment_total = Counter(
+    'catnet_deployments_total',
+    'Total deployments by status and strategy',
+    ['status', 'strategy']
+)
+
+# Week 5: Security metrics
+security_scan_total = Counter(
+    'catnet_security_scans_total',
+    'Total security scans by type and status',
+    ['scan_type', 'status']
+)
+
+vulnerability_count = Gauge(
+    'catnet_vulnerabilities_total',
+    'Current number of vulnerabilities by severity',
+    ['severity']
+)
+
+security_incidents_total = Counter(
+    'catnet_security_incidents_total',
+    'Total security incidents by type and severity',
+    ['incident_type', 'severity']
+)
+
+mfa_verification_total = Counter(
+    'catnet_mfa_verifications_total',
+    'Total MFA verification attempts by result',
+    ['result']
+)
+
+
+async def device_session_cleanup():
+    """Background task to clean up stale device sessions"""
+    while True:
+        try:
+            from src.devices.secure_connector import secure_device_connector
+            await secure_device_connector.cleanup_stale_sessions()
+            logger.debug("Device session cleanup completed")
+        except Exception as e:
+            logger.error("Device session cleanup error", error=str(e))
+
+        # Run every 5 minutes
+        await asyncio.sleep(300)
+
+
+async def collect_metrics():
+    """Background task to collect system metrics"""
+    while True:
+        try:
+            # Update active connections metric
+            from src.devices.secure_connector import secure_device_connector
+            sessions = await secure_device_connector.get_active_sessions()
+            active_device_connections.set(len(sessions))
+            logger.debug("Metrics collected", active_sessions=len(sessions))
+        except Exception as e:
+            logger.error("Metric collection error", error=str(e))
+
+        # Collect every 30 seconds
+        await asyncio.sleep(30)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -107,6 +201,57 @@ async def lifespan(app: FastAPI):
             }
         )
 
+        # Start background tasks
+        app.state.background_tasks = []
+
+        # Device session cleanup task
+        try:
+            cleanup_task = asyncio.create_task(device_session_cleanup())
+            app.state.background_tasks.append(cleanup_task)
+            logger.info("Background task started: device_session_cleanup")
+        except Exception as e:
+            logger.warning("Failed to start device cleanup task", error=str(e))
+
+        # Metric collection task
+        try:
+            metric_task = asyncio.create_task(collect_metrics())
+            app.state.background_tasks.append(metric_task)
+            logger.info("Background task started: collect_metrics")
+        except Exception as e:
+            logger.warning("Failed to start metric collection task", error=str(e))
+
+        # Week 4: Initialize Redis cache
+        try:
+            await redis_cache.connect()
+            logger.info("Redis cache connected")
+        except Exception as e:
+            logger.warning("Failed to connect to Redis cache", error=str(e))
+
+        # Week 4: Start health monitoring
+        try:
+            health_monitor_task = asyncio.create_task(health_monitor.start_monitoring())
+            app.state.background_tasks.append(health_monitor_task)
+            logger.info("Background task started: health_monitor")
+        except Exception as e:
+            logger.warning("Failed to start health monitor", error=str(e))
+
+        # Week 4: Start SLA monitoring (every 5 minutes)
+        async def sla_monitoring_loop():
+            while True:
+                try:
+                    await sla_monitor.evaluate_slas()
+                    logger.debug("SLA evaluation completed")
+                except Exception as e:
+                    logger.error("SLA monitoring error", error=str(e))
+                await asyncio.sleep(300)
+
+        try:
+            sla_monitor_task = asyncio.create_task(sla_monitoring_loop())
+            app.state.background_tasks.append(sla_monitor_task)
+            logger.info("Background task started: sla_monitor")
+        except Exception as e:
+            logger.warning("Failed to start SLA monitor", error=str(e))
+
         yield
 
     except Exception as e:
@@ -117,9 +262,34 @@ async def lifespan(app: FastAPI):
         # Shutdown
         logger.info("Shutting down CatNet application")
 
+        # Cancel background tasks
+        if hasattr(app.state, 'background_tasks'):
+            logger.info("Cancelling background tasks")
+            for task in app.state.background_tasks:
+                task.cancel()
+                try:
+                    await task
+                except asyncio.CancelledError:
+                    pass
+            logger.info("Background tasks cancelled")
+
         # Close database connections
         if db_manager:
             await db_manager.close()
+
+        # Week 4: Stop health monitoring
+        try:
+            await health_monitor.stop_monitoring()
+            logger.info("Health monitor stopped")
+        except Exception as e:
+            logger.warning("Error stopping health monitor", error=str(e))
+
+        # Week 4: Disconnect Redis cache
+        try:
+            await redis_cache.disconnect()
+            logger.info("Redis cache disconnected")
+        except Exception as e:
+            logger.warning("Error disconnecting Redis cache", error=str(e))
 
         logger.info("CatNet shutdown complete")
 
@@ -242,6 +412,39 @@ app.add_middleware(
 # Gzip compression
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
+# Custom metrics middleware
+@app.middleware("http")
+async def custom_metrics_middleware(request: Request, call_next):
+    """Collect custom Prometheus metrics"""
+    start_time = time.time()
+
+    try:
+        response = await call_next(request)
+        duration = time.time() - start_time
+
+        # Update metrics
+        custom_request_count.labels(
+            method=request.method,
+            endpoint=request.url.path,
+            status=response.status_code
+        ).inc()
+
+        custom_request_duration.labels(
+            method=request.method,
+            endpoint=request.url.path
+        ).observe(duration)
+
+        return response
+
+    except Exception as e:
+        # Update error metrics
+        custom_request_count.labels(
+            method=request.method,
+            endpoint=request.url.path,
+            status=500
+        ).inc()
+        raise
+
 # Prometheus metrics
 if settings.metrics_enabled:
     instrumentator = Instrumentator()
@@ -283,6 +486,28 @@ app.include_router(
     prefix="/api/v1/admin",
     tags=["Admin"]
 )
+
+# Week 4: Discovery and monitoring routers
+app.include_router(
+    discovery_endpoints.router,
+    tags=["Discovery"]
+)
+
+app.include_router(
+    monitoring_endpoints.router,
+    tags=["Monitoring"]
+)
+
+# Week 5: Security audit router
+app.include_router(
+    security_audit_endpoints.router,
+    tags=["Security"]
+)
+
+# Week 4: Add cache middleware
+app.add_middleware(CacheMiddleware, default_ttl=300)
+app.add_middleware(CacheInvalidationMiddleware)
+app.add_middleware(ConditionalCacheMiddleware)
 
 # Root endpoint
 @app.get("/", include_in_schema=False)
