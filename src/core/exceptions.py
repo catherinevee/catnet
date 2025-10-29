@@ -208,7 +208,7 @@ class CertificateError(SecurityError):
 
 class SecretScanError(SecurityError):
     """Secrets detected in configuration"""
-    def __init__(self, message: str = "Secrets detected in configuration", locations: Optional[list] = None):
+    def __init__(self, message: str = "Secrets detected in configuration", locations: Optional[List[str]] = None):
         details = {}
         if locations:
             details["locations"] = locations
@@ -347,8 +347,8 @@ class SecretExposedError(SecurityError):
         self,
         repository: str,
         commit_hash: str,
-        secrets_found: list,
-        affected_files: list
+        secrets_found: List[str],
+        affected_files: List[str]
     ):
         message = (
             f"SECURITY ALERT: {len(secrets_found)} secret(s) detected in commit {commit_hash}. "
